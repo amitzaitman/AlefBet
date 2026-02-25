@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlefBet Creator — יצירת משחקים חינוכיים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles/creator.css">
+</head>
+<body>
+  <!-- API Key Modal -->
+  <div id="api-key-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__backdrop"></div>
+    <div class="modal__box">
+      <h2 id="modal-title" class="modal__title">ברוכים הבאים ל-AlefBet Creator</h2>
+      <p class="modal__desc">כדי להתחיל, הזן את מפתח ה-API של Anthropic שלך</p>
+      <input
+        id="api-key-input"
+        type="password"
+        class="modal__input"
+        placeholder="sk-ant-..."
+        autocomplete="off"
+        spellcheck="false"
+        dir="ltr"
+      />
+      <p class="modal__note">המפתח נשמר רק בדפדפן שלך ולא נשלח לשום שרת</p>
+      <button id="api-key-submit" class="modal__btn">התחל ליצור</button>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="app" hidden>
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-header__logo">
+        <span class="app-header__alef">א</span>
+        <span class="app-header__name">AlefBet Creator</span>
+      </div>
+      <div class="app-header__actions">
+        <button id="save-game-btn" class="btn btn--sm btn--success" hidden>
+          שמור משחק
+        </button>
+        <button id="change-key-btn" class="btn btn--sm btn--ghost">
+          שנה מפתח API
+        </button>
+      </div>
+    </header>
+
+    <!-- Body: chat | preview -->
+    <div class="app-body">
+      <!-- Chat Panel (RTL, right side) -->
+      <aside class="chat-panel">
+        <div class="quick-actions">
+          <p class="quick-actions__label">התחל עם:</p>
+          <div class="quick-actions__buttons">
+            <button class="quick-btn" data-prompt="צור משחק התאמת אותיות עם חיות לילדים">התאמת אותיות</button>
+            <button class="quick-btn" data-prompt="צור משחק עקיבה על אותיות עבריות">עקיבה על אותיות</button>
+            <button class="quick-btn" data-prompt="צור משחק ניחוש מילים לפי תמונה">ניחוש מילים</button>
+            <button class="quick-btn" data-prompt="צור משחק זיכרון עם זוגות של אות ותמונה">משחק זיכרון</button>
+          </div>
+        </div>
+
+        <div id="chat-messages" class="chat-messages" aria-live="polite" aria-label="שיחה">
+          <div class="chat-welcome">
+            <p>שלום! אני כאן לעזור לך ליצור משחקים חינוכיים בעברית לילדים.</p>
+            <p>תאר לי את המשחק שאתה רוצה ואני אייצר אותו עבורך.</p>
+          </div>
+        </div>
+
+        <form id="chat-form" class="chat-input-area">
+          <textarea
+            id="chat-input"
+            class="chat-input"
+            placeholder="תאר את המשחק שאתה רוצה..."
+            rows="3"
+            dir="rtl"
+          ></textarea>
+          <button type="submit" id="chat-send-btn" class="chat-send-btn" aria-label="שלח">
+            <span class="chat-send-btn__icon">←</span>
+          </button>
+        </form>
+      </aside>
+
+      <!-- Preview Panel (left side) -->
+      <main class="preview-panel">
+        <div class="preview-tabs">
+          <button class="preview-tab preview-tab--active" data-tab="preview">תצוגה מקדימה</button>
+          <button class="preview-tab" data-tab="code">קוד</button>
+        </div>
+
+        <div id="preview-pane" class="preview-pane">
+          <div class="preview-empty">
+            <div class="preview-empty__icon">🎮</div>
+            <p class="preview-empty__text">המשחק יופיע כאן לאחר שתיצור אחד</p>
+          </div>
+        </div>
+
+        <div id="code-pane" class="code-pane" hidden>
+          <div class="code-toolbar">
+            <button id="copy-code-btn" class="btn btn--sm btn--ghost">העתק</button>
+          </div>
+          <pre id="code-output" class="code-output" dir="ltr"><code></code></pre>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

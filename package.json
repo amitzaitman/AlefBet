@@ -1,0 +1,14 @@
+{
+  "name": "alefbet",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "framework",
+    "creator"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=framework",
+    "dev:creator": "npm run dev --workspace=creator",
+    "dev:framework": "npm run dev --workspace=framework"
+  }
+}
