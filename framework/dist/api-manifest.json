@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-25T23:04:00.369Z",
+  "generatedAt": "2026-02-25T23:10:55.768Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -59,7 +59,7 @@
     },
     {
       "path": "input/drag.js",
-      "description": "גרירה ושחרור (Drag & Drop)\nתומך בעכבר, מגע ועט — מבוסס PointerEvents\nתומך גם בבחירה בהקשה + שחרור בהקשה (למגע קל יותר)\n[נוסף על ידי: nikud-match game]\n\nשימוש:\n  const src = createDragSource(el, { id: 'foo' }, onDragStart?);\n  const tgt = createDropTarget(el, ({ data, sourceEl }) => { ... });\n  src.destroy(); tgt.destroy();",
+      "description": "גרירה ושחרור (Drag & Drop)\nתומך בעכבר, מגע ועט — מבוסס PointerEvents\n[נוסף על ידי: nikud-match game]\n\nשימוש:\n  const src = createDragSource(el, { id: 'foo' });\n  const tgt = createDropTarget(el, ({ data, sourceEl }) => { ... });\n  src.destroy(); tgt.destroy();",
       "exports": [
         "createDragSource",
         "createDropTarget"
