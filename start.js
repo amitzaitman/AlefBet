@@ -17,7 +17,7 @@ import { dirname } from 'path';
 import { exec } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PORT = parseInt(process.argv[2] ?? '8080', 10);
+let PORT = parseInt(process.argv[2] ?? '8080', 10);
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -80,43 +80,47 @@ const server = createServer((req, res) => {
   }
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  const url = `http://localhost:${PORT}`;
-
-  console.log('');
-  console.log('  ╔══════════════════════════════════════╗');
-  console.log('  ║   AlefBet — Hebrew Educational Games ║');
-  console.log('  ╠══════════════════════════════════════╣');
-  console.log(`  ║   Open:  ${url.padEnd(30)}║`);
-  console.log('  ║   Stop:  Ctrl + C                    ║');
-  console.log('  ╚══════════════════════════════════════╝');
-  console.log('');
-
-  // Auto-open browser
-  let openCmd;
-  if (process.platform === 'win32') {
-    openCmd = `start "" "${url}"`;
-  } else if (process.platform === 'darwin') {
-    openCmd = `open "${url}"`;
-  } else {
-    // WSL / Linux — try Windows browser via explorer.exe
-    openCmd = `explorer.exe "${url}" 2>/dev/null || xdg-open "${url}" 2>/dev/null || true`;
-  }
-
-  exec(openCmd, err => {
-    if (err) {
-      console.log(`  Could not open browser automatically.`);
-      console.log(`  Please open ${url} manually.\n`);
+function listen(port) {
+  server.once('error', err => {
+    if (err.code === 'EADDRINUSE') {
+      listen(port + 1);
+    } else {
+      console.error('\n  Server error:', err.message, '\n');
+      process.exit(1);
     }
   });
-});
 
-server.on('error', err => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`\n  Port ${PORT} is already in use.`);
-    console.error(`  Try:  node start.js ${PORT + 1}\n`);
-  } else {
-    console.error('\n  Server error:', err.message, '\n');
-  }
-  process.exit(1);
-});
+  server.listen(port, '127.0.0.1', () => {
+    PORT = port;
+    const url = `http://localhost:${port}`;
+
+    console.log('');
+    console.log('  ╔══════════════════════════════════════╗');
+    console.log('  ║   AlefBet — Hebrew Educational Games ║');
+    console.log('  ╠══════════════════════════════════════╣');
+    console.log(`  ║   Open:  ${url.padEnd(30)}║`);
+    console.log('  ║   Stop:  Ctrl + C                    ║');
+    console.log('  ╚══════════════════════════════════════╝');
+    console.log('');
+
+    // Auto-open browser
+    let openCmd;
+    if (process.platform === 'win32') {
+      openCmd = `start "" "${url}"`;
+    } else if (process.platform === 'darwin') {
+      openCmd = `open "${url}"`;
+    } else {
+      // WSL / Linux — try Windows browser via explorer.exe
+      openCmd = `explorer.exe "${url}" 2>/dev/null || xdg-open "${url}" 2>/dev/null || true`;
+    }
+
+    exec(openCmd, err => {
+      if (err) {
+        console.log(`  Could not open browser automatically.`);
+        console.log(`  Please open ${url} manually.\n`);
+      }
+    });
+  });
+}
+
+listen(PORT);
