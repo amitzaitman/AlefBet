@@ -11,6 +11,8 @@ import {
   createProgressBar,
   createFeedback,
   showCompletionScreen,
+  preloadNikud,
+  getNikud,
 } from '../../framework/dist/alefbet.js';
 
 // ── Game data ─────────────────────────────────────────────────────────────
@@ -36,21 +38,42 @@ const DISTRACTORS = [
   { text: 'תפוח', emoji: '🍎' },
 ];
 
+// ── All texts that need nikud ──────────────────────────────────────────────
+
+const STATIC_TEXTS = [
+  'מצא את החיה שמתחילה באות:',
+  'ברוכים הבאים! מצא את החיה שמתחילה באות',
+  'כל הכבוד',
+  'נסה שוב',
+  'האות',
+  ...ROUNDS.map(r => r.correct),
+  ...DISTRACTORS.map(d => d.text),
+];
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
 function buildOptions(round) {
-  const correct     = { id: 'correct', text: round.correct, emoji: round.correctEmoji };
+  const correct = { id: 'correct', text: getNikud(round.correct), emoji: round.correctEmoji };
   const distractors = shuffle(DISTRACTORS).slice(0, 3)
-    .map((d, i) => ({ id: `wrong-${i}`, text: d.text, emoji: d.emoji }));
+    .map((d, i) => ({ id: `wrong-${i}`, text: getNikud(d.text), emoji: d.emoji }));
   return shuffle([correct, ...distractors]);
 }
 
 // ── Game ──────────────────────────────────────────────────────────────────
 
-export function startGame(container) {
+export async function startGame(container) {
+  // Show loading indicator while nikud loads
+  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוען ניקוד...</div>';
+
+  await preloadNikud(STATIC_TEXTS);
+
+  container.innerHTML = '';
+
   const shell = new GameShell(container, {
     totalRounds: ROUNDS.length,
-    title: 'התאמת אותיות',
+    title: getNikud('התאמת אותיות') || 'התאמת אותיות',
   });
 
   let progressBar = null;
@@ -67,13 +90,14 @@ export function startGame(container) {
 
     const instruction = document.createElement('p');
     instruction.className = 'game-instruction';
-    instruction.textContent = 'מצא את החיה שמתחילה באות:';
+    instruction.textContent = getNikud('מצא את החיה שמתחילה באות:');
     leftPanel.appendChild(instruction);
 
+    const letterInfo = getLetter(roundData.target);
     const letterEl = document.createElement('div');
     letterEl.className = 'letter-display';
     letterEl.textContent = roundData.target;
-    letterEl.setAttribute('aria-label', `האות ${getLetter(roundData.target)?.name || roundData.target}`);
+    letterEl.setAttribute('aria-label', `האות ${letterInfo?.nameNikud || letterInfo?.name || roundData.target}`);
     leftPanel.appendChild(letterEl);
 
     shell.bodyEl.appendChild(leftPanel);
@@ -90,17 +114,19 @@ export function startGame(container) {
     feedback = createFeedback(feedbackContainer);
 
     const options = buildOptions(roundData);
-    cards = createOptionCards(optionsContainer, options, option => onSelect(option, roundData));
+    cards = createOptionCards(optionsContainer, options,
+      option => onSelect(option, roundData, rightPanel));
 
     shell.bodyEl.appendChild(rightPanel);
   }
 
-  function onSelect(option, roundData) {
+  function onSelect(option, roundData, rightPanelEl) {
     cards.disable();
+    const letterName = getLetter(roundData.target)?.nameNikud || roundData.target;
 
     if (option.id === 'correct') {
       cards.highlight('correct', 'correct');
-      feedback.correct(`!נכון — ${roundData.correct} ${roundData.correctEmoji}`);
+      feedback.correct(`!נכון — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
       tts.speak('כל הכבוד');
 
       setTimeout(() => {
@@ -110,31 +136,28 @@ export function startGame(container) {
         if (hasMore) {
           currentRoundIndex++;
           buildRoundUI(ROUNDS[currentRoundIndex]);
-          const name = getLetter(ROUNDS[currentRoundIndex].target)?.name || ROUNDS[currentRoundIndex].target;
-          tts.speak(`האות ${name}`);
+          const nextName = getLetter(ROUNDS[currentRoundIndex].target)?.nameNikud || ROUNDS[currentRoundIndex].target;
+          tts.speak(`האות ${nextName}`);
         } else {
           showCompletionScreen(container, shell.state.score, ROUNDS.length, () => startGame(container));
         }
       }, 1600);
+
     } else {
       cards.highlight(option.id, 'wrong');
-      feedback.wrong(`נסה שוב! חפש את ה-${roundData.target}`);
+      feedback.wrong(`!נסה שוב — חפש את ${letterName}`);
       tts.speak('נסה שוב');
+
       setTimeout(() => {
         cards.reset();
-        const optionsContainer = rightPanel().querySelector('.option-cards-grid')?.parentElement;
-        if (optionsContainer) {
-          optionsContainer.innerHTML = '';
-          const opts = buildOptions(roundData);
-          cards = createOptionCards(optionsContainer, opts, o => onSelect(o, roundData));
+        const optionsEl = rightPanelEl?.querySelector('.option-cards-grid')?.parentElement;
+        if (optionsEl) {
+          optionsEl.innerHTML = '';
+          cards = createOptionCards(optionsEl, buildOptions(roundData),
+            o => onSelect(o, roundData, rightPanelEl));
         }
       }, 1200);
     }
-  }
-
-  // Helper to re-find right panel after rebuild
-  function rightPanel() {
-    return shell.bodyEl.querySelector('.round-panel--options');
   }
 
   // ── Lifecycle ──────────────────────────────────────────────────────────
@@ -147,8 +170,8 @@ export function startGame(container) {
     currentRoundIndex = 0;
     buildRoundUI(ROUNDS[currentRoundIndex]);
 
-    const name = getLetter(ROUNDS[0].target)?.name || ROUNDS[0].target;
-    tts.speak(`ברוכים הבאים! מצא את החיה שמתחילה באות ${name}`);
+    const firstName = getLetter(ROUNDS[0].target)?.nameNikud || ROUNDS[0].target;
+    tts.speak(`ברוכים הבאים! מצא את החיה שמתחילה באות ${firstName}`);
   });
 
   shell.start();

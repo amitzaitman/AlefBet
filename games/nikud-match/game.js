@@ -16,69 +16,81 @@ import {
   sounds,
   createDragSource,
   createDropTarget,
+  preloadNikud,
+  getNikud,
 } from '../../framework/dist/alefbet.js';
+
+// ── Texts to preload ──────────────────────────────────────────────────────
+
+const STATIC_TEXTS = [
+  'גרור לאות עם אותו ניקוד:',
+  'גרור אותי',
+  'ברוכים הבאים למשחק הניקוד',
+  'כל הכבוד',
+  'נסה שוב',
+  'מצא את',
+  ...nikudList.map(n => n.name),
+];
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
-/** Build 4 options: one correct nikud + 3 random distractors, each on a different letter */
 function buildRound(targetNikud) {
-  // Pick 4 different base letters
-  const letters = shuffle(nikudBaseLetters).slice(0, 4);
-
-  // Pick 3 distractors (different from target)
+  const letters     = shuffle(nikudBaseLetters).slice(0, 4);
   const distractors = shuffle(nikudList.filter(n => n.id !== targetNikud.id)).slice(0, 3);
-
-  // Assign nikud to letters: one correct, three distractor
   const correctIndex = Math.floor(Math.random() * 4);
-  const nikudAssigned = distractors.slice();
-  nikudAssigned.splice(correctIndex, 0, targetNikud);
+  const assigned = [...distractors];
+  assigned.splice(correctIndex, 0, targetNikud);
 
   return letters.map((letter, i) => ({
     letter,
-    nikud: nikudAssigned[i],
+    nikud: assigned[i],
     isCorrect: i === correctIndex,
-    display: letterWithNikud(letter, nikudAssigned[i].symbol),
+    display: letterWithNikud(letter, assigned[i].symbol),
   }));
 }
 
 // ── Game ──────────────────────────────────────────────────────────────────
 
-export function startGame(container) {
-  // Pick 8 random nikud marks for the rounds (shuffle, take 8, loop if needed)
+export async function startGame(container) {
+  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיקּוּד...</div>';
+
+  await preloadNikud(STATIC_TEXTS);
+
+  container.innerHTML = '';
+
   const roundNikud = shuffle([...nikudList, ...nikudList]).slice(0, 8);
 
   const shell = new GameShell(container, {
     totalRounds: 8,
-    title: 'לימוד ניקוד',
+    title: 'לִמּוּד נִיקּוּד',
   });
 
-  let progressBar    = null;
-  let feedback       = null;
-  let dragSource     = null;
-  let dropTargets    = [];
-  let roundIndex     = 0;
-  let answered       = false;
+  let progressBar = null;
+  let feedback    = null;
+  let dragSource  = null;
+  let dropTargets = [];
+  let roundIndex  = 0;
+  let answered    = false;
 
   function buildRoundUI(targetNikud) {
     answered = false;
     shell.bodyEl.innerHTML = '';
 
-    // Clean up previous drag/drop handlers
     dragSource?.destroy();
     dropTargets.forEach(d => d.destroy());
     dropTargets = [];
 
     const options = buildRound(targetNikud);
 
-    // ── Left panel: draggable nikud ──
+    // ── Left panel: draggable nikud card ──
     const leftPanel = document.createElement('div');
     leftPanel.className = 'nikud-panel nikud-panel--source';
 
     const instruction = document.createElement('p');
     instruction.className = 'game-instruction';
-    instruction.textContent = 'גרור לאות עם אותו ניקוד:';
+    instruction.textContent = getNikud('גרור לאות עם אותו ניקוד:');
     leftPanel.appendChild(instruction);
 
     const dragCard = document.createElement('div');
@@ -86,8 +98,8 @@ export function startGame(container) {
     dragCard.style.setProperty('--nikud-color', targetNikud.color);
     dragCard.innerHTML = `
       <div class="nikud-drag-card__symbol">${letterWithNikud('א', targetNikud.symbol)}</div>
-      <div class="nikud-drag-card__name">${targetNikud.name}</div>
-      <div class="nikud-drag-card__hint">גרור אותי 👆</div>
+      <div class="nikud-drag-card__name">${targetNikud.nameNikud}</div>
+      <div class="nikud-drag-card__hint">${getNikud('גרור אותי')} 👆</div>
     `;
     leftPanel.appendChild(dragCard);
     shell.bodyEl.appendChild(leftPanel);
@@ -102,13 +114,12 @@ export function startGame(container) {
     options.forEach(opt => {
       const card = document.createElement('div');
       card.className = 'nikud-letter-card';
+      card.setAttribute('aria-label', `${opt.letter} עם ${opt.nikud.nameNikud}`);
       card.innerHTML = `<span class="nikud-letter-card__text">${opt.display}</span>`;
-      card.setAttribute('aria-label', `${opt.letter} עם ${opt.nikud.name}`);
 
       const dt = createDropTarget(card, () => onDrop(opt, targetNikud, dragCard, card));
       dropTargets.push(dt);
 
-      // Also support click-to-place (for touch)
       card.addEventListener('click', () => {
         if (answered) return;
         onDrop(opt, targetNikud, dragCard, card);
@@ -125,36 +136,33 @@ export function startGame(container) {
 
     shell.bodyEl.appendChild(rightPanel);
 
-    // Set up drag source
     dragSource = createDragSource(dragCard, { nikudId: targetNikud.id });
 
-    // Speak the nikud name on round start
-    tts.speak(`מצא את ${targetNikud.name}`);
+    // Speak the nikud name using nikud'd pronunciation
+    tts.speak(`${getNikud('מצא את')} ${targetNikud.nameNikud}`);
   }
 
   function onDrop(option, targetNikud, dragCard, dropCard) {
     if (answered) return;
     answered = true;
 
-    // Clean up drag
     dragSource?.destroy();
     dragSource = null;
     dropTargets.forEach(d => d.destroy());
     dropTargets = [];
 
     if (option.isCorrect) {
-      // Correct!
       dropCard.classList.add('nikud-letter-card--correct');
       dragCard.classList.add('nikud-drag-card--correct');
       animate(dropCard, 'bounce');
       sounds.correct();
-      tts.speak(`!כל הכבוד — ${targetNikud.name} — ${option.display}`);
+      tts.speak(`${getNikud('כל הכבוד')}! ${targetNikud.nameNikud} — ${option.display}`);
 
       setTimeout(() => {
         shell.state.addScore(1);
         progressBar?.update(shell.state.currentRound);
-        const hasMore = shell.state.nextRound();
         roundIndex++;
+        const hasMore = shell.state.nextRound();
         if (hasMore && roundIndex < roundNikud.length) {
           buildRoundUI(roundNikud[roundIndex]);
         } else {
@@ -163,26 +171,22 @@ export function startGame(container) {
       }, 1800);
 
     } else {
-      // Wrong
       dropCard.classList.add('nikud-letter-card--wrong');
       animate(dropCard, 'shake');
       sounds.wrong();
-      tts.speak('נסה שוב');
+      tts.speak(getNikud('נסה שוב'));
 
       setTimeout(() => {
         dropCard.classList.remove('nikud-letter-card--wrong');
         answered = false;
-        // Re-attach drag source and drop targets
+
+        // Re-attach drag/drop
         dragSource = createDragSource(dragCard, { nikudId: targetNikud.id });
         const allCards = shell.bodyEl.querySelectorAll('.nikud-letter-card');
-        const options = buildRound(targetNikud); // rebuild to reassign
+        const fresh = buildRound(targetNikud);
         allCards.forEach((card, i) => {
-          // Re-find option by display text
-          const dt = createDropTarget(card, () => {
-            const optDisplay = card.querySelector('.nikud-letter-card__text')?.textContent;
-            const matchedOpt = options.find(o => o.display === optDisplay);
-            if (matchedOpt) onDrop(matchedOpt, targetNikud, dragCard, card);
-          });
+          const opt = fresh[i];
+          const dt = createDropTarget(card, () => onDrop(opt, targetNikud, dragCard, card));
           dropTargets.push(dt);
         });
       }, 1000);
@@ -195,10 +199,9 @@ export function startGame(container) {
     shell.footerEl.innerHTML = '';
     progressBar = createProgressBar(shell.footerEl, 8);
     progressBar.update(0);
-
     roundIndex = 0;
     buildRoundUI(roundNikud[0]);
-    tts.speak('ברוכים הבאים למשחק הניקוד');
+    tts.speak(getNikud('ברוכים הבאים למשחק הניקוד'));
   });
 
   shell.start();

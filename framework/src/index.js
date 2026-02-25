@@ -40,3 +40,6 @@ export { animate } from './render/animations.js';
 
 // ===== Input [נוסף על ידי: nikud-match game] =====
 export { createDragSource, createDropTarget } from './input/drag.js';
+
+// ===== Utils [נוסף על ידי: nikud support] =====
+export { addNikud, getNikud, preloadNikud } from './utils/nakdan.js';

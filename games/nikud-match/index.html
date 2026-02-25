@@ -11,7 +11,7 @@
   <div id="game"></div>
   <script type="module">
     import { startGame } from './game.js';
-    startGame(document.getElementById('game'));
+    startGame(document.getElementById('game')).catch(console.error);
   </script>
 </body>
 </html>
