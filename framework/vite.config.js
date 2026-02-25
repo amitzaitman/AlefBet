@@ -7,6 +7,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.js'],
+  },
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.js'),
