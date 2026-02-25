@@ -1,4 +1,4 @@
-class y {
+class W {
   constructor() {
     this._handlers = {};
   }
@@ -8,14 +8,14 @@ class y {
   }
   /** בטל הרשמה לאירוע */
   off(e, n) {
-    return this._handlers[e] ? (this._handlers[e] = this._handlers[e].filter((i) => i !== n), this) : this;
+    return this._handlers[e] ? (this._handlers[e] = this._handlers[e].filter((s) => s !== n), this) : this;
   }
   /** שלח אירוע */
   emit(e, n) {
-    return (this._handlers[e] || []).slice().forEach((i) => i(n)), this;
+    return (this._handlers[e] || []).slice().forEach((s) => s(n)), this;
   }
 }
-class N {
+class R {
   constructor(e) {
     this._totalRounds = e, this._currentRound = 0, this._score = 0;
   }
@@ -48,18 +48,27 @@ class N {
     return this._currentRound >= this._totalRounds;
   }
 }
-class W {
+class U {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
-   * @param {object} config - הגדרות: { totalRounds, title }
+   * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
    */
   constructor(e, n = {}) {
-    this.container = e, this.config = { totalRounds: 8, title: "משחק", ...n }, this.events = new y(), this.state = new N(this.config.totalRounds), this._buildShell();
+    this.container = e, this.config = {
+      totalRounds: 8,
+      title: "משחק",
+      homeUrl: "../../index.html",
+      ...n
+    }, this.events = new W(), this.state = new R(this.config.totalRounds), this._buildShell();
   }
   _buildShell() {
-    this.container.classList.add("alefbet-game"), this.container.innerHTML = `
+    this.container.classList.add("alefbet-game");
+    const e = this.config.homeUrl ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="ספריית משחקים">🏠</a>` : '<div class="game-header__spacer"></div>';
+    this.container.innerHTML = `
       <div class="game-header">
+        <div class="game-header__spacer"></div>
         <h1 class="game-title"></h1>
+        ${e}
       </div>
       <div class="game-body"></div>
       <div class="game-footer"></div>
@@ -91,32 +100,32 @@ class W {
     return this.events.on(e, n), this;
   }
 }
-let f = null, b = 0.9, h = [], d = !1;
-function v() {
+let _ = null, F = 0.9, g = [], f = !1;
+function S() {
   const t = speechSynthesis.getVoices();
   return t.find((e) => e.lang === "he-IL") || t.find((e) => e.lang === "iw-IL") || t.find((e) => e.lang.startsWith("he")) || null;
 }
-function g() {
-  f = v();
+function L() {
+  _ = S();
 }
-typeof speechSynthesis < "u" && (speechSynthesis.getVoices().length > 0 ? g() : speechSynthesis.addEventListener("voiceschanged", g, { once: !0 }));
-function p() {
-  if (d || h.length === 0) return;
-  const t = h.shift(), e = new SpeechSynthesisUtterance(t);
-  e.lang = "he-IL", e.rate = b, f && (e.voice = f), e.onend = () => {
-    d = !1, p();
+typeof speechSynthesis < "u" && (speechSynthesis.getVoices().length > 0 ? L() : speechSynthesis.addEventListener("voiceschanged", L, { once: !0 }));
+function x() {
+  if (f || g.length === 0) return;
+  const t = g.shift(), e = new SpeechSynthesisUtterance(t);
+  e.lang = "he-IL", e.rate = F, _ && (e.voice = _), e.onend = () => {
+    f = !1, x();
   }, e.onerror = () => {
-    d = !1, p();
-  }, d = !0, speechSynthesis.speak(e);
+    f = !1, x();
+  }, f = !0, speechSynthesis.speak(e);
 }
-const T = {
+const Y = {
   /** הקרא טקסט עברי */
   speak(t) {
-    typeof speechSynthesis > "u" || (h.push(t), p());
+    typeof speechSynthesis > "u" || (g.push(t), x());
   },
   /** עצור את הדיבור הנוכחי */
   cancel() {
-    typeof speechSynthesis > "u" || (h = [], d = !1, speechSynthesis.cancel());
+    typeof speechSynthesis > "u" || (g = [], f = !1, speechSynthesis.cancel());
   },
   /** האם קריאת טקסט זמינה? */
   get available() {
@@ -124,46 +133,46 @@ const T = {
   },
   /** הגדר מהירות דיבור (0.5–2.0, ברירת מחדל 0.9) */
   setRate(t) {
-    b = Math.max(0.5, Math.min(2, t));
+    F = Math.max(0.5, Math.min(2, t));
   }
 };
-let c = null;
-function F() {
-  if (!c)
+let m = null;
+function B() {
+  if (!m)
     try {
-      c = new (window.AudioContext || window.webkitAudioContext)();
+      m = new (window.AudioContext || window.webkitAudioContext)();
     } catch {
       return null;
     }
-  return c.state === "suspended" && c.resume(), c;
+  return m.state === "suspended" && m.resume(), m;
 }
-function l(t, e, n = "sine", i = 0.3) {
-  const a = F();
-  if (a)
+function u(t, e, n = "sine", s = 0.3) {
+  const o = B();
+  if (o)
     try {
-      const s = a.createOscillator(), r = a.createGain();
-      s.connect(r), r.connect(a.destination), s.type = n, s.frequency.setValueAtTime(t, a.currentTime), r.gain.setValueAtTime(i, a.currentTime), r.gain.exponentialRampToValueAtTime(1e-3, a.currentTime + e), s.start(a.currentTime), s.stop(a.currentTime + e + 0.05);
+      const r = o.createOscillator(), i = o.createGain();
+      r.connect(i), i.connect(o.destination), r.type = n, r.frequency.setValueAtTime(t, o.currentTime), i.gain.setValueAtTime(s, o.currentTime), i.gain.exponentialRampToValueAtTime(1e-3, o.currentTime + e), r.start(o.currentTime), r.stop(o.currentTime + e + 0.05);
     } catch {
     }
 }
-const _ = {
+const b = {
   /** צליל תשובה נכונה */
   correct() {
-    l(523.25, 0.15), setTimeout(() => l(659.25, 0.2), 120), setTimeout(() => l(783.99, 0.3), 240);
+    u(523.25, 0.15), setTimeout(() => u(659.25, 0.2), 120), setTimeout(() => u(783.99, 0.3), 240);
   },
   /** צליל תשובה שגויה */
   wrong() {
-    l(220, 0.25, "sawtooth", 0.2), setTimeout(() => l(165, 0.3, "sawtooth", 0.15), 200);
+    u(220, 0.25, "sawtooth", 0.2), setTimeout(() => u(165, 0.3, "sawtooth", 0.15), 200);
   },
   /** צליל עידוד - סיום מוצלח */
   cheer() {
-    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((e, n) => setTimeout(() => l(e, 0.2), n * 90));
+    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((e, n) => setTimeout(() => u(e, 0.2), n * 90));
   },
   /** קליק עדין */
   click() {
-    l(900, 0.04, "sine", 0.12);
+    u(900, 0.04, "sine", 0.12);
   }
-}, u = [
+}, h = [
   { letter: "א", name: "אלף", nameNikud: "אָלֶף", sound: "", exampleWord: "אריה", emoji: "🦁", isFinal: !1 },
   { letter: "ב", name: "בית", nameNikud: "בֵּית", sound: "b", exampleWord: "בית", emoji: "🏠", isFinal: !1 },
   { letter: "ג", name: "גימל", nameNikud: "גִּימֶל", sound: "g", exampleWord: "גמל", emoji: "🐪", isFinal: !1 },
@@ -192,46 +201,62 @@ const _ = {
   { letter: "ש", name: "שין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שמש", emoji: "☀️", isFinal: !1 },
   { letter: "ת", name: "תו", nameNikud: "תָּו", sound: "t", exampleWord: "תפוח", emoji: "🍎", isFinal: !1 }
 ];
-function R(t) {
-  return u.find((e) => e.letter === t) || null;
+function z(t) {
+  return h.find((e) => e.letter === t) || null;
 }
-function j(t = "regular") {
-  return t === "regular" ? u.filter((e) => !e.isFinal) : t === "final" ? u.filter((e) => e.isFinal) : u;
+function $(t = "regular") {
+  return t === "regular" ? h.filter((e) => !e.isFinal) : t === "final" ? h.filter((e) => e.isFinal) : h;
 }
-function w(t, e = "regular") {
-  const n = j(e);
+function P(t, e = "regular") {
+  const n = $(e);
   return [...n].sort(() => Math.random() - 0.5).slice(0, Math.min(t, n.length));
 }
-function E(t, e, n) {
+const A = [
+  { id: "kamatz", name: "קמץ", symbol: "ָ", sound: "אָ", color: "#FF6B6B", textColor: "#fff" },
+  { id: "patah", name: "פתח", symbol: "ַ", sound: "אַ", color: "#FF8C42", textColor: "#fff" },
+  { id: "hiriq", name: "חיריק", symbol: "ִ", sound: "אִי", color: "#4ECDC4", textColor: "#fff" },
+  { id: "tzere", name: "צרה", symbol: "ֵ", sound: "אֵ", color: "#45B7D1", textColor: "#fff" },
+  { id: "segol", name: "סגול", symbol: "ֶ", sound: "אֶ", color: "#9B59B6", textColor: "#fff" },
+  { id: "holam", name: "חולם", symbol: "ֹ", sound: "אֹ", color: "#2ECC71", textColor: "#fff" },
+  { id: "kubbutz", name: "קובוץ", symbol: "ֻ", sound: "אֻ", color: "#F39C12", textColor: "#fff" },
+  { id: "shva", name: "שווא", symbol: "ְ", sound: "אְ", color: "#95A5A6", textColor: "#fff" }
+], G = ["א", "ב", "ג", "ד", "מ", "נ", "ל", "ר", "ש", "ת", "פ", "ק"];
+function O(t, e) {
+  return t + e;
+}
+function K(t) {
+  return [...A].sort(() => Math.random() - 0.5).slice(0, t);
+}
+function Q(t, e, n) {
   t.innerHTML = "";
-  const i = document.createElement("div");
-  i.className = "option-cards-grid";
-  const a = e.map((s) => {
-    const r = document.createElement("button");
-    return r.className = "option-card", r.dataset.id = s.id, r.innerHTML = `
-      <span class="option-card__emoji">${s.emoji || ""}</span>
-      <span class="option-card__text">${s.text}</span>
-    `, r.addEventListener("click", () => {
-      r.disabled || n(s);
-    }), i.appendChild(r), { el: r, option: s };
+  const s = document.createElement("div");
+  s.className = "option-cards-grid";
+  const o = e.map((r) => {
+    const i = document.createElement("button");
+    return i.className = "option-card", i.dataset.id = r.id, i.innerHTML = `
+      <span class="option-card__emoji">${r.emoji || ""}</span>
+      <span class="option-card__text">${r.text}</span>
+    `, i.addEventListener("click", () => {
+      i.disabled || n(r);
+    }), s.appendChild(i), { el: i, option: r };
   });
-  return t.appendChild(i), {
+  return t.appendChild(s), {
     /** הדגש כרטיס לפי סוג: 'correct' | 'wrong' | 'hint' */
-    highlight(s, r) {
-      a.forEach(({ el: o, option: k }) => {
-        k.id === s && o.classList.add(`option-card--${r}`);
+    highlight(r, i) {
+      o.forEach(({ el: c, option: T }) => {
+        T.id === r && c.classList.add(`option-card--${i}`);
       });
     },
     /** נטרל את כל הכרטיסים */
     disable() {
-      a.forEach(({ el: s }) => {
-        s.disabled = !0;
+      o.forEach(({ el: r }) => {
+        r.disabled = !0;
       });
     },
     /** אפס את מצב הכרטיסים */
     reset() {
-      a.forEach(({ el: s }) => {
-        s.className = "option-card", s.disabled = !1;
+      o.forEach(({ el: r }) => {
+        r.className = "option-card", r.disabled = !1;
       });
     },
     /** הסר את הרכיב */
@@ -240,7 +265,7 @@ function E(t, e, n) {
     }
   };
 }
-function L(t, e) {
+function J(t, e) {
   const n = document.createElement("div");
   n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(e)), n.innerHTML = `
     <div class="progress-bar__track">
@@ -248,12 +273,12 @@ function L(t, e) {
     </div>
     <span class="progress-bar__label">0 / ${e}</span>
   `, t.appendChild(n);
-  const i = n.querySelector(".progress-bar__fill"), a = n.querySelector(".progress-bar__label");
+  const s = n.querySelector(".progress-bar__fill"), o = n.querySelector(".progress-bar__label");
   return {
     /** עדכן את ההתקדמות */
-    update(s) {
-      const r = Math.round(s / e * 100);
-      i.style.width = `${r}%`, a.textContent = `${s} / ${e}`, n.setAttribute("aria-valuenow", String(s));
+    update(r) {
+      const i = Math.round(r / e * 100);
+      s.style.width = `${i}%`, o.textContent = `${r} / ${e}`, n.setAttribute("aria-valuenow", String(r));
     },
     /** הסר את הרכיב */
     destroy() {
@@ -261,7 +286,7 @@ function L(t, e) {
     }
   };
 }
-const x = {
+const N = {
   shake: [
     { transform: "translateX(0)" },
     { transform: "translateX(-8px)" },
@@ -292,41 +317,41 @@ const x = {
     { transform: "scale(1.3) rotate(180deg)", opacity: "1" },
     { transform: "scale(1) rotate(360deg)", opacity: "1" }
   ]
-}, S = {
+}, M = {
   shake: 420,
   bounce: 480,
   pulse: 600,
   fadeIn: 320,
   confetti: 700
 };
-function m(t, e) {
-  !t || !x[e] || t.animate(x[e], {
-    duration: S[e] || 400,
+function p(t, e) {
+  !t || !N[e] || t.animate(N[e], {
+    duration: M[e] || 400,
     easing: "ease-in-out",
     fill: "none"
   });
 }
-function C(t) {
+function Z(t) {
   const e = document.createElement("div");
   e.className = "feedback-message", e.setAttribute("aria-live", "polite"), e.setAttribute("role", "status"), t.appendChild(e);
   let n = null;
-  function i(a, s, r = 1800) {
-    clearTimeout(n), e.textContent = a, e.className = `feedback-message feedback-message--${s}`, n = setTimeout(() => {
+  function s(o, r, i = 1800) {
+    clearTimeout(n), e.textContent = o, e.className = `feedback-message feedback-message--${r}`, n = setTimeout(() => {
       e.textContent = "", e.className = "feedback-message";
-    }, r);
+    }, i);
   }
   return {
     /** הצג משוב חיובי */
-    correct(a = "!כל הכבוד") {
-      _.correct(), i(a, "correct"), m(e, "bounce");
+    correct(o = "!כל הכבוד") {
+      b.correct(), s(o, "correct"), p(e, "bounce");
     },
     /** הצג משוב שלילי */
-    wrong(a = "נסה שוב") {
-      _.wrong(), i(a, "wrong"), m(e, "shake");
+    wrong(o = "נסה שוב") {
+      b.wrong(), s(o, "wrong"), p(e, "shake");
     },
     /** הצג רמז */
-    hint(a) {
-      i(a, "hint"), m(e, "pulse");
+    hint(o) {
+      s(o, "hint"), p(e, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -334,33 +359,132 @@ function C(t) {
     }
   };
 }
-function M(t, e, n, i) {
-  _.cheer();
-  const a = e / n, s = a >= 0.8 ? 3 : a >= 0.5 ? 2 : 1, r = "⭐".repeat(s) + "☆".repeat(3 - s), o = document.createElement("div");
-  o.className = "completion-screen", o.innerHTML = `
+function ee(t, e, n, s) {
+  b.cheer();
+  const o = e / n, r = o >= 0.8 ? 3 : o >= 0.5 ? 2 : 1, i = "⭐".repeat(r) + "☆".repeat(3 - r), c = document.createElement("div");
+  c.className = "completion-screen", c.innerHTML = `
     <div class="completion-screen__content">
-      <div class="completion-screen__stars" aria-label="${s} כוכבים">${r}</div>
+      <div class="completion-screen__stars" aria-label="${r} כוכבים">${i}</div>
       <h2 class="completion-screen__title">!כל הכבוד</h2>
       <p class="completion-screen__score">ניקוד: ${e} מתוך ${n}</p>
       <button class="completion-screen__replay btn btn--primary">שחק שוב</button>
     </div>
-  `, o.querySelector(".completion-screen__replay").addEventListener("click", () => {
-    o.remove(), i();
-  }), t.innerHTML = "", t.appendChild(o), m(o.querySelector(".completion-screen__content"), "fadeIn");
+  `, c.querySelector(".completion-screen__replay").addEventListener("click", () => {
+    c.remove(), s();
+  }), t.innerHTML = "", t.appendChild(c), p(c.querySelector(".completion-screen__content"), "fadeIn");
+}
+let a = null, l = null, v = 0, y = 0;
+const k = /* @__PURE__ */ new Map();
+function C(t, e) {
+  var s;
+  l && (l.style.pointerEvents = "none");
+  const n = ((s = document.elementFromPoint(t, e)) == null ? void 0 : s.closest('[data-drop-target="true"]')) || null;
+  return l && (l.style.pointerEvents = ""), n;
+}
+function X(t, e, n) {
+  const s = t.getBoundingClientRect();
+  v = s.width / 2, y = s.height / 2, l = t.cloneNode(!0), Object.assign(l.style, {
+    position: "fixed",
+    left: `${e - v}px`,
+    top: `${n - y}px`,
+    width: `${s.width}px`,
+    height: `${s.height}px`,
+    pointerEvents: "none",
+    zIndex: "9999",
+    opacity: "0.9",
+    transform: "scale(1.12)",
+    transition: "transform 0.1s",
+    cursor: "grabbing"
+  }), document.body.appendChild(l);
+}
+function q(t, e) {
+  l && (l.style.left = `${t - v}px`, l.style.top = `${e - y}px`);
+}
+function D() {
+  l == null || l.remove(), l = null;
+}
+let d = null;
+function H(t) {
+  d !== t && (d == null || d.classList.remove("drop-target--hover"), d = t, t == null || t.classList.add("drop-target--hover"));
+}
+function I() {
+  d == null || d.classList.remove("drop-target--hover"), d = null;
+}
+function E(t) {
+  q(t.clientX, t.clientY), H(C(t.clientX, t.clientY));
+}
+function w(t) {
+  I();
+  const e = C(t.clientX, t.clientY);
+  V(e), j();
+}
+function V(t) {
+  if (!a || !t) return;
+  const e = k.get(t);
+  e && e.onDrop({
+    data: a.data,
+    sourceEl: a.el,
+    targetEl: t
+  });
+}
+function j() {
+  a && a.el.classList.remove("drag-source--dragging"), D(), a = null, document.removeEventListener("pointermove", E), document.removeEventListener("pointerup", w);
+}
+function te(t, e) {
+  t.classList.add("drag-source");
+  function n(s) {
+    if (!(s.button !== void 0 && s.button !== 0)) {
+      if (s.preventDefault(), !s.pointerType || s.pointerType === "touch") {
+        if ((a == null ? void 0 : a.el) === t) {
+          t.classList.remove("drag-source--selected"), a = null;
+          return;
+        }
+        a == null || a.el.classList.remove("drag-source--selected"), a = { el: t, data: e }, t.classList.add("drag-source--selected");
+        return;
+      }
+      a == null || a.el.classList.remove("drag-source--selected"), a = { el: t, data: e }, t.classList.add("drag-source--dragging"), X(t, s.clientX, s.clientY), document.addEventListener("pointermove", E), document.addEventListener("pointerup", w);
+    }
+  }
+  return t.addEventListener("pointerdown", n), {
+    destroy() {
+      t.removeEventListener("pointerdown", n), t.classList.remove("drag-source", "drag-source--dragging", "drag-source--selected"), (a == null ? void 0 : a.el) === t && (j(), a = null);
+    }
+  };
+}
+function ne(t, e) {
+  t.setAttribute("data-drop-target", "true"), t.classList.add("drop-target--active"), k.set(t, { onDrop: e });
+  function n(s) {
+    a && s.pointerType !== "mouse" && (e({
+      data: a.data,
+      sourceEl: a.el,
+      targetEl: t
+    }), a.el.classList.remove("drag-source--selected"), a = null);
+  }
+  return t.addEventListener("pointerup", n), {
+    destroy() {
+      t.removeAttribute("data-drop-target"), t.classList.remove("drop-target--active", "drop-target--hover"), k.delete(t), t.removeEventListener("pointerup", n);
+    }
+  };
 }
 export {
-  y as EventBus,
-  W as GameShell,
-  N as GameState,
-  m as animate,
-  C as createFeedback,
-  E as createOptionCards,
-  L as createProgressBar,
-  R as getLetter,
-  j as getLettersByGroup,
-  u as hebrewLetters,
-  w as randomLetters,
-  M as showCompletionScreen,
-  _ as sounds,
-  T as tts
+  W as EventBus,
+  U as GameShell,
+  R as GameState,
+  p as animate,
+  te as createDragSource,
+  ne as createDropTarget,
+  Z as createFeedback,
+  Q as createOptionCards,
+  J as createProgressBar,
+  z as getLetter,
+  $ as getLettersByGroup,
+  h as hebrewLetters,
+  O as letterWithNikud,
+  G as nikudBaseLetters,
+  A as nikudList,
+  P as randomLetters,
+  K as randomNikud,
+  ee as showCompletionScreen,
+  b as sounds,
+  Y as tts
 };

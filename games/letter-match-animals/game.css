@@ -1,41 +1,37 @@
 /* ── Letter Match Animals — Game-specific styles ── */
 
-.options-container {
-  width: 100%;
+/* Two-panel layout — flex children inside .game-body */
+.round-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(6px, 1.5dvmin, 14px);
+}
+
+/* Letter panel: fixed size, doesn't grow */
+.round-panel--letter {
+  flex: 0 0 auto;
+}
+
+/* Options panel: expands to fill remaining space,
+   wraps below letter in portrait, sits beside in landscape */
+.round-panel--options {
+  flex: 1 0 min(280px, 85dvw);
   max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(4px, 1dvmin, 10px);
 }
 
-/* Make cards a bit taller for this game */
-.option-card {
-  min-height: 130px;
-}
-
-/* Landscape: options container fills available width */
-@media (orientation: landscape) and (max-height: 600px) {
-  .options-container {
-    max-width: 420px;
-    flex: 1;
-  }
-
-  .option-card {
-    min-height: 80px;
-  }
-}
-
-/* Emphasize the letter display */
+/* Letter entrance animation */
 .letter-display {
-  animation: letter-appear 0.4s ease-out both;
+  animation: letter-appear 0.35s ease-out both;
 }
 
 @keyframes letter-appear {
-  from {
-    opacity: 0;
-    transform: scale(0.7) rotate(-10deg);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
+  from { opacity: 0; transform: scale(0.7) rotate(-10deg); }
+  to   { opacity: 1; transform: scale(1)   rotate(0deg);   }
 }
 
 /* Correct card glow */
@@ -43,7 +39,6 @@
   box-shadow: 0 0 0 4px #2ecc71, 0 4px 20px rgba(46, 204, 113, 0.4) !important;
 }
 
-/* Wrong card shake is handled by animations.js */
 .option-card--wrong {
   box-shadow: 0 0 0 4px #e74c3c, 0 4px 20px rgba(231, 76, 60, 0.3) !important;
 }

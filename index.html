@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlefBet — ספריית משחקים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --primary: #4f67ff;
+      --bg:      #f0f2ff;
+      --surface: #ffffff;
+      --text:    #1a1a2e;
+      --muted:   #6c757d;
+      --font:    'Heebo', 'Arial Hebrew', Arial, sans-serif;
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      min-height: 100dvh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      direction: rtl;
+    }
+
+    /* ── Header ── */
+    .hub-header {
+      background: var(--surface);
+      border-bottom: 1px solid #dee2e6;
+      padding: clamp(12px, 3dvh, 20px) clamp(16px, 4dvw, 32px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hub-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .hub-logo__badge {
+      width:  clamp(44px, 10dvmin, 56px);
+      height: clamp(44px, 10dvmin, 56px);
+      background: linear-gradient(135deg, #4f67ff, #7c94ff);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(22px, 5dvmin, 30px);
+      font-weight: 900;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(79,103,255,0.35);
+      flex-shrink: 0;
+    }
+
+    .hub-logo__title {
+      font-size: clamp(20px, 4dvmin, 28px);
+      font-weight: 900;
+      color: var(--primary);
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .hub-logo__sub {
+      font-size: clamp(12px, 2.5dvmin, 15px);
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ── Main ── */
+    .hub-main {
+      padding: clamp(16px, 4dvh, 40px) clamp(16px, 4dvw, 32px);
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .hub-subtitle {
+      font-size: clamp(18px, 4dvmin, 26px);
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 clamp(12px, 3dvh, 24px) 0;
+    }
+
+    /* ── Games Grid ── */
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+      gap: clamp(12px, 3dvmin, 24px);
+    }
+
+    /* ── Game Card ── */
+    .game-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-radius: 20px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .game-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+    }
+
+    .game-card:active { transform: scale(0.98); }
+
+    /* Icon area */
+    .game-card__icon {
+      height: clamp(120px, 22dvh, 180px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Letter-Match icon */
+    .game-card__icon--letters {
+      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    }
+
+    .icon--letters-letter {
+      font-size: clamp(60px, 14dvmin, 90px);
+      font-weight: 900;
+      color: #ff6b00;
+      line-height: 1;
+      position: absolute;
+      right: 20%;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font);
+    }
+
+    .icon--letters-emoji {
+      font-size: clamp(40px, 9dvmin, 60px);
+      position: absolute;
+      left: 20%;
+      top: 50%;
+      transform: translateY(-55%);
+    }
+
+    /* Nikud icon */
+    .game-card__icon--nikud {
+      background: linear-gradient(135deg, #e8eaff, #d4d9ff);
+    }
+
+    .icon--nikud-samples {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 8px;
+    }
+
+    .icon--nikud-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width:  clamp(36px, 8dvmin, 52px);
+      height: clamp(36px, 8dvmin, 52px);
+      border-radius: 10px;
+      font-size: clamp(18px, 5dvmin, 28px);
+      font-weight: 900;
+      font-family: var(--font);
+      color: #fff;
+    }
+
+    /* Info area */
+    .game-card__info {
+      padding: clamp(12px, 2.5dvh, 20px);
+      flex: 1;
+    }
+
+    .game-card__name {
+      font-size: clamp(16px, 3.5dvmin, 22px);
+      font-weight: 900;
+      margin: 0 0 6px 0;
+      color: var(--text);
+    }
+
+    .game-card__desc {
+      font-size: clamp(13px, 2.5dvmin, 16px);
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Play button */
+    .game-card__play {
+      display: block;
+      margin: 0 clamp(12px, 2.5dvh, 20px) clamp(12px, 2.5dvh, 20px);
+      padding: clamp(10px, 2dvh, 14px);
+      background: var(--primary);
+      color: #fff;
+      border-radius: 12px;
+      text-align: center;
+      font-size: clamp(14px, 3dvmin, 18px);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      transition: background 0.15s;
+    }
+
+    .game-card:hover .game-card__play {
+      background: #3451e0;
+    }
+
+    /* ── Footer ── */
+    .hub-footer {
+      text-align: center;
+      padding: clamp(16px, 4dvh, 32px);
+      font-size: clamp(12px, 2.5dvmin, 14px);
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hub-header">
+    <div class="hub-logo">
+      <div class="hub-logo__badge">א</div>
+      <div>
+        <p class="hub-logo__title">AlefBet</p>
+        <p class="hub-logo__sub">ספריית משחקים חינוכיים לעברית</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="hub-main">
+    <h2 class="hub-subtitle">בחרו משחק:</h2>
+
+    <div class="games-grid">
+
+      <!-- Letter Match Animals -->
+      <a href="games/letter-match-animals/" class="game-card">
+        <div class="game-card__icon game-card__icon--letters">
+          <span class="icon--letters-letter">א</span>
+          <span class="icon--letters-emoji">🦁</span>
+        </div>
+        <div class="game-card__info">
+          <h3 class="game-card__name">התאמת אותיות</h3>
+          <p class="game-card__desc">חבר כל אות לחיה שמתחילה בה — 8 סיבובים, אותיות א–ח</p>
+        </div>
+        <span class="game-card__play">שחק עכשיו ▶</span>
+      </a>
+
+      <!-- Nikud Match -->
+      <a href="games/nikud-match/" class="game-card">
+        <div class="game-card__icon game-card__icon--nikud">
+          <div class="icon--nikud-samples">
+            <div class="icon--nikud-chip" style="background:#FF6B6B;">אָ</div>
+            <div class="icon--nikud-chip" style="background:#4ECDC4;">אִ</div>
+            <div class="icon--nikud-chip" style="background:#2ECC71;">אֹ</div>
+            <div class="icon--nikud-chip" style="background:#9B59B6;">אֶ</div>
+          </div>
+        </div>
+        <div class="game-card__info">
+          <h3 class="game-card__name">לימוד ניקוד</h3>
+          <p class="game-card__desc">גרור את סמל הניקוד לאות המתאימה — לומדים קמץ, חיריק, חולם ועוד</p>
+        </div>
+        <span class="game-card__play">שחק עכשיו ▶</span>
+      </a>
+
+    </div>
+  </main>
+
+  <footer class="hub-footer">
+    AlefBet — משחקים חינוכיים לילדים
+  </footer>
+
+</body>
+</html>

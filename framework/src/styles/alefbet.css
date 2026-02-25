@@ -1,14 +1,12 @@
 /* ==========================================================================
    AlefBet Framework — Base Styles
-   RTL, Hebrew fonts, CSS variables, game container, components
+   Dynamic layout using clamp() + dvmin/dvh/dvw — no orientation breakpoints
    ========================================================================== */
 
-/* ── Google Fonts: Heebo (Hebrew) ────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap');
 
 /* ── CSS Custom Properties ───────────────────────────────────────────────── */
 :root {
-  /* Colors */
   --ab-primary:       #4f67ff;
   --ab-primary-dark:  #3451e0;
   --ab-secondary:     #ff6b6b;
@@ -23,7 +21,6 @@
   --ab-border:        #dee2e6;
   --ab-shadow:        rgba(0, 0, 0, 0.1);
 
-  /* Spacing */
   --ab-space-xs:   4px;
   --ab-space-sm:   8px;
   --ab-space-md:   16px;
@@ -31,7 +28,6 @@
   --ab-space-xl:   32px;
   --ab-space-2xl:  48px;
 
-  /* Border radii */
   --ab-radius-sm:  8px;
   --ab-radius-md:  16px;
   --ab-radius-lg:  24px;
@@ -40,16 +36,7 @@
   /* Font scale — increase for younger children */
   --font-scale: 1;
 
-  /* Typography */
   --ab-font: 'Heebo', 'Arial Hebrew', 'David', Arial, sans-serif;
-  --ab-font-size-base:  calc(16px * var(--font-scale));
-  --ab-font-size-sm:    calc(14px * var(--font-scale));
-  --ab-font-size-lg:    calc(20px * var(--font-scale));
-  --ab-font-size-xl:    calc(28px * var(--font-scale));
-  --ab-font-size-2xl:   calc(40px * var(--font-scale));
-  --ab-font-size-hero:  calc(64px * var(--font-scale));
-
-  /* Transitions */
   --ab-transition: 0.2s ease;
 }
 
@@ -64,41 +51,78 @@
 /* ── Game Container ──────────────────────────────────────────────────────── */
 .alefbet-game {
   font-family: var(--ab-font);
-  font-size: var(--ab-font-size-base);
+  font-size: clamp(14px, 3.5dvmin, 18px);
   color: var(--ab-text);
   background: var(--ab-bg);
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  padding: var(--ab-space-md);
+  padding: clamp(8px, 2dvh, 16px) clamp(8px, 2dvw, 16px);
 }
 
+/* ── Game Header ─────────────────────────────────────────────────────────── */
 .game-header {
-  text-align: center;
-  padding: var(--ab-space-md) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: clamp(4px, 1dvh, 10px) 0;
+  flex-shrink: 0;
 }
 
 .game-title {
-  font-size: var(--ab-font-size-xl);
+  font-size: clamp(18px, 4.5dvmin, 32px);
   font-weight: 900;
   color: var(--ab-primary);
   margin: 0;
   line-height: 1.2;
+  text-align: center;
 }
 
+/* Back-to-library button */
+.game-back-btn {
+  position: absolute;
+  inset-inline-end: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(36px, 8dvmin, 48px);
+  height: clamp(36px, 8dvmin, 48px);
+  border-radius: var(--ab-radius-sm);
+  text-decoration: none;
+  font-size: clamp(18px, 4dvmin, 28px);
+  line-height: 1;
+  background: transparent;
+  transition: background var(--ab-transition), transform var(--ab-transition);
+}
+
+.game-back-btn:hover {
+  background: rgba(79, 103, 255, 0.1);
+  transform: scale(1.1);
+}
+
+/* Spacer to keep title centered when back button is present */
+.game-header__spacer {
+  width: clamp(36px, 8dvmin, 48px);
+  flex-shrink: 0;
+}
+
+/* ── Game Body — naturally wraps portrait↔landscape ──────────────────────── */
 .game-body {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-flow: row wrap;
   align-items: center;
   justify-content: center;
-  gap: var(--ab-space-lg);
-  padding: var(--ab-space-md) 0;
+  gap: clamp(8px, 2.5dvmin, 24px);
+  padding: clamp(4px, 1dvh, 12px) 0;
+  min-height: 0;
+  overflow: auto;
 }
 
 .game-footer {
-  padding: var(--ab-space-md) 0;
+  flex-shrink: 0;
+  padding: clamp(4px, 1dvh, 10px) 0;
 }
 
 /* ── Button Base ─────────────────────────────────────────────────────────── */
@@ -107,13 +131,13 @@
   align-items: center;
   justify-content: center;
   gap: var(--ab-space-sm);
-  min-height: 64px;
-  min-width: 64px;
-  padding: var(--ab-space-md) var(--ab-space-xl);
+  min-height: clamp(48px, 10dvmin, 64px);
+  min-width: clamp(48px, 10dvmin, 64px);
+  padding: clamp(8px, 2dvh, 16px) clamp(16px, 4dvw, 32px);
   border: none;
   border-radius: var(--ab-radius-md);
   font-family: var(--ab-font);
-  font-size: var(--ab-font-size-lg);
+  font-size: clamp(15px, 3.5dvmin, 20px);
   font-weight: 700;
   cursor: pointer;
   transition: transform var(--ab-transition), box-shadow var(--ab-transition);
@@ -121,9 +145,7 @@
   touch-action: manipulation;
 }
 
-.btn:active {
-  transform: scale(0.95);
-}
+.btn:active { transform: scale(0.95); }
 
 .btn--primary {
   background: var(--ab-primary);
@@ -147,7 +169,7 @@
 .option-cards-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--ab-space-md);
+  gap: clamp(6px, 1.5dvmin, 16px);
   width: 100%;
   max-width: 480px;
 }
@@ -157,17 +179,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--ab-space-sm);
-  min-height: 120px;
-  padding: var(--ab-space-md);
+  gap: clamp(4px, 1dvh, 8px);
+  min-height: clamp(70px, 14dvmin, 130px);
+  padding: clamp(6px, 1.5dvh, 16px);
   background: var(--ab-surface);
   border: 3px solid var(--ab-border);
   border-radius: var(--ab-radius-lg);
   cursor: pointer;
-  transition:
-    border-color var(--ab-transition),
-    transform var(--ab-transition),
-    box-shadow var(--ab-transition);
+  transition: border-color var(--ab-transition), transform var(--ab-transition), box-shadow var(--ab-transition);
   font-family: var(--ab-font);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -180,37 +199,20 @@
   box-shadow: 0 6px 16px var(--ab-shadow);
 }
 
-.option-card:active:not(:disabled) {
-  transform: scale(0.96);
-}
+.option-card:active:not(:disabled) { transform: scale(0.96); }
+.option-card:disabled { cursor: default; opacity: 0.75; }
 
-.option-card:disabled {
-  cursor: default;
-  opacity: 0.75;
-}
-
-.option-card--correct {
-  border-color: var(--ab-success) !important;
-  background: #edfbf3 !important;
-}
-
-.option-card--wrong {
-  border-color: var(--ab-error) !important;
-  background: #fdf0f0 !important;
-}
-
-.option-card--hint {
-  border-color: var(--ab-hint) !important;
-  background: #f5edfc !important;
-}
+.option-card--correct { border-color: var(--ab-success) !important; background: #edfbf3 !important; }
+.option-card--wrong   { border-color: var(--ab-error)   !important; background: #fdf0f0 !important; }
+.option-card--hint    { border-color: var(--ab-hint)    !important; background: #f5edfc !important; }
 
 .option-card__emoji {
-  font-size: calc(40px * var(--font-scale));
+  font-size: clamp(24px, 7dvmin, 44px);
   line-height: 1;
 }
 
 .option-card__text {
-  font-size: var(--ab-font-size-lg);
+  font-size: clamp(13px, 3dvmin, 20px);
   font-weight: 700;
   color: var(--ab-text);
 }
@@ -219,14 +221,14 @@
 .progress-bar {
   display: flex;
   align-items: center;
-  gap: var(--ab-space-md);
+  gap: clamp(8px, 2dvmin, 16px);
   width: 100%;
-  max-width: 480px;
+  max-width: 100%;
 }
 
 .progress-bar__track {
   flex: 1;
-  height: 12px;
+  height: clamp(8px, 1.5dvmin, 12px);
   background: var(--ab-border);
   border-radius: var(--ab-radius-full);
   overflow: hidden;
@@ -240,36 +242,27 @@
 }
 
 .progress-bar__label {
-  font-size: var(--ab-font-size-sm);
+  font-size: clamp(11px, 2.5dvmin, 14px);
   font-weight: 700;
   color: var(--ab-text-muted);
   white-space: nowrap;
-  min-width: 48px;
+  min-width: 44px;
   text-align: center;
 }
 
 /* ── Feedback Message ────────────────────────────────────────────────────── */
 .feedback-message {
-  min-height: 48px;
-  font-size: var(--ab-font-size-xl);
+  min-height: clamp(32px, 6dvmin, 48px);
+  font-size: clamp(18px, 5dvmin, 32px);
   font-weight: 900;
   text-align: center;
-  padding: var(--ab-space-sm) var(--ab-space-lg);
+  padding: clamp(4px, 1dvh, 8px) clamp(8px, 2dvw, 16px);
   border-radius: var(--ab-radius-md);
-  transition: background var(--ab-transition);
 }
 
-.feedback-message--correct {
-  color: var(--ab-success);
-}
-
-.feedback-message--wrong {
-  color: var(--ab-error);
-}
-
-.feedback-message--hint {
-  color: var(--ab-hint);
-}
+.feedback-message--correct { color: var(--ab-success); }
+.feedback-message--wrong   { color: var(--ab-error);   }
+.feedback-message--hint    { color: var(--ab-hint);    }
 
 /* ── Completion Screen ───────────────────────────────────────────────────── */
 .completion-screen {
@@ -277,57 +270,55 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: var(--ab-space-xl);
+  padding: clamp(8px, 2dvh, 24px);
 }
 
 .completion-screen__content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--ab-space-lg);
+  gap: clamp(8px, 2dvmin, 20px);
   text-align: center;
   background: var(--ab-surface);
   border-radius: var(--ab-radius-lg);
-  padding: var(--ab-space-2xl) var(--ab-space-xl);
+  padding: clamp(16px, 4dvh, 40px) clamp(16px, 4dvw, 32px);
   box-shadow: 0 8px 32px var(--ab-shadow);
   max-width: 360px;
   width: 100%;
 }
 
 .completion-screen__stars {
-  font-size: calc(48px * var(--font-scale));
+  font-size: clamp(32px, 10dvmin, 56px);
   letter-spacing: 4px;
   line-height: 1;
 }
 
 .completion-screen__title {
-  font-size: var(--ab-font-size-2xl);
+  font-size: clamp(22px, 6dvmin, 40px);
   font-weight: 900;
   color: var(--ab-primary);
   margin: 0;
 }
 
 .completion-screen__score {
-  font-size: var(--ab-font-size-lg);
+  font-size: clamp(14px, 3.5dvmin, 20px);
   color: var(--ab-text-muted);
   margin: 0;
 }
 
-.completion-screen__replay {
-  margin-top: var(--ab-space-sm);
-}
-
 /* ── Letter Display ──────────────────────────────────────────────────────── */
+/* dvmin = min(dvh, dvw) — scales proportionally in any orientation */
 .letter-display {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 160px;
-  height: 160px;
+  flex-shrink: 0;
+  width: clamp(90px, 24dvmin, 160px);
+  height: clamp(90px, 24dvmin, 160px);
   background: var(--ab-surface);
   border: 4px solid var(--ab-primary);
   border-radius: var(--ab-radius-lg);
-  font-size: var(--ab-font-size-hero);
+  font-size: clamp(40px, 14dvmin, 72px);
   font-weight: 900;
   color: var(--ab-primary);
   box-shadow: 0 4px 16px rgba(79, 103, 255, 0.2);
@@ -336,125 +327,49 @@
 
 /* ── Instruction Text ────────────────────────────────────────────────────── */
 .game-instruction {
-  font-size: var(--ab-font-size-lg);
+  font-size: clamp(13px, 3dvmin, 18px);
   font-weight: 500;
   color: var(--ab-text-muted);
   text-align: center;
   margin: 0;
 }
 
+/* ── Drag Source ─────────────────────────────────────────────────────────── */
+.drag-source {
+  cursor: grab;
+  touch-action: none;
+  transition: transform var(--ab-transition), opacity var(--ab-transition);
+}
+
+.drag-source:active { cursor: grabbing; }
+.drag-source--dragging { opacity: 0.4; }
+.drag-source--selected {
+  box-shadow: 0 0 0 4px var(--ab-primary);
+  transform: scale(1.05);
+}
+
+/* ── Drop Target ─────────────────────────────────────────────────────────── */
+.drop-target--active {
+  border-color: var(--ab-primary) !important;
+  box-shadow: 0 0 0 3px rgba(79, 103, 255, 0.3) !important;
+}
+
+.drop-target--hover {
+  border-color: var(--ab-primary) !important;
+  background: #f0f2ff !important;
+  transform: scale(1.04);
+}
+
 /* ── Utility Classes ─────────────────────────────────────────────────────── */
 .visually-hidden {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip: rect(0,0,0,0);
   white-space: nowrap;
   border: 0;
 }
 
 .text-center { text-align: center; }
-.text-start  { text-align: start; }
-
-/* ── Responsive ──────────────────────────────────────────────────────────── */
-@media (max-width: 400px) {
-  .option-cards-grid {
-    gap: var(--ab-space-sm);
-  }
-  .option-card {
-    min-height: 100px;
-    padding: var(--ab-space-sm);
-  }
-  .letter-display {
-    width: 130px;
-    height: 130px;
-  }
-}
-
-@media (min-width: 768px) {
-  .alefbet-game {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-}
-
-/* ── Landscape Layout ────────────────────────────────────────────────────── */
-@media (orientation: landscape) and (max-height: 600px) {
-  .alefbet-game {
-    max-width: 100%;
-    padding: var(--ab-space-sm) var(--ab-space-md);
-  }
-
-  .game-header {
-    padding: var(--ab-space-xs) 0;
-  }
-
-  .game-title {
-    font-size: var(--ab-font-size-lg);
-  }
-
-  /* Side-by-side: letter left, cards right */
-  .game-body {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: var(--ab-space-lg);
-    padding: var(--ab-space-xs) 0;
-  }
-
-  .game-instruction {
-    display: none; /* hidden in landscape — letter is self-explanatory */
-  }
-
-  .letter-display {
-    width: 110px;
-    height: 110px;
-    font-size: calc(48px * var(--font-scale));
-    flex-shrink: 0;
-  }
-
-  /* 2×2 grid stays compact */
-  .option-cards-grid {
-    gap: var(--ab-space-sm);
-    max-width: none;
-  }
-
-  .option-card {
-    min-height: 80px;
-    padding: var(--ab-space-sm);
-  }
-
-  .option-card__emoji {
-    font-size: calc(28px * var(--font-scale));
-  }
-
-  .option-card__text {
-    font-size: var(--ab-font-size-base);
-  }
-
-  /* Progress bar in footer stays compact */
-  .game-footer {
-    padding: var(--ab-space-xs) 0;
-  }
-
-  .progress-bar {
-    max-width: 100%;
-  }
-
-  /* Completion screen */
-  .completion-screen__content {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--ab-space-md);
-    padding: var(--ab-space-lg);
-  }
-
-  .completion-screen__stars {
-    font-size: calc(32px * var(--font-scale));
-    width: 100%;
-  }
-}
+.text-start  { text-align: start;  }

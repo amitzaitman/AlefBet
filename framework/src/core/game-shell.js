@@ -8,11 +8,16 @@ import { GameState } from './state.js';
 export class GameShell {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
-   * @param {object} config - הגדרות: { totalRounds, title }
+   * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
    */
   constructor(containerEl, config = {}) {
     this.container = containerEl;
-    this.config = { totalRounds: 8, title: 'משחק', ...config };
+    this.config = {
+      totalRounds: 8,
+      title: 'משחק',
+      homeUrl: '../../index.html',
+      ...config,
+    };
     this.events = new EventBus();
     this.state = new GameState(this.config.totalRounds);
     this._buildShell();
@@ -20,15 +25,23 @@ export class GameShell {
 
   _buildShell() {
     this.container.classList.add('alefbet-game');
+
+    const backBtn = this.config.homeUrl
+      ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="ספריית משחקים">🏠</a>`
+      : '<div class="game-header__spacer"></div>';
+
     this.container.innerHTML = `
       <div class="game-header">
+        <div class="game-header__spacer"></div>
         <h1 class="game-title"></h1>
+        ${backBtn}
       </div>
       <div class="game-body"></div>
       <div class="game-footer"></div>
     `;
-    this.titleEl = this.container.querySelector('.game-title');
-    this.bodyEl = this.container.querySelector('.game-body');
+
+    this.titleEl  = this.container.querySelector('.game-title');
+    this.bodyEl   = this.container.querySelector('.game-body');
     this.footerEl = this.container.querySelector('.game-footer');
     this.setTitle(this.config.title);
   }
@@ -61,9 +74,7 @@ export class GameShell {
   }
 
   /** קבל את מצב המשחק הנוכחי */
-  getState() {
-    return this.state;
-  }
+  getState() { return this.state; }
 
   /** הירשם לאירועי מחזור החיים: start, round, end */
   on(event, handler) {
