@@ -380,3 +380,81 @@
     margin: 0 auto;
   }
 }
+
+/* ── Landscape Layout ────────────────────────────────────────────────────── */
+@media (orientation: landscape) and (max-height: 600px) {
+  .alefbet-game {
+    max-width: 100%;
+    padding: var(--ab-space-sm) var(--ab-space-md);
+  }
+
+  .game-header {
+    padding: var(--ab-space-xs) 0;
+  }
+
+  .game-title {
+    font-size: var(--ab-font-size-lg);
+  }
+
+  /* Side-by-side: letter left, cards right */
+  .game-body {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: var(--ab-space-lg);
+    padding: var(--ab-space-xs) 0;
+  }
+
+  .game-instruction {
+    display: none; /* hidden in landscape — letter is self-explanatory */
+  }
+
+  .letter-display {
+    width: 110px;
+    height: 110px;
+    font-size: calc(48px * var(--font-scale));
+    flex-shrink: 0;
+  }
+
+  /* 2×2 grid stays compact */
+  .option-cards-grid {
+    gap: var(--ab-space-sm);
+    max-width: none;
+  }
+
+  .option-card {
+    min-height: 80px;
+    padding: var(--ab-space-sm);
+  }
+
+  .option-card__emoji {
+    font-size: calc(28px * var(--font-scale));
+  }
+
+  .option-card__text {
+    font-size: var(--ab-font-size-base);
+  }
+
+  /* Progress bar in footer stays compact */
+  .game-footer {
+    padding: var(--ab-space-xs) 0;
+  }
+
+  .progress-bar {
+    max-width: 100%;
+  }
+
+  /* Completion screen */
+  .completion-screen__content {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--ab-space-md);
+    padding: var(--ab-space-lg);
+  }
+
+  .completion-screen__stars {
+    font-size: calc(32px * var(--font-scale));
+    width: 100%;
+  }
+}

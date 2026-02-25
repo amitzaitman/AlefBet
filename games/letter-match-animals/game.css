@@ -10,6 +10,18 @@
   min-height: 130px;
 }
 
+/* Landscape: options container fills available width */
+@media (orientation: landscape) and (max-height: 600px) {
+  .options-container {
+    max-width: 420px;
+    flex: 1;
+  }
+
+  .option-card {
+    min-height: 80px;
+  }
+}
+
 /* Emphasize the letter display */
 .letter-display {
   animation: letter-appear 0.4s ease-out both;
