@@ -1,6 +1,6 @@
 /**
  * גרירה ושחרור (Drag & Drop)
- * תומך בעכבר, מגע ועט — מבוסס PointerEvents
+ * תומך בעכבר, מגע ועט — מבוסס PointerEvents + setPointerCapture
  * [נוסף על ידי: nikud-match game]
  *
  * שימוש:
@@ -17,12 +17,10 @@ let _halfW = 0, _halfH = 0; // half-dimensions of clone
 
 const _targets = new Map(); // el → { onDrop }
 
+// The clone always has pointer-events:none so elementFromPoint skips it —
+// no need to hide/show it.
 function _findTargetAt(x, y) {
-  // Hide clone temporarily so it doesn't block elementFromPoint
-  if (_clone) _clone.style.display = 'none';
-  const el = document.elementFromPoint(x, y)?.closest('[data-drop-target="true"]') || null;
-  if (_clone) _clone.style.display = '';
-  return el;
+  return document.elementFromPoint(x, y)?.closest('[data-drop-target="true"]') || null;
 }
 
 // ── Floating Clone ────────────────────────────────────────────────────────
@@ -39,7 +37,7 @@ function _createClone(sourceEl, x, y) {
     top:           `${y - _halfH}px`,
     width:         `${rect.width}px`,
     height:        `${rect.height}px`,
-    pointerEvents: 'none',
+    pointerEvents: 'none',   // keeps it out of elementFromPoint + hit-testing
     zIndex:        '9999',
     opacity:       '0.85',
     transform:     'scale(1.12)',
@@ -76,41 +74,6 @@ function _clearHighlight() {
   _hoveredTarget = null;
 }
 
-// ── Global pointer handlers (active during drag) ──────────────────────────
-
-function _onPointerMove(e) {
-  _moveClone(e.clientX, e.clientY);
-  _highlightTarget(_findTargetAt(e.clientX, e.clientY));
-}
-
-function _onPointerUp(e) {
-  _clearHighlight();
-  const targetEl = _findTargetAt(e.clientX, e.clientY);
-  _finalizeDrop(targetEl);
-  _endDrag();
-}
-
-function _finalizeDrop(targetEl) {
-  if (!_activeSource || !targetEl) return;
-  const targetInfo = _targets.get(targetEl);
-  if (!targetInfo) return;
-  targetInfo.onDrop({
-    data:     _activeSource.data,
-    sourceEl: _activeSource.el,
-    targetEl,
-  });
-}
-
-function _endDrag() {
-  if (_activeSource) {
-    _activeSource.el.classList.remove('drag-source--dragging');
-  }
-  _destroyClone();
-  _activeSource = null;
-  document.removeEventListener('pointermove', _onPointerMove);
-  document.removeEventListener('pointerup',   _onPointerUp);
-}
-
 // ── Public API ────────────────────────────────────────────────────────────
 
 /**
@@ -122,23 +85,59 @@ function _endDrag() {
 export function createDragSource(el, data) {
   el.classList.add('drag-source');
 
+  // Handlers are created per-drag so they can be removed cleanly
+  let _moveHandler    = null;
+  let _upHandler      = null;
+  let _cancelHandler  = null;
+
+  function _endDrag() {
+    if (_moveHandler) {
+      el.removeEventListener('pointermove',   _moveHandler);
+      el.removeEventListener('pointerup',     _upHandler);
+      el.removeEventListener('pointercancel', _cancelHandler);
+      _moveHandler = _upHandler = _cancelHandler = null;
+    }
+    _clearHighlight();
+    _destroyClone();
+    el.classList.remove('drag-source--dragging');
+    _activeSource = null;
+  }
+
   function onPointerDown(e) {
-    if (e.button !== undefined && e.button !== 0) return; // left click only (mouse)
+    if (e.button !== undefined && e.button !== 0) return; // left button only
     e.preventDefault();
 
-    // Release any implicit pointer capture so pointermove/pointerup
-    // fire on document (needed for touch)
-    if (el.hasPointerCapture?.(e.pointerId)) {
-      el.releasePointerCapture(e.pointerId);
-    }
+    // End any existing drag (shouldn't happen, but be safe)
+    if (_activeSource) _endDrag();
 
-    _activeSource?.el.classList.remove('drag-source--dragging');
     _activeSource = { el, data };
     el.classList.add('drag-source--dragging');
     _createClone(el, e.clientX, e.clientY);
 
-    document.addEventListener('pointermove', _onPointerMove);
-    document.addEventListener('pointerup',   _onPointerUp);
+    // Explicit pointer capture ensures pointermove/pointerup always fire on
+    // this element — for BOTH mouse and touch — even when the pointer moves
+    // outside the element. clientX/clientY still reflect the real position.
+    el.setPointerCapture(e.pointerId);
+
+    _moveHandler = (ev) => {
+      _moveClone(ev.clientX, ev.clientY);
+      _highlightTarget(_findTargetAt(ev.clientX, ev.clientY));
+    };
+
+    _upHandler = (ev) => {
+      const targetEl = _findTargetAt(ev.clientX, ev.clientY);
+      _endDrag();
+      // Finalize after cleanup so onDrop can safely call destroy()
+      if (targetEl && _targets.has(targetEl)) {
+        _targets.get(targetEl).onDrop({ data, sourceEl: el, targetEl });
+      }
+    };
+
+    _cancelHandler = () => _endDrag();
+
+    el.addEventListener('pointermove',   _moveHandler);
+    el.addEventListener('pointerup',     _upHandler);
+    el.addEventListener('pointercancel', _cancelHandler);
   }
 
   el.addEventListener('pointerdown', onPointerDown);
@@ -146,8 +145,8 @@ export function createDragSource(el, data) {
   return {
     destroy() {
       el.removeEventListener('pointerdown', onPointerDown);
-      el.classList.remove('drag-source', 'drag-source--dragging');
       if (_activeSource?.el === el) _endDrag();
+      el.classList.remove('drag-source');
     },
   };
 }
