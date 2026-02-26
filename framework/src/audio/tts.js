@@ -34,13 +34,13 @@ if (typeof speechSynthesis !== 'undefined') {
 
 function _processQueue() {
   if (_speaking || _queue.length === 0) return;
-  const text = _queue.shift();
-  const utt = new SpeechSynthesisUtterance(text);
+  const item = _queue.shift();
+  const utt = new SpeechSynthesisUtterance(item.text);
   utt.lang = 'he-IL';
   utt.rate = _rate;
   if (_hebrewVoice) utt.voice = _hebrewVoice;
-  utt.onend  = () => { _speaking = false; _processQueue(); };
-  utt.onerror = () => { _speaking = false; _processQueue(); };
+  utt.onend = () => { _speaking = false; item.resolve(); _processQueue(); };
+  utt.onerror = () => { _speaking = false; item.resolve(); _processQueue(); };
   _speaking = true;
   speechSynthesis.speak(utt);
 }
@@ -51,16 +51,19 @@ export const tts = {
    * אם הטקסט נמצא במטמון הניקוד — ישתמש בגרסה המנוקדת לשיפור ההגייה
    */
   speak(text) {
-    if (typeof speechSynthesis === 'undefined') return;
+    if (typeof speechSynthesis === 'undefined') return Promise.resolve();
     // Use nikud'd version if available — improves pronunciation significantly
     const toSpeak = getNikud(text);
-    _queue.push(toSpeak);
-    _processQueue();
+    return new Promise(resolve => {
+      _queue.push({ text: toSpeak, resolve });
+      _processQueue();
+    });
   },
 
   /** עצור את הדיבור הנוכחי */
   cancel() {
     if (typeof speechSynthesis === 'undefined') return;
+    _queue.forEach(item => item.resolve());
     _queue = [];
     _speaking = false;
     speechSynthesis.cancel();
