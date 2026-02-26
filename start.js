@@ -21,19 +21,19 @@ let PORT = parseInt(process.argv[2] ?? '8080', 10);
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
-  '.js':   'application/javascript; charset=utf-8',
-  '.mjs':  'application/javascript; charset=utf-8',
-  '.css':  'text/css; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.mjs': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
-  '.png':  'image/png',
-  '.jpg':  'image/jpeg',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.gif':  'image/gif',
-  '.svg':  'image/svg+xml',
-  '.ico':  'image/x-icon',
-  '.woff2':'font/woff2',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+  '.woff2': 'font/woff2',
   '.woff': 'font/woff',
-  '.ttf':  'font/ttf',
+  '.ttf': 'font/ttf',
 };
 
 function resolvePath(urlPath) {
@@ -80,6 +80,39 @@ const server = createServer((req, res) => {
   }
 });
 
+server.once('listening', () => {
+  const port = server.address().port;
+  PORT = port;
+  const url = `http://localhost:${port}`;
+
+  console.log('');
+  console.log('  ╔══════════════════════════════════════╗');
+  console.log('  ║   AlefBet — Hebrew Educational Games ║');
+  console.log('  ╠══════════════════════════════════════╣');
+  console.log(`  ║   Open:  ${url.padEnd(30)}║`);
+  console.log('  ║   Stop:  Ctrl + C                    ║');
+  console.log('  ╚══════════════════════════════════════╝');
+  console.log('');
+
+  // Auto-open browser
+  let openCmd;
+  if (process.platform === 'win32') {
+    openCmd = `start "" "${url}"`;
+  } else if (process.platform === 'darwin') {
+    openCmd = `open "${url}"`;
+  } else {
+    // WSL / Linux — try Windows browser via explorer.exe
+    openCmd = `explorer.exe "${url}" 2>/dev/null || xdg-open "${url}" 2>/dev/null || true`;
+  }
+
+  exec(openCmd, err => {
+    if (err) {
+      console.log(`  Could not open browser automatically.`);
+      console.log(`  Please open ${url} manually.\n`);
+    }
+  });
+});
+
 function listen(port) {
   server.once('error', err => {
     if (err.code === 'EADDRINUSE') {
@@ -90,37 +123,7 @@ function listen(port) {
     }
   });
 
-  server.listen(port, '127.0.0.1', () => {
-    PORT = port;
-    const url = `http://localhost:${port}`;
-
-    console.log('');
-    console.log('  ╔══════════════════════════════════════╗');
-    console.log('  ║   AlefBet — Hebrew Educational Games ║');
-    console.log('  ╠══════════════════════════════════════╣');
-    console.log(`  ║   Open:  ${url.padEnd(30)}║`);
-    console.log('  ║   Stop:  Ctrl + C                    ║');
-    console.log('  ╚══════════════════════════════════════╝');
-    console.log('');
-
-    // Auto-open browser
-    let openCmd;
-    if (process.platform === 'win32') {
-      openCmd = `start "" "${url}"`;
-    } else if (process.platform === 'darwin') {
-      openCmd = `open "${url}"`;
-    } else {
-      // WSL / Linux — try Windows browser via explorer.exe
-      openCmd = `explorer.exe "${url}" 2>/dev/null || xdg-open "${url}" 2>/dev/null || true`;
-    }
-
-    exec(openCmd, err => {
-      if (err) {
-        console.log(`  Could not open browser automatically.`);
-        console.log(`  Please open ${url} manually.\n`);
-      }
-    });
-  });
+  server.listen(port, '127.0.0.1');
 }
 
 listen(PORT);
