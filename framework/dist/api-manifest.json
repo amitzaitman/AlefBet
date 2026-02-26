@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T08:51:48.018Z",
+  "generatedAt": "2026-02-26T09:07:16.150Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -19,6 +19,11 @@
     },
     {
       "path": "__tests__/nikud-data.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
+      "path": "__tests__/no-meteg.test.js",
       "description": "",
       "exports": []
     },

@@ -22,8 +22,8 @@ function _parseResponse(tokens) {
     } else {
       const opts = token.nakdan?.options;
       if (opts?.length) {
-        // opts[0].w = המילה עם ניקוד; | = גבול מורפמי — יש להסיר
-        result += (opts[0].w ?? '').replace(/\|/g, '');
+        // opts[0].w = המילה עם ניקוד; | = גבול מורפמי, U+05BD = מתג — יש להסיר
+        result += (opts[0].w ?? '').replace(/\|/g, '').replace(/\u05BD/g, '');
       } else {
         result += token.str ?? '';
       }
@@ -39,7 +39,7 @@ async function _fetchNikud(text) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       addmorph: true,
-      keepmetagim: true,
+      keepmetagim: false,
       keepqq: false,
       nodageshdefmem: false,
       patachma: false,

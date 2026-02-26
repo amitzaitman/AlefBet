@@ -31,6 +31,9 @@ jobs:
       - name: Build framework
         run: npm run build
 
+      - name: Run tests
+        run: npm test
+
       - name: Assemble site
         run: |
           mkdir -p _site/framework

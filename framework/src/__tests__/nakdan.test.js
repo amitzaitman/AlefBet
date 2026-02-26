@@ -32,6 +32,18 @@ describe('addNikud', () => {
     expect(await addNikud('הַבַּיִת')).toBe('הַבַּיִת');
   });
 
+  it('strips meteg (U+05BD) cantillation mark from API response', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockResponse(['גְּרוֹ\u05BDר'])));
+    const { addNikud } = await import('../utils/nakdan.js');
+    expect(await addNikud('גרור')).toBe('גְּרוֹר');
+  });
+
+  it('strips both pipe and meteg together', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockResponse(['הַ|\u05BDנִּיקּוּד'])));
+    const { addNikud } = await import('../utils/nakdan.js');
+    expect(await addNikud('הניקוד')).toBe('הַנִּיקּוּד');
+  });
+
   it('caches results — fetch called only once for repeated input', async () => {
     const mockFetch = vi.fn().mockResolvedValue(mockResponse(['שָׁלוֹם']));
     vi.stubGlobal('fetch', mockFetch);

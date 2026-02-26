@@ -109,17 +109,17 @@ function A(t) {
       e += s.str ?? "";
     else {
       const a = (n = s.nakdan) == null ? void 0 : n.options;
-      a != null && a.length ? e += (a[0].w ?? "").replace(/\|/g, "") : e += s.str ?? "";
+      a != null && a.length ? e += (a[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : e += s.str ?? "";
     }
   return e;
 }
-async function $(t) {
+async function B(t) {
   const e = await fetch(W, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       addmorph: !0,
-      keepmetagim: !0,
+      keepmetagim: !1,
       keepqq: !1,
       nodageshdefmem: !1,
       patachma: !1,
@@ -134,11 +134,11 @@ async function $(t) {
   if (!Array.isArray(s)) throw new Error("Nakdan: invalid response");
   return A(s);
 }
-async function B(t) {
+async function $(t) {
   if (!(t != null && t.trim())) return t ?? "";
   if (h.has(t)) return h.get(t);
   try {
-    const e = await $(t);
+    const e = await B(t);
     return h.set(t, e), e;
   } catch {
     return h.set(t, t), t;
@@ -149,7 +149,7 @@ function M(t) {
 }
 async function O(t) {
   const e = [...new Set(t.filter((n) => n == null ? void 0 : n.trim()))];
-  await Promise.all(e.map((n) => B(n)));
+  await Promise.all(e.map((n) => $(n)));
 }
 let v = null, j = 0.9, g = [], p = !1;
 function q() {
@@ -518,7 +518,7 @@ export {
   R as EventBus,
   z as GameShell,
   T as GameState,
-  B as addNikud,
+  $ as addNikud,
   y as animate,
   re as createDragSource,
   ie as createDropTarget,
