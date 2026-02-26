@@ -1,7 +1,32 @@
 {
-  "generatedAt": "2026-02-25T23:20:22.899Z",
+  "generatedAt": "2026-02-26T07:28:58.022Z",
   "version": "1.0.0",
   "modules": [
+    {
+      "path": "__tests__/events.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
+      "path": "__tests__/hebrew-letters.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
+      "path": "__tests__/nakdan.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
+      "path": "__tests__/nikud-data.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
+      "path": "__tests__/state.test.js",
+      "description": "",
+      "exports": []
+    },
     {
       "path": "audio/sounds.js",
       "description": "אפקטים קוליים תכנותיים\nיוצר צלילים פשוטים דרך Web Audio API - ללא קבצים חיצוניים\n[נוסף על ידי: letter-match game]",

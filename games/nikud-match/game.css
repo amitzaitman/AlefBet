@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(6px, 1.5dvmin, 14px);
+  gap: clamp(10px, 2.5dvmin, 20px);
 }
 
 .nikud-panel--source {
@@ -24,11 +24,11 @@
   align-items: center;
   justify-content: center;
   gap: clamp(4px, 1dvmin, 8px);
-  width:  clamp(100px, 24dvmin, 160px);
-  height: clamp(100px, 24dvmin, 160px);
+  width: clamp(120px, 28dvmin, 190px);
+  height: clamp(120px, 28dvmin, 190px);
   background: var(--nikud-color, #4f67ff);
-  border-radius: clamp(12px, 3dvmin, 20px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  border-radius: clamp(16px, 4dvmin, 28px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -36,15 +36,18 @@
   animation: card-drop-in 0.4s ease-out both;
 }
 
-.nikud-drag-card:active { cursor: grabbing; transform: scale(0.96); }
+.nikud-drag-card:active {
+  cursor: grabbing;
+  transform: scale(0.96);
+}
 
 .nikud-drag-card--correct {
-  box-shadow: 0 0 0 5px #2ecc71, 0 6px 20px rgba(46,204,113,0.4);
+  box-shadow: 0 0 0 6px #00C896, 0 6px 20px rgba(0, 200, 150, 0.4);
 }
 
 /* Big symbol: the letter+nikud combination */
 .nikud-drag-card__symbol {
-  font-size: clamp(36px, 12dvmin, 68px);
+  font-size: clamp(44px, 15dvmin, 80px);
   font-weight: 900;
   color: #fff;
   line-height: 1;
@@ -52,19 +55,20 @@
 }
 
 .nikud-drag-card__name {
-  font-size: clamp(13px, 3dvmin, 18px);
+  font-size: clamp(16px, 4dvmin, 22px);
   font-weight: 700;
-  color: rgba(255,255,255,0.92);
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .nikud-drag-card__hint {
-  font-size: clamp(10px, 2dvmin, 13px);
-  color: rgba(255,255,255,0.7);
+  font-size: clamp(11px, 2dvmin, 14px);
+  color: rgba(255, 255, 255, 0.7);
+  display: none;
 }
 
 /* Selected state (tap-to-select on touch) */
 .drag-source--selected.nikud-drag-card {
-  box-shadow: 0 0 0 4px #fff, 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 5px #fff, 0 6px 20px rgba(0, 0, 0, 0.3);
   transform: scale(1.06);
 }
 
@@ -72,7 +76,7 @@
 .nikud-options-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: clamp(6px, 1.5dvmin, 14px);
+  gap: clamp(10px, 2.5dvmin, 20px);
   width: 100%;
   max-width: 380px;
 }
@@ -81,11 +85,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: clamp(70px, 15dvmin, 120px);
+  min-height: clamp(90px, 18dvmin, 150px);
   background: #fff;
-  border: 3px solid #dee2e6;
-  border-radius: clamp(10px, 2.5dvmin, 18px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 4px solid #dee2e6;
+  border-radius: clamp(14px, 3.5dvmin, 24px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   transition: border-color 0.15s, transform 0.15s, background 0.15s, box-shadow 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -94,7 +98,7 @@
 }
 
 .nikud-letter-card__text {
-  font-size: clamp(30px, 10dvmin, 60px);
+  font-size: clamp(36px, 12dvmin, 70px);
   font-weight: 900;
   color: #1a1a2e;
   font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
@@ -107,17 +111,17 @@
 }
 
 .drop-target--hover.nikud-letter-card {
-  border-color: #4f67ff;
-  background: #f0f2ff;
+  border-color: #FF6B35;
+  background: #fff5f0;
   transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(79,103,255,0.25);
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.25);
 }
 
 /* Correct / wrong states */
 .nikud-letter-card--correct {
-  border-color: #2ecc71 !important;
-  background: #edfbf3 !important;
-  box-shadow: 0 0 0 4px #2ecc71, 0 4px 16px rgba(46,204,113,0.35) !important;
+  border-color: #00C896 !important;
+  background: #e8faf5 !important;
+  box-shadow: 0 0 0 6px #00C896, 0 4px 16px rgba(0, 200, 150, 0.35) !important;
 }
 
 .nikud-letter-card--wrong {
@@ -127,6 +131,13 @@
 
 /* ── Animations ──────────────────────────────────────────────────────────── */
 @keyframes card-drop-in {
-  from { opacity: 0; transform: scale(0.75) translateY(-10px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0);     }
+  from {
+    opacity: 0;
+    transform: scale(0.75) translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
