@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AlefBet Creator — יצירת משחקים חינוכיים</title>
+  <title>AlefBet Creator — יְצִירַת מִשְׂחָקִים חִיֽנּוּכִיִּים</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -14,8 +14,8 @@
   <div id="api-key-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal__backdrop"></div>
     <div class="modal__box">
-      <h2 id="modal-title" class="modal__title">ברוכים הבאים ל-AlefBet Creator</h2>
-      <p class="modal__desc">כדי להתחיל, הזן את מפתח ה-API של Anthropic שלך</p>
+      <h2 id="modal-title" class="modal__title">בְּרוּכִים הַבָּאִים לְ-AlefBet Creator</h2>
+      <p class="modal__desc">כְּדֵי לְהַתְחִיל, הַזֵּן אֶת מַפְתֵּחַ הָ-API שֶׁל Anthropic שֶׁלְּךָ</p>
       <input
         id="api-key-input"
         type="password"
@@ -25,8 +25,8 @@
         spellcheck="false"
         dir="ltr"
       />
-      <p class="modal__note">המפתח נשמר רק בדפדפן שלך ולא נשלח לשום שרת</p>
-      <button id="api-key-submit" class="modal__btn">התחל ליצור</button>
+      <p class="modal__note">הַמַּפְתֵּחַ נִשְׁמַר רַק בַּדַּפְדְּפָן שֶׁלְּךָ וְלֹא נִשְׁלַח לְשׁוּם שָׁרָת</p>
+      <button id="api-key-submit" class="modal__btn">הַתְחֵל לִיצֹוֽר</button>
     </div>
   </div>
 
@@ -40,10 +40,10 @@
       </div>
       <div class="app-header__actions">
         <button id="save-game-btn" class="btn btn--sm btn--success" hidden>
-          שמור משחק
+          שָׁמוּר מִשְׂחָק
         </button>
         <button id="change-key-btn" class="btn btn--sm btn--ghost">
-          שנה מפתח API
+          שָׁנָה מְפַתֵּחַ API
         </button>
       </div>
     </header>
@@ -53,19 +53,19 @@
       <!-- Chat Panel (RTL, right side) -->
       <aside class="chat-panel">
         <div class="quick-actions">
-          <p class="quick-actions__label">התחל עם:</p>
+          <p class="quick-actions__label">הַתְחֵל עִם:</p>
           <div class="quick-actions__buttons">
-            <button class="quick-btn" data-prompt="צור משחק התאמת אותיות עם חיות לילדים">התאמת אותיות</button>
-            <button class="quick-btn" data-prompt="צור משחק עקיבה על אותיות עבריות">עקיבה על אותיות</button>
-            <button class="quick-btn" data-prompt="צור משחק ניחוש מילים לפי תמונה">ניחוש מילים</button>
-            <button class="quick-btn" data-prompt="צור משחק זיכרון עם זוגות של אות ותמונה">משחק זיכרון</button>
+            <button class="quick-btn" data-prompt="צוּר מִשְׂחַק הַתְאָמַת אוֹתִיּוֹת עִם חַיּוּת לִילָדִים">הַתְאָמַת אוֹתִיּוֹת</button>
+            <button class="quick-btn" data-prompt="צוּר מִשְׂחַק עֲקִיבָה עַל אוֹתִיּוֹת עִבְרִיּוֹת">עֲקִיבָה עַל אוֹתִיּוֹת</button>
+            <button class="quick-btn" data-prompt="צוּר מִשְׂחַק נִיֽחוּשׁ מִיֽלִּים לְפִי תְּמוּנָה">נִיֽחוּשׁ מִיֽלִּים</button>
+            <button class="quick-btn" data-prompt="צוּר מִשְׂחַק זִיֽכָּרוֹן עִם זוּגוֹת שֶׁל אוֹת וּתְמוּנָה">מִשְׂחַק זִיֽכָּרוֹן</button>
           </div>
         </div>
 
-        <div id="chat-messages" class="chat-messages" aria-live="polite" aria-label="שיחה">
+        <div id="chat-messages" class="chat-messages" aria-live="polite" aria-label="שִׂיחָה">
           <div class="chat-welcome">
-            <p>שלום! אני כאן לעזור לך ליצור משחקים חינוכיים בעברית לילדים.</p>
-            <p>תאר לי את המשחק שאתה רוצה ואני אייצר אותו עבורך.</p>
+            <p>שָׁלוֹם! אֲנִי כָּאן לַעֲזֹוֽר לְךָ לִיצֹוֽר מִשְׂחָקִים חִיֽנּוּכִיִּים בְּעִבְרִית לִילָדִים.</p>
+            <p>תָּאֵר לִי אֶת הַמִּשְׂחָק שֶׁאַתָּה רוֹצֶה וַאֲנִי אֲיַיֽצֵּר אוֹתוֹ עֲבוּרְךָ.</p>
           </div>
         </div>
 
@@ -73,11 +73,11 @@
           <textarea
             id="chat-input"
             class="chat-input"
-            placeholder="תאר את המשחק שאתה רוצה..."
+            placeholder="תָּאֵר אֶת הַמִּשְׂחָק שֶׁאַתָּה רוֹצֶה..."
             rows="3"
             dir="rtl"
           ></textarea>
-          <button type="submit" id="chat-send-btn" class="chat-send-btn" aria-label="שלח">
+          <button type="submit" id="chat-send-btn" class="chat-send-btn" aria-label="שְׁלַח">
             <span class="chat-send-btn__icon">←</span>
           </button>
         </form>
@@ -86,20 +86,20 @@
       <!-- Preview Panel (left side) -->
       <main class="preview-panel">
         <div class="preview-tabs">
-          <button class="preview-tab preview-tab--active" data-tab="preview">תצוגה מקדימה</button>
-          <button class="preview-tab" data-tab="code">קוד</button>
+          <button class="preview-tab preview-tab--active" data-tab="preview">תְּצוּגָה מַקְדִּימָה</button>
+          <button class="preview-tab" data-tab="code">קוֹד</button>
         </div>
 
         <div id="preview-pane" class="preview-pane">
           <div class="preview-empty">
             <div class="preview-empty__icon">🎮</div>
-            <p class="preview-empty__text">המשחק יופיע כאן לאחר שתיצור אחד</p>
+            <p class="preview-empty__text">הַמִּשְׂחָק יוֹפִיעַ כָּאן לְאַחַר שֶׁתִּיֽצֹּוֽר אֶחָד</p>
           </div>
         </div>
 
         <div id="code-pane" class="code-pane" hidden>
           <div class="code-toolbar">
-            <button id="copy-code-btn" class="btn btn--sm btn--ghost">העתק</button>
+            <button id="copy-code-btn" class="btn btn--sm btn--ghost">הֶעְתֵּק</button>
           </div>
           <pre id="code-output" class="code-output" dir="ltr"><code></code></pre>
         </div>

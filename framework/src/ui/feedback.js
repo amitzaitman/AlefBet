@@ -30,14 +30,14 @@ export function createFeedback(container) {
 
   return {
     /** הצג משוב חיובי */
-    correct(text = '!כל הכבוד') {
+    correct(text = '!כָּל הַכָּבוֹד') {
       sounds.correct();
       show(text, 'correct');
       animate(el, 'bounce');
     },
 
     /** הצג משוב שלילי */
-    wrong(text = 'נסה שוב') {
+    wrong(text = 'נַסֵּה שׁוּב') {
       sounds.wrong();
       show(text, 'wrong');
       animate(el, 'shake');

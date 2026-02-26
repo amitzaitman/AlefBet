@@ -51,7 +51,7 @@ export class ChatUI {
   addErrorMessage(text) {
     const el = document.createElement('div');
     el.className = 'message-error';
-    el.textContent = `שגיאה: ${text}`;
+    el.textContent = `שְׁגִיאָה: ${text}`;
     this.container.appendChild(el);
     this._scrollToBottom();
   }
@@ -81,7 +81,7 @@ export class ChatUI {
     wrapper.className = 'message message--assistant message--thinking';
     const bubble = document.createElement('div');
     bubble.className = 'message__bubble';
-    bubble.innerHTML = `חושב <span class="typing-dots"><span></span><span></span><span></span></span>`;
+    bubble.innerHTML = `חוֹשֵׁב <span class="typing-dots"><span></span><span></span><span></span></span>`;
     wrapper.appendChild(bubble);
     return wrapper;
   }

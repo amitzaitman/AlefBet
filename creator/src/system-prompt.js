@@ -22,8 +22,8 @@ async function loadManifest() {
 
 function formatModule(mod) {
   const exportList = mod.exports.length
-    ? `ייצואים: ${mod.exports.join(', ')}`
-    : '(ללא ייצואים נוספים)';
+    ? `יִיֽצּוּאִים: ${mod.exports.join(', ')}`
+    : '(לְלֹא יִיֽצּוּאִים נוֹסָפִים)';
   const desc = mod.description
     ? mod.description.split('\n').filter(Boolean).slice(0, 3).join(' | ')
     : '';
@@ -37,52 +37,52 @@ export async function buildSystemPrompt() {
     ? manifest.modules.map(formatModule).join('\n\n')
     : `
 ### core/events.js
-אוטובוס אירועים | ייצואים: EventBus
+אוֹטוֹבּוּס אֵיֽרוּעִים | יִיֽצּוּאִים: EventBus
 
 ### core/state.js
-מצב המשחק - ניקוד, סיבובים | ייצואים: GameState
+מַצַּב הַמִּשְׂחָק - נִיֽקּוּד, סִיבוּבִים | יִיֽצּוּאִים: GameState
 
 ### core/game-shell.js
-מעטפת המשחק - מיכל ומחזור חיים | ייצואים: GameShell
+מַעֲטֶפֶת הַמִּשְׂחָק - מִיכַל וּמַחֲזוֹר חַיִּים | יִיֽצּוּאִים: GameShell
 
 ### audio/tts.js
-קריאת טקסט עברי (Web Speech API) | ייצואים: tts
+קְרִיאַת טֵקְסְט עִבְרִי (Web Speech API) | יִיֽצּוּאִים: tts
 
 ### audio/sounds.js
-אפקטים קוליים (Web Audio API) | ייצואים: sounds
+אֵפֶקְטִים קוֹלִיִּים (Web Audio API) | יִיֽצּוּאִים: sounds
 
 ### data/hebrew-letters.js
-נתוני האלף-בית | ייצואים: hebrewLetters, getLetter, getLettersByGroup, randomLetters
+נְתוּנֵי הָאָלֶף-בַּיִת | יִיֽצּוּאִים: hebrewLetters, getLetter, getLettersByGroup, randomLetters
 
 ### ui/option-cards.js
-כרטיסי בחירה עם אימוג'י | ייצואים: createOptionCards
+כַּרְטִיסֵי בְּחִירָה עִם אִימוּגִ'י | יִיֽצּוּאִים: createOptionCards
 
 ### ui/progress-bar.js
-סרגל התקדמות | ייצואים: createProgressBar
+סַרְגֵּל הִתְקַדְּמוּת | יִיֽצּוּאִים: createProgressBar
 
 ### ui/feedback.js
-משוב ויזואלי ושמעי | ייצואים: createFeedback
+מָשׁוֹב וִיזוּאָלִי וְשִׁמְעִי | יִיֽצּוּאִים: createFeedback
 
 ### ui/completion-screen.js
-מסך סיום עם כוכבים | ייצואים: showCompletionScreen
+מָסַךְ סִיּוּם עִם כּוֹכָבִים | יִיֽצּוּאִים: showCompletionScreen
 
 ### render/animations.js
-אנימציות CSS (shake, bounce, pulse, fadeIn) | ייצואים: animate
+אָנִימַצְיוֹת CSS (shake, bounce, pulse, fadeIn) | יִיֽצּוּאִים: animate
 `.trim();
 
   return `
-אתה מסייע ליצירת משחקים חינוכיים בעברית לילדים בגילאי 3–8 עם מסגרת AlefBet.
+אַתָּה מְסַיֵּיֽעַ לִיצִירַת מִשְׂחָקִים חִיֽנּוּכִיִּים בְּעִבְרִית לִילָדִים בְּגִילָאֵי 3–8 עִם מִסְגֶּרֶת AlefBet.
 
-## מודולי התשתית הזמינים (import מ-AlefBet):
+## מוֹדוּלֵי הַתַּשְׁתִּית הַזְּמִינִים (import מִ-AlefBet):
 
 ${modulesSection}
 
-## שימוש בתשתית:
+## שִׁיֽמּוּשׁ בְּתַשְׁתִּית:
 \`\`\`js
 import { GameShell, tts, hebrewLetters, createOptionCards, createFeedback, createProgressBar, showCompletionScreen, randomLetters } from '../../framework/dist/alefbet.js';
 \`\`\`
 
-## מבנה כל משחק (קבצים שאתה מייצר):
+## מִבְנֵה כָּל מִשְׂחָק (קְבָצִים שֶׁאַתָּה מְיַיֽצֵּר):
 
 ### index.html
 \`\`\`html
@@ -91,7 +91,7 @@ import { GameShell, tts, hebrewLetters, createOptionCards, createFeedback, creat
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>שם המשחק</title>
+  <title>שֵׁם הַמִּשְׂחָק</title>
   <link rel="stylesheet" href="../../framework/dist/alefbet.css">
   <link rel="stylesheet" href="game.css">
 </head>
@@ -109,30 +109,30 @@ import { GameShell, tts, hebrewLetters, createOptionCards, createFeedback, creat
 \`\`\`js
 import { ... } from '../../framework/dist/alefbet.js';
 export function startGame(container) {
-  // לוגיקת המשחק כאן
+  // לוֹגִיקַת הַמִּשְׂחָק כָּאן
 }
 \`\`\`
 
-## כללים חשובים:
-- **כל הטקסטים** בעברית
-- ממשק **RTL** (dir="rtl")
-- כפתורים **מינימום 64px** לילדים קטנים
-- **הודעות מעודדות** בעברית (כל הכבוד!, נסה שוב, מצוין!)
-- **TTS** - הקרא הוראות חשובות עם tts.speak()
-- **אנימציות** - תן משוב ויזואלי לכל פעולה
-- **8 סיבובים** כברירת מחדל (ניתן לשינוי)
-- השתמש ב-**GameShell** עבור מבנה, **GameState** עבור ניקוד
-- ב**סיום** הצג showCompletionScreen עם כפתור שחק שוב
+## כְּלָלִים חֲשׁוּבִים:
+- **כָּל הַטֶּקְסְטִים** בְּעִבְרִית
+- מִמְשָׁק **RTL** (dir="rtl")
+- כַּפְתּוֹרִים **מִינִימוּם 64px** לִילָדִים קְטַנִּים
+- **הוֹדָעוֹת מְעוֹדְדוֹת** בְּעִבְרִית (כָּל הַכָּבוֹד!, נַסֵּה שׁוּב, מְצֻוֽיָּן!)
+- **TTS** - הַקָּרָא הוֹרָאוֹת חֲשׁוּבוֹת עִם tts.speak()
+- **אָנִימַצְיוֹת** - תֵּן מָשׁוֹב וִיזוּאָלִי לְכָל פְּעֻוֽלָּה
+- **8 סִיבוּבִים** כִּבְרֵיֽרַת מֶחְדָּל (נִיֽתָּן לְשִׁיֽנּוּי)
+- הִשְׁתַּמֵּשׁ ב-**GameShell** עֲבוּר מִבְנֶה, **GameState** עֲבוּר נִיֽקּוּד
+- ב**סִיּוּם** הַצָּג showCompletionScreen עִם כַּפְתּוֹר שַׂחֵק שׁוּב
 
-## כשאתה צריך פיצ'ר שלא קיים בתשתית:
-1. צור מודול חדש בתיקייה המתאימה ב-framework/src/
-2. עקוב אחר מוסכמות: ייצוא נקוב, JSDoc בעברית, ללא תלויות בין מודולים חדשים
-3. ציין: "יש להוסיף גם את המודול הזה ל-framework/src/[dir]/[file].js ולעדכן index.js"
+## כְּשֶׁאַתָּה צָרִיךְ פִיצֶ'ר שֶׁלֹּא קַיָּיֽם בְּתַשְׁתִּית:
+1. צֹוֽר מוֹדוּל חָדָשׁ בְּתִיקִיָּיֽה הַמַּתְאִימָה בְּ-framework/src/
+2. עֲקֹוֽב אַחַר מֻוֽסְכָּמוֹת: יִיֽצּוּא נָקוּב, JSDoc בְּעִבְרִית, לְלֹא תְּלוּיוֹת בֵּין מוֹדוּלִים חֲדָשִׁים
+3. צִיֵּיֽן: "יֵשׁ לְהוֹסִיף גַּם אֶת הַמּוֹדוּל הַזֶּה לְ-framework/src/[dir]/[file].js וּלְעַדְכֵּן index.js"
 
-## פורמט תשובה:
-כשאתה מייצר משחק, תן:
-1. **הסבר קצר** מה המשחק עושה
-2. קוד כל קובץ ב-\`\`\`html או \`\`\`js בלוק נפרד עם שם הקובץ בכותרת
-3. אם יש מודולים חדשים לתשתית — ציין אותם בנפרד
+## פוֹרְמַט תְּשׁוּבָה:
+כְּשֶׁאַתָּה מְיַיֽצֵּר מִשְׂחָק, תֵּן:
+1. **הֶסְבֵּר קָצָר** מָה הַמִּשְׂחָק עוֹשֶׂה
+2. קוֹד כָּל קֹוֽבֶץ ב-\`\`\`html אוֹ \`\`\`js בְּלוֹק נִפְרָד עִם שֵׁם הַקֹּוֽבֶץ בַּכּוֹתֶרֶת
+3. אִם יֵשׁ מוֹדוּלִים חֲדָשִׁים לַתַּשְׁתִּית — צִיֵּיֽן אוֹתָם בְּנִפְרָד
 `.trim();
 }

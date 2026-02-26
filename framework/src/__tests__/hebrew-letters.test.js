@@ -36,7 +36,7 @@ describe('hebrewLetters data integrity', () => {
   });
 
   it('all final forms are marked correctly', () => {
-    const finalChars = ['ך', 'ם', 'ן', 'ף', 'ץ'];
+    const finalChars = ['ךְ', 'םִ', 'ן', 'ף', 'ץ'];
     for (const ch of finalChars) {
       expect(getLetter(ch)?.isFinal, `${ch} should be isFinal`).toBe(true);
     }
@@ -45,8 +45,8 @@ describe('hebrewLetters data integrity', () => {
 
 describe('getLetter', () => {
   it('returns the correct entry for known letters', () => {
-    expect(getLetter('א')?.name).toBe('אלף');
-    expect(getLetter('ת')?.name).toBe('תו');
+    expect(getLetter('א')?.name).toBe('אֶלֶף');
+    expect(getLetter('ת')?.name).toBe('תָּו');
   });
 
   it('returns null for characters not in the alphabet', () => {

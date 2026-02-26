@@ -189,8 +189,8 @@ copyCodeBtn.addEventListener('click', async () => {
   const text = codeOutput.textContent;
   try {
     await navigator.clipboard.writeText(text);
-    copyCodeBtn.textContent = 'הועתק!';
-    setTimeout(() => { copyCodeBtn.textContent = 'העתק'; }, 2000);
+    copyCodeBtn.textContent = 'הֻוֽעְתַּק!';
+    setTimeout(() => { copyCodeBtn.textContent = 'הֶעְתֵּק'; }, 2000);
   } catch {
     // Fallback
     const ta = document.createElement('textarea');

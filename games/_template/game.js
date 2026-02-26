@@ -17,14 +17,14 @@ import {
 export function startGame(container) {
   const shell = new GameShell(container, {
     totalRounds: 5,
-    title: 'שם המשחק',
+    title: 'שֵׁם הַמִּשְׂחָק',
   });
 
   // הוסף לוגיקת משחק כאן
-  shell.bodyEl.innerHTML = '<p style="text-align:center;padding:2rem">המשחק שלך יופיע כאן</p>';
+  shell.bodyEl.innerHTML = '<p style="text-align:center;padding:2rem">הַמִּשְׂחָק שֶׁלְּךָ יוֹפִיעַ כָּאן</p>';
 
   shell.on('start', () => {
-    tts.speak('ברוך הבא למשחק');
+    tts.speak('בָּרוּךְ הַבָּא לַמִּשְׂחָק');
   });
 
   shell.start();

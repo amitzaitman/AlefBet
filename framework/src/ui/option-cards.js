@@ -32,7 +32,7 @@ export function createOptionCards(container, options, onSelect) {
   container.appendChild(grid);
 
   return {
-    /** הדגש כרטיס לפי סוג: 'correct' | 'wrong' | 'hint' */
+    /** הַדָּגֵשׁ כַּרְטִיס לְפִי סוּג: 'correct' | 'wrong' | 'hint' */
     highlight(id, type) {
       cards.forEach(({ el, option }) => {
         if (option.id === id) {

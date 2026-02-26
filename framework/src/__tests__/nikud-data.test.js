@@ -51,7 +51,7 @@ describe('nikudBaseLetters', () => {
   });
 
   it('contains no final-form letters', () => {
-    const finalForms = ['ך', 'ם', 'ן', 'ף', 'ץ'];
+    const finalForms = ['ךְ', 'םִ', 'ן', 'ף', 'ץ'];
     for (const ch of nikudBaseLetters) {
       expect(finalForms).not.toContain(ch);
     }

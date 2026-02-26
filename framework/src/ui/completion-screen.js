@@ -22,10 +22,10 @@ export function showCompletionScreen(container, score, totalRounds, onReplay) {
   screen.className = 'completion-screen';
   screen.innerHTML = `
     <div class="completion-screen__content">
-      <div class="completion-screen__stars" aria-label="${stars} כוכבים">${starDisplay}</div>
-      <h2 class="completion-screen__title">!כל הכבוד</h2>
-      <p class="completion-screen__score">ניקוד: ${score} מתוך ${totalRounds}</p>
-      <button class="completion-screen__replay btn btn--primary">שחק שוב</button>
+      <div class="completion-screen__stars" aria-label="${stars} כּוֹכָבִים">${starDisplay}</div>
+      <h2 class="completion-screen__title">!כָּל הַכָּבוֹד</h2>
+      <p class="completion-screen__score">נִיֽקּוּד: ${score} מִתּוֹךְ ${totalRounds}</p>
+      <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
     </div>
   `;
 

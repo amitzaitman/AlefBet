@@ -66,7 +66,7 @@ export function renderPreview(container, files) {
   const iframe = document.createElement('iframe');
   iframe.className = 'preview-iframe';
   iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
-  iframe.setAttribute('title', 'תצוגה מקדימה של המשחק');
+  iframe.setAttribute('title', 'תְּצוּגָה מַקְדִּימָה שֶׁל הַמִּשְׂחָק');
 
   container.appendChild(iframe);
 

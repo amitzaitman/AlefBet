@@ -18,34 +18,34 @@ import {
 // ── Game data ─────────────────────────────────────────────────────────────
 
 const ROUNDS = [
-  { target: 'א', correct: 'אריה',  correctEmoji: '🦁' },
-  { target: 'ב', correct: 'בית',   correctEmoji: '🏠' },
-  { target: 'ג', correct: 'גמל',   correctEmoji: '🐪' },
-  { target: 'ד', correct: 'דג',    correctEmoji: '🐟' },
-  { target: 'ה', correct: 'הר',    correctEmoji: '⛰️' },
-  { target: 'ו', correct: 'ורד',   correctEmoji: '🌹' },
-  { target: 'ז', correct: 'זאב',   correctEmoji: '🐺' },
-  { target: 'ח', correct: 'חתול',  correctEmoji: '🐱' },
+  { target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' },
+  { target: 'ב', correct: 'בַּיִת', correctEmoji: '🏠' },
+  { target: 'ג', correct: 'גָּמָל', correctEmoji: '🐪' },
+  { target: 'ד', correct: 'דָּג', correctEmoji: '🐟' },
+  { target: 'ה', correct: 'הַר', correctEmoji: '⛰️' },
+  { target: 'ו', correct: 'וֶרֶד', correctEmoji: '🌹' },
+  { target: 'ז', correct: 'זְאֵב', correctEmoji: '🐺' },
+  { target: 'ח', correct: 'חָתוּל', correctEmoji: '🐱' },
 ];
 
 const DISTRACTORS = [
-  { text: 'טלה',  emoji: '🐑' }, { text: 'יונה', emoji: '🕊️' },
-  { text: 'כלב',  emoji: '🐕' }, { text: 'מים',  emoji: '💧' },
-  { text: 'נחש',  emoji: '🐍' }, { text: 'סוס',  emoji: '🐎' },
-  { text: 'עיט',  emoji: '🦅' }, { text: 'פיל',  emoji: '🐘' },
-  { text: 'צב',   emoji: '🐢' }, { text: 'קוף',  emoji: '🐒' },
-  { text: 'רכב',  emoji: '🚗' }, { text: 'שמש',  emoji: '☀️' },
-  { text: 'תפוח', emoji: '🍎' },
+  { text: 'טָלֶה', emoji: '🐑' }, { text: 'יוֹנָה', emoji: '🕊️' },
+  { text: 'כֶּלֶב', emoji: '🐕' }, { text: 'מַיִם', emoji: '💧' },
+  { text: 'נָחָשׁ', emoji: '🐍' }, { text: 'סוּס', emoji: '🐎' },
+  { text: 'עַיִט', emoji: '🦅' }, { text: 'פִּיל', emoji: '🐘' },
+  { text: 'צָב', emoji: '🐢' }, { text: 'קוֹף', emoji: '🐒' },
+  { text: 'רֶכֶב', emoji: '🚗' }, { text: 'שֶׁמֶשׁ', emoji: '☀️' },
+  { text: 'תַּפּוּחַ', emoji: '🍎' },
 ];
 
 // ── All texts that need nikud ──────────────────────────────────────────────
 
 const STATIC_TEXTS = [
-  'מצא את החיה שמתחילה באות:',
-  'ברוכים הבאים! מצא את החיה שמתחילה באות',
-  'כל הכבוד',
-  'נסה שוב',
-  'האות',
+  'מָצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת:',
+  'בְּרוּכִים הַבָּאִים! מָצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת',
+  'כָּל הַכָּבוֹד',
+  'נַסֵּה שׁוּב',
+  'הָאוֹת',
   ...ROUNDS.map(r => r.correct),
   ...DISTRACTORS.map(d => d.text),
 ];
@@ -65,7 +65,7 @@ function buildOptions(round) {
 
 export async function startGame(container) {
   // Show loading indicator while nikud loads
-  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוען ניקוד...</div>';
+  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיֽקּוּד...</div>';
 
   await preloadNikud(STATIC_TEXTS);
 
@@ -77,8 +77,8 @@ export async function startGame(container) {
   });
 
   let progressBar = null;
-  let feedback    = null;
-  let cards       = null;
+  let feedback = null;
+  let cards = null;
   let currentRoundIndex = 0;
 
   function buildRoundUI(roundData) {
@@ -97,7 +97,7 @@ export async function startGame(container) {
     const letterEl = document.createElement('div');
     letterEl.className = 'letter-display';
     letterEl.textContent = roundData.target;
-    letterEl.setAttribute('aria-label', `האות ${letterInfo?.nameNikud || letterInfo?.name || roundData.target}`);
+    letterEl.setAttribute('aria-label', `הָאוֹת ${letterInfo?.nameNikud || letterInfo?.name || roundData.target}`);
     leftPanel.appendChild(letterEl);
 
     shell.bodyEl.appendChild(leftPanel);
@@ -126,7 +126,7 @@ export async function startGame(container) {
 
     if (option.id === 'correct') {
       cards.highlight('correct', 'correct');
-      feedback.correct(`!נכון — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
+      feedback.correct(`!נָכוֹן — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
       tts.speak('כל הכבוד');
 
       setTimeout(() => {
@@ -137,7 +137,7 @@ export async function startGame(container) {
           currentRoundIndex++;
           buildRoundUI(ROUNDS[currentRoundIndex]);
           const nextName = getLetter(ROUNDS[currentRoundIndex].target)?.nameNikud || ROUNDS[currentRoundIndex].target;
-          tts.speak(`האות ${nextName}`);
+          tts.speak(`הָאוֹת ${nextName}`);
         } else {
           showCompletionScreen(container, shell.state.score, ROUNDS.length, () => startGame(container));
         }
@@ -145,7 +145,7 @@ export async function startGame(container) {
 
     } else {
       cards.highlight(option.id, 'wrong');
-      feedback.wrong(`!נסה שוב — חפש את ${letterName}`);
+      feedback.wrong(`!נַסֵּה שׁוּב — חַפֵּשׂ אֶת ${letterName}`);
       tts.speak('נסה שוב');
 
       setTimeout(() => {
@@ -171,7 +171,7 @@ export async function startGame(container) {
     buildRoundUI(ROUNDS[currentRoundIndex]);
 
     const firstName = getLetter(ROUNDS[0].target)?.nameNikud || ROUNDS[0].target;
-    tts.speak(`ברוכים הבאים! מצא את החיה שמתחילה באות ${firstName}`);
+    tts.speak(`בְּרוּכִים הַבָּאִים! מְצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת ${firstName}`);
   });
 
   shell.start();
