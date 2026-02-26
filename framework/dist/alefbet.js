@@ -63,7 +63,7 @@ class z {
   }
   _buildShell() {
     this.container.classList.add("alefbet-game");
-    const e = this.config.homeUrl ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּיֽת מִשְׂחָקִים">🏠</a>` : '<div class="game-header__spacer"></div>';
+    const e = this.config.homeUrl ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>` : '<div class="game-header__spacer"></div>';
     this.container.innerHTML = `
       <div class="game-header">
         <div class="game-header__spacer"></div>
@@ -273,10 +273,10 @@ const C = [
   { id: "patah", name: "פֶּתַח", nameNikud: "פָּתַח", symbol: "ַ", sound: "אָ", color: "#FF8C42", textColor: "#fff" },
   { id: "hiriq", name: "חִירִיק", nameNikud: "חִירִיק", symbol: "ִ", sound: "אִי", color: "#4ECDC4", textColor: "#fff" },
   { id: "tzere", name: "צָרָה", nameNikud: "צֵרֶה", symbol: "ֵ", sound: "אֶ", color: "#45B7D1", textColor: "#fff" },
-  { id: "segol", name: "סָגֹוֽל", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶ", color: "#9B59B6", textColor: "#fff" },
+  { id: "segol", name: "סָגֹול", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶ", color: "#9B59B6", textColor: "#fff" },
   { id: "holam", name: "חוֹלֵם", nameNikud: "חוֹלָם", symbol: "ֹ", sound: "אֹ", color: "#2ECC71", textColor: "#fff" },
-  { id: "kubbutz", name: "קֻוֽבּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אֻ", color: "#F39C12", textColor: "#fff" },
-  { id: "shva", name: "שָׁוְוֽא", nameNikud: "שְׁוָא", symbol: "ְ", sound: "אְ", color: "#95A5A6", textColor: "#fff" }
+  { id: "kubbutz", name: "קֻובּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אֻ", color: "#F39C12", textColor: "#fff" },
+  { id: "shva", name: "שָׁוְוא", nameNikud: "שְׁוָא", symbol: "ְ", sound: "אְ", color: "#95A5A6", textColor: "#fff" }
 ], Q = ["א", "ב", "ג", "ד", "מ", "נ", "ל", "ר", "ש", "ת", "פ", "ק"];
 function Z(t, e) {
   return t + e;
@@ -444,7 +444,7 @@ function ae(t, e, n, s) {
     <div class="completion-screen__content">
       <div class="completion-screen__stars" aria-label="${r} כּוֹכָבִים">${i}</div>
       <h2 class="completion-screen__title">!כָּל הַכָּבוֹד</h2>
-      <p class="completion-screen__score">נִיֽקּוּד: ${e} מִתּוֹךְ ${n}</p>
+      <p class="completion-screen__score">נִיקּוּד: ${e} מִתּוֹךְ ${n}</p>
       <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
     </div>
   `, o.querySelector(".completion-screen__replay").addEventListener("click", () => {

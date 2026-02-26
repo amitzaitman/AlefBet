@@ -24,9 +24,9 @@ import {
 // ── Texts to preload ──────────────────────────────────────────────────────
 
 const STATIC_TEXTS = [
-  'גְּרֹוֽר לְאוֹת עִם אוֹתוֹ נִיֽקּוּד:',
-  'גְּרֹוֽר אוֹתִי',
-  'בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיֽקּוּד',
+  'גְּרֹור לְאוֹת עִם אוֹתוֹ נִיקּוּד:',
+  'גְּרֹור אוֹתִי',
+  'בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד',
   'כָּל הַכָּבוֹד',
   'נַסֵּה שׁוּב',
   'מָצָא אֶת',
@@ -126,7 +126,7 @@ function showSettingsDialog(container) {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיֽקּוּד...</div>';
+  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיקּוּד...</div>';
 
   await preloadNikud(STATIC_TEXTS);
 
@@ -136,7 +136,7 @@ export async function startGame(container) {
 
   const shell = new GameShell(container, {
     totalRounds: 8,
-    title: 'לִמּוּד נִיֽקּוּד',
+    title: 'לִמּוּד נִיקּוּד',
   });
 
   // Inject Settings button into header spacer
@@ -169,7 +169,7 @@ export async function startGame(container) {
 
     const instruction = document.createElement('p');
     instruction.className = 'game-instruction';
-    instruction.textContent = getNikud('גְּרֹוֽר לְאוֹת עִם אוֹתוֹ נִיֽקּוּד:');
+    instruction.textContent = getNikud('גְּרֹור לְאוֹת עִם אוֹתוֹ נִיקּוּד:');
     leftPanel.appendChild(instruction);
 
     const dragCard = document.createElement('div');
@@ -178,7 +178,7 @@ export async function startGame(container) {
     dragCard.innerHTML = `
       <div class="nikud-drag-card__symbol">${letterWithNikud('א', targetNikud.symbol)}</div>
       <div class="nikud-drag-card__name">${targetNikud.nameNikud}</div>
-      <div class="nikud-drag-card__hint">${getNikud('גְּרֹוֽר אוֹתִי')} 👆</div>
+      <div class="nikud-drag-card__hint">${getNikud('גְּרֹור אוֹתִי')} 👆</div>
     `;
     leftPanel.appendChild(dragCard);
     shell.bodyEl.appendChild(leftPanel);
@@ -276,7 +276,7 @@ export async function startGame(container) {
     progressBar = createProgressBar(shell.footerEl, 8);
     progressBar.update(0);
     roundIndex = 0;
-    tts.speak(getNikud('בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיֽקּוּד'));
+    tts.speak(getNikud('בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד'));
     buildRoundUI(roundNikud[0]);
   });
 

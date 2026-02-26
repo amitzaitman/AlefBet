@@ -189,7 +189,7 @@ copyCodeBtn.addEventListener('click', async () => {
   const text = codeOutput.textContent;
   try {
     await navigator.clipboard.writeText(text);
-    copyCodeBtn.textContent = 'הֻוֽעְתַּק!';
+    copyCodeBtn.textContent = 'הֻועְתַּק!';
     setTimeout(() => { copyCodeBtn.textContent = 'הֶעְתֵּק'; }, 2000);
   } catch {
     // Fallback

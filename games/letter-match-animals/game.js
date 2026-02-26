@@ -65,7 +65,7 @@ function buildOptions(round) {
 
 export async function startGame(container) {
   // Show loading indicator while nikud loads
-  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיֽקּוּד...</div>';
+  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיקּוּד...</div>';
 
   await preloadNikud(STATIC_TEXTS);
 

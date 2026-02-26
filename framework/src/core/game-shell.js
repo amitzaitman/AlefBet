@@ -27,7 +27,7 @@ export class GameShell {
     this.container.classList.add('alefbet-game');
 
     const backBtn = this.config.homeUrl
-      ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּיֽת מִשְׂחָקִים">🏠</a>`
+      ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>`
       : '<div class="game-header__spacer"></div>';
 
     this.container.innerHTML = `
