@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-26T09:07:16.150Z",
+  "generatedAt": "2026-03-04T19:05:09.212Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -37,6 +37,14 @@
       "description": "אפקטים קוליים תכנותיים\nיוצר צלילים פשוטים דרך Web Audio API - ללא קבצים חיצוניים\n[נוסף על ידי: letter-match game]",
       "exports": [
         "sounds"
+      ]
+    },
+    {
+      "path": "audio/speech-recognition.js",
+      "description": "זיהוי קול לניקוד עברי\nעוטף את Web Speech API עבור משחקי הגיית ניקוד\n[נוסף על ידי: nikud-speak game]",
+      "exports": [
+        "createSpeechListener",
+        "matchNikudSound"
       ]
     },
     {

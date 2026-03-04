@@ -232,8 +232,8 @@
 }
 
 .option-card--wrong {
-  border-color: var(--ab-error) !important;
-  background: #fff0f1 !important;
+  border-color: var(--ab-warning) !important;
+  background: #fff8e6 !important;
 }
 
 .option-card--hint {
@@ -300,7 +300,7 @@
 }
 
 .feedback-message--wrong {
-  color: var(--ab-error);
+  color: var(--ab-warning);
 }
 
 .feedback-message--hint {

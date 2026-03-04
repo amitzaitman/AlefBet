@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>אֱמוֹר אֶת הַנִּיקּוּד — AlefBet</title>
+  <link rel="stylesheet" href="../../framework/dist/alefbet.css">
+  <link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <div id="game"></div>
+  <script type="module">
+    import { startGame } from './game.js';
+    startGame(document.getElementById('game')).catch(console.error);
+  </script>
+</body>
+</html>

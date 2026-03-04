@@ -14,6 +14,9 @@ export { GameShell } from './core/game-shell.js';
 export { tts } from './audio/tts.js';
 export { sounds } from './audio/sounds.js';
 
+// ===== Audio: Speech Recognition [נוסף על ידי: nikud-speak game] =====
+export { createSpeechListener, matchNikudSound } from './audio/speech-recognition.js';
+
 // ===== Data =====
 export {
   hebrewLetters,

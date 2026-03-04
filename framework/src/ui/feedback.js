@@ -36,11 +36,11 @@ export function createFeedback(container) {
       animate(el, 'bounce');
     },
 
-    /** הצג משוב שלילי */
+    /** הצג עידוד — נסה שוב */
     wrong(text = 'נַסֵּה שׁוּב') {
       sounds.wrong();
       show(text, 'wrong');
-      animate(el, 'shake');
+      animate(el, 'pulse');
     },
 
     /** הצג רמז */

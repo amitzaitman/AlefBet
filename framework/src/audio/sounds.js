@@ -46,10 +46,9 @@ export const sounds = {
     setTimeout(() => _playTone(783.99, 0.3), 240);  // G5
   },
 
-  /** צליל תשובה שגויה */
+  /** צליל עידוד עדין — נסה שוב */
   wrong() {
-    _playTone(220, 0.25, 'sawtooth', 0.2);
-    setTimeout(() => _playTone(165, 0.3, 'sawtooth', 0.15), 200);
+    _playTone(350, 0.15, 'triangle', 0.12);
   },
 
   /** צליל עידוד - סיום מוצלח */

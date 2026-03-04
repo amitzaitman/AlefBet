@@ -1,0 +1,174 @@
+/* ── Nikud Speak — Game-specific styles ── */
+
+/* ── Main panel layout ──────────────────────────────────────────────────── */
+.nikud-speak-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(16px, 3dvmin, 28px);
+  padding: clamp(12px, 2dvmin, 24px) 0;
+}
+
+/* ── Nikud card ─────────────────────────────────────────────────────────── */
+.nikud-speak-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 1.5dvmin, 12px);
+  width: clamp(160px, 40dvmin, 260px);
+  height: clamp(160px, 40dvmin, 260px);
+  background: var(--nikud-color, #4f67ff);
+  border-radius: clamp(20px, 5dvmin, 36px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+  user-select: none;
+  animation: card-drop-in 0.4s ease-out both;
+}
+
+.nikud-speak-card__symbol {
+  font-size: clamp(56px, 18dvmin, 96px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
+}
+
+.nikud-speak-card__name {
+  font-size: clamp(18px, 4.5dvmin, 26px);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
+}
+
+/* ── Demo button (speaker) ──────────────────────────────────────────────── */
+.demo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 140px;
+  min-height: 52px;
+  padding: 0.6rem 1.4rem;
+  background: #f0f4ff;
+  border: 3px solid #c7d2fe;
+  border-radius: 1rem;
+  font-size: clamp(16px, 3.5dvmin, 22px);
+  font-weight: 700;
+  color: #4f67ff;
+  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.demo-btn:hover {
+  background: #e0e7ff;
+  transform: scale(1.04);
+}
+
+.demo-btn:active {
+  transform: scale(0.97);
+}
+
+.demo-btn__icon {
+  font-size: 1.4em;
+}
+
+.demo-btn__text {
+  direction: rtl;
+}
+
+/* ── Mic button ─────────────────────────────────────────────────────────── */
+.mic-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: clamp(80px, 20dvmin, 120px);
+  height: clamp(80px, 20dvmin, 120px);
+  border-radius: 50%;
+  background: var(--ab-primary, #4f67ff);
+  border: none;
+  box-shadow: 0 4px 16px rgba(79, 103, 255, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.mic-btn__icon {
+  font-size: clamp(32px, 8dvmin, 48px);
+  line-height: 1;
+}
+
+.mic-btn__text {
+  font-size: clamp(11px, 2.5dvmin, 14px);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
+}
+
+.mic-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 24px rgba(79, 103, 255, 0.45);
+}
+
+.mic-btn:active {
+  transform: scale(0.95);
+}
+
+/* Recording state — pulsing glow */
+.mic-btn--recording {
+  background: #e53e3e;
+  box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.6);
+  animation: mic-pulse 1s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 18px rgba(229, 62, 62, 0);
+    transform: scale(1.08);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(229, 62, 62, 0);
+    transform: scale(1);
+  }
+}
+
+/* Disabled mic */
+.mic-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mic-btn:disabled:hover {
+  transform: none;
+}
+
+/* ── Feedback area ──────────────────────────────────────────────────────── */
+.nikud-speak-feedback {
+  min-height: 48px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────── */
+@keyframes card-drop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.75) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
