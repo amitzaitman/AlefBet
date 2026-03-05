@@ -1,6 +1,6 @@
 /**
  * משחק לימוד ניקוד — גרסה חדשה
- * אות במרכז, שני סמלי ניקוד בצדדים — גרור את האות לצד הנכון
+ * אות עם ניקוד במרכז, שני סמלי ניקוד בצדדים — גרור או הקש על הצד הנכון
  * 8 סיבובים
  */
 import {
@@ -26,8 +26,6 @@ const STATIC_TEXTS = [
   ...nikudList.map(n => n.name),
 ];
 
-function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
-
 function pickDistractor(correct, pool) {
   const others = pool.filter(n => n.id !== correct.id);
   return others[Math.floor(Math.random() * others.length)];
@@ -35,6 +33,11 @@ function pickDistractor(correct, pool) {
 
 function pickLetter() {
   return nikudBaseLetters[Math.floor(Math.random() * nikudBaseLetters.length)];
+}
+
+function hitTest(el, x, y) {
+  const r = el.getBoundingClientRect();
+  return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
 }
 
 // ── Settings Dialog ───────────────────────────────────────────────────────
@@ -145,7 +148,6 @@ export async function startGame(container) {
     // Left zone
     const leftZone = document.createElement('div');
     leftZone.className = 'nm-zone nm-zone--left';
-    leftZone.dataset.side = 'left';
     leftZone.style.setProperty('--zone-color', leftNikud.color);
     leftZone.innerHTML = `
       <div class="nm-zone__symbol">◌${leftNikud.symbol}</div>
@@ -171,7 +173,6 @@ export async function startGame(container) {
     // Right zone
     const rightZone = document.createElement('div');
     rightZone.className = 'nm-zone nm-zone--right';
-    rightZone.dataset.side = 'right';
     rightZone.style.setProperty('--zone-color', rightNikud.color);
     rightZone.innerHTML = `
       <div class="nm-zone__symbol">◌${rightNikud.symbol}</div>
@@ -185,38 +186,31 @@ export async function startGame(container) {
     let dragging = false;
     let startX = 0;
     let startY = 0;
-    let offsetX = 0;
-    let offsetY = 0;
-
-    function getPointerX(e) { return e.clientX; }
-    function getPointerY(e) { return e.clientY; }
+    let letterStartRect = null;
 
     letterEl.addEventListener('pointerdown', (e) => {
       if (answered) return;
       e.preventDefault();
       letterEl.setPointerCapture(e.pointerId);
       dragging = true;
-      startX = getPointerX(e);
-      startY = getPointerY(e);
-      offsetX = 0;
-      offsetY = 0;
+      startX = e.clientX;
+      startY = e.clientY;
+      letterStartRect = letterEl.getBoundingClientRect();
       letterEl.classList.add('nm-letter--dragging');
     });
 
     letterEl.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       e.preventDefault();
-      offsetX = getPointerX(e) - startX;
-      offsetY = getPointerY(e) - startY;
-      letterEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      letterEl.style.transform = `translate(${dx}px, ${dy}px)`;
 
-      // Highlight zones
-      const leftRect = leftZone.getBoundingClientRect();
-      const rightRect = rightZone.getBoundingClientRect();
-      const cx = getPointerX(e);
-
-      leftZone.classList.toggle('nm-zone--hover', cx < leftRect.right);
-      rightZone.classList.toggle('nm-zone--hover', cx > rightRect.left);
+      // Highlight zone under pointer
+      const overLeft = hitTest(leftZone, e.clientX, e.clientY);
+      const overRight = hitTest(rightZone, e.clientX, e.clientY);
+      leftZone.classList.toggle('nm-zone--hover', overLeft);
+      rightZone.classList.toggle('nm-zone--hover', overRight);
     });
 
     letterEl.addEventListener('pointerup', (e) => {
@@ -226,46 +220,50 @@ export async function startGame(container) {
       leftZone.classList.remove('nm-zone--hover');
       rightZone.classList.remove('nm-zone--hover');
 
-      const leftRect = leftZone.getBoundingClientRect();
-      const rightRect = rightZone.getBoundingClientRect();
-      const cx = getPointerX(e);
+      // Check which zone the pointer is over
+      const overLeft = hitTest(leftZone, e.clientX, e.clientY);
+      const overRight = hitTest(rightZone, e.clientX, e.clientY);
 
-      let droppedSide = null;
-      if (cx < leftRect.right) droppedSide = 'left';
-      else if (cx > rightRect.left) droppedSide = 'right';
-
-      if (droppedSide) {
-        const isCorrect = (droppedSide === 'left' && leftNikud.id === targetNikud.id) ||
-                          (droppedSide === 'right' && rightNikud.id === targetNikud.id);
-        handleDrop(isCorrect, letter, targetNikud, letterEl, droppedSide === 'left' ? leftZone : rightZone);
+      if (overLeft) {
+        const isCorrect = leftNikud.id === targetNikud.id;
+        handleDrop(isCorrect, letter, targetNikud, letterEl, leftZone);
+      } else if (overRight) {
+        const isCorrect = rightNikud.id === targetNikud.id;
+        handleDrop(isCorrect, letter, targetNikud, letterEl, rightZone);
       } else {
         // Snap back
-        letterEl.style.transform = '';
+        snapBack(letterEl);
       }
     });
 
     letterEl.addEventListener('pointercancel', () => {
       dragging = false;
       letterEl.classList.remove('nm-letter--dragging');
-      letterEl.style.transform = '';
+      snapBack(letterEl);
       leftZone.classList.remove('nm-zone--hover');
       rightZone.classList.remove('nm-zone--hover');
     });
 
     // Tap-to-select fallback for zones
     leftZone.addEventListener('click', () => {
-      if (answered) return;
+      if (answered || dragging) return;
       const isCorrect = leftNikud.id === targetNikud.id;
       handleDrop(isCorrect, letter, targetNikud, letterEl, leftZone);
     });
 
     rightZone.addEventListener('click', () => {
-      if (answered) return;
+      if (answered || dragging) return;
       const isCorrect = rightNikud.id === targetNikud.id;
       handleDrop(isCorrect, letter, targetNikud, letterEl, rightZone);
     });
 
     tts.speak(targetNikud.nameNikud);
+  }
+
+  function snapBack(letterEl) {
+    letterEl.style.transition = 'transform 0.3s ease';
+    letterEl.style.transform = '';
+    setTimeout(() => { letterEl.style.transition = ''; }, 300);
   }
 
   async function handleDrop(isCorrect, letter, targetNikud, letterEl, zone) {
@@ -280,8 +278,8 @@ export async function startGame(container) {
       const letterRect = letterEl.getBoundingClientRect();
       const dx = zoneRect.left + zoneRect.width / 2 - (letterRect.left + letterRect.width / 2);
       const dy = zoneRect.top + zoneRect.height / 2 - (letterRect.top + letterRect.height / 2);
-      letterEl.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
       letterEl.style.transition = 'transform 0.3s ease';
+      letterEl.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
 
       animate(zone, 'bounce');
       sounds.correct();
@@ -301,11 +299,8 @@ export async function startGame(container) {
     } else {
       await tts.speak(getNikud('נַסֵּה שׁוּב'));
       await new Promise(r => setTimeout(r, 300));
-      letterEl.style.transform = '';
-      letterEl.style.transition = 'transform 0.3s ease';
+      snapBack(letterEl);
       answered = false;
-      // Remove transition after snap-back
-      setTimeout(() => { letterEl.style.transition = ''; }, 300);
     }
   }
 
