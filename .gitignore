@@ -1,2 +1,5 @@
 node_modules/
 .claude/
+.a5c/
+build_log.txt
+req.txt
