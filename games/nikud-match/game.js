@@ -148,7 +148,7 @@ export async function startGame(container) {
     leftZone.dataset.side = 'left';
     leftZone.style.setProperty('--zone-color', leftNikud.color);
     leftZone.innerHTML = `
-      <div class="nm-zone__symbol">${letterWithNikud('א', leftNikud.symbol)}</div>
+      <div class="nm-zone__symbol">◌${leftNikud.symbol}</div>
       <div class="nm-zone__name">${leftNikud.nameNikud}</div>
     `;
     arena.appendChild(leftZone);
@@ -164,7 +164,7 @@ export async function startGame(container) {
 
     const letterEl = document.createElement('div');
     letterEl.className = 'nm-letter';
-    letterEl.textContent = letter;
+    letterEl.textContent = letterWithNikud(letter, targetNikud.symbol);
     centerArea.appendChild(letterEl);
     arena.appendChild(centerArea);
 
@@ -174,7 +174,7 @@ export async function startGame(container) {
     rightZone.dataset.side = 'right';
     rightZone.style.setProperty('--zone-color', rightNikud.color);
     rightZone.innerHTML = `
-      <div class="nm-zone__symbol">${letterWithNikud('א', rightNikud.symbol)}</div>
+      <div class="nm-zone__symbol">◌${rightNikud.symbol}</div>
       <div class="nm-zone__name">${rightNikud.nameNikud}</div>
     `;
     arena.appendChild(rightZone);
