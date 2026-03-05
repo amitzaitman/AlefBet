@@ -1,7 +1,7 @@
 /**
- * משחק לימוד ניקוד
- * גרור (או הקש) את סמל הניקוד לאות שיש לה אותו ניקוד
- * 8 סיבובים עם ניקוד שונה בכל פעם
+ * משחק לימוד ניקוד — גרסה חדשה
+ * אות במרכז, שני סמלי ניקוד בצדדים — גרור את האות לצד הנכון
+ * 8 סיבובים
  */
 import {
   GameShell,
@@ -9,51 +9,32 @@ import {
   nikudList,
   nikudBaseLetters,
   letterWithNikud,
-  createFeedback,
   createProgressBar,
   showCompletionScreen,
   animate,
   sounds,
-  createDragSource,
-  createDropTarget,
   preloadNikud,
   getNikud,
   randomNikud,
 } from '../../framework/dist/alefbet.js';
 
-// ── Texts to preload ──────────────────────────────────────────────────────
-
 const STATIC_TEXTS = [
-  'גְּרֹור לְאוֹת עִם אוֹתוֹ נִיקּוּד:',
-  'גְּרֹור אוֹתִי',
-  'בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד',
-  'כָּל הַכָּבוֹד',
-  'נַסֵּה שׁוּב',
-  'מָצָא אֶת',
+  'גְּרֹור אֶת הָאוֹת לַנִּיקּוּד הַנָּכוֹן',
+  'בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד',
+  'כָּל הַכָּבוֹד',
+  'נַסֵּה שׁוּב',
   ...nikudList.map(n => n.name),
 ];
 
-// ── Helpers ───────────────────────────────────────────────────────────────
-
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
-function buildRound(targetNikud) {
-  const letters = shuffle(nikudBaseLetters).slice(0, 4);
+function pickDistractor(correct, pool) {
+  const others = pool.filter(n => n.id !== correct.id);
+  return others[Math.floor(Math.random() * others.length)];
+}
 
-  // Create distractors using the CURRENT filtered pool, or global pool
-  // It's better to distract with the currently selected pool or the whole list.
-  // We'll use the whole list so options are varied, but correct is always from filtered pool.
-  const distractors = shuffle(nikudList.filter(n => n.id !== targetNikud.id)).slice(0, 3);
-  const correctIndex = Math.floor(Math.random() * 4);
-  const assigned = [...distractors];
-  assigned.splice(correctIndex, 0, targetNikud);
-
-  return letters.map((letter, i) => ({
-    letter,
-    nikud: assigned[i],
-    isCorrect: i === correctIndex,
-    display: letterWithNikud(letter, assigned[i].symbol),
-  }));
+function pickLetter() {
+  return nikudBaseLetters[Math.floor(Math.random() * nikudBaseLetters.length)];
 }
 
 // ── Settings Dialog ───────────────────────────────────────────────────────
@@ -107,11 +88,10 @@ function showSettingsDialog(container) {
     const url = new URL(window.location);
     if (checked.length > 0 && checked.length < nikudList.length) {
       url.searchParams.set('allowedNikud', checked.join(','));
-      url.searchParams.delete('excludedNikud');
     } else {
       url.searchParams.delete('allowedNikud');
-      url.searchParams.delete('excludedNikud');
     }
+    url.searchParams.delete('excludedNikud');
 
     modal.style.display = 'none';
     window.history.replaceState({}, '', url);
@@ -129,7 +109,6 @@ export async function startGame(container) {
   container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיקּוּד...</div>';
 
   await preloadNikud(STATIC_TEXTS);
-
   container.innerHTML = '';
 
   const roundNikud = randomNikud(8);
@@ -139,7 +118,6 @@ export async function startGame(container) {
     title: 'לִמּוּד נִיקּוּד',
   });
 
-  // Inject Settings button into header spacer
   const spacer = container.querySelector('.game-header__spacer');
   if (spacer) {
     spacer.innerHTML = '<button style="background:none;border:none;font-size:1.5rem;cursor:pointer;" aria-label="הגדרות">⚙️</button>';
@@ -147,9 +125,6 @@ export async function startGame(container) {
   }
 
   let progressBar = null;
-  let feedback = null;
-  let dragSource = null;
-  let dropTargets = [];
   let roundIndex = 0;
   let answered = false;
 
@@ -157,126 +132,194 @@ export async function startGame(container) {
     answered = false;
     shell.bodyEl.innerHTML = '';
 
-    dragSource?.destroy();
-    dropTargets.forEach(d => d.destroy());
-    dropTargets = [];
+    const letter = pickLetter();
+    const distractor = pickDistractor(targetNikud, nikudList);
+    const correctOnRight = Math.random() < 0.5;
+    const leftNikud = correctOnRight ? distractor : targetNikud;
+    const rightNikud = correctOnRight ? targetNikud : distractor;
 
-    const options = buildRound(targetNikud);
+    // ── Arena ──
+    const arena = document.createElement('div');
+    arena.className = 'nm-arena';
 
-    // ── Left panel: draggable nikud card ──
-    const leftPanel = document.createElement('div');
-    leftPanel.className = 'nikud-panel nikud-panel--source';
+    // Left zone
+    const leftZone = document.createElement('div');
+    leftZone.className = 'nm-zone nm-zone--left';
+    leftZone.dataset.side = 'left';
+    leftZone.style.setProperty('--zone-color', leftNikud.color);
+    leftZone.innerHTML = `
+      <div class="nm-zone__symbol">${letterWithNikud('א', leftNikud.symbol)}</div>
+      <div class="nm-zone__name">${leftNikud.nameNikud}</div>
+    `;
+    arena.appendChild(leftZone);
+
+    // Center letter (draggable)
+    const centerArea = document.createElement('div');
+    centerArea.className = 'nm-center';
 
     const instruction = document.createElement('p');
-    instruction.className = 'game-instruction';
-    instruction.textContent = getNikud('גְּרֹור לְאוֹת עִם אוֹתוֹ נִיקּוּד:');
-    leftPanel.appendChild(instruction);
+    instruction.className = 'nm-instruction';
+    instruction.textContent = getNikud('גְּרֹור אֶת הָאוֹת לַנִּיקּוּד הַנָּכוֹן');
+    centerArea.appendChild(instruction);
 
-    const dragCard = document.createElement('div');
-    dragCard.className = 'nikud-drag-card';
-    dragCard.style.setProperty('--nikud-color', targetNikud.color);
-    dragCard.innerHTML = `
-      <div class="nikud-drag-card__symbol">${letterWithNikud('א', targetNikud.symbol)}</div>
-      <div class="nikud-drag-card__name">${targetNikud.nameNikud}</div>
-      <div class="nikud-drag-card__hint">${getNikud('גְּרֹור אוֹתִי')} 👆</div>
+    const letterEl = document.createElement('div');
+    letterEl.className = 'nm-letter';
+    letterEl.textContent = letter;
+    centerArea.appendChild(letterEl);
+    arena.appendChild(centerArea);
+
+    // Right zone
+    const rightZone = document.createElement('div');
+    rightZone.className = 'nm-zone nm-zone--right';
+    rightZone.dataset.side = 'right';
+    rightZone.style.setProperty('--zone-color', rightNikud.color);
+    rightZone.innerHTML = `
+      <div class="nm-zone__symbol">${letterWithNikud('א', rightNikud.symbol)}</div>
+      <div class="nm-zone__name">${rightNikud.nameNikud}</div>
     `;
-    leftPanel.appendChild(dragCard);
-    shell.bodyEl.appendChild(leftPanel);
+    arena.appendChild(rightZone);
 
-    // ── Right panel: letter drop targets ──
-    const rightPanel = document.createElement('div');
-    rightPanel.className = 'nikud-panel nikud-panel--targets';
+    shell.bodyEl.appendChild(arena);
 
-    const grid = document.createElement('div');
-    grid.className = 'nikud-options-grid';
+    // ── Drag logic (pointer events) ──
+    let dragging = false;
+    let startX = 0;
+    let startY = 0;
+    let offsetX = 0;
+    let offsetY = 0;
 
-    options.forEach(opt => {
-      const card = document.createElement('div');
-      card.className = 'nikud-letter-card';
-      card.setAttribute('aria-label', `${opt.letter} עַם ${opt.nikud.nameNikud}`);
-      card.innerHTML = `<span class="nikud-letter-card__text">${opt.display}</span>`;
+    function getPointerX(e) { return e.clientX; }
+    function getPointerY(e) { return e.clientY; }
 
-      const dt = createDropTarget(card, () => onDrop(opt, targetNikud, dragCard, card));
-      dropTargets.push(dt);
-
-      card.addEventListener('click', () => {
-        if (answered) return;
-        onDrop(opt, targetNikud, dragCard, card);
-      });
-
-      grid.appendChild(card);
+    letterEl.addEventListener('pointerdown', (e) => {
+      if (answered) return;
+      e.preventDefault();
+      letterEl.setPointerCapture(e.pointerId);
+      dragging = true;
+      startX = getPointerX(e);
+      startY = getPointerY(e);
+      offsetX = 0;
+      offsetY = 0;
+      letterEl.classList.add('nm-letter--dragging');
     });
 
-    rightPanel.appendChild(grid);
+    letterEl.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      e.preventDefault();
+      offsetX = getPointerX(e) - startX;
+      offsetY = getPointerY(e) - startY;
+      letterEl.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 
-    const feedbackContainer = document.createElement('div');
-    rightPanel.appendChild(feedbackContainer);
-    feedback = createFeedback(feedbackContainer);
+      // Highlight zones
+      const leftRect = leftZone.getBoundingClientRect();
+      const rightRect = rightZone.getBoundingClientRect();
+      const cx = getPointerX(e);
 
-    shell.bodyEl.appendChild(rightPanel);
+      leftZone.classList.toggle('nm-zone--hover', cx < leftRect.right);
+      rightZone.classList.toggle('nm-zone--hover', cx > rightRect.left);
+    });
 
-    dragSource = createDragSource(dragCard, { nikudId: targetNikud.id });
+    letterEl.addEventListener('pointerup', (e) => {
+      if (!dragging) return;
+      dragging = false;
+      letterEl.classList.remove('nm-letter--dragging');
+      leftZone.classList.remove('nm-zone--hover');
+      rightZone.classList.remove('nm-zone--hover');
 
-    // Speak the nikud name using nikud'd pronunciation
-    tts.speak(`${getNikud('מָצָא אֶת')} ${targetNikud.nameNikud}`);
+      const leftRect = leftZone.getBoundingClientRect();
+      const rightRect = rightZone.getBoundingClientRect();
+      const cx = getPointerX(e);
+
+      let droppedSide = null;
+      if (cx < leftRect.right) droppedSide = 'left';
+      else if (cx > rightRect.left) droppedSide = 'right';
+
+      if (droppedSide) {
+        const isCorrect = (droppedSide === 'left' && leftNikud.id === targetNikud.id) ||
+                          (droppedSide === 'right' && rightNikud.id === targetNikud.id);
+        handleDrop(isCorrect, letter, targetNikud, letterEl, droppedSide === 'left' ? leftZone : rightZone);
+      } else {
+        // Snap back
+        letterEl.style.transform = '';
+      }
+    });
+
+    letterEl.addEventListener('pointercancel', () => {
+      dragging = false;
+      letterEl.classList.remove('nm-letter--dragging');
+      letterEl.style.transform = '';
+      leftZone.classList.remove('nm-zone--hover');
+      rightZone.classList.remove('nm-zone--hover');
+    });
+
+    // Tap-to-select fallback for zones
+    leftZone.addEventListener('click', () => {
+      if (answered) return;
+      const isCorrect = leftNikud.id === targetNikud.id;
+      handleDrop(isCorrect, letter, targetNikud, letterEl, leftZone);
+    });
+
+    rightZone.addEventListener('click', () => {
+      if (answered) return;
+      const isCorrect = rightNikud.id === targetNikud.id;
+      handleDrop(isCorrect, letter, targetNikud, letterEl, rightZone);
+    });
+
+    tts.speak(targetNikud.nameNikud);
   }
 
-  async function onDrop(option, targetNikud, dragCard, dropCard) {
+  async function handleDrop(isCorrect, letter, targetNikud, letterEl, zone) {
     if (answered) return;
     answered = true;
 
-    dragSource?.destroy();
-    dragSource = null;
-    dropTargets.forEach(d => d.destroy());
-    dropTargets = [];
+    if (isCorrect) {
+      zone.classList.add('nm-zone--correct');
+      letterEl.classList.add('nm-letter--correct');
+      // Animate letter into the zone
+      const zoneRect = zone.getBoundingClientRect();
+      const letterRect = letterEl.getBoundingClientRect();
+      const dx = zoneRect.left + zoneRect.width / 2 - (letterRect.left + letterRect.width / 2);
+      const dy = zoneRect.top + zoneRect.height / 2 - (letterRect.top + letterRect.height / 2);
+      letterEl.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
+      letterEl.style.transition = 'transform 0.3s ease';
 
-    if (option.isCorrect) {
-      dropCard.classList.add('nikud-letter-card--correct');
-      dragCard.classList.add('nikud-drag-card--correct');
-      animate(dropCard, 'bounce');
+      animate(zone, 'bounce');
       sounds.correct();
-      await tts.speak(letterWithNikud('א', option.nikud.symbol));
+
+      const combined = letterWithNikud(letter, targetNikud.symbol);
+      await tts.speak(combined);
 
       shell.state.addScore(1);
       progressBar?.update(shell.state.currentRound);
       roundIndex++;
       const hasMore = shell.state.nextRound();
-      if (hasMore && roundIndex < roundNikud.length) {
+      if (hasMore && roundIndex < 8) {
         buildRoundUI(roundNikud[roundIndex]);
       } else {
         showCompletionScreen(container, shell.state.score, 8, () => startGame(container));
       }
-
     } else {
-      dropCard.classList.add('nikud-letter-card--wrong');
-      animate(dropCard, 'shake');
+      zone.classList.add('nm-zone--wrong');
+      animate(zone, 'pulse');
       sounds.wrong();
-      await tts.speak(getNikud('נַסֵּה שׁוּב'));
-      await new Promise(r => setTimeout(r, 200));
-
-      dropCard.classList.remove('nikud-letter-card--wrong');
+      await tts.speak(getNikud('נַסֵּה שׁוּב'));
+      await new Promise(r => setTimeout(r, 400));
+      zone.classList.remove('nm-zone--wrong');
+      letterEl.style.transform = '';
+      letterEl.style.transition = 'transform 0.3s ease';
       answered = false;
-
-      // Re-attach drag/drop
-      dragSource = createDragSource(dragCard, { nikudId: targetNikud.id });
-      const allCards = shell.bodyEl.querySelectorAll('.nikud-letter-card');
-      const fresh = buildRound(targetNikud);
-      allCards.forEach((card, i) => {
-        const opt = fresh[i];
-        const dt = createDropTarget(card, () => onDrop(opt, targetNikud, dragCard, card));
-        dropTargets.push(dt);
-      });
+      // Remove transition after snap-back
+      setTimeout(() => { letterEl.style.transition = ''; }, 300);
     }
   }
 
-  // ── Lifecycle ──────────────────────────────────────────────────────────
-
+  // ── Lifecycle ──
   shell.on('start', () => {
     shell.footerEl.innerHTML = '';
     progressBar = createProgressBar(shell.footerEl, 8);
     progressBar.update(0);
     roundIndex = 0;
-    tts.speak(getNikud('בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד'));
+    tts.speak(getNikud('בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד'));
     buildRoundUI(roundNikud[0]);
   });
 

@@ -1,143 +1,135 @@
-/* ── Nikud Match — Game-specific styles ── */
+/* ── Nikud Match v2 — Drag letter to correct nikud side ── */
 
-/* Two-panel layout */
-.nikud-panel {
+/* Three-column arena: left zone | center letter | right zone */
+.nm-arena {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(10px, 2.5dvmin, 20px);
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(8px, 2dvmin, 16px);
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  min-height: clamp(260px, 50dvh, 420px);
+  padding: clamp(8px, 2dvmin, 16px);
 }
 
-.nikud-panel--source {
-  flex: 0 0 auto;
-}
-
-.nikud-panel--targets {
-  flex: 1 0 min(280px, 85dvw);
-  max-width: 480px;
-}
-
-/* ── Draggable Nikud Card ────────────────────────────────────────────────── */
-.nikud-drag-card {
+/* ── Nikud zones (left & right) ── */
+.nm-zone {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(4px, 1dvmin, 8px);
-  width: clamp(120px, 28dvmin, 190px);
-  height: clamp(120px, 28dvmin, 190px);
-  background: var(--nikud-color, #4f67ff);
+  gap: clamp(6px, 1.5dvmin, 12px);
+  background: var(--zone-color, #4f67ff);
   border-radius: clamp(16px, 4dvmin, 28px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
-  cursor: grab;
-  touch-action: none;
+  padding: clamp(12px, 3dvmin, 24px);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  opacity: 0.85;
+  -webkit-tap-highlight-color: transparent;
   user-select: none;
-  transition: transform 0.15s, box-shadow 0.15s;
-  animation: card-drop-in 0.4s ease-out both;
+  animation: zone-appear 0.4s ease-out both;
 }
 
-.nikud-drag-card:active {
-  cursor: grabbing;
-  transform: scale(0.96);
+.nm-zone--left { animation-delay: 0s; }
+.nm-zone--right { animation-delay: 0.1s; }
+
+.nm-zone:hover,
+.nm-zone--hover {
+  opacity: 1;
+  transform: scale(1.04);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
 }
 
-.nikud-drag-card--correct {
-  box-shadow: 0 0 0 6px #00C896, 0 6px 20px rgba(0, 200, 150, 0.4);
+.nm-zone--correct {
+  opacity: 1;
+  box-shadow: 0 0 0 6px #00C896, 0 8px 28px rgba(0, 200, 150, 0.4) !important;
 }
 
-/* Big symbol: the letter+nikud combination */
-.nikud-drag-card__symbol {
-  font-size: clamp(44px, 15dvmin, 80px);
+.nm-zone--wrong {
+  opacity: 1;
+  box-shadow: 0 0 0 5px #FFB400, 0 4px 16px rgba(255, 180, 0, 0.3) !important;
+}
+
+.nm-zone__symbol {
+  font-size: clamp(44px, 14dvmin, 80px);
   font-weight: 900;
   color: #fff;
   line-height: 1;
   font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
 }
 
-.nikud-drag-card__name {
-  font-size: clamp(16px, 4dvmin, 22px);
+.nm-zone__name {
+  font-size: clamp(14px, 3.5dvmin, 22px);
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
 }
 
-.nikud-drag-card__hint {
-  font-size: clamp(11px, 2dvmin, 14px);
-  color: rgba(255, 255, 255, 0.7);
-  display: none;
+/* ── Center area with draggable letter ── */
+.nm-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2dvmin, 16px);
+  flex: 0 0 auto;
+  min-width: clamp(100px, 22dvmin, 160px);
 }
 
-/* Selected state (tap-to-select on touch) */
-.drag-source--selected.nikud-drag-card {
-  box-shadow: 0 0 0 5px #fff, 0 6px 20px rgba(0, 0, 0, 0.3);
-  transform: scale(1.06);
+.nm-instruction {
+  font-size: clamp(13px, 2.8dvmin, 18px);
+  font-weight: 700;
+  color: #4f67ff;
+  text-align: center;
+  margin: 0;
+  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
+  line-height: 1.4;
 }
 
-/* ── Letter Drop Target Cards ────────────────────────────────────────────── */
-.nikud-options-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: clamp(10px, 2.5dvmin, 20px);
-  width: 100%;
-  max-width: 380px;
-}
-
-.nikud-letter-card {
+.nm-letter {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: clamp(90px, 18dvmin, 150px);
+  width: clamp(90px, 22dvmin, 150px);
+  height: clamp(90px, 22dvmin, 150px);
   background: #fff;
-  border: 4px solid #dee2e6;
-  border-radius: clamp(14px, 3.5dvmin, 24px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: border-color 0.15s, transform 0.15s, background 0.15s, box-shadow 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  user-select: none;
-}
-
-.nikud-letter-card__text {
-  font-size: clamp(36px, 12dvmin, 70px);
+  border: 5px solid #dee2e6;
+  border-radius: clamp(16px, 4dvmin, 28px);
+  font-size: clamp(48px, 16dvmin, 90px);
   font-weight: 900;
   color: #1a1a2e;
   font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
-  line-height: 1.2;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.15s;
+  animation: letter-pop 0.35s ease-out both;
+  animation-delay: 0.15s;
+  z-index: 10;
+  position: relative;
 }
 
-/* Drop target states */
-.drop-target--active.nikud-letter-card {
-  border-color: #c7d2fe;
+.nm-letter--dragging {
+  cursor: grabbing;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+  z-index: 100;
 }
 
-.drop-target--hover.nikud-letter-card {
-  border-color: #FF6B35;
-  background: #fff5f0;
-  transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.25);
+.nm-letter--correct {
+  border-color: #00C896;
+  color: #00C896;
 }
 
-/* Correct / wrong states */
-.nikud-letter-card--correct {
-  border-color: #00C896 !important;
-  background: #e8faf5 !important;
-  box-shadow: 0 0 0 6px #00C896, 0 4px 16px rgba(0, 200, 150, 0.35) !important;
+/* ── Animations ── */
+@keyframes zone-appear {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 0.85; transform: scale(1); }
 }
 
-.nikud-letter-card--wrong {
-  border-color: #FFB400 !important;
-  background: #fff8e6 !important;
-}
-
-/* ── Animations ──────────────────────────────────────────────────────────── */
-@keyframes card-drop-in {
-  from {
-    opacity: 0;
-    transform: scale(0.75) translateY(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+@keyframes letter-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
 }
