@@ -47,10 +47,6 @@
   box-shadow: 0 0 0 6px #00C896, 0 8px 28px rgba(0, 200, 150, 0.4) !important;
 }
 
-.nm-zone--wrong {
-  opacity: 1;
-  box-shadow: 0 0 0 5px #FFB400, 0 4px 16px rgba(255, 180, 0, 0.3) !important;
-}
 
 .nm-zone__symbol {
   font-size: clamp(44px, 14dvmin, 80px);

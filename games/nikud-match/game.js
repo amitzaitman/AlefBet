@@ -299,12 +299,8 @@ export async function startGame(container) {
         showCompletionScreen(container, shell.state.score, 8, () => startGame(container));
       }
     } else {
-      zone.classList.add('nm-zone--wrong');
-      animate(zone, 'pulse');
-      sounds.wrong();
       await tts.speak(getNikud('נַסֵּה שׁוּב'));
-      await new Promise(r => setTimeout(r, 400));
-      zone.classList.remove('nm-zone--wrong');
+      await new Promise(r => setTimeout(r, 300));
       letterEl.style.transform = '';
       letterEl.style.transition = 'transform 0.3s ease';
       answered = false;
