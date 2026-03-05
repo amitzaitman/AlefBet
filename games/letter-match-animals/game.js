@@ -13,6 +13,8 @@ import {
   showCompletionScreen,
   preloadNikud,
   getNikud,
+  showLoadingScreen,
+  hideLoadingScreen,
 } from '../../framework/dist/alefbet.js';
 
 // ── Game data ─────────────────────────────────────────────────────────────
@@ -65,11 +67,11 @@ function buildOptions(round) {
 
 export async function startGame(container) {
   // Show loading indicator while nikud loads
-  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיקּוּד...</div>';
+  showLoadingScreen(container, 'טוֹעֵן...');
 
   await preloadNikud(STATIC_TEXTS);
 
-  container.innerHTML = '';
+  hideLoadingScreen(container);
 
   const shell = new GameShell(container, {
     totalRounds: ROUNDS.length,
@@ -95,7 +97,7 @@ export async function startGame(container) {
 
     const letterInfo = getLetter(roundData.target);
     const letterEl = document.createElement('div');
-    letterEl.className = 'letter-display';
+    letterEl.className = 'letter-display anim-appear';
     letterEl.textContent = roundData.target;
     letterEl.setAttribute('aria-label', `הָאוֹת ${letterInfo?.nameNikud || letterInfo?.name || roundData.target}`);
     leftPanel.appendChild(letterEl);

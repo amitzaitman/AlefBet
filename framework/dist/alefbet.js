@@ -1,4 +1,4 @@
-class W {
+class P {
   constructor() {
     this._handlers = {};
   }
@@ -8,14 +8,14 @@ class W {
   }
   /** בטל הרשמה לאירוע */
   off(e, n) {
-    return this._handlers[e] ? (this._handlers[e] = this._handlers[e].filter((a) => a !== n), this) : this;
+    return this._handlers[e] ? (this._handlers[e] = this._handlers[e].filter((r) => r !== n), this) : this;
   }
   /** שלח אירוע */
   emit(e, n) {
-    return (this._handlers[e] || []).slice().forEach((a) => a(n)), this;
+    return (this._handlers[e] || []).slice().forEach((r) => r(n)), this;
   }
 }
-class $ {
+class z {
   constructor(e) {
     this._totalRounds = e, this._currentRound = 0, this._score = 0;
   }
@@ -48,7 +48,7 @@ class $ {
     return this._currentRound >= this._totalRounds;
   }
 }
-class Q {
+class se {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
@@ -59,7 +59,7 @@ class Q {
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
       ...n
-    }, this.events = new W(), this.state = new $(this.config.totalRounds), this._buildShell();
+    }, this.events = new P(), this.state = new z(this.config.totalRounds), this._buildShell();
   }
   _buildShell() {
     this.container.classList.add("alefbet-game");
@@ -100,127 +100,8 @@ class Q {
     return this.events.on(e, n), this;
   }
 }
-const A = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api", p = /* @__PURE__ */ new Map();
-function B(t) {
-  var n;
-  let e = "";
-  for (const a of t)
-    if (a.sep)
-      e += a.str ?? "";
-    else {
-      const s = (n = a.nakdan) == null ? void 0 : n.options;
-      s != null && s.length ? e += (s[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : e += a.str ?? "";
-    }
-  return e;
-}
-async function M(t) {
-  const e = await fetch(A, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      addmorph: !0,
-      keepmetagim: !1,
-      keepqq: !1,
-      nodageshdefmem: !1,
-      patachma: !1,
-      task: "nakdan",
-      data: t,
-      useTokenization: !0,
-      genre: "modern"
-    })
-  });
-  if (!e.ok) throw new Error(`Nakdan ${e.status}`);
-  const n = await e.json(), a = n == null ? void 0 : n.data;
-  if (!Array.isArray(a)) throw new Error("Nakdan: invalid response");
-  return B(a);
-}
-async function q(t) {
-  if (!(t != null && t.trim())) return t ?? "";
-  if (p.has(t)) return p.get(t);
-  try {
-    const e = await M(t);
-    return p.set(t, e), e;
-  } catch {
-    return p.set(t, t), t;
-  }
-}
-function P(t) {
-  return p.get(t) ?? t ?? "";
-}
-async function Z(t) {
-  const e = [...new Set(t.filter((n) => n == null ? void 0 : n.trim()))];
-  await Promise.all(e.map((n) => q(n)));
-}
-let g = [], k = !1, T = !0, L = 0.9;
-function D(t) {
-  return new Promise((e) => {
-    try {
-      const a = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(t)}&tl=he&client=tw-ob`, s = new Audio(a);
-      s.playbackRate = L, s.onended = e, s.onerror = () => {
-        _(t).then(e);
-      }, s.play().catch(() => {
-        _(t).then(e);
-      });
-    } catch {
-      _(t).then(e);
-    }
-  });
-}
-let v = null;
-function H() {
-  const t = speechSynthesis.getVoices();
-  return t.find((e) => e.lang === "he-IL") || t.find((e) => e.lang === "iw-IL") || t.find((e) => e.lang.startsWith("he")) || null;
-}
-function F() {
-  v = H();
-}
-typeof speechSynthesis < "u" && (speechSynthesis.getVoices().length > 0 ? F() : speechSynthesis.addEventListener("voiceschanged", F, { once: !0 }));
-function _(t) {
-  return new Promise((e) => {
-    if (typeof speechSynthesis > "u") {
-      e();
-      return;
-    }
-    const n = new SpeechSynthesisUtterance(t);
-    n.lang = "he-IL", n.rate = L, v && (n.voice = v), n.onend = e, n.onerror = e, speechSynthesis.speak(n);
-  });
-}
-function j() {
-  if (k || g.length === 0) return;
-  const t = g.shift();
-  k = !0, (T ? D : _)(t.text).then(() => {
-    k = !1, t.resolve(), j();
-  });
-}
-const ee = {
-  /**
-   * הקרא טקסט עברי
-   * משתמש ב-Google Translate TTS לאיכות טובה יותר
-   */
-  speak(t) {
-    const e = P(t);
-    return new Promise((n) => {
-      g.push({ text: e, resolve: n }), j();
-    });
-  },
-  /** עצור את הדיבור הנוכחי */
-  cancel() {
-    g.forEach((t) => t.resolve()), g = [], k = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
-  },
-  get available() {
-    return !0;
-  },
-  /** הגדר מהירות דיבור (0.5–2.0) */
-  setRate(t) {
-    L = Math.max(0.5, Math.min(2, t));
-  },
-  /** השתמש ב-Google Translate TTS (ברירת מחדל) או בדפדפן */
-  useGoogle(t = !0) {
-    T = t;
-  }
-};
 let h = null;
-function U() {
+function B() {
   if (!h)
     try {
       h = new (window.AudioContext || window.webkitAudioContext)();
@@ -229,16 +110,16 @@ function U() {
     }
   return h.state === "suspended" && h.resume(), h;
 }
-function m(t, e, n = "sine", a = 0.3) {
-  const s = U();
-  if (s)
+function m(t, e, n = "sine", r = 0.3) {
+  const a = B();
+  if (a)
     try {
-      const r = s.createOscillator(), o = s.createGain();
-      r.connect(o), o.connect(s.destination), r.type = n, r.frequency.setValueAtTime(t, s.currentTime), o.gain.setValueAtTime(a, s.currentTime), o.gain.exponentialRampToValueAtTime(1e-3, s.currentTime + e), r.start(s.currentTime), r.stop(s.currentTime + e + 0.05);
+      const s = a.createOscillator(), i = a.createGain();
+      s.connect(i), i.connect(a.destination), s.type = n, s.frequency.setValueAtTime(t, a.currentTime), i.gain.setValueAtTime(r, a.currentTime), i.gain.exponentialRampToValueAtTime(1e-3, a.currentTime + e), s.start(a.currentTime), s.stop(a.currentTime + e + 0.05);
     } catch {
     }
 }
-const N = {
+const _ = {
   /** צליל תשובה נכונה */
   correct() {
     m(523.25, 0.15), setTimeout(() => m(659.25, 0.2), 120), setTimeout(() => m(783.99, 0.3), 240);
@@ -255,210 +136,125 @@ const N = {
   click() {
     m(900, 0.04, "sine", 0.12);
   }
-}, X = {
-  kamatz: "ah",
-  patah: "ah",
-  tzere: "eh",
-  segol: "eh",
-  hiriq: "ee",
-  holam: "oh",
-  kubbutz: "oo",
-  shva: "shva"
-}, I = {
-  ah: [/[אה]/, /^א$/, /אא/, /הא/],
-  eh: [/[אה]/, /^א$/, /אא/, /הא/, /אה/],
-  ee: [/[אי]/, /^י$/, /אי/, /הי/],
-  oh: [/[או]/, /^[או]$/, /או/, /הו/],
-  oo: [/[או]/, /^[או]$/, /או/, /הו/, /אוּ/],
-  shva: [/[אה]/, /^א$/, /^$/, /אה/]
-};
-function te() {
-  const t = typeof window < "u" ? window.SpeechRecognition || window.webkitSpeechRecognition : null, e = !!t;
-  let n = null;
-  return {
-    available: e,
-    listen(a = 4e3) {
-      return e ? new Promise((s) => {
-        n = new t(), n.lang = "he-IL", n.continuous = !1, n.interimResults = !1, n.maxAlternatives = 3;
-        let r = !1;
-        const o = (l, c) => {
-          r || (r = !0, n = null, s({ text: l.trim(), confidence: c }));
-        };
-        n.onresult = (l) => {
-          const c = l.results[0];
-          c ? o(c[0].transcript, c[0].confidence) : o("", 0);
-        }, n.onerror = () => o("", 0), n.onnomatch = () => o("", 0);
-        const i = setTimeout(() => {
-          try {
-            n == null || n.stop();
-          } catch {
-          }
-          o("", 0);
-        }, a);
-        n.onend = () => {
-          clearTimeout(i), o("", 0);
-        };
-        try {
-          n.start();
-        } catch {
-          o("", 0);
-        }
-      }) : Promise.resolve({ text: "", confidence: 0 });
-    },
-    cancel() {
-      try {
-        n == null || n.abort();
-      } catch {
-      }
-      n = null;
+}, H = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api", p = /* @__PURE__ */ new Map();
+function q(t) {
+  var n;
+  let e = "";
+  for (const r of t)
+    if (r.sep)
+      e += r.str ?? "";
+    else {
+      const a = (n = r.nakdan) == null ? void 0 : n.options;
+      a != null && a.length ? e += (a[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : e += r.str ?? "";
     }
-  };
+  return e;
 }
-function ne(t, e) {
-  if (!t || !e) return !1;
-  const n = X[e];
-  if (!n) return !1;
-  const a = I[n];
-  if (!a) return !1;
-  const s = t.replace(/[\s.,!?]/g, "");
-  return s.length ? a.some((r) => r.test(s)) : !1;
-}
-const b = [
-  { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
-  { letter: "ב", name: "בַּיִת", nameNikud: "בֵּית", sound: "b", exampleWord: "בַּיִת", emoji: "🏠", isFinal: !1 },
-  { letter: "ג", name: "גִּימֶל", nameNikud: "גִּימֶל", sound: "g", exampleWord: "גָּמָל", emoji: "🐪", isFinal: !1 },
-  { letter: "ד", name: "דֶּלֶת", nameNikud: "דָּלֶת", sound: "d", exampleWord: "דָּג", emoji: "🐟", isFinal: !1 },
-  { letter: "ה", name: "הָא", nameNikud: "הֵא", sound: "h", exampleWord: "הַר", emoji: "⛰️", isFinal: !1 },
-  { letter: "ו", name: "ווּ", nameNikud: "וָו", sound: "v", exampleWord: "וֶרֶד", emoji: "🌹", isFinal: !1 },
-  { letter: "ז", name: "זַיִן", nameNikud: "זַיִן", sound: "z", exampleWord: "זְאֵב", emoji: "🐺", isFinal: !1 },
-  { letter: "ח", name: "חֵית", nameNikud: "חֵית", sound: "ch", exampleWord: "חָתוּל", emoji: "🐱", isFinal: !1 },
-  { letter: "ט", name: "טֵית", nameNikud: "טֵית", sound: "t", exampleWord: "טָלֶה", emoji: "🐑", isFinal: !1 },
-  { letter: "י", name: "יוֹד", nameNikud: "יוֹד", sound: "y", exampleWord: "יוֹנָה", emoji: "🕊️", isFinal: !1 },
-  { letter: "כ", name: "כַּף", nameNikud: "כַּף", sound: "k", exampleWord: "כֶּלֶב", emoji: "🐕", isFinal: !1 },
-  { letter: "ךְ", name: "כָּף סוֹפִית", nameNikud: "כָּף סוֹפִית", sound: "k", exampleWord: "מֶלֶךְ", emoji: "👑", isFinal: !0 },
-  { letter: "ל", name: "לָמַד", nameNikud: "לָמֵד", sound: "l", exampleWord: "לֵב", emoji: "❤️", isFinal: !1 },
-  { letter: "מ", name: "מֵם", nameNikud: "מֵם", sound: "m", exampleWord: "מַיִם", emoji: "💧", isFinal: !1 },
-  { letter: "םִ", name: "מֵם סוֹפִית", nameNikud: "מֵם סוֹפִית", sound: "m", exampleWord: "שָׂמִים", emoji: "🌤️", isFinal: !0 },
-  { letter: "נ", name: "נוּן", nameNikud: "נוּן", sound: "n", exampleWord: "נָחָשׁ", emoji: "🐍", isFinal: !1 },
-  { letter: "ן", name: "נוּן סוֹפִית", nameNikud: "נוּן סוֹפִית", sound: "n", exampleWord: "גַּן", emoji: "🌳", isFinal: !0 },
-  { letter: "ס", name: "סֶמֶךְ", nameNikud: "סָמֶךְ", sound: "s", exampleWord: "סוּס", emoji: "🐎", isFinal: !1 },
-  { letter: "ע", name: "עַיִן", nameNikud: "עַיִן", sound: "", exampleWord: "עַיִט", emoji: "🦅", isFinal: !1 },
-  { letter: "פ", name: "פא", nameNikud: "פֵּא", sound: "p", exampleWord: "פִּיל", emoji: "🐘", isFinal: !1 },
-  { letter: "ף", name: "פא סוֹפִית", nameNikud: "פֵּא סוֹפִית", sound: "p", exampleWord: "אַף", emoji: "👃", isFinal: !0 },
-  { letter: "צ", name: "צִדֵּי", nameNikud: "צַדִּי", sound: "ts", exampleWord: "צָב", emoji: "🐢", isFinal: !1 },
-  { letter: "ץ", name: "צִדֵּי סוֹפִית", nameNikud: "צַדִּי סוֹפִית", sound: "ts", exampleWord: "עֵץ", emoji: "🌲", isFinal: !0 },
-  { letter: "ק", name: "קוֹף", nameNikud: "קוֹף", sound: "k", exampleWord: "קוֹף", emoji: "🐒", isFinal: !1 },
-  { letter: "ר", name: "רֵישׁ", nameNikud: "רֵישׁ", sound: "r", exampleWord: "רֶכֶב", emoji: "🚗", isFinal: !1 },
-  { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
-  { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
-];
-function se(t) {
-  return b.find((e) => e.letter === t) || null;
-}
-function z(t = "regular") {
-  return t === "regular" ? b.filter((e) => !e.isFinal) : t === "final" ? b.filter((e) => e.isFinal) : b;
-}
-function ae(t, e = "regular") {
-  const n = z(e);
-  return [...n].sort(() => Math.random() - 0.5).slice(0, Math.min(t, n.length));
-}
-const R = [
-  { id: "kamatz", name: "קָמָץ", nameNikud: "קָמָץ", symbol: "ָ", sound: "אָ", color: "#FF6B6B", textColor: "#fff" },
-  { id: "patah", name: "פֶּתַח", nameNikud: "פָּתַח", symbol: "ַ", sound: "אָ", color: "#FF8C42", textColor: "#fff" },
-  { id: "hiriq", name: "חִירִיק", nameNikud: "חִירִיק", symbol: "ִ", sound: "אִי", color: "#4ECDC4", textColor: "#fff" },
-  { id: "tzere", name: "צָרָה", nameNikud: "צֵרֶה", symbol: "ֵ", sound: "אֶ", color: "#45B7D1", textColor: "#fff" },
-  { id: "segol", name: "סָגֹול", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶ", color: "#9B59B6", textColor: "#fff" },
-  { id: "holam", name: "חוֹלֵם", nameNikud: "חוֹלָם", symbol: "ֹ", sound: "אֹ", color: "#2ECC71", textColor: "#fff" },
-  { id: "kubbutz", name: "קֻובּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אֻ", color: "#F39C12", textColor: "#fff" },
-  { id: "shva", name: "שָׁוְוא", nameNikud: "שְׁוָא", symbol: "ְ", sound: "אְ", color: "#95A5A6", textColor: "#fff" }
-], re = ["א", "ב", "ג", "ד", "מ", "נ", "ל", "ר", "ש", "ת", "פ", "ק"];
-function oe(t, e) {
-  return t + e;
-}
-function ie(t) {
-  let e = [...R];
-  if (typeof window < "u" && window.location && window.location.search) {
-    const a = new URLSearchParams(window.location.search), s = a.get("allowedNikud");
-    if (s) {
-      const o = s.split(",").map((i) => i.trim());
-      e = e.filter(
-        (i) => o.includes(i.id) || o.includes(i.name) || o.includes(i.nameNikud)
-      );
-    }
-    const r = a.get("excludedNikud");
-    if (r) {
-      const o = r.split(",").map((i) => i.trim());
-      e = e.filter(
-        (i) => !o.includes(i.id) && !o.includes(i.name) && !o.includes(i.nameNikud)
-      );
-    }
-  }
-  e.length === 0 && (e = [...R]);
-  let n = [...e];
-  for (; n.length < t; )
-    n.push(...e);
-  return n.sort(() => Math.random() - 0.5).slice(0, t);
-}
-function le(t, e, n) {
-  t.innerHTML = "";
-  const a = document.createElement("div");
-  a.className = "option-cards-grid";
-  const s = e.map((r) => {
-    const o = document.createElement("button");
-    return o.className = "option-card", o.dataset.id = r.id, o.innerHTML = `
-      <span class="option-card__emoji">${r.emoji || ""}</span>
-      <span class="option-card__text">${r.text}</span>
-    `, o.addEventListener("click", () => {
-      o.disabled || n(r);
-    }), a.appendChild(o), { el: o, option: r };
+async function I(t) {
+  const e = await fetch(H, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      addmorph: !0,
+      keepmetagim: !1,
+      keepqq: !1,
+      nodageshdefmem: !1,
+      patachma: !1,
+      task: "nakdan",
+      data: t,
+      useTokenization: !0,
+      genre: "modern"
+    })
   });
-  return t.appendChild(a), {
-    /** הַדָּגֵשׁ כַּרְטִיס לְפִי סוּג: 'correct' | 'wrong' | 'hint' */
-    highlight(r, o) {
-      s.forEach(({ el: i, option: l }) => {
-        l.id === r && i.classList.add(`option-card--${o}`);
-      });
-    },
-    /** נטרל את כל הכרטיסים */
-    disable() {
-      s.forEach(({ el: r }) => {
-        r.disabled = !0;
-      });
-    },
-    /** אפס את מצב הכרטיסים */
-    reset() {
-      s.forEach(({ el: r }) => {
-        r.className = "option-card", r.disabled = !1;
-      });
-    },
-    /** הסר את הרכיב */
-    destroy() {
-      t.innerHTML = "";
-    }
-  };
+  if (!e.ok) throw new Error(`Nakdan ${e.status}`);
+  const n = await e.json(), r = n == null ? void 0 : n.data;
+  if (!Array.isArray(r)) throw new Error("Nakdan: invalid response");
+  return q(r);
 }
-function ce(t, e) {
-  const n = document.createElement("div");
-  n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(e)), n.innerHTML = `
-    <div class="progress-bar__track">
-      <div class="progress-bar__fill" style="width: 0%"></div>
-    </div>
-    <span class="progress-bar__label">0 / ${e}</span>
-  `, t.appendChild(n);
-  const a = n.querySelector(".progress-bar__fill"), s = n.querySelector(".progress-bar__label");
-  return {
-    /** עדכן את ההתקדמות */
-    update(r) {
-      const o = Math.round(r / e * 100);
-      a.style.width = `${o}%`, s.textContent = `${r} / ${e}`, n.setAttribute("aria-valuenow", String(r));
-    },
-    /** הסר את הרכיב */
-    destroy() {
-      n.remove();
-    }
-  };
+async function D(t) {
+  if (!(t != null && t.trim())) return t ?? "";
+  if (p.has(t)) return p.get(t);
+  try {
+    const e = await I(t);
+    return p.set(t, e), e;
+  } catch {
+    return p.set(t, t), t;
+  }
 }
-const C = {
+function U(t) {
+  return p.get(t) ?? t ?? "";
+}
+async function ie(t) {
+  const e = [...new Set(t.filter((n) => n == null ? void 0 : n.trim()))];
+  await Promise.all(e.map((n) => D(n)));
+}
+let g = [], b = !1, $ = !0, E = 0.9;
+function X(t) {
+  return new Promise((e) => {
+    try {
+      const r = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(t)}&tl=he&client=tw-ob`, a = new Audio(r);
+      a.playbackRate = E, a.onended = e, a.onerror = () => {
+        k(t).then(e);
+      }, a.play().catch(() => {
+        k(t).then(e);
+      });
+    } catch {
+      k(t).then(e);
+    }
+  });
+}
+let x = null;
+function O() {
+  const t = speechSynthesis.getVoices();
+  return t.find((e) => e.lang === "he-IL") || t.find((e) => e.lang === "iw-IL") || t.find((e) => e.lang.startsWith("he")) || null;
+}
+function R() {
+  x = O();
+}
+typeof speechSynthesis < "u" && (speechSynthesis.getVoices().length > 0 ? R() : speechSynthesis.addEventListener("voiceschanged", R, { once: !0 }));
+function k(t) {
+  return new Promise((e) => {
+    if (typeof speechSynthesis > "u") {
+      e();
+      return;
+    }
+    const n = new SpeechSynthesisUtterance(t);
+    n.lang = "he-IL", n.rate = E, x && (n.voice = x), n.onend = e, n.onerror = e, speechSynthesis.speak(n);
+  });
+}
+function j() {
+  if (b || g.length === 0) return;
+  const t = g.shift();
+  b = !0, ($ ? X : k)(t.text).then(() => {
+    b = !1, t.resolve(), j();
+  });
+}
+const V = {
+  /**
+   * הקרא טקסט עברי
+   * משתמש ב-Google Translate TTS לאיכות טובה יותר
+   */
+  speak(t) {
+    const e = U(t);
+    return new Promise((n) => {
+      g.push({ text: e, resolve: n }), j();
+    });
+  },
+  /** עצור את הדיבור הנוכחי */
+  cancel() {
+    g.forEach((t) => t.resolve()), g = [], b = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
+  },
+  get available() {
+    return !0;
+  },
+  /** הגדר מהירות דיבור (0.5–2.0) */
+  setRate(t) {
+    E = Math.max(0.5, Math.min(2, t));
+  },
+  /** השתמש ב-Google Translate TTS (ברירת מחדל) או בדפדפן */
+  useGoogle(t = !0) {
+    $ = t;
+  }
+}, C = {
   shake: [
     { transform: "translateX(0)" },
     { transform: "translateX(-8px)" },
@@ -489,7 +285,7 @@ const C = {
     { transform: "scale(1.3) rotate(180deg)", opacity: "1" },
     { transform: "scale(1) rotate(360deg)", opacity: "1" }
   ]
-}, O = {
+}, G = {
   shake: 420,
   bounce: 480,
   pulse: 600,
@@ -498,32 +294,274 @@ const C = {
 };
 function y(t, e) {
   !t || !C[e] || t.animate(C[e], {
-    duration: O[e] || 400,
+    duration: G[e] || 400,
     easing: "ease-in-out",
     fill: "none"
   });
 }
+function Y(t, e, n, r) {
+  _.cheer();
+  const a = e / n, s = a >= 0.8 ? 3 : a >= 0.5 ? 2 : 1, i = "⭐".repeat(s) + "☆".repeat(3 - s), o = document.createElement("div");
+  o.className = "completion-screen", o.innerHTML = `
+    <div class="completion-screen__content">
+      <div class="completion-screen__stars" aria-label="${s} כּוֹכָבִים">${i}</div>
+      <h2 class="completion-screen__title">!כָּל הַכָּבוֹד</h2>
+      <p class="completion-screen__score">נִיקּוּד: ${e} מִתּוֹךְ ${n}</p>
+      <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
+    </div>
+  `, o.querySelector(".completion-screen__replay").addEventListener("click", () => {
+    o.remove(), r();
+  }), t.innerHTML = "", t.appendChild(o), y(o.querySelector(".completion-screen__content"), "fadeIn");
+}
+function oe(t, e, {
+  totalRounds: n,
+  progressBar: r = null,
+  buildRoundUI: a,
+  onCorrect: s,
+  onWrong: i
+} = {}) {
+  let o = !1;
+  async function l(T) {
+    if (o) return;
+    o = !0, _.correct(), T && await T(), s && await s(), t.state.addScore(1), r == null || r.update(t.state.currentRound), await new Promise((M) => setTimeout(M, 1200)), t.state.nextRound() ? (o = !1, a()) : Y(e, t.state.score, n, () => {
+      location.reload();
+    });
+  }
+  async function c() {
+    o || (o = !0, await V.speak("נסה שוב"), i && await i(), o = !1);
+  }
+  function W() {
+    return o;
+  }
+  function A() {
+    o = !1;
+  }
+  return { handleCorrect: l, handleWrong: c, isAnswered: W, reset: A };
+}
+const K = {
+  kamatz: "ah",
+  patah: "ah",
+  tzere: "eh",
+  segol: "eh",
+  hiriq: "ee",
+  holam: "oh",
+  kubbutz: "oo",
+  shva: "shva"
+}, J = {
+  ah: [/[אה]/, /^א$/, /אא/, /הא/],
+  eh: [/[אה]/, /^א$/, /אא/, /הא/, /אה/],
+  ee: [/[אי]/, /^י$/, /אי/, /הי/],
+  oh: [/[או]/, /^[או]$/, /או/, /הו/],
+  oo: [/[או]/, /^[או]$/, /או/, /הו/, /אוּ/],
+  shva: [/[אה]/, /^א$/, /^$/, /אה/]
+};
+function le() {
+  const t = typeof window < "u" ? window.SpeechRecognition || window.webkitSpeechRecognition : null, e = !!t;
+  let n = null;
+  return {
+    available: e,
+    listen(r = 4e3) {
+      return e ? new Promise((a) => {
+        n = new t(), n.lang = "he-IL", n.continuous = !1, n.interimResults = !1, n.maxAlternatives = 3;
+        let s = !1;
+        const i = (l, c) => {
+          s || (s = !0, n = null, a({ text: l.trim(), confidence: c }));
+        };
+        n.onresult = (l) => {
+          const c = l.results[0];
+          c ? i(c[0].transcript, c[0].confidence) : i("", 0);
+        }, n.onerror = () => i("", 0), n.onnomatch = () => i("", 0);
+        const o = setTimeout(() => {
+          try {
+            n == null || n.stop();
+          } catch {
+          }
+          i("", 0);
+        }, r);
+        n.onend = () => {
+          clearTimeout(o), i("", 0);
+        };
+        try {
+          n.start();
+        } catch {
+          i("", 0);
+        }
+      }) : Promise.resolve({ text: "", confidence: 0 });
+    },
+    cancel() {
+      try {
+        n == null || n.abort();
+      } catch {
+      }
+      n = null;
+    }
+  };
+}
+function ce(t, e) {
+  if (!t || !e) return !1;
+  const n = K[e];
+  if (!n) return !1;
+  const r = J[n];
+  if (!r) return !1;
+  const a = t.replace(/[\s.,!?]/g, "");
+  return a.length ? r.some((s) => s.test(a)) : !1;
+}
+const w = [
+  { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
+  { letter: "ב", name: "בַּיִת", nameNikud: "בֵּית", sound: "b", exampleWord: "בַּיִת", emoji: "🏠", isFinal: !1 },
+  { letter: "ג", name: "גִּימֶל", nameNikud: "גִּימֶל", sound: "g", exampleWord: "גָּמָל", emoji: "🐪", isFinal: !1 },
+  { letter: "ד", name: "דֶּלֶת", nameNikud: "דָּלֶת", sound: "d", exampleWord: "דָּג", emoji: "🐟", isFinal: !1 },
+  { letter: "ה", name: "הָא", nameNikud: "הֵא", sound: "h", exampleWord: "הַר", emoji: "⛰️", isFinal: !1 },
+  { letter: "ו", name: "ווּ", nameNikud: "וָו", sound: "v", exampleWord: "וֶרֶד", emoji: "🌹", isFinal: !1 },
+  { letter: "ז", name: "זַיִן", nameNikud: "זַיִן", sound: "z", exampleWord: "זְאֵב", emoji: "🐺", isFinal: !1 },
+  { letter: "ח", name: "חֵית", nameNikud: "חֵית", sound: "ch", exampleWord: "חָתוּל", emoji: "🐱", isFinal: !1 },
+  { letter: "ט", name: "טֵית", nameNikud: "טֵית", sound: "t", exampleWord: "טָלֶה", emoji: "🐑", isFinal: !1 },
+  { letter: "י", name: "יוֹד", nameNikud: "יוֹד", sound: "y", exampleWord: "יוֹנָה", emoji: "🕊️", isFinal: !1 },
+  { letter: "כ", name: "כַּף", nameNikud: "כַּף", sound: "k", exampleWord: "כֶּלֶב", emoji: "🐕", isFinal: !1 },
+  { letter: "ךְ", name: "כָּף סוֹפִית", nameNikud: "כָּף סוֹפִית", sound: "k", exampleWord: "מֶלֶךְ", emoji: "👑", isFinal: !0 },
+  { letter: "ל", name: "לָמַד", nameNikud: "לָמֵד", sound: "l", exampleWord: "לֵב", emoji: "❤️", isFinal: !1 },
+  { letter: "מ", name: "מֵם", nameNikud: "מֵם", sound: "m", exampleWord: "מַיִם", emoji: "💧", isFinal: !1 },
+  { letter: "םִ", name: "מֵם סוֹפִית", nameNikud: "מֵם סוֹפִית", sound: "m", exampleWord: "שָׂמִים", emoji: "🌤️", isFinal: !0 },
+  { letter: "נ", name: "נוּן", nameNikud: "נוּן", sound: "n", exampleWord: "נָחָשׁ", emoji: "🐍", isFinal: !1 },
+  { letter: "ן", name: "נוּן סוֹפִית", nameNikud: "נוּן סוֹפִית", sound: "n", exampleWord: "גַּן", emoji: "🌳", isFinal: !0 },
+  { letter: "ס", name: "סֶמֶךְ", nameNikud: "סָמֶךְ", sound: "s", exampleWord: "סוּס", emoji: "🐎", isFinal: !1 },
+  { letter: "ע", name: "עַיִן", nameNikud: "עַיִן", sound: "", exampleWord: "עַיִט", emoji: "🦅", isFinal: !1 },
+  { letter: "פ", name: "פא", nameNikud: "פֵּא", sound: "p", exampleWord: "פִּיל", emoji: "🐘", isFinal: !1 },
+  { letter: "ף", name: "פא סוֹפִית", nameNikud: "פֵּא סוֹפִית", sound: "p", exampleWord: "אַף", emoji: "👃", isFinal: !0 },
+  { letter: "צ", name: "צִדֵּי", nameNikud: "צַדִּי", sound: "ts", exampleWord: "צָב", emoji: "🐢", isFinal: !1 },
+  { letter: "ץ", name: "צִדֵּי סוֹפִית", nameNikud: "צַדִּי סוֹפִית", sound: "ts", exampleWord: "עֵץ", emoji: "🌲", isFinal: !0 },
+  { letter: "ק", name: "קוֹף", nameNikud: "קוֹף", sound: "k", exampleWord: "קוֹף", emoji: "🐒", isFinal: !1 },
+  { letter: "ר", name: "רֵישׁ", nameNikud: "רֵישׁ", sound: "r", exampleWord: "רֶכֶב", emoji: "🚗", isFinal: !1 },
+  { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
+  { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
+];
 function de(t) {
+  return w.find((e) => e.letter === t) || null;
+}
+function Q(t = "regular") {
+  return t === "regular" ? w.filter((e) => !e.isFinal) : t === "final" ? w.filter((e) => e.isFinal) : w;
+}
+function ue(t, e = "regular") {
+  const n = Q(e);
+  return [...n].sort(() => Math.random() - 0.5).slice(0, Math.min(t, n.length));
+}
+const v = [
+  { id: "kamatz", name: "קָמָץ", nameNikud: "קָמָץ", symbol: "ָ", sound: "אָ", color: "#FF6B6B", textColor: "#fff" },
+  { id: "patah", name: "פֶּתַח", nameNikud: "פָּתַח", symbol: "ַ", sound: "אָ", color: "#FF8C42", textColor: "#fff" },
+  { id: "hiriq", name: "חִירִיק", nameNikud: "חִירִיק", symbol: "ִ", sound: "אִי", color: "#4ECDC4", textColor: "#fff" },
+  { id: "tzere", name: "צָרָה", nameNikud: "צֵרֶה", symbol: "ֵ", sound: "אֶ", color: "#45B7D1", textColor: "#fff" },
+  { id: "segol", name: "סָגֹול", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶ", color: "#9B59B6", textColor: "#fff" },
+  { id: "holam", name: "חוֹלֵם", nameNikud: "חוֹלָם", symbol: "ֹ", sound: "אֹ", color: "#2ECC71", textColor: "#fff" },
+  { id: "kubbutz", name: "קֻובּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אֻ", color: "#F39C12", textColor: "#fff" },
+  { id: "shva", name: "שָׁוְוא", nameNikud: "שְׁוָא", symbol: "ְ", sound: "אְ", color: "#95A5A6", textColor: "#fff" }
+], me = ["א", "ב", "ג", "ד", "מ", "נ", "ל", "ר", "ש", "ת", "פ", "ק"];
+function fe(t, e) {
+  return t + e;
+}
+function he(t) {
+  let e = [...v];
+  if (typeof window < "u" && window.location && window.location.search) {
+    const r = new URLSearchParams(window.location.search), a = r.get("allowedNikud");
+    if (a) {
+      const i = a.split(",").map((o) => o.trim());
+      e = e.filter(
+        (o) => i.includes(o.id) || i.includes(o.name) || i.includes(o.nameNikud)
+      );
+    }
+    const s = r.get("excludedNikud");
+    if (s) {
+      const i = s.split(",").map((o) => o.trim());
+      e = e.filter(
+        (o) => !i.includes(o.id) && !i.includes(o.name) && !i.includes(o.nameNikud)
+      );
+    }
+  }
+  e.length === 0 && (e = [...v]);
+  let n = [...e];
+  for (; n.length < t; )
+    n.push(...e);
+  return n.sort(() => Math.random() - 0.5).slice(0, t);
+}
+function pe(t, e, n) {
+  t.innerHTML = "";
+  const r = document.createElement("div");
+  r.className = "option-cards-grid";
+  const a = e.map((s) => {
+    const i = document.createElement("button");
+    return i.className = "option-card", i.dataset.id = s.id, i.innerHTML = `
+      <span class="option-card__emoji">${s.emoji || ""}</span>
+      <span class="option-card__text">${s.text}</span>
+    `, i.addEventListener("click", () => {
+      i.disabled || n(s);
+    }), r.appendChild(i), { el: i, option: s };
+  });
+  return t.appendChild(r), {
+    /** הַדָּגֵשׁ כַּרְטִיס לְפִי סוּג: 'correct' | 'wrong' | 'hint' */
+    highlight(s, i) {
+      a.forEach(({ el: o, option: l }) => {
+        l.id === s && o.classList.add(`option-card--${i}`);
+      });
+    },
+    /** נטרל את כל הכרטיסים */
+    disable() {
+      a.forEach(({ el: s }) => {
+        s.disabled = !0;
+      });
+    },
+    /** אפס את מצב הכרטיסים */
+    reset() {
+      a.forEach(({ el: s }) => {
+        s.className = "option-card", s.disabled = !1;
+      });
+    },
+    /** הסר את הרכיב */
+    destroy() {
+      t.innerHTML = "";
+    }
+  };
+}
+function ge(t, e) {
+  const n = document.createElement("div");
+  n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(e)), n.innerHTML = `
+    <div class="progress-bar__track">
+      <div class="progress-bar__fill" style="width: 0%"></div>
+    </div>
+    <span class="progress-bar__label">0 / ${e}</span>
+  `, t.appendChild(n);
+  const r = n.querySelector(".progress-bar__fill"), a = n.querySelector(".progress-bar__label");
+  return {
+    /** עדכן את ההתקדמות */
+    update(s) {
+      const i = Math.round(s / e * 100);
+      r.style.width = `${i}%`, a.textContent = `${s} / ${e}`, n.setAttribute("aria-valuenow", String(s));
+    },
+    /** הסר את הרכיב */
+    destroy() {
+      n.remove();
+    }
+  };
+}
+function be(t) {
   const e = document.createElement("div");
   e.className = "feedback-message", e.setAttribute("aria-live", "polite"), e.setAttribute("role", "status"), t.appendChild(e);
   let n = null;
-  function a(s, r, o = 1800) {
-    clearTimeout(n), e.textContent = s, e.className = `feedback-message feedback-message--${r}`, n = setTimeout(() => {
+  function r(a, s, i = 1800) {
+    clearTimeout(n), e.textContent = a, e.className = `feedback-message feedback-message--${s}`, n = setTimeout(() => {
       e.textContent = "", e.className = "feedback-message";
-    }, o);
+    }, i);
   }
   return {
     /** הצג משוב חיובי */
-    correct(s = "!כָּל הַכָּבוֹד") {
-      N.correct(), a(s, "correct"), y(e, "bounce");
+    correct(a = "!כָּל הַכָּבוֹד") {
+      _.correct(), r(a, "correct"), y(e, "bounce");
     },
     /** הצג עידוד — נסה שוב */
-    wrong(s = "נַסֵּה שׁוּב") {
-      N.wrong(), a(s, "wrong"), y(e, "pulse");
+    wrong(a = "נַסֵּה שׁוּב") {
+      _.wrong(), r(a, "wrong"), y(e, "pulse");
     },
     /** הצג רמז */
-    hint(s) {
-      a(s, "hint"), y(e, "pulse");
+    hint(a) {
+      r(a, "hint"), y(e, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -531,34 +569,94 @@ function de(t) {
     }
   };
 }
-function ue(t, e, n, a) {
-  N.cheer();
-  const s = e / n, r = s >= 0.8 ? 3 : s >= 0.5 ? 2 : 1, o = "⭐".repeat(r) + "☆".repeat(3 - r), i = document.createElement("div");
-  i.className = "completion-screen", i.innerHTML = `
-    <div class="completion-screen__content">
-      <div class="completion-screen__stars" aria-label="${r} כּוֹכָבִים">${o}</div>
-      <h2 class="completion-screen__title">!כָּל הַכָּבוֹד</h2>
-      <p class="completion-screen__score">נִיקּוּד: ${e} מִתּוֹךְ ${n}</p>
-      <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
+function ke(t, e) {
+  let n = document.getElementById("nikud-settings");
+  n || (n = document.createElement("div"), n.id = "nikud-settings", Object.assign(n.style, {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: "0px",
+    bottom: "0px",
+    background: "rgba(0,0,0,0.5)",
+    zIndex: 9999,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+  }), document.body.appendChild(n));
+  const r = new URLSearchParams(window.location.search), a = r.get("allowedNikud") ? r.get("allowedNikud").split(",") : [];
+  let s = `
+    <div style="background:white; padding:1.5rem; border-radius:1rem; min-width:300px; text-align:center; color:#333; font-family:Heebo,Arial; direction:rtl;">
+      <h2 style="margin-top:0">בחר ניקוד</h2>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:1rem 0; text-align:right;">
+  `;
+  v.forEach((i) => {
+    const o = a.length === 0 || a.includes(i.id) || a.includes(i.name);
+    s += `
+      <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+        <input type="checkbox" value="${i.id}" class="nikud-filter-cb" ${o ? "checked" : ""} style="width:1.2rem;height:1.2rem;">
+        <span>${i.nameNikud}</span>
+      </label>
+    `;
+  }), s += `
+      </div>
+      <button id="save-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#4f67ff; color:white; border:none; font-size:1.1rem; cursor:pointer;">שמור והתחל מחדש</button>
+      <button id="close-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#ddd; color:#333; border:none; font-size:1.1rem; cursor:pointer; margin-right:0.5rem;">ביטול</button>
     </div>
-  `, i.querySelector(".completion-screen__replay").addEventListener("click", () => {
-    i.remove(), a();
-  }), t.innerHTML = "", t.appendChild(i), y(i.querySelector(".completion-screen__content"), "fadeIn");
+  `, n.innerHTML = s, n.style.display = "flex", document.getElementById("save-settings-btn").onclick = () => {
+    const i = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((l) => l.checked).map((l) => l.value), o = new URL(window.location);
+    i.length > 0 && i.length < v.length ? o.searchParams.set("allowedNikud", i.join(",")) : o.searchParams.delete("allowedNikud"), o.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", o), e && e(t);
+  }, document.getElementById("close-settings-btn").onclick = () => {
+    n.style.display = "none";
+  };
 }
-let f = null, d = null, x = 0, S = 0;
-const w = /* @__PURE__ */ new Map();
-function E(t, e) {
+function ye(t) {
+  const e = document.createElement("div");
+  e.className = "ab-zone", e.style.setProperty("--zone-color", t.color || "#4f67ff"), e.innerHTML = `
+    <div class="ab-zone__symbol">${t.symbol || ""}</div>
+    <div class="ab-zone__label">${t.label || ""}</div>
+  `;
+  const n = () => {
+    t.onTap && t.onTap();
+  };
+  return e.addEventListener("click", n), {
+    el: e,
+    highlight(r) {
+      e.classList.remove("ab-zone--correct", "ab-zone--hover"), r && e.classList.add(`ab-zone--${r}`);
+    },
+    reset() {
+      e.classList.remove("ab-zone--correct", "ab-zone--hover");
+    },
+    destroy() {
+      e.removeEventListener("click", n);
+    }
+  };
+}
+function we(t, e = "טוֹעֵן...") {
+  t.innerHTML = `<div class="ab-loading">${e}</div>`;
+}
+function _e(t) {
+  t.innerHTML = "";
+}
+function ve(t, e, n, r) {
+  const a = t.querySelector(".game-header__spacer");
+  if (!a) return null;
+  const s = document.createElement("button");
+  return s.className = "ab-header-btn", s.setAttribute("aria-label", n), s.textContent = e, s.onclick = r, a.innerHTML = "", a.appendChild(s), s;
+}
+let f = null, d = null, L = 0, S = 0;
+const N = /* @__PURE__ */ new Map();
+function F(t, e) {
   var n;
   return ((n = document.elementFromPoint(t, e)) == null ? void 0 : n.closest('[data-drop-target="true"]')) || null;
 }
-function V(t, e, n) {
-  const a = t.getBoundingClientRect();
-  x = a.width / 2, S = a.height / 2, d = t.cloneNode(!0), Object.assign(d.style, {
+function Z(t, e, n) {
+  const r = t.getBoundingClientRect();
+  L = r.width / 2, S = r.height / 2, d = t.cloneNode(!0), Object.assign(d.style, {
     position: "fixed",
-    left: `${e - x}px`,
+    left: `${e - L}px`,
     top: `${n - S}px`,
-    width: `${a.width}px`,
-    height: `${a.height}px`,
+    width: `${r.width}px`,
+    height: `${r.height}px`,
     pointerEvents: "none",
     // keeps it out of elementFromPoint + hit-testing
     zIndex: "9999",
@@ -568,70 +666,76 @@ function V(t, e, n) {
     margin: "0"
   }), document.body.appendChild(d);
 }
-function G(t, e) {
-  d && (d.style.left = `${t - x}px`, d.style.top = `${e - S}px`);
+function ee(t, e) {
+  d && (d.style.left = `${t - L}px`, d.style.top = `${e - S}px`);
 }
-function Y() {
+function te() {
   d == null || d.remove(), d = null;
 }
 let u = null;
-function K(t) {
+function ne(t) {
   u !== t && (u == null || u.classList.remove("drop-target--hover"), u = t, t == null || t.classList.add("drop-target--hover"));
 }
-function J() {
+function ae() {
   u == null || u.classList.remove("drop-target--hover"), u = null;
 }
-function me(t, e) {
+function Ne(t, e) {
   t.classList.add("drag-source");
-  let n = null, a = null, s = null;
-  function r() {
-    n && (t.removeEventListener("pointermove", n), t.removeEventListener("pointerup", a), t.removeEventListener("pointercancel", s), n = a = s = null), J(), Y(), t.classList.remove("drag-source--dragging"), f = null;
+  let n = null, r = null, a = null;
+  function s() {
+    n && (t.removeEventListener("pointermove", n), t.removeEventListener("pointerup", r), t.removeEventListener("pointercancel", a), n = r = a = null), ae(), te(), t.classList.remove("drag-source--dragging"), f = null;
   }
-  function o(i) {
-    i.button !== void 0 && i.button !== 0 || (i.preventDefault(), f && r(), f = { el: t, data: e }, t.classList.add("drag-source--dragging"), V(t, i.clientX, i.clientY), t.setPointerCapture(i.pointerId), n = (l) => {
-      G(l.clientX, l.clientY), K(E(l.clientX, l.clientY));
-    }, a = (l) => {
-      const c = E(l.clientX, l.clientY);
-      r(), c && w.has(c) && w.get(c).onDrop({ data: e, sourceEl: t, targetEl: c });
-    }, s = () => r(), t.addEventListener("pointermove", n), t.addEventListener("pointerup", a), t.addEventListener("pointercancel", s));
+  function i(o) {
+    o.button !== void 0 && o.button !== 0 || (o.preventDefault(), f && s(), f = { el: t, data: e }, t.classList.add("drag-source--dragging"), Z(t, o.clientX, o.clientY), t.setPointerCapture(o.pointerId), n = (l) => {
+      ee(l.clientX, l.clientY), ne(F(l.clientX, l.clientY));
+    }, r = (l) => {
+      const c = F(l.clientX, l.clientY);
+      s(), c && N.has(c) && N.get(c).onDrop({ data: e, sourceEl: t, targetEl: c });
+    }, a = () => s(), t.addEventListener("pointermove", n), t.addEventListener("pointerup", r), t.addEventListener("pointercancel", a));
   }
-  return t.addEventListener("pointerdown", o), {
+  return t.addEventListener("pointerdown", i), {
     destroy() {
-      t.removeEventListener("pointerdown", o), (f == null ? void 0 : f.el) === t && r(), t.classList.remove("drag-source");
+      t.removeEventListener("pointerdown", i), (f == null ? void 0 : f.el) === t && s(), t.classList.remove("drag-source");
     }
   };
 }
-function fe(t, e) {
-  return t.setAttribute("data-drop-target", "true"), t.classList.add("drop-target--active"), w.set(t, { onDrop: e }), {
+function xe(t, e) {
+  return t.setAttribute("data-drop-target", "true"), t.classList.add("drop-target--active"), N.set(t, { onDrop: e }), {
     destroy() {
-      t.removeAttribute("data-drop-target"), t.classList.remove("drop-target--active", "drop-target--hover"), w.delete(t);
+      t.removeAttribute("data-drop-target"), t.classList.remove("drop-target--active", "drop-target--hover"), N.delete(t);
     }
   };
 }
 export {
-  W as EventBus,
-  Q as GameShell,
-  $ as GameState,
-  q as addNikud,
+  P as EventBus,
+  se as GameShell,
+  z as GameState,
+  D as addNikud,
   y as animate,
-  me as createDragSource,
-  fe as createDropTarget,
-  de as createFeedback,
-  le as createOptionCards,
-  ce as createProgressBar,
-  te as createSpeechListener,
-  se as getLetter,
-  z as getLettersByGroup,
-  P as getNikud,
-  b as hebrewLetters,
-  oe as letterWithNikud,
-  ne as matchNikudSound,
-  re as nikudBaseLetters,
-  R as nikudList,
-  Z as preloadNikud,
-  ae as randomLetters,
-  ie as randomNikud,
-  ue as showCompletionScreen,
-  N as sounds,
-  ee as tts
+  Ne as createDragSource,
+  xe as createDropTarget,
+  be as createFeedback,
+  pe as createOptionCards,
+  ge as createProgressBar,
+  oe as createRoundManager,
+  le as createSpeechListener,
+  ye as createZone,
+  de as getLetter,
+  Q as getLettersByGroup,
+  U as getNikud,
+  w as hebrewLetters,
+  _e as hideLoadingScreen,
+  ve as injectHeaderButton,
+  fe as letterWithNikud,
+  ce as matchNikudSound,
+  me as nikudBaseLetters,
+  v as nikudList,
+  ie as preloadNikud,
+  ue as randomLetters,
+  he as randomNikud,
+  Y as showCompletionScreen,
+  we as showLoadingScreen,
+  ke as showNikudSettingsDialog,
+  _ as sounds,
+  V as tts
 };

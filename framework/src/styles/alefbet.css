@@ -415,6 +415,22 @@
   outline-offset: 3px;
 }
 
+/* ── Loading Screen ─────────────────────────────────────────────────────── */
+.ab-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  font-family: var(--ab-font, 'Heebo', Arial, sans-serif);
+  font-size: 1.2rem;
+  color: #4f67ff;
+  direction: rtl;
+}
+
+/* ── Header Button ──────────────────────────────────────────────────────── */
+.ab-header-btn { background:none; border:none; font-size:1.5rem; cursor:pointer; padding:4px; border-radius:8px; transition: background 0.15s; }
+.ab-header-btn:hover { background: rgba(0,0,0,0.06); }
+
 /* ── Utility Classes ─────────────────────────────────────────────────────── */
 .visually-hidden {
   position: absolute;
@@ -456,3 +472,37 @@
     transform: none !important;
   }
 }
+
+/* ── Shared Entry Animations ── */
+@keyframes ab-appear { from { opacity:0; transform:scale(0.75) translateY(-10px); } to { opacity:1; transform:scale(1) translateY(0); } }
+@keyframes ab-pop { from { opacity:0; transform:scale(0.6); } to { opacity:1; transform:scale(1); } }
+@keyframes ab-zone-in { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+@keyframes ab-hint-pulse { 0%,100% { opacity:0.4; } 50% { opacity:1; } }
+
+.anim-appear { animation: ab-appear 0.4s ease-out both; }
+.anim-pop { animation: ab-pop 0.35s ease-out both; }
+.anim-zone-in { animation: ab-zone-in 0.4s ease-out both; }
+.anim-hint-pulse { animation: ab-hint-pulse 1.5s ease-in-out infinite; }
+
+/* ── Interactive Zones ── */
+.ab-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 2dvmin, 16px);
+  background: var(--zone-color, #4f67ff);
+  border-radius: clamp(20px, 5dvmin, 36px);
+  padding: clamp(16px, 4dvmin, 32px);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+.ab-zone:active { transform: scale(0.96); }
+.ab-zone--hover { transform: scale(1.06); box-shadow: 0 10px 32px rgba(0,0,0,0.25); }
+.ab-zone--correct { box-shadow: 0 0 0 8px #00C896, 0 10px 32px rgba(0,200,150,0.4) !important; transform: scale(1.04); }
+.ab-zone__symbol { font-size: clamp(56px, 18dvmin, 100px); font-weight: 900; color: #fff; line-height: 1; font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; }
+.ab-zone__label { font-size: clamp(16px, 4dvmin, 26px); font-weight: 700; color: rgba(255,255,255,0.95); font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; }

@@ -22,7 +22,7 @@
   border-radius: clamp(20px, 5dvmin, 36px);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
   user-select: none;
-  animation: card-drop-in 0.4s ease-out both;
+  /* uses framework .anim-appear class added in JS */
 }
 
 .nikud-speak-card__symbol {
@@ -162,13 +162,4 @@
 }
 
 /* ── Animations ─────────────────────────────────────────────────────────── */
-@keyframes card-drop-in {
-  from {
-    opacity: 0;
-    transform: scale(0.75) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
+/* card-drop-in replaced by framework .anim-appear (ab-appear keyframe) */

@@ -19,6 +19,9 @@ import {
   showNikudSettingsDialog,
   createDragSource,
   createDropTarget,
+  showLoadingScreen,
+  hideLoadingScreen,
+  injectHeaderButton,
 } from '../../framework/dist/alefbet.js';
 
 const STATIC_TEXTS = [
@@ -40,10 +43,10 @@ function pickLetter() {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.2rem;color:#4f67ff;direction:rtl;">טוֹעֵן נִיקּוּד...</div>';
+  showLoadingScreen(container, 'טוֹעֵן נִיקּוּד...');
 
   await preloadNikud(STATIC_TEXTS);
-  container.innerHTML = '';
+  hideLoadingScreen(container);
 
   const roundNikud = randomNikud(8);
 
@@ -52,11 +55,7 @@ export async function startGame(container) {
     title: 'לִמּוּד נִיקּוּד',
   });
 
-  const spacer = container.querySelector('.game-header__spacer');
-  if (spacer) {
-    spacer.innerHTML = '<button style="background:none;border:none;font-size:1.5rem;cursor:pointer;" aria-label="הגדרות">⚙️</button>';
-    spacer.querySelector('button').onclick = () => showNikudSettingsDialog(container, startGame);
-  }
+  injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
 
   let progressBar = null;
   let roundIndex = 0;

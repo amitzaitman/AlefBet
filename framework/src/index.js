@@ -9,6 +9,7 @@ import './styles/alefbet.css';
 export { EventBus } from './core/events.js';
 export { GameState } from './core/state.js';
 export { GameShell } from './core/game-shell.js';
+export { createRoundManager } from './core/round-manager.js';
 
 // ===== Audio =====
 export { tts } from './audio/tts.js';
@@ -33,10 +34,14 @@ export {
 } from './data/nikud.js';
 
 // ===== UI [נוסף על ידי: letter-match game] =====
-export { createOptionCards }    from './ui/option-cards.js';
-export { createProgressBar }    from './ui/progress-bar.js';
-export { createFeedback }       from './ui/feedback.js';
+export { createOptionCards } from './ui/option-cards.js';
+export { createProgressBar } from './ui/progress-bar.js';
+export { createFeedback } from './ui/feedback.js';
 export { showCompletionScreen } from './ui/completion-screen.js';
+export { showNikudSettingsDialog } from './ui/nikud-settings.js';
+export { createZone } from './ui/interactive-zones.js';
+export { showLoadingScreen, hideLoadingScreen } from './ui/loading-screen.js';
+export { injectHeaderButton } from './ui/header-button.js';
 
 // ===== Render [נוסף על ידי: letter-match game] =====
 export { animate } from './render/animations.js';

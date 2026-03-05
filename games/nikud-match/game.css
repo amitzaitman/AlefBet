@@ -28,7 +28,7 @@
   transition: transform 0.2s, box-shadow 0.2s;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  animation: zone-appear 0.4s ease-out both;
+  animation: ab-zone-in 0.4s ease-out both;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
@@ -81,7 +81,7 @@
 .nm-hint {
   font-size: clamp(22px, 6dvmin, 40px);
   color: #b0b8d4;
-  animation: hint-pulse 1.5s ease-in-out infinite;
+  animation: ab-hint-pulse 1.5s ease-in-out infinite;
 }
 
 .nm-letter {
@@ -102,7 +102,7 @@
   user-select: none;
   box-shadow: 0 6px 24px rgba(79, 103, 255, 0.15);
   transition: box-shadow 0.15s;
-  animation: letter-pop 0.35s ease-out both;
+  animation: ab-pop 0.35s ease-out both;
   animation-delay: 0.15s;
   z-index: 10;
   position: relative;
@@ -119,18 +119,4 @@
   background: #e8faf5;
 }
 
-/* ── Animations ── */
-@keyframes zone-appear {
-  from { opacity: 0; transform: scale(0.8); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes letter-pop {
-  from { opacity: 0; transform: scale(0.6); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes hint-pulse {
-  0%, 100% { opacity: 0.4; }
-  50%      { opacity: 1; }
-}
+/* Animations: using framework @keyframes (ab-zone-in, ab-pop, ab-hint-pulse) from alefbet.css */
