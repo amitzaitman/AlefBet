@@ -3,6 +3,8 @@
 
 A growing framework for creating interactive Hebrew literacy games. Teachers use the built-in **Creator** tool to generate new games by chatting with Claude in Hebrew — no coding required.
 
+**🌐 Play online:** [amitzaitman.github.io/AlefBet](https://amitzaitman.github.io/AlefBet/) (hosted on GitHub Pages)
+
 ---
 
 ## Quick Start — One Click
@@ -39,10 +41,18 @@ Match each Hebrew letter to the animal whose name starts with it.
 - Hebrew TTS reads instructions and feedback
 
 ### אָ לִמּוּד נִיקּוּד — Nikud Match
-Drag the vowel symbol onto the letter that carries the same vowel.
+A letter appears in the center — drag it to the correct nikud side.
 - 8 rounds with 7 different nikud marks (קָמַץ, חִירִיק, חוֹלָם, ...)
-- Supports drag-and-drop (mouse/stylus) and tap-to-select (touch)
-- Sound effects + TTS feedback
+- Two nikud options shown on left and right sides
+- On success, TTS speaks the letter with the correct nikud
+- Supports drag and tap-to-select (touch)
+
+### 🎤 אֱמוֹר אֶת הַנִּיקּוּד — Nikud Speak
+Listen to a nikud name and say it aloud — speech recognition validates pronunciation.
+- 8 rounds with random nikud marks
+- Microphone recording via Web Speech API (Chrome/Edge)
+- Up to 3 attempts per round, auto-advances on 3 misses
+- Gentle encouragement only — no negative feedback
 
 ---
 
@@ -87,8 +97,9 @@ AlefBet/
 │   │   │   ├── state.js        GameState (score, rounds, progress)
 │   │   │   └── game-shell.js   GameShell (container, lifecycle, back button)
 │   │   ├── audio/
-│   │   │   ├── tts.js          Hebrew TTS — auto-uses nikud for pronunciation
-│   │   │   └── sounds.js       Programmatic sound effects (Web Audio API)
+│   │   │   ├── tts.js          Hebrew TTS — Google Translate (browser fallback)
+│   │   │   ├── sounds.js       Programmatic sound effects (Web Audio API)
+│   │   │   └── speech-recognition.js  Microphone input via Web Speech API
 │   │   ├── data/
 │   │   │   ├── hebrew-letters.js   Full alphabet + metadata + nikud names
 │   │   │   └── nikud.js            Vowel mark data (8 nikud types)
@@ -126,7 +137,8 @@ AlefBet/
 └── games/                      ← Each game is an independent folder
     ├── _template/              ← Copy this to start a new game
     ├── letter-match-animals/   🦁 Letter → Animal matching
-    └── nikud-match/            אָ Vowel mark drag-and-drop
+    ├── nikud-match/            אָ Drag letter to correct nikud side
+    └── nikud-speak/            🎤 Say nikud aloud (speech recognition)
 ```
 
 ---
@@ -167,13 +179,34 @@ All Hebrew text is automatically vowelized using the **Dicta Nakdan API**:
 | Framework build | Vite (library mode, ESM + UMD) |
 | Creator dev server | Vite |
 | AI generation | Anthropic Claude API (streaming) |
-| Hebrew TTS | Web Speech API |
+| Hebrew TTS | Google Translate TTS (Web Speech API fallback) |
 | Hebrew nikud | Dicta Nakdan API |
 | Sounds | Web Audio API |
 | Drag & drop | Pointer Events API |
 | Animations | Web Animations API |
 | Fonts | Heebo (Google Fonts) |
 | Language | Vanilla JS (ES modules) |
+
+---
+
+## GitHub Pages Deployment
+
+The site is hosted at **https://amitzaitman.github.io/AlefBet/** via GitHub Pages, serving directly from the `main` branch root.
+
+Every push to `main` automatically deploys. To add a new game to the live site:
+1. Create the game folder under `games/`
+2. Add a game card to `index.html` (the hub page)
+3. Commit and push — the game appears on the site after Pages rebuilds (~1–2 minutes)
+
+---
+
+## Hebrew TTS
+
+The framework uses **Google Translate TTS** for high-quality Hebrew pronunciation:
+- Audio is fetched from Google's servers and played via the `<audio>` element
+- Nikud-aware: text is auto-vowelized via the Dicta Nakdan API before speaking
+- If Google TTS is unavailable (offline, blocked), falls back to the browser's built-in Web Speech API
+- Configurable speech rate via `tts.setRate()`
 
 ---
 
