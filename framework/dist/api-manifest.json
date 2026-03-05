@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-04T19:05:09.212Z",
+  "generatedAt": "2026-03-05T19:07:09.291Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -49,7 +49,7 @@
     },
     {
       "path": "audio/tts.js",
-      "description": "מנוע קריאת טקסט עברי\nמשתמש ב-Web Speech API עם קול עברי אוטומטי\nאם הניקוד נטען מראש (getNikud), משתמש בו לשיפור ההגייה",
+      "description": "מנוע קריאת טקסט עברי\nמשתמש ב-Google Translate TTS לאיכות גבוהה יותר\nעם נפילה ל-Web Speech API כגיבוי",
       "exports": [
         "tts"
       ]
