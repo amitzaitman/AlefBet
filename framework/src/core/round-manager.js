@@ -3,7 +3,6 @@
  * עוזר משותף לניהול זרימת תשובה נכונה / שגויה בין סיבובים
  */
 import { sounds } from '../audio/sounds.js';
-import { tts } from '../audio/tts.js';
 import { showCompletionScreen } from '../ui/completion-screen.js';
 
 /**
@@ -62,8 +61,6 @@ export function createRoundManager(shell, container, {
   async function handleWrong() {
     if (answered) return;
     answered = true;
-
-    await tts.speak('נסה שוב');
 
     if (onWrong) await onWrong();
 

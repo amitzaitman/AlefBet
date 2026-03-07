@@ -5,7 +5,6 @@
  */
 import {
   GameShell,
-  tts,
   nikudList,
   letterWithNikud,
   createFeedback,
@@ -88,16 +87,6 @@ export async function startGame(container) {
     `;
     panel.appendChild(card);
 
-    // ── Demo button (speaker) ──
-    const demoBtn = document.createElement('button');
-    demoBtn.className = 'demo-btn';
-    demoBtn.setAttribute('aria-label', 'הַשְׁמַע צְלִיל');
-    demoBtn.innerHTML = '<span class="demo-btn__icon">🔊</span><span class="demo-btn__text">הַקְשֵׁב</span>';
-    demoBtn.onclick = () => {
-      tts.speak(letterWithNikud('א', nikud.symbol));
-    };
-    panel.appendChild(demoBtn);
-
     // ── Mic button ──
     const micBtn = document.createElement('button');
     micBtn.className = 'mic-btn';
@@ -114,11 +103,7 @@ export async function startGame(container) {
 
     shell.bodyEl.appendChild(panel);
 
-    // Animate card entry
     animate(card, 'fadeIn');
-
-    // Speak the nikud name
-    tts.speak(`${nikud.nameNikud}`);
   }
 
   async function onMicPress(nikud, micBtn) {
@@ -161,7 +146,6 @@ export async function startGame(container) {
       if (failCount >= 3) {
         // Auto-advance after 3 fails
         feedback.hint(getNikud('הַצְּלִיל הַנָּכוֹן הוּא:'));
-        await tts.speak(letterWithNikud('א', nikud.symbol));
 
         progressBar?.update(shell.state.currentRound);
 
@@ -189,7 +173,6 @@ export async function startGame(container) {
     progressBar = createProgressBar(shell.footerEl, 8);
     progressBar.update(0);
     roundIndex = 0;
-    tts.speak(getNikud('בְּרוּכִים הַבָּאִים! אֱמוֹר אֶת הַנִּיקּוּד'));
     buildRoundUI(roundNikud[0]);
   });
 

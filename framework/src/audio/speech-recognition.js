@@ -10,7 +10,6 @@ const SOUND_GROUPS = {
   hiriq: 'ee',
   holam: 'oh',
   kubbutz: 'oo',
-  shva: 'shva',
 };
 
 const PATTERNS = {
@@ -19,7 +18,6 @@ const PATTERNS = {
   ee: [/[אי]/, /^י$/, /אי/, /הי/],
   oh: [/[או]/, /^[או]$/, /או/, /הו/],
   oo: [/[או]/, /^[או]$/, /או/, /הו/, /אוּ/],
-  shva: [/[אה]/, /^א$/, /^$/, /אה/],
 };
 
 export function createSpeechListener() {

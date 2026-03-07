@@ -5,7 +5,6 @@
  */
 import {
   GameShell,
-  tts,
   nikudList,
   nikudBaseLetters,
   letterWithNikud,
@@ -140,7 +139,6 @@ export async function startGame(container) {
       handleDrop(rightNikud.id === targetNikud.id, letter, targetNikud, letterEl, rightZone);
     });
 
-    tts.speak(targetNikud.nameNikud);
   }
 
   async function handleDrop(isCorrect, letter, targetNikud, letterEl, zone) {
@@ -162,9 +160,6 @@ export async function startGame(container) {
       animate(zone, 'bounce');
       sounds.correct();
 
-      const combined = letterWithNikud(letter, targetNikud.symbol);
-      await tts.speak(combined);
-
       shell.state.addScore(1);
       progressBar?.update(shell.state.currentRound);
       roundIndex++;
@@ -175,7 +170,6 @@ export async function startGame(container) {
         showCompletionScreen(container, shell.state.score, 8, () => startGame(container));
       }
     } else {
-      await tts.speak(getNikud('נַסֵּה שׁוּב'));
       answered = false;
     }
   }
@@ -186,7 +180,6 @@ export async function startGame(container) {
     progressBar = createProgressBar(shell.footerEl, 8);
     progressBar.update(0);
     roundIndex = 0;
-    tts.speak(getNikud('בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד'));
     buildRoundUI(roundNikud[0]);
   });
 

@@ -10,8 +10,28 @@
  */
 
 const NAKDAN_URL = 'https://nakdan-u1-0.loadbalancer.dicta.org.il/api';
+let _nakdanDisabledNoticeShown = false;
 
 const _cache = new Map();
+
+function _resolveNakdanUrl() {
+  if (typeof window === 'undefined') return NAKDAN_URL;
+
+  const queryProxy = new URLSearchParams(window.location.search).get('nakdanProxy');
+  const globalProxy = window.ALEFBET_NAKDAN_PROXY_URL;
+  if (queryProxy && window.localStorage) {
+    try { window.localStorage.setItem('alefbet.nakdanProxyUrl', queryProxy); } catch {}
+  }
+  const storageProxy = window.localStorage?.getItem('alefbet.nakdanProxyUrl');
+  const proxyUrl = queryProxy || globalProxy || storageProxy;
+
+  if (proxyUrl) return proxyUrl;
+
+  // Dicta blocks browser CORS on GitHub Pages; use proxy there.
+  if (window.location.hostname.endsWith('github.io')) return null;
+
+  return NAKDAN_URL;
+}
 
 /** המר תגובת Nakdan API לטקסט עם ניקוד */
 function _parseResponse(tokens) {
@@ -34,7 +54,16 @@ function _parseResponse(tokens) {
 
 /** קרא ל-API לניקוד טקסט יחיד */
 async function _fetchNikud(text) {
-  const resp = await fetch(NAKDAN_URL, {
+  const nakdanUrl = _resolveNakdanUrl();
+  if (!nakdanUrl) {
+    if (!_nakdanDisabledNoticeShown) {
+      _nakdanDisabledNoticeShown = true;
+      console.warn('[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.');
+    }
+    throw new Error('Nakdan unavailable without proxy on this host');
+  }
+
+  const resp = await fetch(nakdanUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

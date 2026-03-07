@@ -13,7 +13,6 @@ export const nikudList = [
   { id: 'segol', name: 'סָגֹול', nameNikud: 'סְגוֹל', symbol: '\u05B6', sound: 'אֶ', color: '#9B59B6', textColor: '#fff' },
   { id: 'holam', name: 'חוֹלֵם', nameNikud: 'חוֹלָם', symbol: '\u05B9', sound: 'אֹ', color: '#2ECC71', textColor: '#fff' },
   { id: 'kubbutz', name: 'קֻובּוּץ', nameNikud: 'קֻבּוּץ', symbol: '\u05BB', sound: 'אֻ', color: '#F39C12', textColor: '#fff' },
-  { id: 'shva', name: 'שָׁוְוא', nameNikud: 'שְׁוָא', symbol: '\u05B0', sound: 'אְ', color: '#95A5A6', textColor: '#fff' },
 ];
 
 /** אותיות בסיס לשימוש עם ניקוד (ללא אותיות סופיות) */

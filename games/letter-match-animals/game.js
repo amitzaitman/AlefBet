@@ -5,7 +5,6 @@
  */
 import {
   GameShell,
-  tts,
   getLetter,
   createOptionCards,
   createProgressBar,
@@ -129,7 +128,6 @@ export async function startGame(container) {
     if (option.id === 'correct') {
       cards.highlight('correct', 'correct');
       feedback.correct(`!נָכוֹן — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
-      tts.speak('כל הכבוד');
 
       setTimeout(() => {
         shell.state.addScore(1);
@@ -139,7 +137,6 @@ export async function startGame(container) {
           currentRoundIndex++;
           buildRoundUI(ROUNDS[currentRoundIndex]);
           const nextName = getLetter(ROUNDS[currentRoundIndex].target)?.nameNikud || ROUNDS[currentRoundIndex].target;
-          tts.speak(`הָאוֹת ${nextName}`);
         } else {
           showCompletionScreen(container, shell.state.score, ROUNDS.length, () => startGame(container));
         }
@@ -148,7 +145,6 @@ export async function startGame(container) {
     } else {
       cards.highlight(option.id, 'wrong');
       feedback.wrong(`!נַסֵּה שׁוּב — חַפֵּשׂ אֶת ${letterName}`);
-      tts.speak('נסה שוב');
 
       setTimeout(() => {
         cards.reset();
@@ -173,7 +169,6 @@ export async function startGame(container) {
     buildRoundUI(ROUNDS[currentRoundIndex]);
 
     const firstName = getLetter(ROUNDS[0].target)?.nameNikud || ROUNDS[0].target;
-    tts.speak(`בְּרוּכִים הַבָּאִים! מְצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת ${firstName}`);
   });
 
   shell.start();

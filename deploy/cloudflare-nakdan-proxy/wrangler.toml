@@ -1,0 +1,8 @@
+name = "alefbet-nakdan-proxy"
+main = "worker.js"
+compatibility_date = "2026-03-05"
+
+# Optional: uncomment and set your custom domain route
+# routes = [
+#   { pattern = "example.com/nakdan-proxy/*", zone_name = "example.com" }
+# ]

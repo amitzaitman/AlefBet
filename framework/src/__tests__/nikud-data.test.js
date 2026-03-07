@@ -7,8 +7,8 @@ import {
 } from '../data/nikud.js';
 
 describe('nikudList data integrity', () => {
-  it('has 8 entries', () => {
-    expect(nikudList).toHaveLength(8);
+  it('has 7 entries', () => {
+    expect(nikudList).toHaveLength(7);
   });
 
   it('every entry has required fields', () => {
@@ -32,9 +32,9 @@ describe('nikudList data integrity', () => {
     expect(new Set(syms).size).toBe(syms.length);
   });
 
-  it('contains the seven canonical nikud + shva', () => {
+  it('contains the seven canonical nikud', () => {
     const ids = nikudList.map(n => n.id);
-    for (const expected of ['kamatz', 'patah', 'hiriq', 'tzere', 'segol', 'holam', 'kubbutz', 'shva']) {
+    for (const expected of ['kamatz', 'patah', 'hiriq', 'tzere', 'segol', 'holam', 'kubbutz']) {
       expect(ids, `missing ${expected}`).toContain(expected);
     }
   });
@@ -90,7 +90,7 @@ describe('randomNikud', () => {
   });
 
   it('returns no duplicates', () => {
-    const result = randomNikud(8);
+    const result = randomNikud(7);
     const ids = result.map(n => n.id);
     expect(new Set(ids).size).toBe(ids.length);
   });

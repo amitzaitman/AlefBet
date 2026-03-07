@@ -4,7 +4,6 @@
  */
 import {
   GameShell,
-  tts,
   hebrewLetters,
   getLettersByGroup,
   randomLetters,
@@ -24,7 +23,6 @@ export function startGame(container) {
   shell.bodyEl.innerHTML = '<p style="text-align:center;padding:2rem">הַמִּשְׂחָק שֶׁלְּךָ יוֹפִיעַ כָּאן</p>';
 
   shell.on('start', () => {
-    tts.speak('בָּרוּךְ הַבָּא לַמִּשְׂחָק');
   });
 
   shell.start();

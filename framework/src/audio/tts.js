@@ -9,27 +9,107 @@ let _queue = [];
 let _speaking = false;
 let _useGoogleTTS = true;
 let _rate = 0.9;
+let _interactionReady = false;
+let _interactionPromise = null;
 
 // ── Google Translate TTS ──────────────────────────────────────────────────
 
+function _reportTTSFailure(provider, text, reason, sentText = text) {
+  console.warn(`[tts] ${provider} TTS failed`, { text, sentText, reason });
+  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+    window.dispatchEvent(new CustomEvent('alefbet:tts-error', {
+      detail: { provider, text, sentText, reason },
+    }));
+  }
+}
+
+function _stripNikud(text) {
+  return (text || '').replace(/[\u0591-\u05C7]/g, '');
+}
+
+function _isInteractionBlockedReason(reason) {
+  const msg = String(reason || '').toLowerCase();
+  return msg.includes("didn't interact") || msg.includes('notallowed');
+}
+
+function _waitForFirstInteraction() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return Promise.resolve();
+  }
+  if (_interactionReady || document.userActivation?.hasBeenActive) {
+    _interactionReady = true;
+    return Promise.resolve();
+  }
+  if (_interactionPromise) return _interactionPromise;
+
+  _interactionPromise = new Promise((resolve) => {
+    const done = () => {
+      _interactionReady = true;
+      window.removeEventListener('pointerdown', done, true);
+      window.removeEventListener('keydown', done, true);
+      window.removeEventListener('touchstart', done, true);
+      resolve();
+    };
+    window.addEventListener('pointerdown', done, { once: true, capture: true });
+    window.addEventListener('keydown', done, { once: true, capture: true });
+    window.addEventListener('touchstart', done, { once: true, capture: true });
+  }).finally(() => {
+    _interactionPromise = null;
+  });
+
+  return _interactionPromise;
+}
+
+function _playGoogleAudio(text, resolve, fail) {
+  const encoded = encodeURIComponent(text);
+  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=he&client=tw-ob`;
+  const audio = new Audio(url);
+  audio.playbackRate = _rate;
+  audio.onended = resolve;
+  audio.onerror = () => fail('audio.onerror');
+  audio.play().catch((err) => {
+    fail(err?.message || 'audio.play() rejected');
+  });
+}
+
 function _googleSpeak(text) {
-  return new Promise((resolve) => {
-    try {
-      const encoded = encodeURIComponent(text);
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=he&client=tw-ob`;
-      const audio = new Audio(url);
-      audio.playbackRate = _rate;
-      audio.onended = resolve;
-      audio.onerror = () => {
-        // Google TTS failed — fall back to browser TTS for this call
-        _browserSpeak(text).then(resolve);
-      };
-      audio.play().catch(() => {
-        _browserSpeak(text).then(resolve);
-      });
-    } catch {
-      _browserSpeak(text).then(resolve);
-    }
+  return new Promise((resolve, reject) => {
+    const textForGoogle = _stripNikud(text).trim() || text;
+    let settled = false;
+    let retriedAfterInteraction = false;
+
+    const resolveOnce = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+
+    const rejectOnce = (reason) => {
+      if (settled) return;
+      settled = true;
+      reject(reason);
+    };
+
+    const startPlay = () => {
+      try {
+        _playGoogleAudio(textForGoogle, resolveOnce, (reason) => {
+          if (!retriedAfterInteraction && _isInteractionBlockedReason(reason)) {
+            retriedAfterInteraction = true;
+            _waitForFirstInteraction().then(() => {
+              if (!settled) startPlay();
+            });
+            return;
+          }
+          _reportTTSFailure('google', text, reason, textForGoogle);
+          rejectOnce(reason);
+        });
+      } catch (err) {
+        _reportTTSFailure('google', text, err?.message || 'Audio() construction failed', textForGoogle);
+        rejectOnce(err?.message);
+      }
+    };
+
+    startPlay();
   });
 }
 
@@ -74,13 +154,24 @@ function _browserSpeak(text) {
 
 // ── Queue ─────────────────────────────────────────────────────────────────
 
+async function _speakWithFallback(text) {
+  if (_useGoogleTTS) {
+    try {
+      await _googleSpeak(text);
+      return;
+    } catch {
+      console.info('[tts] Falling back to browser Speech API');
+    }
+  }
+  await _browserSpeak(text);
+}
+
 function _processQueue() {
   if (_speaking || _queue.length === 0) return;
   const item = _queue.shift();
   _speaking = true;
 
-  const speakFn = _useGoogleTTS ? _googleSpeak : _browserSpeak;
-  speakFn(item.text).then(() => {
+  _speakWithFallback(item.text).then(() => {
     _speaking = false;
     item.resolve();
     _processQueue();

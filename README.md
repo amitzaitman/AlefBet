@@ -162,6 +162,19 @@ When a game needs a feature that doesn't exist yet:
 
 ---
 
+## GitHub Pages + Nakdan Proxy
+
+Dicta Nakdan blocks direct browser CORS from `https://amitzaitman.github.io`, so production on GitHub Pages must use a proxy.
+
+A ready Cloudflare Worker proxy is included at:
+- `deploy/cloudflare-nakdan-proxy/worker.js`
+- `deploy/cloudflare-nakdan-proxy/wrangler.toml`
+- `deploy/cloudflare-nakdan-proxy/README.md`
+
+You can configure the proxy URL in any one of these ways:
+- Query string: `?nakdanProxy=https://<your-worker>.workers.dev`
+- Local storage key: `alefbet.nakdanProxyUrl`
+- Global variable: `window.ALEFBET_NAKDAN_PROXY_URL`
 ## Nikud (Vowel Marks)
 
 All Hebrew text is automatically vowelized using the **Dicta Nakdan API**:
