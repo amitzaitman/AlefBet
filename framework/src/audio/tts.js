@@ -9,8 +9,7 @@ let _queue = [];
 let _speaking = false;
 let _useGoogleTTS = true;
 let _rate = 0.9;
-let _nikudRepeats = 3;
-let _nikudRate = 0.6;
+let _nikudRate = 0.5;
 let _interactionReady = false;
 let _interactionPromise = null;
 
@@ -216,30 +215,25 @@ export const tts = {
   },
 
   /**
-   * הגדר פרמטרי הדגשת ניקוד
-   * @param {{ repeats?: number, rate?: number }} opts
-   *   repeats: כמה פעמים לחזור על ההברה (ברירת מחדל 3)
-   *   rate: מהירות דיבור להדגשה (ברירת מחדל 0.6)
+   * הגדר מהירות דיבור להדגשת ניקוד
+   * @param {{ rate?: number }} opts
+   *   rate: מהירות דיבור להדגשה (ברירת מחדל 0.5)
    */
-  setNikudEmphasis({ repeats, rate } = {}) {
-    if (repeats != null) _nikudRepeats = Math.max(1, Math.min(8, repeats));
+  setNikudEmphasis({ rate } = {}) {
     if (rate != null) _nikudRate = Math.max(0.3, Math.min(1.5, rate));
   },
 
   /**
-   * הקרא אות עם ניקוד בהדגשת התנועה
-   * מאריך את צליל התנועה לצורכי לימוד
+   * הקרא אות עם ניקוד באיטיות להדגשת התנועה
    * @param {string} letter - האות (למשל 'ב')
    * @param {string} nikudSymbol - סמל הניקוד (למשל '\u05B7')
    */
   speakNikud(letter, nikudSymbol) {
-    const base = letter + nikudSymbol;
-    const vowel = '\u05D0' + nikudSymbol; // א + nikud
-    const elongated = base + vowel.repeat(_nikudRepeats);
+    const text = letter + nikudSymbol;
     const savedRate = _rate;
     _rate = _nikudRate;
     return new Promise(resolve => {
-      _queue.push({ text: elongated, resolve });
+      _queue.push({ text, resolve });
       _processQueue();
     }).finally(() => {
       _rate = savedRate;
