@@ -3,6 +3,7 @@
  * עוזר משותף לניהול זרימת תשובה נכונה / שגויה בין סיבובים
  */
 import { sounds } from '../audio/sounds.js';
+import { tts } from '../audio/tts.js';
 import { showCompletionScreen } from '../ui/completion-screen.js';
 
 /**

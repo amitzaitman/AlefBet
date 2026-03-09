@@ -5,6 +5,7 @@
  */
 import {
   GameShell,
+  tts,
   getLetter,
   createOptionCards,
   createProgressBar,

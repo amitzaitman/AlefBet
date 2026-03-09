@@ -4,6 +4,7 @@
  */
 import {
   GameShell,
+  tts,
   hebrewLetters,
   getLettersByGroup,
   randomLetters,

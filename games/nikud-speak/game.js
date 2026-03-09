@@ -5,6 +5,7 @@
  */
 import {
   GameShell,
+  tts,
   nikudList,
   letterWithNikud,
   createFeedback,
@@ -86,6 +87,16 @@ export async function startGame(container) {
       <div class="nikud-speak-card__name">${nikud.nameNikud}</div>
     `;
     panel.appendChild(card);
+
+    // ── Demo button (speaker) ──
+    const demoBtn = document.createElement('button');
+    demoBtn.className = 'demo-btn';
+    demoBtn.setAttribute('aria-label', 'הַשְׁמַע צְלִיל');
+    demoBtn.innerHTML = '<span class="demo-btn__icon">🔊</span><span class="demo-btn__text">הַקְשֵׁב</span>';
+    demoBtn.onclick = () => {
+      tts.speakNikud('א', nikud.symbol);
+    };
+    panel.appendChild(demoBtn);
 
     // ── Mic button ──
     const micBtn = document.createElement('button');

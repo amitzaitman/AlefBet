@@ -5,6 +5,7 @@
  */
 import {
   GameShell,
+  tts,
   nikudList,
   nikudBaseLetters,
   letterWithNikud,
