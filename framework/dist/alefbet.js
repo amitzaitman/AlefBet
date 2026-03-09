@@ -8,11 +8,11 @@ class H {
   }
   /** בטל הרשמה לאירוע */
   off(t, n) {
-    return this._handlers[t] ? (this._handlers[t] = this._handlers[t].filter((a) => a !== n), this) : this;
+    return this._handlers[t] ? (this._handlers[t] = this._handlers[t].filter((r) => r !== n), this) : this;
   }
   /** שלח אירוע */
   emit(t, n) {
-    return (this._handlers[t] || []).slice().forEach((a) => a(n)), this;
+    return (this._handlers[t] || []).slice().forEach((r) => r(n)), this;
   }
 }
 class q {
@@ -110,12 +110,12 @@ function D() {
     }
   return y.state === "suspended" && y.resume(), y;
 }
-function p(e, t, n = "sine", a = 0.3) {
-  const r = D();
-  if (r)
+function p(e, t, n = "sine", r = 0.3) {
+  const a = D();
+  if (a)
     try {
-      const o = r.createOscillator(), i = r.createGain();
-      o.connect(i), i.connect(r.destination), o.type = n, o.frequency.setValueAtTime(e, r.currentTime), i.gain.setValueAtTime(a, r.currentTime), i.gain.exponentialRampToValueAtTime(1e-3, r.currentTime + t), o.start(r.currentTime), o.stop(r.currentTime + t + 0.05);
+      const o = a.createOscillator(), i = a.createGain();
+      o.connect(i), i.connect(a.destination), o.type = n, o.frequency.setValueAtTime(e, a.currentTime), i.gain.setValueAtTime(r, a.currentTime), i.gain.exponentialRampToValueAtTime(1e-3, a.currentTime + t), o.start(a.currentTime), o.stop(a.currentTime + t + 0.05);
     } catch {
     }
 }
@@ -137,10 +137,10 @@ const L = {
     p(900, 0.04, "sine", 0.12);
   }
 }, A = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api";
-let j = !1;
+let $ = !1;
 const v = /* @__PURE__ */ new Map();
 function O() {
-  var r;
+  var a;
   if (typeof window > "u") return A;
   const e = new URLSearchParams(window.location.search).get("nakdanProxy"), t = window.ALEFBET_NAKDAN_PROXY_URL;
   if (e && window.localStorage)
@@ -148,25 +148,25 @@ function O() {
       window.localStorage.setItem("alefbet.nakdanProxyUrl", e);
     } catch {
     }
-  const n = (r = window.localStorage) == null ? void 0 : r.getItem("alefbet.nakdanProxyUrl"), a = e || t || n;
-  return a || (window.location.hostname.endsWith("github.io") ? null : A);
+  const n = (a = window.localStorage) == null ? void 0 : a.getItem("alefbet.nakdanProxyUrl"), r = e || t || n;
+  return r || (window.location.hostname.endsWith("github.io") ? null : A);
 }
 function X(e) {
   var n;
   let t = "";
-  for (const a of e)
-    if (a.sep)
-      t += a.str ?? "";
+  for (const r of e)
+    if (r.sep)
+      t += r.str ?? "";
     else {
-      const r = (n = a.nakdan) == null ? void 0 : n.options;
-      r != null && r.length ? t += (r[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : t += a.str ?? "";
+      const a = (n = r.nakdan) == null ? void 0 : n.options;
+      a != null && a.length ? t += (a[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : t += r.str ?? "";
     }
   return t;
 }
 async function G(e) {
   const t = O();
   if (!t)
-    throw j || (j = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
+    throw $ || ($ = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
   const n = await fetch(t, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -183,9 +183,9 @@ async function G(e) {
     })
   });
   if (!n.ok) throw new Error(`Nakdan ${n.status}`);
-  const a = await n.json(), r = a == null ? void 0 : a.data;
-  if (!Array.isArray(r)) throw new Error("Nakdan: invalid response");
-  return X(r);
+  const r = await n.json(), a = r == null ? void 0 : r.data;
+  if (!Array.isArray(a)) throw new Error("Nakdan: invalid response");
+  return X(a);
 }
 async function V(e) {
   if (!(e != null && e.trim())) return e ?? "";
@@ -204,10 +204,10 @@ async function be(e) {
   const t = [...new Set(e.filter((n) => n == null ? void 0 : n.trim()))];
   await Promise.all(t.map((n) => V(n)));
 }
-let b = [], _ = !1, z = !0, w = 0.9, $ = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, R = !1, k = null;
-function W(e, t, n, a = t) {
-  console.warn(`[tts] ${e} TTS failed`, { text: t, sentText: a, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
-    detail: { provider: e, text: t, sentText: a, reason: n }
+let b = [], _ = !1, z = !0, w = 0.9, j = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, R = !1, k = null;
+function W(e, t, n, r = t) {
+  console.warn(`[tts] ${e} TTS failed`, { text: t, sentText: r, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
+    detail: { provider: e, text: t, sentText: r, reason: n }
   }));
 }
 function K(e) {
@@ -229,32 +229,32 @@ function Q() {
   }), k);
 }
 function Z(e, t, n) {
-  const r = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(e)}&tl=he&client=tw-ob`, o = new Audio(r);
+  const a = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(e)}&tl=he&client=tw-ob`, o = new Audio(a);
   o.playbackRate = w, o.onended = t, o.onerror = () => n("audio.onerror"), o.play().catch((i) => {
     n((i == null ? void 0 : i.message) || "audio.play() rejected");
   });
 }
 function ee(e) {
   return new Promise((t, n) => {
-    const a = K(e).trim() || e;
-    let r = !1, o = !1;
+    const r = K(e).trim() || e;
+    let a = !1, o = !1;
     const i = () => {
-      r || (r = !0, t());
+      a || (a = !0, t());
     }, s = (l) => {
-      r || (r = !0, n(l));
+      a || (a = !0, n(l));
     }, c = () => {
       try {
-        Z(a, i, (l) => {
+        Z(r, i, (l) => {
           if (!o && J(l)) {
             o = !0, Q().then(() => {
-              r || c();
+              a || c();
             });
             return;
           }
-          W("google", e, l, a), s(l);
+          W("google", e, l, r), s(l);
         });
       } catch (l) {
-        W("google", e, (l == null ? void 0 : l.message) || "Audio() construction failed", a), s(l == null ? void 0 : l.message);
+        W("google", e, (l == null ? void 0 : l.message) || "Audio() construction failed", r), s(l == null ? void 0 : l.message);
       }
     };
     c();
@@ -328,7 +328,7 @@ const re = {
    *   rate: מהירות דיבור להדגשה (ברירת מחדל 0.5)
    */
   setNikudEmphasis({ rate: e } = {}) {
-    e != null && ($ = Math.max(0.3, Math.min(1.5, e)));
+    e != null && (j = Math.max(0.3, Math.min(1.5, e)));
   },
   /**
    * הקרא אות עם ניקוד באיטיות להדגשת התנועה
@@ -336,11 +336,11 @@ const re = {
    * @param {string} nikudSymbol - סמל הניקוד (למשל '\u05B7')
    */
   speakNikud(e, t) {
-    const n = e + t, a = w;
-    return w = $, new Promise((r) => {
-      b.push({ text: n, resolve: r }), F();
+    const n = e + t, r = w;
+    return w = j, new Promise((a) => {
+      b.push({ text: n, resolve: a }), F();
     }).finally(() => {
-      w = a;
+      w = r;
     });
   }
 }, B = {
@@ -388,9 +388,9 @@ function x(e, t) {
     fill: "none"
   });
 }
-function ie(e, t, n, a) {
+function ie(e, t, n, r) {
   L.cheer();
-  const r = t / n, o = r >= 0.8 ? 3 : r >= 0.5 ? 2 : 1, i = "⭐".repeat(o) + "☆".repeat(3 - o), s = document.createElement("div");
+  const a = t / n, o = a >= 0.8 ? 3 : a >= 0.5 ? 2 : 1, i = "⭐".repeat(o) + "☆".repeat(3 - o), s = document.createElement("div");
   s.className = "completion-screen", s.innerHTML = `
     <div class="completion-screen__content">
       <div class="completion-screen__stars" aria-label="${o} כּוֹכָבִים">${i}</div>
@@ -399,20 +399,20 @@ function ie(e, t, n, a) {
       <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
     </div>
   `, s.querySelector(".completion-screen__replay").addEventListener("click", () => {
-    s.remove(), a();
+    s.remove(), r();
   }), e.innerHTML = "", e.appendChild(s), x(s.querySelector(".completion-screen__content"), "fadeIn");
 }
 function we(e, t, {
   totalRounds: n,
-  progressBar: a = null,
-  buildRoundUI: r,
+  progressBar: r = null,
+  buildRoundUI: a,
   onCorrect: o,
   onWrong: i
 } = {}) {
   let s = !1;
   async function c(h) {
     if (s) return;
-    s = !0, L.correct(), h && await h(), o && await o(), e.state.addScore(1), a == null || a.update(e.state.currentRound), await new Promise((U) => setTimeout(U, 1200)), e.state.nextRound() ? (s = !1, r()) : ie(t, e.state.score, n, () => {
+    s = !0, L.correct(), h && await h(), o && await o(), e.state.addScore(1), r == null || r.update(e.state.currentRound), await new Promise((U) => setTimeout(U, 1200)), e.state.nextRound() ? (s = !1, a()) : ie(t, e.state.score, n, () => {
       location.reload();
     });
   }
@@ -447,12 +447,12 @@ function ye() {
   let n = null;
   return {
     available: t,
-    listen(a = 4e3) {
-      return t ? new Promise((r) => {
+    listen(r = 4e3) {
+      return t ? new Promise((a) => {
         n = new e(), n.lang = "he-IL", n.continuous = !1, n.interimResults = !1, n.maxAlternatives = 3;
         let o = !1;
         const i = (c, l) => {
-          o || (o = !0, n = null, r({ text: c.trim(), confidence: l }));
+          o || (o = !0, n = null, a({ text: c.trim(), confidence: l }));
         };
         n.onresult = (c) => {
           const l = c.results[0];
@@ -464,7 +464,7 @@ function ye() {
           } catch {
           }
           i("", 0);
-        }, a);
+        }, r);
         n.onend = () => {
           clearTimeout(s), i("", 0);
         };
@@ -488,10 +488,10 @@ function ke(e, t) {
   if (!e || !t) return !1;
   const n = se[t];
   if (!n) return !1;
-  const a = le[n];
-  if (!a) return !1;
-  const r = e.replace(/[\s.,!?]/g, "");
-  return r.length ? a.some((o) => o.test(r)) : !1;
+  const r = le[n];
+  if (!r) return !1;
+  const a = e.replace(/[\s.,!?]/g, "");
+  return a.length ? r.some((o) => o.test(a)) : !1;
 }
 const N = [
   { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
@@ -547,14 +547,14 @@ function Ne(e, t) {
 function Le(e) {
   let t = [...S];
   if (typeof window < "u" && window.location && window.location.search) {
-    const a = new URLSearchParams(window.location.search), r = a.get("allowedNikud");
-    if (r) {
-      const i = r.split(",").map((s) => s.trim());
+    const r = new URLSearchParams(window.location.search), a = r.get("allowedNikud");
+    if (a) {
+      const i = a.split(",").map((s) => s.trim());
       t = t.filter(
         (s) => i.includes(s.id) || i.includes(s.name) || i.includes(s.nameNikud)
       );
     }
-    const o = a.get("excludedNikud");
+    const o = r.get("excludedNikud");
     if (o) {
       const i = o.split(",").map((s) => s.trim());
       t = t.filter(
@@ -570,33 +570,33 @@ function Le(e) {
 }
 function Se(e, t, n) {
   e.innerHTML = "";
-  const a = document.createElement("div");
-  a.className = "option-cards-grid";
-  const r = t.map((o) => {
+  const r = document.createElement("div");
+  r.className = "option-cards-grid";
+  const a = t.map((o) => {
     const i = document.createElement("button");
     return i.className = "option-card", i.dataset.id = o.id, i.innerHTML = `
       <span class="option-card__emoji">${o.emoji || ""}</span>
       <span class="option-card__text">${o.text}</span>
     `, i.addEventListener("click", () => {
       i.disabled || n(o);
-    }), a.appendChild(i), { el: i, option: o };
+    }), r.appendChild(i), { el: i, option: o };
   });
-  return e.appendChild(a), {
+  return e.appendChild(r), {
     /** הַדָּגֵשׁ כַּרְטִיס לְפִי סוּג: 'correct' | 'wrong' | 'hint' */
     highlight(o, i) {
-      r.forEach(({ el: s, option: c }) => {
+      a.forEach(({ el: s, option: c }) => {
         c.id === o && s.classList.add(`option-card--${i}`);
       });
     },
     /** נטרל את כל הכרטיסים */
     disable() {
-      r.forEach(({ el: o }) => {
+      a.forEach(({ el: o }) => {
         o.disabled = !0;
       });
     },
     /** אפס את מצב הכרטיסים */
     reset() {
-      r.forEach(({ el: o }) => {
+      a.forEach(({ el: o }) => {
         o.className = "option-card", o.disabled = !1;
       });
     },
@@ -614,12 +614,12 @@ function Ee(e, t) {
     </div>
     <span class="progress-bar__label">0 / ${t}</span>
   `, e.appendChild(n);
-  const a = n.querySelector(".progress-bar__fill"), r = n.querySelector(".progress-bar__label");
+  const r = n.querySelector(".progress-bar__fill"), a = n.querySelector(".progress-bar__label");
   return {
     /** עדכן את ההתקדמות */
     update(o) {
       const i = Math.round(o / t * 100);
-      a.style.width = `${i}%`, r.textContent = `${o} / ${t}`, n.setAttribute("aria-valuenow", String(o));
+      r.style.width = `${i}%`, a.textContent = `${o} / ${t}`, n.setAttribute("aria-valuenow", String(o));
     },
     /** הסר את הרכיב */
     destroy() {
@@ -631,23 +631,23 @@ function Re(e) {
   const t = document.createElement("div");
   t.className = "feedback-message", t.setAttribute("aria-live", "polite"), t.setAttribute("role", "status"), e.appendChild(t);
   let n = null;
-  function a(r, o, i = 1800) {
-    clearTimeout(n), t.textContent = r, t.className = `feedback-message feedback-message--${o}`, n = setTimeout(() => {
+  function r(a, o, i = 1800) {
+    clearTimeout(n), t.textContent = a, t.className = `feedback-message feedback-message--${o}`, n = setTimeout(() => {
       t.textContent = "", t.className = "feedback-message";
     }, i);
   }
   return {
     /** הצג משוב חיובי */
-    correct(r = "!כָּל הַכָּבוֹד") {
-      L.correct(), a(r, "correct"), x(t, "bounce");
+    correct(a = "!כָּל הַכָּבוֹד") {
+      L.correct(), r(a, "correct"), x(t, "bounce");
     },
     /** הצג עידוד — נסה שוב */
-    wrong(r = "נַסֵּה שׁוּב") {
-      L.wrong(), a(r, "wrong"), x(t, "pulse");
+    wrong(a = "נַסֵּה שׁוּב") {
+      L.wrong(), r(a, "wrong"), x(t, "pulse");
     },
     /** הצג רמז */
-    hint(r) {
-      a(r, "hint"), x(t, "pulse");
+    hint(a) {
+      r(a, "hint"), x(t, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -669,14 +669,14 @@ function Ce(e, t) {
     justifyContent: "center",
     alignItems: "center"
   }), document.body.appendChild(n));
-  const a = new URLSearchParams(window.location.search), r = a.get("allowedNikud") ? a.get("allowedNikud").split(",") : [];
+  const r = new URLSearchParams(window.location.search), a = r.get("allowedNikud") ? r.get("allowedNikud").split(",") : [];
   let o = `
     <div style="background:white; padding:1.5rem; border-radius:1rem; min-width:300px; text-align:center; color:#333; font-family:Heebo,Arial; direction:rtl;">
       <h2 style="margin-top:0">בחר ניקוד</h2>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:1rem 0; text-align:right;">
   `;
   S.forEach((l) => {
-    const m = r.length === 0 || r.includes(l.id) || r.includes(l.name);
+    const m = a.length === 0 || a.includes(l.id) || a.includes(l.name);
     o += `
       <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
         <input type="checkbox" value="${l.id}" class="nikud-filter-cb" ${m ? "checked" : ""} style="width:1.2rem;height:1.2rem;">
@@ -722,8 +722,8 @@ function Fe(e) {
   };
   return t.addEventListener("click", n), {
     el: t,
-    highlight(a) {
-      t.classList.remove("ab-zone--correct", "ab-zone--hover"), a && t.classList.add(`ab-zone--${a}`);
+    highlight(r) {
+      t.classList.remove("ab-zone--correct", "ab-zone--hover"), r && t.classList.add(`ab-zone--${r}`);
     },
     reset() {
       t.classList.remove("ab-zone--correct", "ab-zone--hover");
@@ -739,19 +739,19 @@ function Te(e, t = "טוֹעֵן...") {
 function Pe(e) {
   e.innerHTML = "";
 }
-function Ae(e, t, n, a) {
-  const r = e.querySelector(".game-header__spacer");
-  if (!r) return null;
+function Ae(e, t, n, r) {
+  const a = e.querySelector(".game-header__spacer");
+  if (!a) return null;
   const o = document.createElement("button");
-  return o.className = "ab-header-btn", o.setAttribute("aria-label", n), o.textContent = t, o.onclick = a, r.innerHTML = "", r.appendChild(o), o;
+  return o.className = "ab-header-btn", o.setAttribute("aria-label", n), o.textContent = t, o.onclick = r, a.innerHTML = "", a.appendChild(o), o;
 }
-function je(e, { size: t = "md" } = {}) {
+function $e(e, { size: t = "md" } = {}) {
   const n = document.createElement("div");
-  n.className = `ab-nikud-box ab-nikud-box--${t}`;
-  const a = document.createElement("span");
-  a.className = "ab-nikud-box__text", a.textContent = "◌" + e.symbol;
+  n.className = `ab-nikud-box ab-nikud-box--${t} ab-nikud-box--${e.id}`;
   const r = document.createElement("div");
-  return r.className = "ab-nikud-box__box", n.appendChild(a), n.appendChild(r), n;
+  r.className = "ab-nikud-box__box";
+  const a = document.createElement("div");
+  return a.className = "ab-nikud-box__mark", a.textContent = e.symbol, n.appendChild(r), n.appendChild(a), n;
 }
 let g = null, d = null, T = 0, P = 0;
 const E = /* @__PURE__ */ new Map();
@@ -760,13 +760,13 @@ function I(e, t) {
   return ((n = document.elementFromPoint(e, t)) == null ? void 0 : n.closest('[data-drop-target="true"]')) || null;
 }
 function de(e, t, n) {
-  const a = e.getBoundingClientRect();
-  T = a.width / 2, P = a.height / 2, d = e.cloneNode(!0), Object.assign(d.style, {
+  const r = e.getBoundingClientRect();
+  T = r.width / 2, P = r.height / 2, d = e.cloneNode(!0), Object.assign(d.style, {
     position: "fixed",
     left: `${t - T}px`,
     top: `${n - P}px`,
-    width: `${a.width}px`,
-    height: `${a.height}px`,
+    width: `${r.width}px`,
+    height: `${r.height}px`,
     pointerEvents: "none",
     // keeps it out of elementFromPoint + hit-testing
     zIndex: "9999",
@@ -789,19 +789,19 @@ function fe(e) {
 function he() {
   u == null || u.classList.remove("drop-target--hover"), u = null;
 }
-function $e(e, t) {
+function je(e, t) {
   e.classList.add("drag-source");
-  let n = null, a = null, r = null;
+  let n = null, r = null, a = null;
   function o() {
-    n && (e.removeEventListener("pointermove", n), e.removeEventListener("pointerup", a), e.removeEventListener("pointercancel", r), n = a = r = null), he(), me(), e.classList.remove("drag-source--dragging"), g = null;
+    n && (e.removeEventListener("pointermove", n), e.removeEventListener("pointerup", r), e.removeEventListener("pointercancel", a), n = r = a = null), he(), me(), e.classList.remove("drag-source--dragging"), g = null;
   }
   function i(s) {
     s.button !== void 0 && s.button !== 0 || (s.preventDefault(), g && o(), g = { el: e, data: t }, e.classList.add("drag-source--dragging"), de(e, s.clientX, s.clientY), e.setPointerCapture(s.pointerId), n = (c) => {
       ue(c.clientX, c.clientY), fe(I(c.clientX, c.clientY));
-    }, a = (c) => {
+    }, r = (c) => {
       const l = I(c.clientX, c.clientY);
       o(), l && E.has(l) && E.get(l).onDrop({ data: t, sourceEl: e, targetEl: l });
-    }, r = () => o(), e.addEventListener("pointermove", n), e.addEventListener("pointerup", a), e.addEventListener("pointercancel", r));
+    }, a = () => o(), e.addEventListener("pointermove", n), e.addEventListener("pointerup", r), e.addEventListener("pointercancel", a));
   }
   return e.addEventListener("pointerdown", i), {
     destroy() {
@@ -822,10 +822,10 @@ export {
   q as GameState,
   V as addNikud,
   x as animate,
-  $e as createDragSource,
+  je as createDragSource,
   We as createDropTarget,
   Re as createFeedback,
-  je as createNikudBox,
+  $e as createNikudBox,
   Se as createOptionCards,
   Ee as createProgressBar,
   we as createRoundManager,
