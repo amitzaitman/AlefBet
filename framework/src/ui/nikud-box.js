@@ -5,22 +5,16 @@
  */
 
 /**
- * צור אלמנט DOM של קופסת ניקוד — ריבוע ריק עם סימן הניקוד במיקומו הנכון
- * משתמש באות א שקופה כדי שהדפדפן ימקם את הניקוד בדיוק במקום הנכון
+ * צור אלמנט DOM של קופסת ניקוד — ריבוע עם סימן הניקוד במיקומו הנכון
+ * משתמש בעיגול מנוקד (◌ U+25CC) כדי שהדפדפן ימקם את הניקוד בדיוק
  * @param {object} nikud — אובייקט ניקוד מ-nikudList (חייב id ו-symbol)
  * @param {object} [opts] — אפשרויות
  * @param {string} [opts.size] — גודל: 'sm' | 'md' | 'lg' (ברירת מחדל 'md')
  * @returns {HTMLElement}
  */
 export function createNikudBox(nikud, { size = 'md' } = {}) {
-  const wrapper = document.createElement('div');
-  wrapper.className = `ab-nikud-box ab-nikud-box--${size}`;
-
-  const letter = document.createElement('span');
-  letter.className = 'ab-nikud-box__letter';
-  letter.textContent = '\u05D0' + nikud.symbol; // א + nikud
-
-  wrapper.appendChild(letter);
-
-  return wrapper;
+  const box = document.createElement('div');
+  box.className = `ab-nikud-box ab-nikud-box--${size}`;
+  box.textContent = '\u25CC' + nikud.symbol; // ◌ + nikud
+  return box;
 }

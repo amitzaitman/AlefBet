@@ -15,7 +15,7 @@ class H {
     return (this._handlers[t] || []).slice().forEach((a) => a(n)), this;
   }
 }
-class D {
+class q {
   constructor(t) {
     this._totalRounds = t, this._currentRound = 0, this._score = 0;
   }
@@ -59,7 +59,7 @@ class ge {
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
       ...n
-    }, this.events = new H(), this.state = new D(this.config.totalRounds), this._buildShell();
+    }, this.events = new H(), this.state = new q(this.config.totalRounds), this._buildShell();
   }
   _buildShell() {
     this.container.classList.add("alefbet-game");
@@ -101,7 +101,7 @@ class ge {
   }
 }
 let b = null;
-function q() {
+function D() {
   if (!b)
     try {
       b = new (window.AudioContext || window.webkitAudioContext)();
@@ -111,7 +111,7 @@ function q() {
   return b.state === "suspended" && b.resume(), b;
 }
 function p(e, t, n = "sine", a = 0.3) {
-  const r = q();
+  const r = D();
   if (r)
     try {
       const o = r.createOscillator(), i = r.createGain();
@@ -747,9 +747,7 @@ function Ae(e, t, n, a) {
 }
 function je(e, { size: t = "md" } = {}) {
   const n = document.createElement("div");
-  n.className = `ab-nikud-box ab-nikud-box--${t}`;
-  const a = document.createElement("span");
-  return a.className = "ab-nikud-box__letter", a.textContent = "א" + e.symbol, n.appendChild(a), n;
+  return n.className = `ab-nikud-box ab-nikud-box--${t}`, n.textContent = "◌" + e.symbol, n;
 }
 let g = null, d = null, T = 0, P = 0;
 const E = /* @__PURE__ */ new Map();
@@ -817,7 +815,7 @@ function We(e, t) {
 export {
   H as EventBus,
   ge as GameShell,
-  D as GameState,
+  q as GameState,
   V as addNikud,
   x as animate,
   $e as createDragSource,
