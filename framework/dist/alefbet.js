@@ -1,4 +1,4 @@
-class z {
+class H {
   constructor() {
     this._handlers = {};
   }
@@ -8,11 +8,11 @@ class z {
   }
   /** בטל הרשמה לאירוע */
   off(t, n) {
-    return this._handlers[t] ? (this._handlers[t] = this._handlers[t].filter((r) => r !== n), this) : this;
+    return this._handlers[t] ? (this._handlers[t] = this._handlers[t].filter((a) => a !== n), this) : this;
   }
   /** שלח אירוע */
   emit(t, n) {
-    return (this._handlers[t] || []).slice().forEach((r) => r(n)), this;
+    return (this._handlers[t] || []).slice().forEach((a) => a(n)), this;
   }
 }
 class q {
@@ -48,7 +48,7 @@ class q {
     return this._currentRound >= this._totalRounds;
   }
 }
-class pe {
+class ge {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
@@ -59,7 +59,7 @@ class pe {
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
       ...n
-    }, this.events = new z(), this.state = new q(this.config.totalRounds), this._buildShell();
+    }, this.events = new H(), this.state = new q(this.config.totalRounds), this._buildShell();
   }
   _buildShell() {
     this.container.classList.add("alefbet-game");
@@ -100,73 +100,73 @@ class pe {
     return this.events.on(t, n), this;
   }
 }
-let g = null;
+let y = null;
 function D() {
-  if (!g)
+  if (!y)
     try {
-      g = new (window.AudioContext || window.webkitAudioContext)();
+      y = new (window.AudioContext || window.webkitAudioContext)();
     } catch {
       return null;
     }
-  return g.state === "suspended" && g.resume(), g;
+  return y.state === "suspended" && y.resume(), y;
 }
-function m(e, t, n = "sine", r = 0.3) {
-  const a = D();
-  if (a)
+function p(e, t, n = "sine", a = 0.3) {
+  const r = D();
+  if (r)
     try {
-      const o = a.createOscillator(), i = a.createGain();
-      o.connect(i), i.connect(a.destination), o.type = n, o.frequency.setValueAtTime(e, a.currentTime), i.gain.setValueAtTime(r, a.currentTime), i.gain.exponentialRampToValueAtTime(1e-3, a.currentTime + t), o.start(a.currentTime), o.stop(a.currentTime + t + 0.05);
+      const o = r.createOscillator(), i = r.createGain();
+      o.connect(i), i.connect(r.destination), o.type = n, o.frequency.setValueAtTime(e, r.currentTime), i.gain.setValueAtTime(a, r.currentTime), i.gain.exponentialRampToValueAtTime(1e-3, r.currentTime + t), o.start(r.currentTime), o.stop(r.currentTime + t + 0.05);
     } catch {
     }
 }
-const v = {
+const L = {
   /** צליל תשובה נכונה */
   correct() {
-    m(523.25, 0.15), setTimeout(() => m(659.25, 0.2), 120), setTimeout(() => m(783.99, 0.3), 240);
+    p(523.25, 0.15), setTimeout(() => p(659.25, 0.2), 120), setTimeout(() => p(783.99, 0.3), 240);
   },
   /** צליל עידוד עדין — נסה שוב */
   wrong() {
-    m(350, 0.15, "triangle", 0.12);
+    p(350, 0.15, "triangle", 0.12);
   },
   /** צליל עידוד - סיום מוצלח */
   cheer() {
-    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((t, n) => setTimeout(() => m(t, 0.2), n * 90));
+    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((t, n) => setTimeout(() => p(t, 0.2), n * 90));
   },
   /** קליק עדין */
   click() {
-    m(900, 0.04, "sine", 0.12);
+    p(900, 0.04, "sine", 0.12);
   }
-}, F = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api";
-let P = !1;
-const b = /* @__PURE__ */ new Map();
+}, A = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api";
+let $ = !1;
+const v = /* @__PURE__ */ new Map();
 function O() {
-  var a;
-  if (typeof window > "u") return F;
+  var r;
+  if (typeof window > "u") return A;
   const e = new URLSearchParams(window.location.search).get("nakdanProxy"), t = window.ALEFBET_NAKDAN_PROXY_URL;
   if (e && window.localStorage)
     try {
       window.localStorage.setItem("alefbet.nakdanProxyUrl", e);
     } catch {
     }
-  const n = (a = window.localStorage) == null ? void 0 : a.getItem("alefbet.nakdanProxyUrl"), r = e || t || n;
-  return r || (window.location.hostname.endsWith("github.io") ? null : F);
+  const n = (r = window.localStorage) == null ? void 0 : r.getItem("alefbet.nakdanProxyUrl"), a = e || t || n;
+  return a || (window.location.hostname.endsWith("github.io") ? null : A);
 }
 function X(e) {
   var n;
   let t = "";
-  for (const r of e)
-    if (r.sep)
-      t += r.str ?? "";
+  for (const a of e)
+    if (a.sep)
+      t += a.str ?? "";
     else {
-      const a = (n = r.nakdan) == null ? void 0 : n.options;
-      a != null && a.length ? t += (a[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : t += r.str ?? "";
+      const r = (n = a.nakdan) == null ? void 0 : n.options;
+      r != null && r.length ? t += (r[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : t += a.str ?? "";
     }
   return t;
 }
 async function G(e) {
   const t = O();
   if (!t)
-    throw P || (P = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
+    throw $ || ($ = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
   const n = await fetch(t, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -183,31 +183,31 @@ async function G(e) {
     })
   });
   if (!n.ok) throw new Error(`Nakdan ${n.status}`);
-  const r = await n.json(), a = r == null ? void 0 : r.data;
-  if (!Array.isArray(a)) throw new Error("Nakdan: invalid response");
-  return X(a);
+  const a = await n.json(), r = a == null ? void 0 : a.data;
+  if (!Array.isArray(r)) throw new Error("Nakdan: invalid response");
+  return X(r);
 }
-async function Y(e) {
+async function V(e) {
   if (!(e != null && e.trim())) return e ?? "";
-  if (b.has(e)) return b.get(e);
+  if (v.has(e)) return v.get(e);
   try {
     const t = await G(e);
-    return b.set(e, t), t;
+    return v.set(e, t), t;
   } catch {
-    return b.set(e, e), e;
+    return v.set(e, e), e;
   }
 }
-function V(e) {
-  return b.get(e) ?? e ?? "";
+function Y(e) {
+  return v.get(e) ?? e ?? "";
 }
-async function ge(e) {
+async function be(e) {
   const t = [...new Set(e.filter((n) => n == null ? void 0 : n.trim()))];
-  await Promise.all(t.map((n) => Y(n)));
+  await Promise.all(t.map((n) => V(n)));
 }
-let h = [], k = !1, B = !0, p = 0.9, A = 0.5, L = !1, w = null;
-function j(e, t, n, r = t) {
-  console.warn(`[tts] ${e} TTS failed`, { text: t, sentText: r, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
-    detail: { provider: e, text: t, sentText: r, reason: n }
+let b = [], _ = !1, z = !0, w = 0.9, j = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, R = !1, k = null;
+function W(e, t, n, a = t) {
+  console.warn(`[tts] ${e} TTS failed`, { text: t, sentText: a, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
+    detail: { provider: e, text: t, sentText: a, reason: n }
   }));
 }
 function K(e) {
@@ -219,56 +219,56 @@ function J(e) {
 }
 function Q() {
   var e;
-  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : L || (e = document.userActivation) != null && e.hasBeenActive ? (L = !0, Promise.resolve()) : w || (w = new Promise((t) => {
+  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : R || (e = document.userActivation) != null && e.hasBeenActive ? (R = !0, Promise.resolve()) : k || (k = new Promise((t) => {
     const n = () => {
-      L = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), t();
+      R = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), t();
     };
     window.addEventListener("pointerdown", n, { once: !0, capture: !0 }), window.addEventListener("keydown", n, { once: !0, capture: !0 }), window.addEventListener("touchstart", n, { once: !0, capture: !0 });
   }).finally(() => {
-    w = null;
-  }), w);
+    k = null;
+  }), k);
 }
 function Z(e, t, n) {
-  const a = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(e)}&tl=he&client=tw-ob`, o = new Audio(a);
-  o.playbackRate = p, o.onended = t, o.onerror = () => n("audio.onerror"), o.play().catch((i) => {
+  const r = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(e)}&tl=he&client=tw-ob`, o = new Audio(r);
+  o.playbackRate = w, o.onended = t, o.onerror = () => n("audio.onerror"), o.play().catch((i) => {
     n((i == null ? void 0 : i.message) || "audio.play() rejected");
   });
 }
 function ee(e) {
   return new Promise((t, n) => {
-    const r = K(e).trim() || e;
-    let a = !1, o = !1;
+    const a = K(e).trim() || e;
+    let r = !1, o = !1;
     const i = () => {
-      a || (a = !0, t());
+      r || (r = !0, t());
     }, s = (l) => {
-      a || (a = !0, n(l));
+      r || (r = !0, n(l));
     }, c = () => {
       try {
-        Z(r, i, (l) => {
+        Z(a, i, (l) => {
           if (!o && J(l)) {
             o = !0, Q().then(() => {
-              a || c();
+              r || c();
             });
             return;
           }
-          j("google", e, l, r), s(l);
+          W("google", e, l, a), s(l);
         });
       } catch (l) {
-        j("google", e, (l == null ? void 0 : l.message) || "Audio() construction failed", r), s(l == null ? void 0 : l.message);
+        W("google", e, (l == null ? void 0 : l.message) || "Audio() construction failed", a), s(l == null ? void 0 : l.message);
       }
     };
     c();
   });
 }
-let E = null;
+let C = null;
 function te() {
   const e = speechSynthesis.getVoices();
   return e.find((t) => t.lang === "he-IL") || e.find((t) => t.lang === "iw-IL") || e.find((t) => t.lang.startsWith("he")) || null;
 }
-function $() {
-  E = te();
+function M() {
+  C = te();
 }
-typeof speechSynthesis < "u" && (speechSynthesis.getVoices().length > 0 ? $() : speechSynthesis.addEventListener("voiceschanged", $, { once: !0 }));
+typeof speechSynthesis < "u" && (speechSynthesis.getVoices().length > 0 ? M() : speechSynthesis.addEventListener("voiceschanged", M, { once: !0 }));
 function ne(e) {
   return new Promise((t) => {
     if (typeof speechSynthesis > "u") {
@@ -276,11 +276,11 @@ function ne(e) {
       return;
     }
     const n = new SpeechSynthesisUtterance(e);
-    n.lang = "he-IL", n.rate = p, E && (n.voice = E), n.onend = t, n.onerror = t, speechSynthesis.speak(n);
+    n.lang = "he-IL", n.rate = w, C && (n.voice = C), n.onend = t, n.onerror = t, speechSynthesis.speak(n);
   });
 }
-async function re(e) {
-  if (B)
+async function ae(e) {
+  if (z)
     try {
       await ee(e);
       return;
@@ -289,38 +289,38 @@ async function re(e) {
     }
   await ne(e);
 }
-function S() {
-  if (k || h.length === 0) return;
-  const e = h.shift();
-  k = !0, re(e.text).then(() => {
-    k = !1, e.resolve(), S();
+function F() {
+  if (_ || b.length === 0) return;
+  const e = b.shift();
+  _ = !0, ae(e.text).then(() => {
+    _ = !1, e.resolve(), F();
   });
 }
-const we = {
+const re = {
   /**
    * הקרא טקסט עברי
    * משתמש ב-Google Translate TTS לאיכות טובה יותר
    */
   speak(e) {
-    const t = V(e);
+    const t = Y(e);
     return new Promise((n) => {
-      h.push({ text: t, resolve: n }), S();
+      b.push({ text: t, resolve: n }), F();
     });
   },
   /** עצור את הדיבור הנוכחי */
   cancel() {
-    h.forEach((e) => e.resolve()), h = [], k = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
+    b.forEach((e) => e.resolve()), b = [], _ = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
   },
   get available() {
     return !0;
   },
   /** הגדר מהירות דיבור (0.5–2.0) */
   setRate(e) {
-    p = Math.max(0.5, Math.min(2, e));
+    w = Math.max(0.5, Math.min(2, e));
   },
   /** השתמש ב-Google Translate TTS (ברירת מחדל) או בדפדפן */
   useGoogle(e = !0) {
-    B = e;
+    z = e;
   },
   /**
    * הגדר מהירות דיבור להדגשת ניקוד
@@ -328,7 +328,7 @@ const we = {
    *   rate: מהירות דיבור להדגשה (ברירת מחדל 0.5)
    */
   setNikudEmphasis({ rate: e } = {}) {
-    e != null && (A = Math.max(0.3, Math.min(1.5, e)));
+    e != null && (j = Math.max(0.3, Math.min(1.5, e)));
   },
   /**
    * הקרא אות עם ניקוד באיטיות להדגשת התנועה
@@ -336,14 +336,14 @@ const we = {
    * @param {string} nikudSymbol - סמל הניקוד (למשל '\u05B7')
    */
   speakNikud(e, t) {
-    const n = e + t, r = p;
-    return p = A, new Promise((a) => {
-      h.push({ text: n, resolve: a }), S();
+    const n = e + t, a = w;
+    return w = j, new Promise((r) => {
+      b.push({ text: n, resolve: r }), F();
     }).finally(() => {
-      p = r;
+      w = a;
     });
   }
-}, W = {
+}, B = {
   shake: [
     { transform: "translateX(0)" },
     { transform: "translateX(-8px)" },
@@ -374,23 +374,23 @@ const we = {
     { transform: "scale(1.3) rotate(180deg)", opacity: "1" },
     { transform: "scale(1) rotate(360deg)", opacity: "1" }
   ]
-}, ae = {
+}, oe = {
   shake: 420,
   bounce: 480,
   pulse: 600,
   fadeIn: 320,
   confetti: 700
 };
-function y(e, t) {
-  !e || !W[t] || e.animate(W[t], {
-    duration: ae[t] || 400,
+function x(e, t) {
+  !e || !B[t] || e.animate(B[t], {
+    duration: oe[t] || 400,
     easing: "ease-in-out",
     fill: "none"
   });
 }
-function oe(e, t, n, r) {
-  v.cheer();
-  const a = t / n, o = a >= 0.8 ? 3 : a >= 0.5 ? 2 : 1, i = "⭐".repeat(o) + "☆".repeat(3 - o), s = document.createElement("div");
+function ie(e, t, n, a) {
+  L.cheer();
+  const r = t / n, o = r >= 0.8 ? 3 : r >= 0.5 ? 2 : 1, i = "⭐".repeat(o) + "☆".repeat(3 - o), s = document.createElement("div");
   s.className = "completion-screen", s.innerHTML = `
     <div class="completion-screen__content">
       <div class="completion-screen__stars" aria-label="${o} כּוֹכָבִים">${i}</div>
@@ -399,35 +399,35 @@ function oe(e, t, n, r) {
       <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
     </div>
   `, s.querySelector(".completion-screen__replay").addEventListener("click", () => {
-    s.remove(), r();
-  }), e.innerHTML = "", e.appendChild(s), y(s.querySelector(".completion-screen__content"), "fadeIn");
+    s.remove(), a();
+  }), e.innerHTML = "", e.appendChild(s), x(s.querySelector(".completion-screen__content"), "fadeIn");
 }
-function be(e, t, {
+function we(e, t, {
   totalRounds: n,
-  progressBar: r = null,
-  buildRoundUI: a,
+  progressBar: a = null,
+  buildRoundUI: r,
   onCorrect: o,
   onWrong: i
 } = {}) {
   let s = !1;
-  async function c(T) {
+  async function c(h) {
     if (s) return;
-    s = !0, v.correct(), T && await T(), o && await o(), e.state.addScore(1), r == null || r.update(e.state.currentRound), await new Promise((I) => setTimeout(I, 1200)), e.state.nextRound() ? (s = !1, a()) : oe(t, e.state.score, n, () => {
+    s = !0, L.correct(), h && await h(), o && await o(), e.state.addScore(1), a == null || a.update(e.state.currentRound), await new Promise((U) => setTimeout(U, 1200)), e.state.nextRound() ? (s = !1, r()) : ie(t, e.state.score, n, () => {
       location.reload();
     });
   }
   async function l() {
     s || (s = !0, i && await i(), s = !1);
   }
-  function U() {
+  function m() {
     return s;
   }
-  function H() {
+  function f() {
     s = !1;
   }
-  return { handleCorrect: c, handleWrong: l, isAnswered: U, reset: H };
+  return { handleCorrect: c, handleWrong: l, isAnswered: m, reset: f };
 }
-const ie = {
+const se = {
   kamatz: "ah",
   patah: "ah",
   tzere: "eh",
@@ -435,24 +435,24 @@ const ie = {
   hiriq: "ee",
   holam: "oh",
   kubbutz: "oo"
-}, se = {
+}, le = {
   ah: [/[אה]/, /^א$/, /אא/, /הא/],
   eh: [/[אה]/, /^א$/, /אא/, /הא/, /אה/],
   ee: [/[אי]/, /^י$/, /אי/, /הי/],
   oh: [/[או]/, /^[או]$/, /או/, /הו/],
   oo: [/[או]/, /^[או]$/, /או/, /הו/, /אוּ/]
 };
-function ke() {
+function ye() {
   const e = typeof window < "u" ? window.SpeechRecognition || window.webkitSpeechRecognition : null, t = !!e;
   let n = null;
   return {
     available: t,
-    listen(r = 4e3) {
-      return t ? new Promise((a) => {
+    listen(a = 4e3) {
+      return t ? new Promise((r) => {
         n = new e(), n.lang = "he-IL", n.continuous = !1, n.interimResults = !1, n.maxAlternatives = 3;
         let o = !1;
         const i = (c, l) => {
-          o || (o = !0, n = null, a({ text: c.trim(), confidence: l }));
+          o || (o = !0, n = null, r({ text: c.trim(), confidence: l }));
         };
         n.onresult = (c) => {
           const l = c.results[0];
@@ -464,7 +464,7 @@ function ke() {
           } catch {
           }
           i("", 0);
-        }, r);
+        }, a);
         n.onend = () => {
           clearTimeout(s), i("", 0);
         };
@@ -484,16 +484,16 @@ function ke() {
     }
   };
 }
-function ye(e, t) {
+function ke(e, t) {
   if (!e || !t) return !1;
-  const n = ie[t];
+  const n = se[t];
   if (!n) return !1;
-  const r = se[n];
-  if (!r) return !1;
-  const a = e.replace(/[\s.,!?]/g, "");
-  return a.length ? r.some((o) => o.test(a)) : !1;
+  const a = le[n];
+  if (!a) return !1;
+  const r = e.replace(/[\s.,!?]/g, "");
+  return r.length ? a.some((o) => o.test(r)) : !1;
 }
-const _ = [
+const N = [
   { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
   { letter: "ב", name: "בַּיִת", nameNikud: "בֵּית", sound: "b", exampleWord: "בַּיִת", emoji: "🏠", isFinal: !1 },
   { letter: "ג", name: "גִּימֶל", nameNikud: "גִּימֶל", sound: "g", exampleWord: "גָּמָל", emoji: "🐪", isFinal: !1 },
@@ -522,17 +522,17 @@ const _ = [
   { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
   { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
 ];
-function _e(e) {
-  return _.find((t) => t.letter === e) || null;
+function ve(e) {
+  return N.find((t) => t.letter === e) || null;
 }
-function le(e = "regular") {
-  return e === "regular" ? _.filter((t) => !t.isFinal) : e === "final" ? _.filter((t) => t.isFinal) : _;
+function ce(e = "regular") {
+  return e === "regular" ? N.filter((t) => !t.isFinal) : e === "final" ? N.filter((t) => t.isFinal) : N;
 }
-function ve(e, t = "regular") {
-  const n = le(t);
+function _e(e, t = "regular") {
+  const n = ce(t);
   return [...n].sort(() => Math.random() - 0.5).slice(0, Math.min(e, n.length));
 }
-const x = [
+const S = [
   { id: "kamatz", name: "קָמָץ", nameNikud: "קָמָץ", symbol: "ָ", sound: "אָ", color: "#FF6B6B", textColor: "#fff" },
   { id: "patah", name: "פֶּתַח", nameNikud: "פָּתַח", symbol: "ַ", sound: "אָ", color: "#FF8C42", textColor: "#fff" },
   { id: "hiriq", name: "חִירִיק", nameNikud: "חִירִיק", symbol: "ִ", sound: "אִי", color: "#4ECDC4", textColor: "#fff" },
@@ -545,16 +545,16 @@ function Ne(e, t) {
   return e + t;
 }
 function Le(e) {
-  let t = [...x];
+  let t = [...S];
   if (typeof window < "u" && window.location && window.location.search) {
-    const r = new URLSearchParams(window.location.search), a = r.get("allowedNikud");
-    if (a) {
-      const i = a.split(",").map((s) => s.trim());
+    const a = new URLSearchParams(window.location.search), r = a.get("allowedNikud");
+    if (r) {
+      const i = r.split(",").map((s) => s.trim());
       t = t.filter(
         (s) => i.includes(s.id) || i.includes(s.name) || i.includes(s.nameNikud)
       );
     }
-    const o = r.get("excludedNikud");
+    const o = a.get("excludedNikud");
     if (o) {
       const i = o.split(",").map((s) => s.trim());
       t = t.filter(
@@ -562,41 +562,41 @@ function Le(e) {
       );
     }
   }
-  t.length === 0 && (t = [...x]);
+  t.length === 0 && (t = [...S]);
   let n = [...t];
   for (; n.length < e; )
     n.push(...t);
   return n.sort(() => Math.random() - 0.5).slice(0, e);
 }
-function Ee(e, t, n) {
+function Se(e, t, n) {
   e.innerHTML = "";
-  const r = document.createElement("div");
-  r.className = "option-cards-grid";
-  const a = t.map((o) => {
+  const a = document.createElement("div");
+  a.className = "option-cards-grid";
+  const r = t.map((o) => {
     const i = document.createElement("button");
     return i.className = "option-card", i.dataset.id = o.id, i.innerHTML = `
       <span class="option-card__emoji">${o.emoji || ""}</span>
       <span class="option-card__text">${o.text}</span>
     `, i.addEventListener("click", () => {
       i.disabled || n(o);
-    }), r.appendChild(i), { el: i, option: o };
+    }), a.appendChild(i), { el: i, option: o };
   });
-  return e.appendChild(r), {
+  return e.appendChild(a), {
     /** הַדָּגֵשׁ כַּרְטִיס לְפִי סוּג: 'correct' | 'wrong' | 'hint' */
     highlight(o, i) {
-      a.forEach(({ el: s, option: c }) => {
+      r.forEach(({ el: s, option: c }) => {
         c.id === o && s.classList.add(`option-card--${i}`);
       });
     },
     /** נטרל את כל הכרטיסים */
     disable() {
-      a.forEach(({ el: o }) => {
+      r.forEach(({ el: o }) => {
         o.disabled = !0;
       });
     },
     /** אפס את מצב הכרטיסים */
     reset() {
-      a.forEach(({ el: o }) => {
+      r.forEach(({ el: o }) => {
         o.className = "option-card", o.disabled = !1;
       });
     },
@@ -606,7 +606,7 @@ function Ee(e, t, n) {
     }
   };
 }
-function Se(e, t) {
+function Ee(e, t) {
   const n = document.createElement("div");
   n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(t)), n.innerHTML = `
     <div class="progress-bar__track">
@@ -614,12 +614,12 @@ function Se(e, t) {
     </div>
     <span class="progress-bar__label">0 / ${t}</span>
   `, e.appendChild(n);
-  const r = n.querySelector(".progress-bar__fill"), a = n.querySelector(".progress-bar__label");
+  const a = n.querySelector(".progress-bar__fill"), r = n.querySelector(".progress-bar__label");
   return {
     /** עדכן את ההתקדמות */
     update(o) {
       const i = Math.round(o / t * 100);
-      r.style.width = `${i}%`, a.textContent = `${o} / ${t}`, n.setAttribute("aria-valuenow", String(o));
+      a.style.width = `${i}%`, r.textContent = `${o} / ${t}`, n.setAttribute("aria-valuenow", String(o));
     },
     /** הסר את הרכיב */
     destroy() {
@@ -631,23 +631,23 @@ function Re(e) {
   const t = document.createElement("div");
   t.className = "feedback-message", t.setAttribute("aria-live", "polite"), t.setAttribute("role", "status"), e.appendChild(t);
   let n = null;
-  function r(a, o, i = 1800) {
-    clearTimeout(n), t.textContent = a, t.className = `feedback-message feedback-message--${o}`, n = setTimeout(() => {
+  function a(r, o, i = 1800) {
+    clearTimeout(n), t.textContent = r, t.className = `feedback-message feedback-message--${o}`, n = setTimeout(() => {
       t.textContent = "", t.className = "feedback-message";
     }, i);
   }
   return {
     /** הצג משוב חיובי */
-    correct(a = "!כָּל הַכָּבוֹד") {
-      v.correct(), r(a, "correct"), y(t, "bounce");
+    correct(r = "!כָּל הַכָּבוֹד") {
+      L.correct(), a(r, "correct"), x(t, "bounce");
     },
     /** הצג עידוד — נסה שוב */
-    wrong(a = "נַסֵּה שׁוּב") {
-      v.wrong(), r(a, "wrong"), y(t, "pulse");
+    wrong(r = "נַסֵּה שׁוּב") {
+      L.wrong(), a(r, "wrong"), x(t, "pulse");
     },
     /** הצג רמז */
-    hint(a) {
-      r(a, "hint"), y(t, "pulse");
+    hint(r) {
+      a(r, "hint"), x(t, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -669,33 +669,49 @@ function Ce(e, t) {
     justifyContent: "center",
     alignItems: "center"
   }), document.body.appendChild(n));
-  const r = new URLSearchParams(window.location.search), a = r.get("allowedNikud") ? r.get("allowedNikud").split(",") : [];
+  const a = new URLSearchParams(window.location.search), r = a.get("allowedNikud") ? a.get("allowedNikud").split(",") : [];
   let o = `
     <div style="background:white; padding:1.5rem; border-radius:1rem; min-width:300px; text-align:center; color:#333; font-family:Heebo,Arial; direction:rtl;">
       <h2 style="margin-top:0">בחר ניקוד</h2>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:1rem 0; text-align:right;">
   `;
-  x.forEach((i) => {
-    const s = a.length === 0 || a.includes(i.id) || a.includes(i.name);
+  S.forEach((l) => {
+    const m = r.length === 0 || r.includes(l.id) || r.includes(l.name);
     o += `
       <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-        <input type="checkbox" value="${i.id}" class="nikud-filter-cb" ${s ? "checked" : ""} style="width:1.2rem;height:1.2rem;">
-        <span>${i.nameNikud}</span>
+        <input type="checkbox" value="${l.id}" class="nikud-filter-cb" ${m ? "checked" : ""} style="width:1.2rem;height:1.2rem;">
+        <span>${l.nameNikud}</span>
       </label>
     `;
-  }), o += `
+  });
+  const i = parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5;
+  o += `
+      </div>
+      <div style="margin:1rem 0; text-align:right;">
+        <label style="font-weight:700; font-size:0.95rem;">מהירות הגייה: <span id="nikud-rate-val">${i}</span></label>
+        <input type="range" id="nikud-rate-slider" min="0.3" max="1.5" step="0.1" value="${i}" style="width:100%; margin-top:0.3rem; accent-color:#4f67ff;">
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888;">
+          <span>אִטִּי</span>
+          <span>מָהִיר</span>
+        </div>
       </div>
       <button id="save-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#4f67ff; color:white; border:none; font-size:1.1rem; cursor:pointer;">שמור והתחל מחדש</button>
       <button id="close-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#ddd; color:#333; border:none; font-size:1.1rem; cursor:pointer; margin-right:0.5rem;">ביטול</button>
     </div>
-  `, n.innerHTML = o, n.style.display = "flex", document.getElementById("save-settings-btn").onclick = () => {
-    const i = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((c) => c.checked).map((c) => c.value), s = new URL(window.location);
-    i.length > 0 && i.length < x.length ? s.searchParams.set("allowedNikud", i.join(",")) : s.searchParams.delete("allowedNikud"), s.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", s), t && t(e);
+  `, n.innerHTML = o, n.style.display = "flex";
+  const s = document.getElementById("nikud-rate-slider"), c = document.getElementById("nikud-rate-val");
+  s.oninput = () => {
+    c.textContent = s.value;
+  }, document.getElementById("save-settings-btn").onclick = () => {
+    const l = parseFloat(s.value);
+    localStorage.setItem("alefbet.nikudRate", l), re.setNikudEmphasis({ rate: l });
+    const m = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((h) => h.checked).map((h) => h.value), f = new URL(window.location);
+    m.length > 0 && m.length < S.length ? f.searchParams.set("allowedNikud", m.join(",")) : f.searchParams.delete("allowedNikud"), f.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", f), t && t(e);
   }, document.getElementById("close-settings-btn").onclick = () => {
     n.style.display = "none";
   };
 }
-function Te(e) {
+function Fe(e) {
   const t = document.createElement("div");
   t.className = "ab-zone", t.style.setProperty("--zone-color", e.color || "#4f67ff"), t.innerHTML = `
     <div class="ab-zone__symbol">${e.symbol || ""}</div>
@@ -706,8 +722,8 @@ function Te(e) {
   };
   return t.addEventListener("click", n), {
     el: t,
-    highlight(r) {
-      t.classList.remove("ab-zone--correct", "ab-zone--hover"), r && t.classList.add(`ab-zone--${r}`);
+    highlight(a) {
+      t.classList.remove("ab-zone--correct", "ab-zone--hover"), a && t.classList.add(`ab-zone--${a}`);
     },
     reset() {
       t.classList.remove("ab-zone--correct", "ab-zone--hover");
@@ -717,40 +733,40 @@ function Te(e) {
     }
   };
 }
-function Fe(e, t = "טוֹעֵן...") {
+function Te(e, t = "טוֹעֵן...") {
   e.innerHTML = `<div class="ab-loading">${t}</div>`;
 }
 function Pe(e) {
   e.innerHTML = "";
 }
-function Ae(e, t, n, r) {
-  const a = e.querySelector(".game-header__spacer");
-  if (!a) return null;
+function Ae(e, t, n, a) {
+  const r = e.querySelector(".game-header__spacer");
+  if (!r) return null;
   const o = document.createElement("button");
-  return o.className = "ab-header-btn", o.setAttribute("aria-label", n), o.textContent = t, o.onclick = r, a.innerHTML = "", a.appendChild(o), o;
+  return o.className = "ab-header-btn", o.setAttribute("aria-label", n), o.textContent = t, o.onclick = a, r.innerHTML = "", r.appendChild(o), o;
 }
-function je(e, { size: t = "md" } = {}) {
+function $e(e, { size: t = "md" } = {}) {
   const n = document.createElement("div");
   n.className = `ab-nikud-box ab-nikud-box--${e.id} ab-nikud-box--${t}`;
-  const r = document.createElement("div");
-  r.className = "ab-nikud-box__mark", r.textContent = e.symbol;
   const a = document.createElement("div");
-  return a.className = "ab-nikud-box__placeholder", n.appendChild(r), n.appendChild(a), n;
+  a.className = "ab-nikud-box__mark", a.textContent = e.symbol;
+  const r = document.createElement("div");
+  return r.className = "ab-nikud-box__placeholder", n.appendChild(a), n.appendChild(r), n;
 }
-let f = null, d = null, R = 0, C = 0;
-const N = /* @__PURE__ */ new Map();
-function M(e, t) {
+let g = null, d = null, T = 0, P = 0;
+const E = /* @__PURE__ */ new Map();
+function I(e, t) {
   var n;
   return ((n = document.elementFromPoint(e, t)) == null ? void 0 : n.closest('[data-drop-target="true"]')) || null;
 }
-function ce(e, t, n) {
-  const r = e.getBoundingClientRect();
-  R = r.width / 2, C = r.height / 2, d = e.cloneNode(!0), Object.assign(d.style, {
+function de(e, t, n) {
+  const a = e.getBoundingClientRect();
+  T = a.width / 2, P = a.height / 2, d = e.cloneNode(!0), Object.assign(d.style, {
     position: "fixed",
-    left: `${t - R}px`,
-    top: `${n - C}px`,
-    width: `${r.width}px`,
-    height: `${r.height}px`,
+    left: `${t - T}px`,
+    top: `${n - P}px`,
+    width: `${a.width}px`,
+    height: `${a.height}px`,
     pointerEvents: "none",
     // keeps it out of elementFromPoint + hit-testing
     zIndex: "9999",
@@ -760,77 +776,77 @@ function ce(e, t, n) {
     margin: "0"
   }), document.body.appendChild(d);
 }
-function de(e, t) {
-  d && (d.style.left = `${e - R}px`, d.style.top = `${t - C}px`);
+function ue(e, t) {
+  d && (d.style.left = `${e - T}px`, d.style.top = `${t - P}px`);
 }
-function ue() {
+function me() {
   d == null || d.remove(), d = null;
 }
 let u = null;
-function me(e) {
+function fe(e) {
   u !== e && (u == null || u.classList.remove("drop-target--hover"), u = e, e == null || e.classList.add("drop-target--hover"));
 }
-function fe() {
+function he() {
   u == null || u.classList.remove("drop-target--hover"), u = null;
 }
-function $e(e, t) {
+function je(e, t) {
   e.classList.add("drag-source");
-  let n = null, r = null, a = null;
+  let n = null, a = null, r = null;
   function o() {
-    n && (e.removeEventListener("pointermove", n), e.removeEventListener("pointerup", r), e.removeEventListener("pointercancel", a), n = r = a = null), fe(), ue(), e.classList.remove("drag-source--dragging"), f = null;
+    n && (e.removeEventListener("pointermove", n), e.removeEventListener("pointerup", a), e.removeEventListener("pointercancel", r), n = a = r = null), he(), me(), e.classList.remove("drag-source--dragging"), g = null;
   }
   function i(s) {
-    s.button !== void 0 && s.button !== 0 || (s.preventDefault(), f && o(), f = { el: e, data: t }, e.classList.add("drag-source--dragging"), ce(e, s.clientX, s.clientY), e.setPointerCapture(s.pointerId), n = (c) => {
-      de(c.clientX, c.clientY), me(M(c.clientX, c.clientY));
-    }, r = (c) => {
-      const l = M(c.clientX, c.clientY);
-      o(), l && N.has(l) && N.get(l).onDrop({ data: t, sourceEl: e, targetEl: l });
-    }, a = () => o(), e.addEventListener("pointermove", n), e.addEventListener("pointerup", r), e.addEventListener("pointercancel", a));
+    s.button !== void 0 && s.button !== 0 || (s.preventDefault(), g && o(), g = { el: e, data: t }, e.classList.add("drag-source--dragging"), de(e, s.clientX, s.clientY), e.setPointerCapture(s.pointerId), n = (c) => {
+      ue(c.clientX, c.clientY), fe(I(c.clientX, c.clientY));
+    }, a = (c) => {
+      const l = I(c.clientX, c.clientY);
+      o(), l && E.has(l) && E.get(l).onDrop({ data: t, sourceEl: e, targetEl: l });
+    }, r = () => o(), e.addEventListener("pointermove", n), e.addEventListener("pointerup", a), e.addEventListener("pointercancel", r));
   }
   return e.addEventListener("pointerdown", i), {
     destroy() {
-      e.removeEventListener("pointerdown", i), (f == null ? void 0 : f.el) === e && o(), e.classList.remove("drag-source");
+      e.removeEventListener("pointerdown", i), (g == null ? void 0 : g.el) === e && o(), e.classList.remove("drag-source");
     }
   };
 }
 function We(e, t) {
-  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), N.set(e, { onDrop: t }), {
+  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), E.set(e, { onDrop: t }), {
     destroy() {
-      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), N.delete(e);
+      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), E.delete(e);
     }
   };
 }
 export {
-  z as EventBus,
-  pe as GameShell,
+  H as EventBus,
+  ge as GameShell,
   q as GameState,
-  Y as addNikud,
-  y as animate,
-  $e as createDragSource,
+  V as addNikud,
+  x as animate,
+  je as createDragSource,
   We as createDropTarget,
   Re as createFeedback,
-  je as createNikudBox,
-  Ee as createOptionCards,
-  Se as createProgressBar,
-  be as createRoundManager,
-  ke as createSpeechListener,
-  Te as createZone,
-  _e as getLetter,
-  le as getLettersByGroup,
-  V as getNikud,
-  _ as hebrewLetters,
+  $e as createNikudBox,
+  Se as createOptionCards,
+  Ee as createProgressBar,
+  we as createRoundManager,
+  ye as createSpeechListener,
+  Fe as createZone,
+  ve as getLetter,
+  ce as getLettersByGroup,
+  Y as getNikud,
+  N as hebrewLetters,
   Pe as hideLoadingScreen,
   Ae as injectHeaderButton,
   Ne as letterWithNikud,
-  ye as matchNikudSound,
+  ke as matchNikudSound,
   xe as nikudBaseLetters,
-  x as nikudList,
-  ge as preloadNikud,
-  ve as randomLetters,
+  S as nikudList,
+  be as preloadNikud,
+  _e as randomLetters,
   Le as randomNikud,
-  oe as showCompletionScreen,
-  Fe as showLoadingScreen,
+  ie as showCompletionScreen,
+  Te as showLoadingScreen,
   Ce as showNikudSettingsDialog,
-  v as sounds,
-  we as tts
+  L as sounds,
+  re as tts
 };

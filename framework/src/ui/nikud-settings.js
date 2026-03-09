@@ -4,6 +4,7 @@
  */
 
 import { nikudList } from '../data/nikud.js';
+import { tts } from '../audio/tts.js';
 
 /**
  * מציג דיאלוג הגדרות לבחירת ניקוד מותר.
@@ -44,7 +45,17 @@ export function showNikudSettingsDialog(container, onSave) {
     `;
     });
 
+    const savedRate = parseFloat(localStorage.getItem('alefbet.nikudRate')) || 0.5;
+
     content += `
+      </div>
+      <div style="margin:1rem 0; text-align:right;">
+        <label style="font-weight:700; font-size:0.95rem;">מהירות הגייה: <span id="nikud-rate-val">${savedRate}</span></label>
+        <input type="range" id="nikud-rate-slider" min="0.3" max="1.5" step="0.1" value="${savedRate}" style="width:100%; margin-top:0.3rem; accent-color:#4f67ff;">
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888;">
+          <span>אִטִּי</span>
+          <span>מָהִיר</span>
+        </div>
       </div>
       <button id="save-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#4f67ff; color:white; border:none; font-size:1.1rem; cursor:pointer;">שמור והתחל מחדש</button>
       <button id="close-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#ddd; color:#333; border:none; font-size:1.1rem; cursor:pointer; margin-right:0.5rem;">ביטול</button>
@@ -54,7 +65,14 @@ export function showNikudSettingsDialog(container, onSave) {
     modal.innerHTML = content;
     modal.style.display = 'flex';
 
+    const rateSlider = document.getElementById('nikud-rate-slider');
+    const rateVal = document.getElementById('nikud-rate-val');
+    rateSlider.oninput = () => { rateVal.textContent = rateSlider.value; };
+
     document.getElementById('save-settings-btn').onclick = () => {
+        const rate = parseFloat(rateSlider.value);
+        localStorage.setItem('alefbet.nikudRate', rate);
+        tts.setNikudEmphasis({ rate });
         const checked = Array.from(modal.querySelectorAll('.nikud-filter-cb'))
             .filter(cb => cb.checked)
             .map(cb => cb.value);

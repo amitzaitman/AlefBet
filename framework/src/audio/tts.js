@@ -9,7 +9,7 @@ let _queue = [];
 let _speaking = false;
 let _useGoogleTTS = true;
 let _rate = 0.9;
-let _nikudRate = 0.5;
+let _nikudRate = (typeof localStorage !== 'undefined' && parseFloat(localStorage.getItem('alefbet.nikudRate'))) || 0.5;
 let _interactionReady = false;
 let _interactionPromise = null;
 
