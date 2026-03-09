@@ -530,9 +530,9 @@
   z-index: 1;
   pointer-events: none;
 }
-.ab-nikud-box--sm .ab-nikud-box__text { font-size: clamp(40px, 10dvmin, 62px); }
-.ab-nikud-box--md .ab-nikud-box__text { font-size: clamp(54px, 14dvmin, 86px); }
-.ab-nikud-box--lg .ab-nikud-box__text { font-size: clamp(72px, 19dvmin, 112px); }
+.ab-nikud-box--sm .ab-nikud-box__text { font-size: clamp(60px, 16dvmin, 96px); }
+.ab-nikud-box--md .ab-nikud-box__text { font-size: clamp(80px, 22dvmin, 130px); }
+.ab-nikud-box--lg .ab-nikud-box__text { font-size: clamp(100px, 28dvmin, 160px); }
 
 /* Box layer: opaque with zone color, covers ◌, nikud sticks out */
 .ab-nikud-box__box {
