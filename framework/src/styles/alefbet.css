@@ -507,21 +507,38 @@
 .ab-zone__symbol { font-size: clamp(56px, 18dvmin, 100px); font-weight: 900; color: #fff; line-height: 1; font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; }
 .ab-zone__label { font-size: clamp(16px, 4dvmin, 26px); font-weight: 700; color: rgba(255,255,255,0.95); font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; }
 
-/* ── Nikud Box — placeholder box with nikud in correct position ── */
-/* Uses dotted circle ◌ (U+25CC) so the browser places nikud naturally */
+/* ── Nikud Box — dashed box (letter placeholder) with nikud outside ── */
+/* ◌+nikud text sits behind the box; the opaque box covers ◌ while nikud extends beyond */
 .ab-nikud-box {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 4px dashed rgba(255, 255, 255, 0.5);
-  border-radius: clamp(8px, 2dvmin, 14px);
-  background: rgba(255, 255, 255, 0.1);
-  font-size: clamp(40px, 13dvmin, 72px);
+  overflow: visible;
+}
+.ab-nikud-box--sm { width: clamp(44px, 11dvmin, 66px); height: clamp(50px, 12dvmin, 74px); }
+.ab-nikud-box--md { width: clamp(58px, 15dvmin, 90px); height: clamp(66px, 17dvmin, 100px); }
+.ab-nikud-box--lg { width: clamp(76px, 20dvmin, 116px); height: clamp(86px, 22dvmin, 128px); }
+
+/* Text layer: ◌+nikud centered, white, behind the box */
+.ab-nikud-box__text {
+  position: absolute;
+  font-size: clamp(36px, 12dvmin, 64px);
   font-weight: 900;
   font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
   line-height: 1;
   color: #fff;
+  z-index: 1;
+  pointer-events: none;
 }
-.ab-nikud-box--sm { width: clamp(50px, 12dvmin, 76px); height: clamp(58px, 14dvmin, 86px); }
-.ab-nikud-box--md { width: clamp(68px, 17dvmin, 104px); height: clamp(78px, 19dvmin, 116px); }
-.ab-nikud-box--lg { width: clamp(88px, 22dvmin, 132px); height: clamp(98px, 25dvmin, 146px); }
+
+/* Box layer: opaque, covers the ◌ circle, nikud sticks out */
+.ab-nikud-box__box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 4px dashed rgba(255, 255, 255, 0.6);
+  border-radius: clamp(8px, 2dvmin, 14px);
+  background: inherit;
+  z-index: 2;
+}

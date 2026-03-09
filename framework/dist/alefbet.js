@@ -100,15 +100,15 @@ class ge {
     return this.events.on(t, n), this;
   }
 }
-let b = null;
+let y = null;
 function D() {
-  if (!b)
+  if (!y)
     try {
-      b = new (window.AudioContext || window.webkitAudioContext)();
+      y = new (window.AudioContext || window.webkitAudioContext)();
     } catch {
       return null;
     }
-  return b.state === "suspended" && b.resume(), b;
+  return y.state === "suspended" && y.resume(), y;
 }
 function p(e, t, n = "sine", a = 0.3) {
   const r = D();
@@ -200,11 +200,11 @@ async function V(e) {
 function Y(e) {
   return v.get(e) ?? e ?? "";
 }
-async function we(e) {
+async function be(e) {
   const t = [...new Set(e.filter((n) => n == null ? void 0 : n.trim()))];
   await Promise.all(t.map((n) => V(n)));
 }
-let w = [], _ = !1, z = !0, y = 0.9, $ = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, R = !1, k = null;
+let b = [], _ = !1, z = !0, w = 0.9, $ = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, R = !1, k = null;
 function W(e, t, n, a = t) {
   console.warn(`[tts] ${e} TTS failed`, { text: t, sentText: a, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
     detail: { provider: e, text: t, sentText: a, reason: n }
@@ -230,7 +230,7 @@ function Q() {
 }
 function Z(e, t, n) {
   const r = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(e)}&tl=he&client=tw-ob`, o = new Audio(r);
-  o.playbackRate = y, o.onended = t, o.onerror = () => n("audio.onerror"), o.play().catch((i) => {
+  o.playbackRate = w, o.onended = t, o.onerror = () => n("audio.onerror"), o.play().catch((i) => {
     n((i == null ? void 0 : i.message) || "audio.play() rejected");
   });
 }
@@ -276,7 +276,7 @@ function ne(e) {
       return;
     }
     const n = new SpeechSynthesisUtterance(e);
-    n.lang = "he-IL", n.rate = y, C && (n.voice = C), n.onend = t, n.onerror = t, speechSynthesis.speak(n);
+    n.lang = "he-IL", n.rate = w, C && (n.voice = C), n.onend = t, n.onerror = t, speechSynthesis.speak(n);
   });
 }
 async function ae(e) {
@@ -290,8 +290,8 @@ async function ae(e) {
   await ne(e);
 }
 function F() {
-  if (_ || w.length === 0) return;
-  const e = w.shift();
+  if (_ || b.length === 0) return;
+  const e = b.shift();
   _ = !0, ae(e.text).then(() => {
     _ = !1, e.resolve(), F();
   });
@@ -304,19 +304,19 @@ const re = {
   speak(e) {
     const t = Y(e);
     return new Promise((n) => {
-      w.push({ text: t, resolve: n }), F();
+      b.push({ text: t, resolve: n }), F();
     });
   },
   /** עצור את הדיבור הנוכחי */
   cancel() {
-    w.forEach((e) => e.resolve()), w = [], _ = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
+    b.forEach((e) => e.resolve()), b = [], _ = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
   },
   get available() {
     return !0;
   },
   /** הגדר מהירות דיבור (0.5–2.0) */
   setRate(e) {
-    y = Math.max(0.5, Math.min(2, e));
+    w = Math.max(0.5, Math.min(2, e));
   },
   /** השתמש ב-Google Translate TTS (ברירת מחדל) או בדפדפן */
   useGoogle(e = !0) {
@@ -336,11 +336,11 @@ const re = {
    * @param {string} nikudSymbol - סמל הניקוד (למשל '\u05B7')
    */
   speakNikud(e, t) {
-    const n = e + t, a = y;
-    return y = $, new Promise((r) => {
-      w.push({ text: n, resolve: r }), F();
+    const n = e + t, a = w;
+    return w = $, new Promise((r) => {
+      b.push({ text: n, resolve: r }), F();
     }).finally(() => {
-      y = a;
+      w = a;
     });
   }
 }, B = {
@@ -402,7 +402,7 @@ function ie(e, t, n, a) {
     s.remove(), a();
   }), e.innerHTML = "", e.appendChild(s), x(s.querySelector(".completion-screen__content"), "fadeIn");
 }
-function ye(e, t, {
+function we(e, t, {
   totalRounds: n,
   progressBar: a = null,
   buildRoundUI: r,
@@ -442,7 +442,7 @@ const se = {
   oh: [/[או]/, /^[או]$/, /או/, /הו/],
   oo: [/[או]/, /^[או]$/, /או/, /הו/, /אוּ/]
 };
-function be() {
+function ye() {
   const e = typeof window < "u" ? window.SpeechRecognition || window.webkitSpeechRecognition : null, t = !!e;
   let n = null;
   return {
@@ -747,7 +747,11 @@ function Ae(e, t, n, a) {
 }
 function je(e, { size: t = "md" } = {}) {
   const n = document.createElement("div");
-  return n.className = `ab-nikud-box ab-nikud-box--${t}`, n.textContent = "◌" + e.symbol, n;
+  n.className = `ab-nikud-box ab-nikud-box--${t}`;
+  const a = document.createElement("span");
+  a.className = "ab-nikud-box__text", a.textContent = "◌" + e.symbol;
+  const r = document.createElement("div");
+  return r.className = "ab-nikud-box__box", n.appendChild(a), n.appendChild(r), n;
 }
 let g = null, d = null, T = 0, P = 0;
 const E = /* @__PURE__ */ new Map();
@@ -824,8 +828,8 @@ export {
   je as createNikudBox,
   Se as createOptionCards,
   Ee as createProgressBar,
-  ye as createRoundManager,
-  be as createSpeechListener,
+  we as createRoundManager,
+  ye as createSpeechListener,
   Fe as createZone,
   ve as getLetter,
   ce as getLettersByGroup,
@@ -837,7 +841,7 @@ export {
   ke as matchNikudSound,
   xe as nikudBaseLetters,
   S as nikudList,
-  we as preloadNikud,
+  be as preloadNikud,
   _e as randomLetters,
   Le as randomNikud,
   ie as showCompletionScreen,
