@@ -42,6 +42,7 @@ export { showNikudSettingsDialog } from './ui/nikud-settings.js';
 export { createZone } from './ui/interactive-zones.js';
 export { showLoadingScreen, hideLoadingScreen } from './ui/loading-screen.js';
 export { injectHeaderButton } from './ui/header-button.js';
+export { createNikudBox } from './ui/nikud-box.js';
 
 // ===== Render [נוסף על ידי: letter-match game] =====
 export { animate } from './render/animations.js';

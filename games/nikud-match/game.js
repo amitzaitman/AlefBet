@@ -22,6 +22,7 @@ import {
   showLoadingScreen,
   hideLoadingScreen,
   injectHeaderButton,
+  createNikudBox,
 } from '../../framework/dist/alefbet.js';
 
 const STATIC_TEXTS = [
@@ -79,13 +80,11 @@ export async function startGame(container) {
     const leftZone = document.createElement('div');
     leftZone.className = 'nm-zone nm-zone--left';
     leftZone.style.setProperty('--zone-color', leftNikud.color);
-    leftZone.innerHTML = `
-      <div class="nm-zone__box-wrapper nm-zone__box-wrapper--${leftNikud.id}">
-        <div class="nm-zone__nikud-mark">${leftNikud.symbol}</div>
-        <div class="nm-zone__empty-box"></div>
-      </div>
-      <div class="nm-zone__name">${leftNikud.nameNikud}</div>
-    `;
+    leftZone.appendChild(createNikudBox(leftNikud));
+    const leftLabel = document.createElement('div');
+    leftLabel.className = 'nm-zone__name';
+    leftLabel.textContent = leftNikud.nameNikud;
+    leftZone.appendChild(leftLabel);
     arena.appendChild(leftZone);
 
     // Center: letter with nikud + hint arrows
@@ -113,13 +112,11 @@ export async function startGame(container) {
     const rightZone = document.createElement('div');
     rightZone.className = 'nm-zone nm-zone--right';
     rightZone.style.setProperty('--zone-color', rightNikud.color);
-    rightZone.innerHTML = `
-      <div class="nm-zone__box-wrapper nm-zone__box-wrapper--${rightNikud.id}">
-        <div class="nm-zone__nikud-mark">${rightNikud.symbol}</div>
-        <div class="nm-zone__empty-box"></div>
-      </div>
-      <div class="nm-zone__name">${rightNikud.nameNikud}</div>
-    `;
+    rightZone.appendChild(createNikudBox(rightNikud));
+    const rightLabel = document.createElement('div');
+    rightLabel.className = 'nm-zone__name';
+    rightLabel.textContent = rightNikud.nameNikud;
+    rightZone.appendChild(rightLabel);
     arena.appendChild(rightZone);
 
     shell.bodyEl.appendChild(arena);

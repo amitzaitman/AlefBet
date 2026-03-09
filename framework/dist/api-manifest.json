@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-09T22:05:00.808Z",
+  "generatedAt": "2026-03-09T22:15:02.021Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -151,6 +151,13 @@
       "exports": [
         "showLoadingScreen",
         "hideLoadingScreen"
+      ]
+    },
+    {
+      "path": "ui/nikud-box.js",
+      "description": "קופסת ניקוד — תצוגת ריבוע ריק עם סימן ניקוד במיקום הנכון\nשימושי להצגת סימן ניקוד בלי אות — למשחקי התאמה, בחירה ולימוד\n[נוסף על ידי: nikud-match game]",
+      "exports": [
+        "createNikudBox"
       ]
     },
     {

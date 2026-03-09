@@ -49,49 +49,7 @@
   transform: scale(1.04);
 }
 
-/* ── Empty box with positioned nikud ── */
-.nm-zone__box-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: clamp(64px, 16dvmin, 100px);
-  height: clamp(72px, 18dvmin, 110px);
-}
-
-.nm-zone__empty-box {
-  width: clamp(50px, 12dvmin, 76px);
-  height: clamp(56px, 14dvmin, 84px);
-  border: 4px dashed rgba(255, 255, 255, 0.7);
-  border-radius: clamp(8px, 2dvmin, 14px);
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.nm-zone__nikud-mark {
-  position: absolute;
-  font-size: clamp(32px, 10dvmin, 56px);
-  color: #fff;
-  font-weight: 900;
-  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
-  line-height: 1;
-  pointer-events: none;
-}
-
-/* Default position: below the box (patach, kamatz, hiriq, tzere, segol, kubbutz) */
-.nm-zone__box-wrapper .nm-zone__nikud-mark {
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* Holam: upper-left corner */
-.nm-zone__box-wrapper--holam .nm-zone__nikud-mark {
-  bottom: auto;
-  left: auto;
-  top: -2px;
-  right: -2px;
-  transform: none;
-}
+/* Nikud box uses shared ab-nikud-box from framework CSS */
 
 /* Nikud name label */
 .nm-zone__name {
