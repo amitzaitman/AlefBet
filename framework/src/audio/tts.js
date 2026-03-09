@@ -235,7 +235,7 @@ export const tts = {
   speakNikud(letter, nikudSymbol) {
     const base = letter + nikudSymbol;
     const vowel = '\u05D0' + nikudSymbol; // א + nikud
-    const elongated = base + ' ' + (vowel + ' ').repeat(_nikudRepeats).trim();
+    const elongated = base + vowel.repeat(_nikudRepeats);
     const savedRate = _rate;
     _rate = _nikudRate;
     return new Promise(resolve => {

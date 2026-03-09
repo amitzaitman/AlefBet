@@ -338,7 +338,7 @@ const be = {
    * @param {string} nikudSymbol - סמל הניקוד (למשל '\u05B7')
    */
   speakNikud(e, t) {
-    const n = e + t, a = "א" + t, r = n + " " + (a + " ").repeat(A).trim(), o = p;
+    const n = e + t, a = "א" + t, r = n + a.repeat(A), o = p;
     return p = j, new Promise((i) => {
       h.push({ text: r, resolve: i }), S();
     }).finally(() => {
