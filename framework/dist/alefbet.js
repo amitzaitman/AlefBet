@@ -15,7 +15,7 @@ class H {
     return (this._handlers[t] || []).slice().forEach((a) => a(n)), this;
   }
 }
-class q {
+class D {
   constructor(t) {
     this._totalRounds = t, this._currentRound = 0, this._score = 0;
   }
@@ -59,7 +59,7 @@ class ge {
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
       ...n
-    }, this.events = new H(), this.state = new q(this.config.totalRounds), this._buildShell();
+    }, this.events = new H(), this.state = new D(this.config.totalRounds), this._buildShell();
   }
   _buildShell() {
     this.container.classList.add("alefbet-game");
@@ -100,18 +100,18 @@ class ge {
     return this.events.on(t, n), this;
   }
 }
-let y = null;
-function D() {
-  if (!y)
+let b = null;
+function q() {
+  if (!b)
     try {
-      y = new (window.AudioContext || window.webkitAudioContext)();
+      b = new (window.AudioContext || window.webkitAudioContext)();
     } catch {
       return null;
     }
-  return y.state === "suspended" && y.resume(), y;
+  return b.state === "suspended" && b.resume(), b;
 }
 function p(e, t, n = "sine", a = 0.3) {
-  const r = D();
+  const r = q();
   if (r)
     try {
       const o = r.createOscillator(), i = r.createGain();
@@ -137,7 +137,7 @@ const L = {
     p(900, 0.04, "sine", 0.12);
   }
 }, A = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api";
-let $ = !1;
+let j = !1;
 const v = /* @__PURE__ */ new Map();
 function O() {
   var r;
@@ -166,7 +166,7 @@ function X(e) {
 async function G(e) {
   const t = O();
   if (!t)
-    throw $ || ($ = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
+    throw j || (j = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
   const n = await fetch(t, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -200,11 +200,11 @@ async function V(e) {
 function Y(e) {
   return v.get(e) ?? e ?? "";
 }
-async function be(e) {
+async function we(e) {
   const t = [...new Set(e.filter((n) => n == null ? void 0 : n.trim()))];
   await Promise.all(t.map((n) => V(n)));
 }
-let b = [], _ = !1, z = !0, w = 0.9, j = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, R = !1, k = null;
+let w = [], _ = !1, z = !0, y = 0.9, $ = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, R = !1, k = null;
 function W(e, t, n, a = t) {
   console.warn(`[tts] ${e} TTS failed`, { text: t, sentText: a, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
     detail: { provider: e, text: t, sentText: a, reason: n }
@@ -230,7 +230,7 @@ function Q() {
 }
 function Z(e, t, n) {
   const r = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(e)}&tl=he&client=tw-ob`, o = new Audio(r);
-  o.playbackRate = w, o.onended = t, o.onerror = () => n("audio.onerror"), o.play().catch((i) => {
+  o.playbackRate = y, o.onended = t, o.onerror = () => n("audio.onerror"), o.play().catch((i) => {
     n((i == null ? void 0 : i.message) || "audio.play() rejected");
   });
 }
@@ -276,7 +276,7 @@ function ne(e) {
       return;
     }
     const n = new SpeechSynthesisUtterance(e);
-    n.lang = "he-IL", n.rate = w, C && (n.voice = C), n.onend = t, n.onerror = t, speechSynthesis.speak(n);
+    n.lang = "he-IL", n.rate = y, C && (n.voice = C), n.onend = t, n.onerror = t, speechSynthesis.speak(n);
   });
 }
 async function ae(e) {
@@ -290,8 +290,8 @@ async function ae(e) {
   await ne(e);
 }
 function F() {
-  if (_ || b.length === 0) return;
-  const e = b.shift();
+  if (_ || w.length === 0) return;
+  const e = w.shift();
   _ = !0, ae(e.text).then(() => {
     _ = !1, e.resolve(), F();
   });
@@ -304,19 +304,19 @@ const re = {
   speak(e) {
     const t = Y(e);
     return new Promise((n) => {
-      b.push({ text: t, resolve: n }), F();
+      w.push({ text: t, resolve: n }), F();
     });
   },
   /** עצור את הדיבור הנוכחי */
   cancel() {
-    b.forEach((e) => e.resolve()), b = [], _ = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
+    w.forEach((e) => e.resolve()), w = [], _ = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
   },
   get available() {
     return !0;
   },
   /** הגדר מהירות דיבור (0.5–2.0) */
   setRate(e) {
-    w = Math.max(0.5, Math.min(2, e));
+    y = Math.max(0.5, Math.min(2, e));
   },
   /** השתמש ב-Google Translate TTS (ברירת מחדל) או בדפדפן */
   useGoogle(e = !0) {
@@ -328,7 +328,7 @@ const re = {
    *   rate: מהירות דיבור להדגשה (ברירת מחדל 0.5)
    */
   setNikudEmphasis({ rate: e } = {}) {
-    e != null && (j = Math.max(0.3, Math.min(1.5, e)));
+    e != null && ($ = Math.max(0.3, Math.min(1.5, e)));
   },
   /**
    * הקרא אות עם ניקוד באיטיות להדגשת התנועה
@@ -336,11 +336,11 @@ const re = {
    * @param {string} nikudSymbol - סמל הניקוד (למשל '\u05B7')
    */
   speakNikud(e, t) {
-    const n = e + t, a = w;
-    return w = j, new Promise((r) => {
-      b.push({ text: n, resolve: r }), F();
+    const n = e + t, a = y;
+    return y = $, new Promise((r) => {
+      w.push({ text: n, resolve: r }), F();
     }).finally(() => {
-      w = a;
+      y = a;
     });
   }
 }, B = {
@@ -402,7 +402,7 @@ function ie(e, t, n, a) {
     s.remove(), a();
   }), e.innerHTML = "", e.appendChild(s), x(s.querySelector(".completion-screen__content"), "fadeIn");
 }
-function we(e, t, {
+function ye(e, t, {
   totalRounds: n,
   progressBar: a = null,
   buildRoundUI: r,
@@ -442,7 +442,7 @@ const se = {
   oh: [/[או]/, /^[או]$/, /או/, /הו/],
   oo: [/[או]/, /^[או]$/, /או/, /הו/, /אוּ/]
 };
-function ye() {
+function be() {
   const e = typeof window < "u" ? window.SpeechRecognition || window.webkitSpeechRecognition : null, t = !!e;
   let n = null;
   return {
@@ -745,13 +745,11 @@ function Ae(e, t, n, a) {
   const o = document.createElement("button");
   return o.className = "ab-header-btn", o.setAttribute("aria-label", n), o.textContent = t, o.onclick = a, r.innerHTML = "", r.appendChild(o), o;
 }
-function $e(e, { size: t = "md" } = {}) {
+function je(e, { size: t = "md" } = {}) {
   const n = document.createElement("div");
-  n.className = `ab-nikud-box ab-nikud-box--${e.id} ab-nikud-box--${t}`;
-  const a = document.createElement("div");
-  a.className = "ab-nikud-box__mark", a.textContent = e.symbol;
-  const r = document.createElement("div");
-  return r.className = "ab-nikud-box__placeholder", n.appendChild(a), n.appendChild(r), n;
+  n.className = `ab-nikud-box ab-nikud-box--${t}`;
+  const a = document.createElement("span");
+  return a.className = "ab-nikud-box__letter", a.textContent = "א" + e.symbol, n.appendChild(a), n;
 }
 let g = null, d = null, T = 0, P = 0;
 const E = /* @__PURE__ */ new Map();
@@ -789,7 +787,7 @@ function fe(e) {
 function he() {
   u == null || u.classList.remove("drop-target--hover"), u = null;
 }
-function je(e, t) {
+function $e(e, t) {
   e.classList.add("drag-source");
   let n = null, a = null, r = null;
   function o() {
@@ -819,17 +817,17 @@ function We(e, t) {
 export {
   H as EventBus,
   ge as GameShell,
-  q as GameState,
+  D as GameState,
   V as addNikud,
   x as animate,
-  je as createDragSource,
+  $e as createDragSource,
   We as createDropTarget,
   Re as createFeedback,
-  $e as createNikudBox,
+  je as createNikudBox,
   Se as createOptionCards,
   Ee as createProgressBar,
-  we as createRoundManager,
-  ye as createSpeechListener,
+  ye as createRoundManager,
+  be as createSpeechListener,
   Fe as createZone,
   ve as getLetter,
   ce as getLettersByGroup,
@@ -841,7 +839,7 @@ export {
   ke as matchNikudSound,
   xe as nikudBaseLetters,
   S as nikudList,
-  be as preloadNikud,
+  we as preloadNikud,
   _e as randomLetters,
   Le as randomNikud,
   ie as showCompletionScreen,

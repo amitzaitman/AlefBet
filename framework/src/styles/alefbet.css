@@ -507,45 +507,25 @@
 .ab-zone__symbol { font-size: clamp(56px, 18dvmin, 100px); font-weight: 900; color: #fff; line-height: 1; font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; }
 .ab-zone__label { font-size: clamp(16px, 4dvmin, 26px); font-weight: 700; color: rgba(255,255,255,0.95); font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; }
 
-/* ── Nikud Box — empty letter placeholder with positioned nikud mark ── */
+/* ── Nikud Box — empty letter placeholder with nikud in correct position ── */
+/* Uses a transparent א so the browser font renderer places nikud naturally */
 .ab-nikud-box {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.ab-nikud-box--sm { width: clamp(44px, 11dvmin, 68px); height: clamp(50px, 12dvmin, 76px); }
-.ab-nikud-box--md { width: clamp(64px, 16dvmin, 100px); height: clamp(72px, 18dvmin, 110px); }
-.ab-nikud-box--lg { width: clamp(84px, 22dvmin, 130px); height: clamp(92px, 24dvmin, 140px); }
-
-.ab-nikud-box__placeholder {
-  width: 78%;
-  height: 78%;
   border: 4px dashed rgba(255, 255, 255, 0.7);
   border-radius: clamp(8px, 2dvmin, 14px);
   background: rgba(255, 255, 255, 0.12);
 }
+.ab-nikud-box--sm { width: clamp(44px, 11dvmin, 68px); height: clamp(50px, 12dvmin, 76px); }
+.ab-nikud-box--md { width: clamp(56px, 14dvmin, 86px); height: clamp(64px, 16dvmin, 96px); }
+.ab-nikud-box--lg { width: clamp(76px, 20dvmin, 116px); height: clamp(84px, 22dvmin, 126px); }
 
-.ab-nikud-box__mark {
-  position: absolute;
-  font-size: clamp(32px, 10dvmin, 56px);
-  color: #fff;
+.ab-nikud-box__letter {
+  font-size: clamp(36px, 12dvmin, 64px);
   font-weight: 900;
   font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
   line-height: 1;
+  color: rgba(255, 255, 255, 0.9);
   pointer-events: none;
-  /* Default: centered below the dashed box (patach, kamatz, hiriq, tzere, segol, kubbutz) */
-  /* Placeholder is 78% → starts at 11% from each edge */
-  bottom: 6%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* Holam: upper-right of the dashed box */
-.ab-nikud-box--holam .ab-nikud-box__mark {
-  bottom: auto;
-  left: auto;
-  top: 6%;
-  right: 10%;
-  transform: none;
 }
