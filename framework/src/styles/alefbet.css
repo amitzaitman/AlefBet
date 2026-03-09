@@ -534,17 +534,18 @@
   font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
   line-height: 1;
   pointer-events: none;
-  /* Default: below the box (patach, kamatz, hiriq, tzere, segol, kubbutz) */
-  bottom: -4px;
+  /* Default: centered below the dashed box (patach, kamatz, hiriq, tzere, segol, kubbutz) */
+  /* Placeholder is 78% → starts at 11% from each edge */
+  bottom: 6%;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* Holam: upper-left corner */
+/* Holam: upper-right of the dashed box */
 .ab-nikud-box--holam .ab-nikud-box__mark {
   bottom: auto;
   left: auto;
-  top: -2px;
-  right: -2px;
+  top: 6%;
+  right: 10%;
   transform: none;
 }
