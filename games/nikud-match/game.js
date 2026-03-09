@@ -80,7 +80,10 @@ export async function startGame(container) {
     leftZone.className = 'nm-zone nm-zone--left';
     leftZone.style.setProperty('--zone-color', leftNikud.color);
     leftZone.innerHTML = `
-      <div class="nm-zone__symbol">◌${leftNikud.symbol}</div>
+      <div class="nm-zone__box-wrapper nm-zone__box-wrapper--${leftNikud.id}">
+        <div class="nm-zone__nikud-mark">${leftNikud.symbol}</div>
+        <div class="nm-zone__empty-box"></div>
+      </div>
       <div class="nm-zone__name">${leftNikud.nameNikud}</div>
     `;
     arena.appendChild(leftZone);
@@ -111,7 +114,10 @@ export async function startGame(container) {
     rightZone.className = 'nm-zone nm-zone--right';
     rightZone.style.setProperty('--zone-color', rightNikud.color);
     rightZone.innerHTML = `
-      <div class="nm-zone__symbol">◌${rightNikud.symbol}</div>
+      <div class="nm-zone__box-wrapper nm-zone__box-wrapper--${rightNikud.id}">
+        <div class="nm-zone__nikud-mark">${rightNikud.symbol}</div>
+        <div class="nm-zone__empty-box"></div>
+      </div>
       <div class="nm-zone__name">${rightNikud.nameNikud}</div>
     `;
     arena.appendChild(rightZone);
@@ -160,16 +166,20 @@ export async function startGame(container) {
 
       animate(zone, 'bounce');
       sounds.correct();
+      tts.speakNikud(letter, targetNikud.symbol);
 
       shell.state.addScore(1);
       progressBar?.update(shell.state.currentRound);
-      roundIndex++;
-      const hasMore = shell.state.nextRound();
-      if (hasMore && roundIndex < 8) {
-        buildRoundUI(roundNikud[roundIndex]);
-      } else {
-        showCompletionScreen(container, shell.state.score, 8, () => startGame(container));
-      }
+
+      setTimeout(() => {
+        roundIndex++;
+        const hasMore = shell.state.nextRound();
+        if (hasMore && roundIndex < 8) {
+          buildRoundUI(roundNikud[roundIndex]);
+        } else {
+          showCompletionScreen(container, shell.state.score, 8, () => startGame(container));
+        }
+      }, 1800);
     } else {
       answered = false;
     }
