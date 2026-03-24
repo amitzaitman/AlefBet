@@ -1,0 +1,819 @@
+/* ניקיון פסח - סגנונות */
+:root {
+  --primary: #4f67ff;
+  --primary-light: #e8ebff;
+  --success: #00C896;
+  --success-light: #e0f9f1;
+  --warning: #FFB400;
+  --warning-light: #fff6e0;
+  --danger: #FF4757;
+  --bg: #f0f2ff;
+  --surface: #ffffff;
+  --text: #1a1a2e;
+  --text-muted: #6c757d;
+  --border: #e2e5f1;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --font: 'Heebo', Arial, sans-serif;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Header --- */
+.app-header {
+  background: var(--primary);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(79,103,255,0.3);
+}
+
+.app-header h1 {
+  font-size: clamp(18px, 5vw, 24px);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.header-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.header-btn:hover { background: rgba(255,255,255,0.3); }
+.header-btn.active { background: rgba(255,255,255,0.4); }
+
+/* --- Progress Summary Bar --- */
+.progress-summary {
+  background: var(--surface);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.progress-ring svg {
+  transform: rotate(-90deg);
+  width: 56px;
+  height: 56px;
+}
+
+.progress-ring circle {
+  fill: none;
+  stroke-width: 5;
+}
+
+.progress-ring .ring-bg {
+  stroke: var(--border);
+}
+
+.progress-ring .ring-fill {
+  stroke: var(--success);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+
+.progress-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.progress-info {
+  flex: 1;
+}
+
+.progress-info .label {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.progress-info .numbers {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* --- Tab Navigation --- */
+.tab-nav {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-nav button {
+  flex: 1;
+  min-width: max-content;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.tab-nav button.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 700;
+}
+
+.tab-nav button:hover:not(.active) {
+  color: var(--text);
+  background: var(--primary-light);
+}
+
+/* --- Main Content --- */
+.tab-content {
+  padding: 16px;
+  padding-bottom: 100px;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* --- Room Section --- */
+.room-section {
+  margin-bottom: 20px;
+}
+
+.room-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.room-header .room-emoji {
+  font-size: 24px;
+}
+
+.room-header .room-name {
+  font-size: 18px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.room-header .room-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--primary-light);
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.room-header .room-count.all-done {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.room-header .chevron {
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+}
+
+.room-header.open .chevron {
+  transform: rotate(90deg);
+}
+
+/* --- Task Item --- */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-item {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow);
+  transition: all 0.2s;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.task-item.done {
+  opacity: 0.6;
+  background: var(--success-light);
+}
+
+.task-item.done .task-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.task-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border);
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.task-check:hover {
+  border-color: var(--success);
+  background: var(--success-light);
+}
+
+.task-item.done .task-check {
+  border-color: var(--success);
+  background: var(--success);
+  color: white;
+}
+
+.task-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-text {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.task-assignee {
+  font-size: 12px;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.task-assignee:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.task-guide-btn {
+  font-size: 12px;
+  color: var(--warning);
+  background: var(--warning-light);
+  padding: 1px 8px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: var(--font);
+}
+
+.task-guide-btn:hover {
+  background: var(--warning);
+  color: white;
+}
+
+.task-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.task-action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.task-action-btn:hover {
+  background: var(--bg);
+}
+
+/* --- Assignee Picker (inline) --- */
+.assignee-picker {
+  position: absolute;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  padding: 8px;
+  z-index: 200;
+  min-width: 160px;
+  animation: popIn 0.15s ease-out;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.assignee-picker button {
+  display: block;
+  width: 100%;
+  text-align: right;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  font-family: var(--font);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.assignee-picker button:hover {
+  background: var(--primary-light);
+}
+
+.assignee-picker button.current {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* --- Members View --- */
+.member-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.member-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.member-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.member-name {
+  font-size: 18px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.member-stats {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.member-task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.member-task-item:last-child {
+  border-bottom: none;
+}
+
+.member-task-room {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* --- Add Task / Add Member forms --- */
+.add-form {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.add-form h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.form-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 15px;
+  direction: rtl;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+}
+
+.form-select {
+  padding: 10px 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 15px;
+  background: white;
+  direction: rtl;
+  outline: none;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.form-select:focus {
+  border-color: var(--primary);
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover { background: #3a50e6; }
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+
+.btn-success:hover { background: #00a87e; }
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* --- Guide View --- */
+.guide-section {
+  margin-bottom: 20px;
+}
+
+.guide-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.guide-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.guide-card h3 {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.guide-card.open {
+  cursor: default;
+}
+
+.guide-steps {
+  display: none;
+  margin-top: 12px;
+}
+
+.guide-card.open .guide-steps {
+  display: block;
+}
+
+.guide-steps ol {
+  padding-right: 20px;
+}
+
+.guide-steps li {
+  padding: 6px 0;
+  line-height: 1.5;
+  font-size: 14px;
+}
+
+.guide-content {
+  display: none;
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.guide-card.open .guide-content {
+  display: block;
+}
+
+.guide-content strong {
+  color: var(--primary);
+}
+
+.guide-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.guide-tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.guide-tab-btn.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* --- Members Management Section --- */
+.members-manage {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+
+.members-manage h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.member-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 8px 8px;
+}
+
+.member-chip .remove-member {
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+  font-family: var(--font);
+}
+
+.member-chip .remove-member:hover {
+  opacity: 1;
+}
+
+/* --- Empty State --- */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state .emoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  font-size: 15px;
+}
+
+/* --- Modal/Overlay --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: popIn 0.2s ease-out;
+}
+
+.modal h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: flex-start;
+}
+
+/* --- Back to top / Home --- */
+.home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: white;
+  text-decoration: none;
+  font-size: 20px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.home-link:hover { opacity: 1; }
+
+/* --- Filter bar --- */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-chip.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* --- Responsive --- */
+@media (max-width: 400px) {
+  .tab-nav button {
+    font-size: 12px;
+    padding: 10px 10px;
+  }
+  .tab-content {
+    padding: 12px;
+  }
+}
+
+/* --- Celebration animation --- */
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.celebrate {
+  animation: celebrate 0.4s ease-out;
+}
+
+/* task custom added indicator */
+.task-custom {
+  border-right: 3px solid var(--warning);
+}
