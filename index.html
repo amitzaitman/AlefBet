@@ -225,6 +225,23 @@
       background: #3451e0;
     }
 
+    /* Pesach Cleaning icon */
+    .game-card__icon--pesach {
+      background: linear-gradient(135deg, #fef3e2, #fde2c8);
+    }
+
+    .icon--pesach-emoji {
+      font-size: clamp(60px, 14dvmin, 90px);
+      position: absolute;
+    }
+
+    /* Section separator */
+    .hub-separator {
+      margin: clamp(20px, 4dvh, 36px) 0 clamp(8px, 2dvh, 16px) 0;
+      border: none;
+      border-top: 1px solid #dee2e6;
+    }
+
     /* ── Footer ── */
     .hub-footer {
       text-align: center;
@@ -291,6 +308,25 @@
           <p class="game-card__desc">הַקְשִׁיבוּ לְשֵׁם הַנִּיקּוּד וְאִמְרוּ אוֹתוֹ בְּקוֹל — תַּרְגִּילֵי הִגּוּי עִם זִיהוּי דִּיבּוּר</p>
         </div>
         <span class="game-card__play">שַׂחֵק עַכְשָׁיו ▶</span>
+      </a>
+
+    </div>
+
+    <hr class="hub-separator">
+    <h2 class="hub-subtitle">כְּלֵי עֲזָר:</h2>
+
+    <div class="games-grid">
+
+      <!-- Passover Cleaning App -->
+      <a href="apps/passover-cleaning/dist/" class="game-card">
+        <div class="game-card__icon game-card__icon--pesach">
+          <span class="icon--pesach-emoji">🧹</span>
+        </div>
+        <div class="game-card__info">
+          <h3 class="game-card__name">נִיקְיוֹן פֶּסַח</h3>
+          <p class="game-card__desc">נִיהוּל נִיקְיוֹן פֶּסַח לַבַּיִת — מְשִׁימוֹת, חֲלוּקַת עֲבוֹדָה, הַדְרָכוֹת הַכְשָׁרָה וְטִיפֵּי נִיקָּיוֹן</p>
+        </div>
+        <span class="game-card__play">פִּתְחוּ עַכְשָׁיו ▶</span>
       </a>
 
     </div>

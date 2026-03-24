@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    margin: 0;
+    font-family: 'Rubik', 'Heebo', 'Assistant', sans-serif;
+    direction: rtl;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    line-height: 1.6;
+  }
+
+  /* Better Hebrew text rendering */
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  /* Ensure proper RTL select rendering */
+  select {
+    direction: rtl;
+  }
+
+  /* Improve focus visibility for accessibility */
+  :focus-visible {
+    outline: 2px solid #c56823;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  /* Safe area for bottom nav on notch devices */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Page transition */
+  .page-enter {
+    animation: pageIn 0.25s ease-out;
+  }
+
+  /* Card hover lift */
+  .card-hover {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Smooth accordion expand/collapse */
+  .accordion-body {
+    animation: accordionOpen 0.2s ease-out;
+  }
+
+  /* Touch target minimum size */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Subtle festive shimmer on gradient headers */
+  .festive-header {
+    position: relative;
+    overflow: hidden;
+  }
+  .festive-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.06),
+      transparent
+    );
+    animation: shimmer 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+@layer utilities {
+  /* Smooth all transitions by default on interactive elements */
+  .transition-smooth {
+    transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+}
+
+/* ── Animations ── */
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes accordionOpen {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+}
