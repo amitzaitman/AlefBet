@@ -41,6 +41,8 @@ jobs:
           cp index.html _site/
           cp -r framework/dist _site/framework/dist
           cp -r games _site/games
+          mkdir -p _site/apps/passover-cleaning
+          cp -r apps/passover-cleaning/dist _site/apps/passover-cleaning/dist
 
       - uses: actions/upload-pages-artifact@v3
         with:
