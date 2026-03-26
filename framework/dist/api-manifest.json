@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-26T18:51:28.779Z",
+  "generatedAt": "2026-03-26T19:00:09.861Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -130,6 +130,13 @@
       ]
     },
     {
+      "path": "editor/audio-manager.js",
+      "description": "מנהל הקלטות — Audio Manager\nחלונית מודלית לניהול כל ההקלטות הקוליות של המשחק.\nמאורגן בקטגוריות: הוראות, משוב, סיבובים, מותאם אישית.\nעובד עם מפתחות voiceKey שרירותיים — ניתן להשתמש בכל הקלטה\nבכל נקודה בקוד המשחק דרך playVoice(gameId, voiceKey).",
+      "exports": [
+        "showAudioManager"
+      ]
+    },
+    {
       "path": "editor/editor-overlay.js",
       "description": "שכבת-על שקופה מעל game-body — מקפיאה את המשחק במצב עריכה",
       "exports": [
@@ -162,7 +169,7 @@
     },
     {
       "path": "editor/round-inspector.js",
-      "description": "בודק סיבוב — חלונית עריכת שדות הסיבוב הנוכחי\nמוצב בצד inline-end (שמאל ב-RTL)",
+      "description": "בודק סיבוב — חלונית עריכת שדות הסיבוב הנוכחי\nמוצב בצד inline-end (שמאל ב-RTL)\nהקלטות קוליות מנוהלות דרך מנהל ההקלטות (audio-manager.js)",
       "exports": [
         "createRoundInspector"
       ]

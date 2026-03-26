@@ -1,4 +1,4 @@
-class pe {
+class be {
   constructor() {
     this._handlers = {};
   }
@@ -8,14 +8,14 @@ class pe {
   }
   /** בטל הרשמה לאירוע */
   off(e, n) {
-    return this._handlers[e] ? (this._handlers[e] = this._handlers[e].filter((a) => a !== n), this) : this;
+    return this._handlers[e] ? (this._handlers[e] = this._handlers[e].filter((o) => o !== n), this) : this;
   }
   /** שלח אירוע */
   emit(e, n) {
-    return (this._handlers[e] || []).slice().forEach((a) => a(n)), this;
+    return (this._handlers[e] || []).slice().forEach((o) => o(n)), this;
   }
 }
-class fe {
+class ge {
   constructor(e) {
     this._totalRounds = e, this._currentRound = 0, this._score = 0;
   }
@@ -48,7 +48,7 @@ class fe {
     return this._currentRound >= this._totalRounds;
   }
 }
-class at {
+class dt {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
@@ -59,7 +59,7 @@ class at {
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
       ...n
-    }, this.events = new pe(), this.state = new fe(this.config.totalRounds), this._buildShell();
+    }, this.events = new be(), this.state = new ge(this.config.totalRounds), this._buildShell();
   }
   _buildShell() {
     this.container.classList.add("alefbet-game");
@@ -100,73 +100,73 @@ class at {
     return this.events.on(e, n), this;
   }
 }
-let M = null;
-function be() {
-  if (!M)
+let T = null;
+function _e() {
+  if (!T)
     try {
-      M = new (window.AudioContext || window.webkitAudioContext)();
+      T = new (window.AudioContext || window.webkitAudioContext)();
     } catch {
       return null;
     }
-  return M.state === "suspended" && M.resume(), M;
+  return T.state === "suspended" && T.resume(), T;
 }
-function T(t, e, n = "sine", a = 0.3) {
-  const o = be();
-  if (o)
+function L(t, e, n = "sine", o = 0.3) {
+  const a = _e();
+  if (a)
     try {
-      const i = o.createOscillator(), s = o.createGain();
-      i.connect(s), s.connect(o.destination), i.type = n, i.frequency.setValueAtTime(t, o.currentTime), s.gain.setValueAtTime(a, o.currentTime), s.gain.exponentialRampToValueAtTime(1e-3, o.currentTime + e), i.start(o.currentTime), i.stop(o.currentTime + e + 0.05);
+      const i = a.createOscillator(), r = a.createGain();
+      i.connect(r), r.connect(a.destination), i.type = n, i.frequency.setValueAtTime(t, a.currentTime), r.gain.setValueAtTime(o, a.currentTime), r.gain.exponentialRampToValueAtTime(1e-3, a.currentTime + e), i.start(a.currentTime), i.stop(a.currentTime + e + 0.05);
     } catch {
     }
 }
-const W = {
+const H = {
   /** צליל תשובה נכונה */
   correct() {
-    T(523.25, 0.15), setTimeout(() => T(659.25, 0.2), 120), setTimeout(() => T(783.99, 0.3), 240);
+    L(523.25, 0.15), setTimeout(() => L(659.25, 0.2), 120), setTimeout(() => L(783.99, 0.3), 240);
   },
   /** צליל עידוד עדין — נסה שוב */
   wrong() {
-    T(350, 0.15, "triangle", 0.12);
+    L(350, 0.15, "triangle", 0.12);
   },
   /** צליל עידוד - סיום מוצלח */
   cheer() {
-    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((e, n) => setTimeout(() => T(e, 0.2), n * 90));
+    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((e, n) => setTimeout(() => L(e, 0.2), n * 90));
   },
   /** קליק עדין */
   click() {
-    T(900, 0.04, "sine", 0.12);
+    L(900, 0.04, "sine", 0.12);
   }
-}, te = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api";
-let ne = !1;
+}, Q = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api";
+let Z = !1;
 const B = /* @__PURE__ */ new Map();
-function ge() {
-  var o;
-  if (typeof window > "u") return te;
+function ve() {
+  var a;
+  if (typeof window > "u") return Q;
   const t = new URLSearchParams(window.location.search).get("nakdanProxy"), e = window.ALEFBET_NAKDAN_PROXY_URL;
   if (t && window.localStorage)
     try {
       window.localStorage.setItem("alefbet.nakdanProxyUrl", t);
     } catch {
     }
-  const n = (o = window.localStorage) == null ? void 0 : o.getItem("alefbet.nakdanProxyUrl"), a = t || e || n;
-  return a || (window.location.hostname.endsWith("github.io") ? null : te);
+  const n = (a = window.localStorage) == null ? void 0 : a.getItem("alefbet.nakdanProxyUrl"), o = t || e || n;
+  return o || (window.location.hostname.endsWith("github.io") ? null : Q);
 }
-function _e(t) {
+function ye(t) {
   var n;
   let e = "";
-  for (const a of t)
-    if (a.sep)
-      e += a.str ?? "";
+  for (const o of t)
+    if (o.sep)
+      e += o.str ?? "";
     else {
-      const o = (n = a.nakdan) == null ? void 0 : n.options;
-      o != null && o.length ? e += (o[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : e += a.str ?? "";
+      const a = (n = o.nakdan) == null ? void 0 : n.options;
+      a != null && a.length ? e += (a[0].w ?? "").replace(/\|/g, "").replace(/\u05BD/g, "") : e += o.str ?? "";
     }
   return e;
 }
-async function ve(t) {
-  const e = ge();
+async function ke(t) {
+  const e = ve();
   if (!e)
-    throw ne || (ne = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
+    throw Z || (Z = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
   const n = await fetch(e, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -183,144 +183,144 @@ async function ve(t) {
     })
   });
   if (!n.ok) throw new Error(`Nakdan ${n.status}`);
-  const a = await n.json(), o = a == null ? void 0 : a.data;
-  if (!Array.isArray(o)) throw new Error("Nakdan: invalid response");
-  return _e(o);
+  const o = await n.json(), a = o == null ? void 0 : o.data;
+  if (!Array.isArray(a)) throw new Error("Nakdan: invalid response");
+  return ye(a);
 }
-async function ye(t) {
+async function we(t) {
   if (!(t != null && t.trim())) return t ?? "";
   if (B.has(t)) return B.get(t);
   try {
-    const e = await ve(t);
+    const e = await ke(t);
     return B.set(t, e), e;
   } catch {
     return B.set(t, t), t;
   }
 }
-function we(t) {
+function Ee(t) {
   return B.get(t) ?? t ?? "";
 }
-async function ot(t) {
+async function ut(t) {
   const e = [...new Set(t.filter((n) => n == null ? void 0 : n.trim()))];
-  await Promise.all(e.map((n) => ye(n)));
+  await Promise.all(e.map((n) => we(n)));
 }
-let $ = [], H = !1, de = !0, j = 0.9, ae = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, X = !1, P = null;
-function oe(t, e, n, a = e) {
-  console.warn(`[tts] ${t} TTS failed`, { text: e, sentText: a, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
-    detail: { provider: t, text: e, sentText: a, reason: n }
+let R = [], F = !1, se = !0, A = 0.9, ee = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, W = !1, $ = null;
+function te(t, e, n, o = e) {
+  console.warn(`[tts] ${t} TTS failed`, { text: e, sentText: o, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
+    detail: { provider: t, text: e, sentText: o, reason: n }
   }));
 }
-function ke(t) {
+function xe(t) {
   return (t || "").replace(/[\u0591-\u05C7]/g, "");
 }
-function xe(t) {
+function Ne(t) {
   const e = String(t || "").toLowerCase();
   return e.includes("didn't interact") || e.includes("notallowed");
 }
-function Ee() {
+function Ce() {
   var t;
-  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : X || (t = document.userActivation) != null && t.hasBeenActive ? (X = !0, Promise.resolve()) : P || (P = new Promise((e) => {
+  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : W || (t = document.userActivation) != null && t.hasBeenActive ? (W = !0, Promise.resolve()) : $ || ($ = new Promise((e) => {
     const n = () => {
-      X = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), e();
+      W = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), e();
     };
     window.addEventListener("pointerdown", n, { once: !0, capture: !0 }), window.addEventListener("keydown", n, { once: !0, capture: !0 }), window.addEventListener("touchstart", n, { once: !0, capture: !0 });
   }).finally(() => {
-    P = null;
-  }), P);
+    $ = null;
+  }), $);
 }
-function Ne(t, e, n) {
-  const o = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(t)}&tl=he&client=tw-ob`, i = new Audio(o);
-  i.playbackRate = j, i.onended = e, i.onerror = () => n("audio.onerror"), i.play().catch((s) => {
-    n((s == null ? void 0 : s.message) || "audio.play() rejected");
+function Le(t, e, n) {
+  const a = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(t)}&tl=he&client=tw-ob`, i = new Audio(a);
+  i.playbackRate = A, i.onended = e, i.onerror = () => n("audio.onerror"), i.play().catch((r) => {
+    n((r == null ? void 0 : r.message) || "audio.play() rejected");
   });
 }
-function Le(t) {
+function Se(t) {
   return new Promise((e, n) => {
-    const a = ke(t).trim() || t;
-    let o = !1, i = !1;
-    const s = () => {
-      o || (o = !0, e());
-    }, r = (l) => {
-      o || (o = !0, n(l));
-    }, c = () => {
+    const o = xe(t).trim() || t;
+    let a = !1, i = !1;
+    const r = () => {
+      a || (a = !0, e());
+    }, s = (c) => {
+      a || (a = !0, n(c));
+    }, l = () => {
       try {
-        Ne(a, s, (l) => {
-          if (!i && xe(l)) {
-            i = !0, Ee().then(() => {
-              o || c();
+        Le(o, r, (c) => {
+          if (!i && Ne(c)) {
+            i = !0, Ce().then(() => {
+              a || l();
             });
             return;
           }
-          oe("google", t, l, a), r(l);
+          te("google", t, c, o), s(c);
         });
-      } catch (l) {
-        oe("google", t, (l == null ? void 0 : l.message) || "Audio() construction failed", a), r(l == null ? void 0 : l.message);
+      } catch (c) {
+        te("google", t, (c == null ? void 0 : c.message) || "Audio() construction failed", o), s(c == null ? void 0 : c.message);
       }
     };
-    c();
+    l();
   });
 }
-let J = null;
-function Ce() {
+let z = null;
+function Re() {
   const t = speechSynthesis.getVoices();
   return t.find((e) => e.lang === "he-IL") || t.find((e) => e.lang === "iw-IL") || t.find((e) => e.lang.startsWith("he")) || null;
 }
-function ie() {
-  J = Ce();
+function ne() {
+  z = Re();
 }
-typeof speechSynthesis < "u" && (speechSynthesis.getVoices().length > 0 ? ie() : speechSynthesis.addEventListener("voiceschanged", ie, { once: !0 }));
-function Re(t) {
+typeof speechSynthesis < "u" && (speechSynthesis.getVoices().length > 0 ? ne() : speechSynthesis.addEventListener("voiceschanged", ne, { once: !0 }));
+function Ae(t) {
   return new Promise((e) => {
     if (typeof speechSynthesis > "u") {
       e();
       return;
     }
     const n = new SpeechSynthesisUtterance(t);
-    n.lang = "he-IL", n.rate = j, J && (n.voice = J), n.onend = e, n.onerror = e, speechSynthesis.speak(n);
+    n.lang = "he-IL", n.rate = A, z && (n.voice = z), n.onend = e, n.onerror = e, speechSynthesis.speak(n);
   });
 }
-async function Se(t) {
-  if (de)
+async function Te(t) {
+  if (se)
     try {
-      await Le(t);
+      await Se(t);
       return;
     } catch {
       console.info("[tts] Falling back to browser Speech API");
     }
-  await Re(t);
+  await Ae(t);
 }
-function Y() {
-  if (H || $.length === 0) return;
-  const t = $.shift();
-  H = !0, Se(t.text).then(() => {
-    H = !1, t.resolve(), Y();
+function V() {
+  if (F || R.length === 0) return;
+  const t = R.shift();
+  F = !0, Te(t.text).then(() => {
+    F = !1, t.resolve(), V();
   });
 }
-const Te = {
+const $e = {
   /**
    * הקרא טקסט עברי
    * משתמש ב-Google Translate TTS לאיכות טובה יותר
    */
   speak(t) {
-    const e = we(t);
+    const e = Ee(t);
     return new Promise((n) => {
-      $.push({ text: e, resolve: n }), Y();
+      R.push({ text: e, resolve: n }), V();
     });
   },
   /** עצור את הדיבור הנוכחי */
   cancel() {
-    $.forEach((t) => t.resolve()), $ = [], H = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
+    R.forEach((t) => t.resolve()), R = [], F = !1, typeof speechSynthesis < "u" && speechSynthesis.cancel();
   },
   get available() {
     return !0;
   },
   /** הגדר מהירות דיבור (0.5–2.0) */
   setRate(t) {
-    j = Math.max(0.5, Math.min(2, t));
+    A = Math.max(0.5, Math.min(2, t));
   },
   /** השתמש ב-Google Translate TTS (ברירת מחדל) או בדפדפן */
   useGoogle(t = !0) {
-    de = t;
+    se = t;
   },
   /**
    * הגדר מהירות דיבור להדגשת ניקוד
@@ -328,7 +328,7 @@ const Te = {
    *   rate: מהירות דיבור להדגשה (ברירת מחדל 0.5)
    */
   setNikudEmphasis({ rate: t } = {}) {
-    t != null && (ae = Math.max(0.3, Math.min(1.5, t)));
+    t != null && (ee = Math.max(0.3, Math.min(1.5, t)));
   },
   /**
    * הקרא אות עם ניקוד באיטיות להדגשת התנועה
@@ -336,14 +336,14 @@ const Te = {
    * @param {string} nikudSymbol - סמל הניקוד (למשל '\u05B7')
    */
   speakNikud(t, e) {
-    const n = t + e, a = j;
-    return j = ae, new Promise((o) => {
-      $.push({ text: n, resolve: o }), Y();
+    const n = t + e, o = A;
+    return A = ee, new Promise((a) => {
+      R.push({ text: n, resolve: a }), V();
     }).finally(() => {
-      j = a;
+      A = o;
     });
   }
-}, re = {
+}, ae = {
   shake: [
     { transform: "translateX(0)" },
     { transform: "translateX(-8px)" },
@@ -374,58 +374,58 @@ const Te = {
     { transform: "scale(1.3) rotate(180deg)", opacity: "1" },
     { transform: "scale(1) rotate(360deg)", opacity: "1" }
   ]
-}, Ae = {
+}, Me = {
   shake: 420,
   bounce: 480,
   pulse: 600,
   fadeIn: 320,
   confetti: 700
 };
-function U(t, e) {
-  !t || !re[e] || t.animate(re[e], {
-    duration: Ae[e] || 400,
+function P(t, e) {
+  !t || !ae[e] || t.animate(ae[e], {
+    duration: Me[e] || 400,
     easing: "ease-in-out",
     fill: "none"
   });
 }
-function $e(t, e, n, a) {
-  W.cheer();
-  const o = e / n, i = o >= 0.8 ? 3 : o >= 0.5 ? 2 : 1, s = "⭐".repeat(i) + "☆".repeat(3 - i), r = document.createElement("div");
-  r.className = "completion-screen", r.innerHTML = `
+function Be(t, e, n, o) {
+  H.cheer();
+  const a = e / n, i = a >= 0.8 ? 3 : a >= 0.5 ? 2 : 1, r = "⭐".repeat(i) + "☆".repeat(3 - i), s = document.createElement("div");
+  s.className = "completion-screen", s.innerHTML = `
     <div class="completion-screen__content">
-      <div class="completion-screen__stars" aria-label="${i} כּוֹכָבִים">${s}</div>
+      <div class="completion-screen__stars" aria-label="${i} כּוֹכָבִים">${r}</div>
       <h2 class="completion-screen__title">!כָּל הַכָּבוֹד</h2>
       <p class="completion-screen__score">נִיקּוּד: ${e} מִתּוֹךְ ${n}</p>
       <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
     </div>
-  `, r.querySelector(".completion-screen__replay").addEventListener("click", () => {
-    r.remove(), a();
-  }), t.innerHTML = "", t.appendChild(r), U(r.querySelector(".completion-screen__content"), "fadeIn");
+  `, s.querySelector(".completion-screen__replay").addEventListener("click", () => {
+    s.remove(), o();
+  }), t.innerHTML = "", t.appendChild(s), P(s.querySelector(".completion-screen__content"), "fadeIn");
 }
-function it(t, e, {
+function mt(t, e, {
   totalRounds: n,
-  progressBar: a = null,
-  buildRoundUI: o,
+  progressBar: o = null,
+  buildRoundUI: a,
   onCorrect: i,
-  onWrong: s
+  onWrong: r
 } = {}) {
-  let r = !1;
-  async function c(_) {
-    if (r) return;
-    r = !0, W.correct(), _ && await _(), i && await i(), t.state.addScore(1), a == null || a.update(t.state.currentRound), await new Promise((f) => setTimeout(f, 1200)), t.state.nextRound() ? (r = !1, o()) : $e(e, t.state.score, n, () => {
+  let s = !1;
+  async function l(h) {
+    if (s) return;
+    s = !0, H.correct(), h && await h(), i && await i(), t.state.addScore(1), o == null || o.update(t.state.currentRound), await new Promise((g) => setTimeout(g, 1200)), t.state.nextRound() ? (s = !1, a()) : Be(e, t.state.score, n, () => {
       location.reload();
     });
   }
-  async function l() {
-    r || (r = !0, s && await s(), r = !1);
+  async function c() {
+    s || (s = !0, r && await r(), s = !1);
   }
-  function u() {
-    return r;
+  function m() {
+    return s;
   }
-  function h() {
-    r = !1;
+  function d() {
+    s = !1;
   }
-  return { handleCorrect: c, handleWrong: l, isAnswered: u, reset: h };
+  return { handleCorrect: l, handleWrong: c, isAnswered: m, reset: d };
 }
 const je = {
   kamatz: "ah",
@@ -442,36 +442,36 @@ const je = {
   oh: [/[או]/, /^[או]$/, /או/, /הו/],
   oo: [/[או]/, /^[או]$/, /או/, /הו/, /אוּ/]
 };
-function rt() {
+function pt() {
   const t = typeof window < "u" ? window.SpeechRecognition || window.webkitSpeechRecognition : null, e = !!t;
   let n = null;
   return {
     available: e,
-    listen(a = 4e3) {
-      return e ? new Promise((o) => {
+    listen(o = 4e3) {
+      return e ? new Promise((a) => {
         n = new t(), n.lang = "he-IL", n.continuous = !1, n.interimResults = !1, n.maxAlternatives = 3;
         let i = !1;
-        const s = (c, l) => {
-          i || (i = !0, n = null, o({ text: c.trim(), confidence: l }));
+        const r = (l, c) => {
+          i || (i = !0, n = null, a({ text: l.trim(), confidence: c }));
         };
-        n.onresult = (c) => {
-          const l = c.results[0];
-          l ? s(l[0].transcript, l[0].confidence) : s("", 0);
-        }, n.onerror = () => s("", 0), n.onnomatch = () => s("", 0);
-        const r = setTimeout(() => {
+        n.onresult = (l) => {
+          const c = l.results[0];
+          c ? r(c[0].transcript, c[0].confidence) : r("", 0);
+        }, n.onerror = () => r("", 0), n.onnomatch = () => r("", 0);
+        const s = setTimeout(() => {
           try {
             n == null || n.stop();
           } catch {
           }
-          s("", 0);
-        }, a);
+          r("", 0);
+        }, o);
         n.onend = () => {
-          clearTimeout(r), s("", 0);
+          clearTimeout(s), r("", 0);
         };
         try {
           n.start();
         } catch {
-          s("", 0);
+          r("", 0);
         }
       }) : Promise.resolve({ text: "", confidence: 0 });
     },
@@ -484,16 +484,16 @@ function rt() {
     }
   };
 }
-function st(t, e) {
+function ht(t, e) {
   if (!t || !e) return !1;
   const n = je[e];
   if (!n) return !1;
-  const a = Fe[n];
-  if (!a) return !1;
-  const o = t.replace(/[\s.,!?]/g, "");
-  return o.length ? a.some((i) => i.test(o)) : !1;
+  const o = Fe[n];
+  if (!o) return !1;
+  const a = t.replace(/[\s.,!?]/g, "");
+  return a.length ? o.some((i) => i.test(a)) : !1;
 }
-const O = [
+const I = [
   { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
   { letter: "ב", name: "בַּיִת", nameNikud: "בֵּית", sound: "b", exampleWord: "בַּיִת", emoji: "🏠", isFinal: !1 },
   { letter: "ג", name: "גִּימֶל", nameNikud: "גִּימֶל", sound: "g", exampleWord: "גָּמָל", emoji: "🐪", isFinal: !1 },
@@ -522,14 +522,14 @@ const O = [
   { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
   { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
 ];
-function lt(t) {
-  return O.find((e) => e.letter === t) || null;
+function ft(t) {
+  return I.find((e) => e.letter === t) || null;
 }
-function Me(t = "regular") {
-  return t === "regular" ? O.filter((e) => !e.isFinal) : t === "final" ? O.filter((e) => e.isFinal) : O;
+function Pe(t = "regular") {
+  return t === "regular" ? I.filter((e) => !e.isFinal) : t === "final" ? I.filter((e) => e.isFinal) : I;
 }
-function ct(t, e = "regular") {
-  const n = Me(e);
+function bt(t, e = "regular") {
+  const n = Pe(e);
   return [...n].sort(() => Math.random() - 0.5).slice(0, Math.min(t, n.length));
 }
 const q = [
@@ -540,25 +540,25 @@ const q = [
   { id: "segol", name: "סָגֹול", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶ", color: "#9B59B6", textColor: "#fff" },
   { id: "holam", name: "חוֹלֵם", nameNikud: "חוֹלָם", symbol: "ֹ", sound: "אֹ", color: "#2ECC71", textColor: "#fff" },
   { id: "kubbutz", name: "קֻובּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אֻ", color: "#F39C12", textColor: "#fff" }
-], dt = ["א", "ב", "ג", "ד", "מ", "נ", "ל", "ר", "ש", "ת", "פ", "ק"];
-function ut(t, e) {
+], gt = ["א", "ב", "ג", "ד", "מ", "נ", "ל", "ר", "ש", "ת", "פ", "ק"];
+function _t(t, e) {
   return t + e;
 }
-function mt(t) {
+function vt(t) {
   let e = [...q];
   if (typeof window < "u" && window.location && window.location.search) {
-    const a = new URLSearchParams(window.location.search), o = a.get("allowedNikud");
-    if (o) {
-      const s = o.split(",").map((r) => r.trim());
+    const o = new URLSearchParams(window.location.search), a = o.get("allowedNikud");
+    if (a) {
+      const r = a.split(",").map((s) => s.trim());
       e = e.filter(
-        (r) => s.includes(r.id) || s.includes(r.name) || s.includes(r.nameNikud)
+        (s) => r.includes(s.id) || r.includes(s.name) || r.includes(s.nameNikud)
       );
     }
-    const i = a.get("excludedNikud");
+    const i = o.get("excludedNikud");
     if (i) {
-      const s = i.split(",").map((r) => r.trim());
+      const r = i.split(",").map((s) => s.trim());
       e = e.filter(
-        (r) => !s.includes(r.id) && !s.includes(r.name) && !s.includes(r.nameNikud)
+        (s) => !r.includes(s.id) && !r.includes(s.name) && !r.includes(s.nameNikud)
       );
     }
   }
@@ -568,35 +568,35 @@ function mt(t) {
     n.push(...e);
   return n.sort(() => Math.random() - 0.5).slice(0, t);
 }
-function ht(t, e, n) {
+function yt(t, e, n) {
   t.innerHTML = "";
-  const a = document.createElement("div");
-  a.className = "option-cards-grid";
-  const o = e.map((i) => {
-    const s = document.createElement("button");
-    return s.className = "option-card", s.dataset.id = i.id, s.innerHTML = `
+  const o = document.createElement("div");
+  o.className = "option-cards-grid";
+  const a = e.map((i) => {
+    const r = document.createElement("button");
+    return r.className = "option-card", r.dataset.id = i.id, r.innerHTML = `
       <span class="option-card__emoji">${i.emoji || ""}</span>
       <span class="option-card__text">${i.text}</span>
-    `, s.addEventListener("click", () => {
-      s.disabled || n(i);
-    }), a.appendChild(s), { el: s, option: i };
+    `, r.addEventListener("click", () => {
+      r.disabled || n(i);
+    }), o.appendChild(r), { el: r, option: i };
   });
-  return t.appendChild(a), {
+  return t.appendChild(o), {
     /** הַדָּגֵשׁ כַּרְטִיס לְפִי סוּג: 'correct' | 'wrong' | 'hint' */
-    highlight(i, s) {
-      o.forEach(({ el: r, option: c }) => {
-        c.id === i && r.classList.add(`option-card--${s}`);
+    highlight(i, r) {
+      a.forEach(({ el: s, option: l }) => {
+        l.id === i && s.classList.add(`option-card--${r}`);
       });
     },
     /** נטרל את כל הכרטיסים */
     disable() {
-      o.forEach(({ el: i }) => {
+      a.forEach(({ el: i }) => {
         i.disabled = !0;
       });
     },
     /** אפס את מצב הכרטיסים */
     reset() {
-      o.forEach(({ el: i }) => {
+      a.forEach(({ el: i }) => {
         i.className = "option-card", i.disabled = !1;
       });
     },
@@ -606,7 +606,7 @@ function ht(t, e, n) {
     }
   };
 }
-function pt(t, e) {
+function kt(t, e) {
   const n = document.createElement("div");
   n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(e)), n.innerHTML = `
     <div class="progress-bar__track">
@@ -614,12 +614,12 @@ function pt(t, e) {
     </div>
     <span class="progress-bar__label">0 / ${e}</span>
   `, t.appendChild(n);
-  const a = n.querySelector(".progress-bar__fill"), o = n.querySelector(".progress-bar__label");
+  const o = n.querySelector(".progress-bar__fill"), a = n.querySelector(".progress-bar__label");
   return {
     /** עדכן את ההתקדמות */
     update(i) {
-      const s = Math.round(i / e * 100);
-      a.style.width = `${s}%`, o.textContent = `${i} / ${e}`, n.setAttribute("aria-valuenow", String(i));
+      const r = Math.round(i / e * 100);
+      o.style.width = `${r}%`, a.textContent = `${i} / ${e}`, n.setAttribute("aria-valuenow", String(i));
     },
     /** הסר את הרכיב */
     destroy() {
@@ -627,27 +627,27 @@ function pt(t, e) {
     }
   };
 }
-function ft(t) {
+function wt(t) {
   const e = document.createElement("div");
   e.className = "feedback-message", e.setAttribute("aria-live", "polite"), e.setAttribute("role", "status"), t.appendChild(e);
   let n = null;
-  function a(o, i, s = 1800) {
-    clearTimeout(n), e.textContent = o, e.className = `feedback-message feedback-message--${i}`, n = setTimeout(() => {
+  function o(a, i, r = 1800) {
+    clearTimeout(n), e.textContent = a, e.className = `feedback-message feedback-message--${i}`, n = setTimeout(() => {
       e.textContent = "", e.className = "feedback-message";
-    }, s);
+    }, r);
   }
   return {
     /** הצג משוב חיובי */
-    correct(o = "!כָּל הַכָּבוֹד") {
-      W.correct(), a(o, "correct"), U(e, "bounce");
+    correct(a = "!כָּל הַכָּבוֹד") {
+      H.correct(), o(a, "correct"), P(e, "bounce");
     },
     /** הצג עידוד — נסה שוב */
-    wrong(o = "נַסֵּה שׁוּב") {
-      W.wrong(), a(o, "wrong"), U(e, "pulse");
+    wrong(a = "נַסֵּה שׁוּב") {
+      H.wrong(), o(a, "wrong"), P(e, "pulse");
     },
     /** הצג רמז */
-    hint(o) {
-      a(o, "hint"), U(e, "pulse");
+    hint(a) {
+      o(a, "hint"), P(e, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -655,7 +655,7 @@ function ft(t) {
     }
   };
 }
-function bt(t, e) {
+function Et(t, e) {
   let n = document.getElementById("nikud-settings");
   n || (n = document.createElement("div"), n.id = "nikud-settings", Object.assign(n.style, {
     position: "fixed",
@@ -669,27 +669,27 @@ function bt(t, e) {
     justifyContent: "center",
     alignItems: "center"
   }), document.body.appendChild(n));
-  const a = new URLSearchParams(window.location.search), o = a.get("allowedNikud") ? a.get("allowedNikud").split(",") : [];
+  const o = new URLSearchParams(window.location.search), a = o.get("allowedNikud") ? o.get("allowedNikud").split(",") : [];
   let i = `
     <div style="background:white; padding:1.5rem; border-radius:1rem; min-width:300px; text-align:center; color:#333; font-family:Heebo,Arial; direction:rtl;">
       <h2 style="margin-top:0">בחר ניקוד</h2>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:1rem 0; text-align:right;">
   `;
-  q.forEach((l) => {
-    const u = o.length === 0 || o.includes(l.id) || o.includes(l.name);
+  q.forEach((c) => {
+    const m = a.length === 0 || a.includes(c.id) || a.includes(c.name);
     i += `
       <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-        <input type="checkbox" value="${l.id}" class="nikud-filter-cb" ${u ? "checked" : ""} style="width:1.2rem;height:1.2rem;">
-        <span>${l.nameNikud}</span>
+        <input type="checkbox" value="${c.id}" class="nikud-filter-cb" ${m ? "checked" : ""} style="width:1.2rem;height:1.2rem;">
+        <span>${c.nameNikud}</span>
       </label>
     `;
   });
-  const s = parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5;
+  const r = parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5;
   i += `
       </div>
       <div style="margin:1rem 0; text-align:right;">
-        <label style="font-weight:700; font-size:0.95rem;">מהירות הגייה: <span id="nikud-rate-val">${s}</span></label>
-        <input type="range" id="nikud-rate-slider" min="0.3" max="1.5" step="0.1" value="${s}" style="width:100%; margin-top:0.3rem; accent-color:#4f67ff;">
+        <label style="font-weight:700; font-size:0.95rem;">מהירות הגייה: <span id="nikud-rate-val">${r}</span></label>
+        <input type="range" id="nikud-rate-slider" min="0.3" max="1.5" step="0.1" value="${r}" style="width:100%; margin-top:0.3rem; accent-color:#4f67ff;">
         <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888;">
           <span>אִטִּי</span>
           <span>מָהִיר</span>
@@ -699,19 +699,19 @@ function bt(t, e) {
       <button id="close-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#ddd; color:#333; border:none; font-size:1.1rem; cursor:pointer; margin-right:0.5rem;">ביטול</button>
     </div>
   `, n.innerHTML = i, n.style.display = "flex";
-  const r = document.getElementById("nikud-rate-slider"), c = document.getElementById("nikud-rate-val");
-  r.oninput = () => {
-    c.textContent = r.value;
+  const s = document.getElementById("nikud-rate-slider"), l = document.getElementById("nikud-rate-val");
+  s.oninput = () => {
+    l.textContent = s.value;
   }, document.getElementById("save-settings-btn").onclick = () => {
-    const l = parseFloat(r.value);
-    localStorage.setItem("alefbet.nikudRate", l), Te.setNikudEmphasis({ rate: l });
-    const u = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((_) => _.checked).map((_) => _.value), h = new URL(window.location);
-    u.length > 0 && u.length < q.length ? h.searchParams.set("allowedNikud", u.join(",")) : h.searchParams.delete("allowedNikud"), h.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", h), e && e(t);
+    const c = parseFloat(s.value);
+    localStorage.setItem("alefbet.nikudRate", c), $e.setNikudEmphasis({ rate: c });
+    const m = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((h) => h.checked).map((h) => h.value), d = new URL(window.location);
+    m.length > 0 && m.length < q.length ? d.searchParams.set("allowedNikud", m.join(",")) : d.searchParams.delete("allowedNikud"), d.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", d), e && e(t);
   }, document.getElementById("close-settings-btn").onclick = () => {
     n.style.display = "none";
   };
 }
-function gt(t) {
+function xt(t) {
   const e = document.createElement("div");
   e.className = "ab-zone", e.style.setProperty("--zone-color", t.color || "#4f67ff"), e.innerHTML = `
     <div class="ab-zone__symbol">${t.symbol || ""}</div>
@@ -722,8 +722,8 @@ function gt(t) {
   };
   return e.addEventListener("click", n), {
     el: e,
-    highlight(a) {
-      e.classList.remove("ab-zone--correct", "ab-zone--hover"), a && e.classList.add(`ab-zone--${a}`);
+    highlight(o) {
+      e.classList.remove("ab-zone--correct", "ab-zone--hover"), o && e.classList.add(`ab-zone--${o}`);
     },
     reset() {
       e.classList.remove("ab-zone--correct", "ab-zone--hover");
@@ -733,40 +733,40 @@ function gt(t) {
     }
   };
 }
-function _t(t, e = "טוֹעֵן...") {
+function Nt(t, e = "טוֹעֵן...") {
   t.innerHTML = `<div class="ab-loading">${e}</div>`;
 }
-function vt(t) {
+function Ct(t) {
   t.innerHTML = "";
 }
-function yt(t, e, n, a) {
-  const o = t.querySelector(".game-header__spacer");
-  if (!o) return null;
+function Lt(t, e, n, o) {
+  const a = t.querySelector(".game-header__spacer");
+  if (!a) return null;
   const i = document.createElement("button");
-  return i.className = "ab-header-btn", i.setAttribute("aria-label", n), i.textContent = e, i.onclick = a, o.innerHTML = "", o.appendChild(i), i;
+  return i.className = "ab-header-btn", i.setAttribute("aria-label", n), i.textContent = e, i.onclick = o, a.innerHTML = "", a.appendChild(i), i;
 }
-function wt(t, { size: e = "md" } = {}) {
+function St(t, { size: e = "md" } = {}) {
   const n = document.createElement("div");
   n.className = `ab-nikud-box ab-nikud-box--${e} ab-nikud-box--${t.id}`;
-  const a = document.createElement("div");
-  a.className = "ab-nikud-box__box";
   const o = document.createElement("div");
-  return o.className = "ab-nikud-box__mark", o.textContent = t.symbol, n.appendChild(a), n.appendChild(o), n;
+  o.className = "ab-nikud-box__box";
+  const a = document.createElement("div");
+  return a.className = "ab-nikud-box__mark", a.textContent = t.symbol, n.appendChild(o), n.appendChild(a), n;
 }
-let A = null, w = null, K = 0, Q = 0;
-const z = /* @__PURE__ */ new Map();
-function se(t, e) {
+let S = null, k = null, G = 0, X = 0;
+const D = /* @__PURE__ */ new Map();
+function oe(t, e) {
   var n;
   return ((n = document.elementFromPoint(t, e)) == null ? void 0 : n.closest('[data-drop-target="true"]')) || null;
 }
-function Pe(t, e, n) {
-  const a = t.getBoundingClientRect();
-  K = a.width / 2, Q = a.height / 2, w = t.cloneNode(!0), Object.assign(w.style, {
+function Ie(t, e, n) {
+  const o = t.getBoundingClientRect();
+  G = o.width / 2, X = o.height / 2, k = t.cloneNode(!0), Object.assign(k.style, {
     position: "fixed",
-    left: `${e - K}px`,
-    top: `${n - Q}px`,
-    width: `${a.width}px`,
-    height: `${a.height}px`,
+    left: `${e - G}px`,
+    top: `${n - X}px`,
+    width: `${o.width}px`,
+    height: `${o.height}px`,
     pointerEvents: "none",
     // keeps it out of elementFromPoint + hit-testing
     zIndex: "9999",
@@ -774,136 +774,136 @@ function Pe(t, e, n) {
     transform: "scale(1.12)",
     cursor: "grabbing",
     margin: "0"
-  }), document.body.appendChild(w);
+  }), document.body.appendChild(k);
 }
-function Ie(t, e) {
-  w && (w.style.left = `${t - K}px`, w.style.top = `${e - Q}px`);
+function He(t, e) {
+  k && (k.style.left = `${t - G}px`, k.style.top = `${e - X}px`);
 }
-function Be() {
-  w == null || w.remove(), w = null;
+function qe() {
+  k == null || k.remove(), k = null;
 }
-let k = null;
+let w = null;
 function De(t) {
-  k !== t && (k == null || k.classList.remove("drop-target--hover"), k = t, t == null || t.classList.add("drop-target--hover"));
+  w !== t && (w == null || w.classList.remove("drop-target--hover"), w = t, t == null || t.classList.add("drop-target--hover"));
 }
-function He() {
-  k == null || k.classList.remove("drop-target--hover"), k = null;
+function Ue() {
+  w == null || w.classList.remove("drop-target--hover"), w = null;
 }
-function kt(t, e) {
+function Rt(t, e) {
   t.classList.add("drag-source");
-  let n = null, a = null, o = null;
+  let n = null, o = null, a = null;
   function i() {
-    n && (t.removeEventListener("pointermove", n), t.removeEventListener("pointerup", a), t.removeEventListener("pointercancel", o), n = a = o = null), He(), Be(), t.classList.remove("drag-source--dragging"), A = null;
+    n && (t.removeEventListener("pointermove", n), t.removeEventListener("pointerup", o), t.removeEventListener("pointercancel", a), n = o = a = null), Ue(), qe(), t.classList.remove("drag-source--dragging"), S = null;
   }
-  function s(r) {
-    r.button !== void 0 && r.button !== 0 || (r.preventDefault(), A && i(), A = { el: t, data: e }, t.classList.add("drag-source--dragging"), Pe(t, r.clientX, r.clientY), t.setPointerCapture(r.pointerId), n = (c) => {
-      Ie(c.clientX, c.clientY), De(se(c.clientX, c.clientY));
-    }, a = (c) => {
-      const l = se(c.clientX, c.clientY);
-      i(), l && z.has(l) && z.get(l).onDrop({ data: e, sourceEl: t, targetEl: l });
-    }, o = () => i(), t.addEventListener("pointermove", n), t.addEventListener("pointerup", a), t.addEventListener("pointercancel", o));
+  function r(s) {
+    s.button !== void 0 && s.button !== 0 || (s.preventDefault(), S && i(), S = { el: t, data: e }, t.classList.add("drag-source--dragging"), Ie(t, s.clientX, s.clientY), t.setPointerCapture(s.pointerId), n = (l) => {
+      He(l.clientX, l.clientY), De(oe(l.clientX, l.clientY));
+    }, o = (l) => {
+      const c = oe(l.clientX, l.clientY);
+      i(), c && D.has(c) && D.get(c).onDrop({ data: e, sourceEl: t, targetEl: c });
+    }, a = () => i(), t.addEventListener("pointermove", n), t.addEventListener("pointerup", o), t.addEventListener("pointercancel", a));
   }
-  return t.addEventListener("pointerdown", s), {
+  return t.addEventListener("pointerdown", r), {
     destroy() {
-      t.removeEventListener("pointerdown", s), (A == null ? void 0 : A.el) === t && i(), t.classList.remove("drag-source");
+      t.removeEventListener("pointerdown", r), (S == null ? void 0 : S.el) === t && i(), t.classList.remove("drag-source");
     }
   };
 }
-function xt(t, e) {
-  return t.setAttribute("data-drop-target", "true"), t.classList.add("drop-target--active"), z.set(t, { onDrop: e }), {
+function At(t, e) {
+  return t.setAttribute("data-drop-target", "true"), t.classList.add("drop-target--active"), D.set(t, { onDrop: e }), {
     destroy() {
-      t.removeAttribute("data-drop-target"), t.classList.remove("drop-target--active", "drop-target--hover"), z.delete(t);
+      t.removeAttribute("data-drop-target"), t.classList.remove("drop-target--active", "drop-target--hover"), D.delete(t);
     }
   };
 }
-function Ue(t, e) {
+function le(t, e) {
   const n = [];
-  function a() {
+  function o() {
     try {
-      const r = localStorage.getItem(t);
-      return r === null ? e : JSON.parse(r);
+      const s = localStorage.getItem(t);
+      return s === null ? e : JSON.parse(s);
     } catch {
       return e;
     }
   }
-  function o(r) {
+  function a(s) {
     try {
-      localStorage.setItem(t, JSON.stringify(r));
-    } catch (c) {
-      console.warn(`[createLocalState] שגיאה בשמירת "${t}":`, c);
+      localStorage.setItem(t, JSON.stringify(s));
+    } catch (l) {
+      console.warn(`[createLocalState] שגיאה בשמירת "${t}":`, l);
     }
-    n.forEach((c) => c(r));
+    n.forEach((l) => l(s));
   }
-  function i(r) {
-    o(r(a()));
+  function i(s) {
+    a(s(o()));
   }
-  function s(r) {
-    return n.push(r), function() {
-      const l = n.indexOf(r);
-      l !== -1 && n.splice(l, 1);
+  function r(s) {
+    return n.push(s), function() {
+      const c = n.indexOf(s);
+      c !== -1 && n.splice(c, 1);
     };
   }
-  return { get: a, set: o, update: i, subscribe: s };
+  return { get: o, set: a, update: i, subscribe: r };
 }
-function Et(t, e = {}) {
+function Tt(t, e = {}) {
   const {
     title: n = "",
-    subtitle: a = "",
-    tabs: o = [],
+    subtitle: o = "",
+    tabs: a = [],
     homeUrl: i = null,
-    onTabChange: s = null
+    onTabChange: r = null
   } = e;
   t.classList.add("ab-app");
-  const r = i ? `<a href="${i}" class="ab-app-back-link" aria-label="דף הבית">🏠</a>` : "", c = a ? `<span class="ab-app-subtitle">${a}</span>` : '<span class="ab-app-subtitle"></span>', l = o.map(
-    (d) => `<button class="ab-app-tab" data-tab="${d.id}" aria-selected="false" role="tab"><span class="ab-app-tab-icon">${d.icon}</span><span class="ab-app-tab-label">${d.label}</span></button>`
-  ).join(""), u = o.map(
-    (d) => `<button class="ab-app-nav-item" data-tab="${d.id}" aria-selected="false" role="tab"><span class="ab-app-nav-icon">${d.icon}</span><span class="ab-app-nav-label">${d.label}</span></button>`
+  const s = i ? `<a href="${i}" class="ab-app-back-link" aria-label="דף הבית">🏠</a>` : "", l = o ? `<span class="ab-app-subtitle">${o}</span>` : '<span class="ab-app-subtitle"></span>', c = a.map(
+    (u) => `<button class="ab-app-tab" data-tab="${u.id}" aria-selected="false" role="tab"><span class="ab-app-tab-icon">${u.icon}</span><span class="ab-app-tab-label">${u.label}</span></button>`
+  ).join(""), m = a.map(
+    (u) => `<button class="ab-app-nav-item" data-tab="${u.id}" aria-selected="false" role="tab"><span class="ab-app-nav-icon">${u.icon}</span><span class="ab-app-nav-label">${u.label}</span></button>`
   ).join("");
   t.innerHTML = `
     <header class="ab-app-header">
       <div class="ab-app-header-text">
         <h1 class="ab-app-title">${n}</h1>
-        ${c}
+        ${l}
       </div>
-      ${r}
+      ${s}
     </header>
     <nav class="ab-app-tabs" role="tablist" aria-label="ניווט ראשי">
-      ${l}
+      ${c}
     </nav>
     <main class="ab-app-content"></main>
     <nav class="ab-app-bottom-nav" role="tablist" aria-label="ניווט תחתון">
-      ${u}
+      ${m}
     </nav>
   `;
-  const h = t.querySelector(".ab-app-subtitle"), _ = t.querySelector(".ab-app-content");
-  function b(d) {
-    f(d), typeof s == "function" && s(d);
+  const d = t.querySelector(".ab-app-subtitle"), h = t.querySelector(".ab-app-content");
+  function p(u) {
+    g(u), typeof r == "function" && r(u);
   }
-  t.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((d) => {
-    d.addEventListener("click", () => b(d.dataset.tab));
+  t.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((u) => {
+    u.addEventListener("click", () => p(u.dataset.tab));
   });
-  function f(d) {
-    t.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((v) => {
-      const p = v.dataset.tab === d;
-      v.classList.toggle("ab-active", p), v.setAttribute("aria-selected", p ? "true" : "false");
+  function g(u) {
+    t.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((_) => {
+      const f = _.dataset.tab === u;
+      _.classList.toggle("ab-active", f), _.setAttribute("aria-selected", f ? "true" : "false");
     });
   }
-  return o.length > 0 && f(o[0].id), {
+  return a.length > 0 && g(a[0].id), {
     /** אלמנט תוכן הראשי — כאן מרנדרים את תוכן הטאב הנוכחי */
-    contentEl: _,
+    contentEl: h,
     /**
      * עדכן את כותרת המשנה
      * @param {string} text - הטקסט החדש לכותרת המשנה
      */
-    setSubtitle(d) {
-      h.textContent = d;
+    setSubtitle(u) {
+      d.textContent = u;
     },
     /**
      * הגדר את הטאב הפעיל באופן תכנותי
      * @param {string} tabId - מזהה הטאב להפעלה
      */
-    setActiveTab(d) {
-      f(d);
+    setActiveTab(u) {
+      g(u);
     }
   };
 }
@@ -914,230 +914,230 @@ function We() {
   var t;
   return typeof navigator < "u" && typeof ((t = navigator.mediaDevices) == null ? void 0 : t.getUserMedia) == "function" && typeof MediaRecorder < "u";
 }
-function qe() {
+function ze() {
   let t = null, e = null, n = [];
-  async function a() {
+  async function o() {
     if (t && t.state === "recording") return;
     e = await navigator.mediaDevices.getUserMedia({ audio: !0, video: !1 }), n = [];
-    const c = {}, l = Oe();
-    l && (c.mimeType = l), t = new MediaRecorder(e, c), t.ondataavailable = (u) => {
-      var h;
-      ((h = u.data) == null ? void 0 : h.size) > 0 && n.push(u.data);
+    const l = {}, c = Oe();
+    c && (l.mimeType = c), t = new MediaRecorder(e, l), t.ondataavailable = (m) => {
+      var d;
+      ((d = m.data) == null ? void 0 : d.size) > 0 && n.push(m.data);
     }, t.start(100);
   }
-  function o() {
-    return new Promise((c, l) => {
+  function a() {
+    return new Promise((l, c) => {
       if (!t || t.state === "inactive") {
-        l(new Error("[voice-recorder] not recording"));
+        c(new Error("[voice-recorder] not recording"));
         return;
       }
       t.onstop = () => {
-        const u = new Blob(n, { type: t.mimeType || "audio/webm" });
-        s(), c(u);
-      }, t.onerror = (u) => {
-        s(), l(u.error);
+        const m = new Blob(n, { type: t.mimeType || "audio/webm" });
+        r(), l(m);
+      }, t.onerror = (m) => {
+        r(), c(m.error);
       }, t.stop();
     });
   }
   function i() {
-    t && t.state !== "inactive" && (t.ondataavailable = null, t.onstop = null, t.stop()), s();
-  }
-  function s() {
-    e == null || e.getTracks().forEach((c) => c.stop()), e = null, t = null, n = [];
+    t && t.state !== "inactive" && (t.ondataavailable = null, t.onstop = null, t.stop()), r();
   }
   function r() {
+    e == null || e.getTracks().forEach((l) => l.stop()), e = null, t = null, n = [];
+  }
+  function s() {
     return (t == null ? void 0 : t.state) === "recording";
   }
-  return { start: a, stop: o, cancel: i, isActive: r };
+  return { start: o, stop: a, cancel: i, isActive: s };
 }
-const ze = "alefbet-voices", x = "recordings", Ve = 1;
-let I = null;
-function G() {
-  return I || (I = new Promise((t, e) => {
-    const n = indexedDB.open(ze, Ve);
-    n.onupgradeneeded = (a) => {
-      a.target.result.createObjectStore(x);
-    }, n.onsuccess = (a) => t(a.target.result), n.onerror = (a) => {
-      I = null, e(a.target.error);
+const Ve = "alefbet-voices", E = "recordings", Ge = 1;
+let M = null;
+function O() {
+  return M || (M = new Promise((t, e) => {
+    const n = indexedDB.open(Ve, Ge);
+    n.onupgradeneeded = (o) => {
+      o.target.result.createObjectStore(E);
+    }, n.onsuccess = (o) => t(o.target.result), n.onerror = (o) => {
+      M = null, e(o.target.error);
     };
-  }), I);
+  }), M);
 }
-function Z(t, e) {
+function J(t, e) {
   return `${t}/${e}`;
 }
-async function Ge(t, e, n) {
-  const a = await G();
-  return new Promise((o, i) => {
-    const s = a.transaction(x, "readwrite");
-    s.objectStore(x).put(n, Z(t, e)), s.oncomplete = o, s.onerror = (r) => i(r.target.error);
+async function Xe(t, e, n) {
+  const o = await O();
+  return new Promise((a, i) => {
+    const r = o.transaction(E, "readwrite");
+    r.objectStore(E).put(n, J(t, e)), r.oncomplete = a, r.onerror = (s) => i(s.target.error);
   });
 }
-async function ee(t, e) {
-  const n = await G();
-  return new Promise((a, o) => {
-    const s = n.transaction(x, "readonly").objectStore(x).get(Z(t, e));
-    s.onsuccess = () => a(s.result ?? null), s.onerror = (r) => o(r.target.error);
-  });
-}
-async function Xe(t, e) {
-  const n = await G();
-  return new Promise((a, o) => {
-    const i = n.transaction(x, "readwrite");
-    i.objectStore(x).delete(Z(t, e)), i.oncomplete = a, i.onerror = (s) => o(s.target.error);
-  });
-}
-async function Nt(t) {
-  const e = await G();
-  return new Promise((n, a) => {
-    const i = e.transaction(x, "readonly").objectStore(x).getAllKeys();
-    i.onsuccess = () => {
-      const s = `${t}/`;
-      n(
-        (i.result || []).filter((r) => r.startsWith(s)).map((r) => r.slice(s.length))
-      );
-    }, i.onerror = (s) => a(s.target.error);
+async function Y(t, e) {
+  const n = await O();
+  return new Promise((o, a) => {
+    const r = n.transaction(E, "readonly").objectStore(E).get(J(t, e));
+    r.onsuccess = () => o(r.result ?? null), r.onerror = (s) => a(s.target.error);
   });
 }
 async function Je(t, e) {
+  const n = await O();
+  return new Promise((o, a) => {
+    const i = n.transaction(E, "readwrite");
+    i.objectStore(E).delete(J(t, e)), i.oncomplete = o, i.onerror = (r) => a(r.target.error);
+  });
+}
+async function $t(t) {
+  const e = await O();
+  return new Promise((n, o) => {
+    const i = e.transaction(E, "readonly").objectStore(E).getAllKeys();
+    i.onsuccess = () => {
+      const r = `${t}/`;
+      n(
+        (i.result || []).filter((s) => s.startsWith(r)).map((s) => s.slice(r.length))
+      );
+    }, i.onerror = (r) => o(r.target.error);
+  });
+}
+async function Ye(t, e) {
   let n;
   try {
-    n = await ee(t, e);
+    n = await Y(t, e);
   } catch {
     return !1;
   }
-  return n ? new Promise((a) => {
-    const o = URL.createObjectURL(n), i = new Audio(o), s = (r) => {
-      URL.revokeObjectURL(o), a(r);
+  return n ? new Promise((o) => {
+    const a = URL.createObjectURL(n), i = new Audio(a), r = (s) => {
+      URL.revokeObjectURL(a), o(s);
     };
-    i.onended = () => s(!0), i.onerror = () => s(!1), i.play().catch(() => s(!1));
+    i.onended = () => r(!0), i.onerror = () => r(!1), i.play().catch(() => r(!1));
   }) : !1;
 }
-async function Lt(t, e) {
-  return await ee(t, e).catch(() => null) !== null;
+async function Mt(t, e) {
+  return await Y(t, e).catch(() => null) !== null;
 }
-function Ye(t, {
+function Ke(t, {
   gameId: e,
   voiceKey: n,
-  label: a = "הקלטת קול",
-  onSaved: o,
+  label: o = "הקלטת קול",
+  onSaved: a,
   onDeleted: i
 } = {}) {
   if (!We()) {
-    const m = document.createElement("span");
-    return m.className = "ab-voice-unsupported", m.textContent = "🎤 הקלטה לא נתמכת בדפדפן זה", t.appendChild(m), { refresh: async () => {
-    }, destroy: () => m.remove() };
+    const b = document.createElement("span");
+    return b.className = "ab-voice-unsupported", b.textContent = "🎤 הקלטה לא נתמכת בדפדפן זה", t.appendChild(b), { refresh: async () => {
+    }, destroy: () => b.remove() };
   }
-  const s = qe(), r = document.createElement("div");
-  r.className = "ab-voice-btn-wrap", r.setAttribute("aria-label", a), t.appendChild(r);
-  let c = "idle", l = null, u = null, h = null, _ = null, b = null, f = null, d = 0;
-  function v() {
-    if (r.innerHTML = "", c === "idle")
-      l = p("🎤", "ab-voice-btn ab-voice-btn--record", "התחל הקלטה", C), r.appendChild(l);
-    else if (c === "recording") {
-      b = document.createElement("span"), b.className = "ab-voice-indicator", r.appendChild(b);
-      const m = document.createElement("span");
-      m.className = "ab-voice-timer", m.textContent = "0:00", r.appendChild(m), d = 0, f = setInterval(() => {
-        d++;
-        const E = Math.floor(d / 60), D = String(d % 60).padStart(2, "0");
-        m.textContent = `${E}:${D}`, d >= 120 && R();
-      }, 1e3), u = p("⏹", "ab-voice-btn ab-voice-btn--stop", "עצור הקלטה", R), r.appendChild(u);
-    } else c === "has-voice" && (h = p("▶", "ab-voice-btn ab-voice-btn--play", "נגן הקלטה", y), r.appendChild(h), l = p("🎤", "ab-voice-btn ab-voice-btn--re-record", "הקלט מחדש", C), r.appendChild(l), _ = p("🗑", "ab-voice-btn ab-voice-btn--delete", "מחק הקלטה", N), r.appendChild(_));
+  const r = ze(), s = document.createElement("div");
+  s.className = "ab-voice-btn-wrap", s.setAttribute("aria-label", o), t.appendChild(s);
+  let l = "idle", c = null, m = null, d = null, h = null, p = null, g = null, u = 0;
+  function _() {
+    if (s.innerHTML = "", l === "idle")
+      c = f("🎤", "ab-voice-btn ab-voice-btn--record", "התחל הקלטה", v), s.appendChild(c);
+    else if (l === "recording") {
+      p = document.createElement("span"), p.className = "ab-voice-indicator", s.appendChild(p);
+      const b = document.createElement("span");
+      b.className = "ab-voice-timer", b.textContent = "0:00", s.appendChild(b), u = 0, g = setInterval(() => {
+        u++;
+        const x = Math.floor(u / 60), j = String(u % 60).padStart(2, "0");
+        b.textContent = `${x}:${j}`, u >= 120 && N();
+      }, 1e3), m = f("⏹", "ab-voice-btn ab-voice-btn--stop", "עצור הקלטה", N), s.appendChild(m);
+    } else l === "has-voice" && (d = f("▶", "ab-voice-btn ab-voice-btn--play", "נגן הקלטה", y), s.appendChild(d), c = f("🎤", "ab-voice-btn ab-voice-btn--re-record", "הקלט מחדש", v), s.appendChild(c), h = f("🗑", "ab-voice-btn ab-voice-btn--delete", "מחק הקלטה", me), s.appendChild(h));
   }
-  function p(m, E, D, he) {
-    const L = document.createElement("button");
-    return L.className = E, L.type = "button", L.title = D, L.setAttribute("aria-label", D), L.textContent = m, L.addEventListener("click", he), L;
+  function f(b, x, j, fe) {
+    const C = document.createElement("button");
+    return C.className = x, C.type = "button", C.title = j, C.setAttribute("aria-label", j), C.textContent = b, C.addEventListener("click", fe), C;
   }
-  async function C() {
+  async function v() {
     try {
-      await s.start(), c = "recording", v();
-    } catch (m) {
-      console.warn("[voice-record-button] microphone access denied:", m), F("לא ניתן לגשת למיקרופון");
+      await r.start(), l = "recording", _();
+    } catch (b) {
+      console.warn("[voice-record-button] microphone access denied:", b), pe("לא ניתן לגשת למיקרופון");
     }
   }
-  async function R() {
-    clearInterval(f);
+  async function N() {
+    clearInterval(g);
     try {
-      const m = await s.stop();
-      await Ge(e, n, m), c = "has-voice", v(), o == null || o(m);
-    } catch (m) {
-      console.warn("[voice-record-button] stop error:", m), c = "idle", v();
+      const b = await r.stop();
+      await Xe(e, n, b), l = "has-voice", _(), a == null || a(b);
+    } catch (b) {
+      console.warn("[voice-record-button] stop error:", b), l = "idle", _();
     }
   }
   async function y() {
-    h == null || h.setAttribute("disabled", "true"), await Je(e, n), h == null || h.removeAttribute("disabled");
+    d == null || d.setAttribute("disabled", "true"), await Ye(e, n), d == null || d.removeAttribute("disabled");
   }
-  async function N() {
-    confirm("למחוק את ההקלטה?") && (await Xe(e, n), c = "idle", v(), i == null || i());
+  async function me() {
+    confirm("למחוק את ההקלטה?") && (await Je(e, n), l = "idle", _(), i == null || i());
   }
-  function F(m) {
-    const E = document.createElement("span");
-    E.className = "ab-voice-error", E.textContent = m, r.appendChild(E), setTimeout(() => E.remove(), 3e3);
+  function pe(b) {
+    const x = document.createElement("span");
+    x.className = "ab-voice-error", x.textContent = b, s.appendChild(x), setTimeout(() => x.remove(), 3e3);
   }
-  async function g() {
-    if (s.isActive()) return;
-    c = await ee(e, n).catch(() => null) ? "has-voice" : "idle", v();
+  async function K() {
+    if (r.isActive()) return;
+    l = await Y(e, n).catch(() => null) ? "has-voice" : "idle", _();
   }
-  function S() {
-    clearInterval(f), s.isActive() && s.cancel(), r.remove();
+  function he() {
+    clearInterval(g), r.isActive() && r.cancel(), s.remove();
   }
-  return g(), { refresh: g, destroy: S };
+  return K(), { refresh: K, destroy: he };
 }
-function Ke(t, { onClick: e } = {}) {
+function Qe(t, { onClick: e } = {}) {
   const n = document.createElement("div");
   n.className = "ab-editor-overlay", e && n.addEventListener("pointerdown", e);
-  function a() {
+  function o() {
     n.parentElement || (t.style.position = "relative", t.appendChild(n));
   }
-  function o() {
+  function a() {
     n.remove();
   }
   function i() {
-    o();
+    a();
   }
-  return { show: a, hide: o, destroy: i };
+  return { show: o, hide: a, destroy: i };
 }
-function Qe(t, e, { onSelectRound: n, onAddRound: a }) {
-  const o = document.createElement("div");
-  o.className = "ab-editor-nav", o.setAttribute("aria-label", "ניווט סיבובים");
+function Ze(t, e, { onSelectRound: n, onAddRound: o }) {
+  const a = document.createElement("div");
+  a.className = "ab-editor-nav", a.setAttribute("aria-label", "ניווט סיבובים");
   const i = document.createElement("div");
-  i.className = "ab-editor-nav__header", i.textContent = "סיבובים", o.appendChild(i);
-  const s = document.createElement("div");
-  s.className = "ab-editor-nav__list", o.appendChild(s);
-  const r = document.createElement("button");
-  r.className = "ab-editor-nav__add", r.textContent = "+ הוסף", r.addEventListener("click", () => a(null)), o.appendChild(r), t.appendChild(o);
-  let c = null;
-  function l(b, f) {
-    const d = document.createElement("div");
-    d.className = "ab-editor-nav__thumb", b.id === c && d.classList.add("ab-editor-nav__thumb--active"), d.setAttribute("role", "button"), d.setAttribute("tabindex", "0"), d.setAttribute("aria-label", `סיבוב ${f + 1}`), d.dataset.roundId = b.id;
-    const v = document.createElement("div");
-    if (v.className = "ab-editor-nav__num", v.textContent = f + 1, d.appendChild(v), b.correctEmoji) {
-      const p = document.createElement("div");
-      p.className = "ab-editor-nav__emoji", p.textContent = b.correctEmoji, d.appendChild(p);
+  i.className = "ab-editor-nav__header", i.textContent = "סיבובים", a.appendChild(i);
+  const r = document.createElement("div");
+  r.className = "ab-editor-nav__list", a.appendChild(r);
+  const s = document.createElement("button");
+  s.className = "ab-editor-nav__add", s.textContent = "+ הוסף", s.addEventListener("click", () => o(null)), a.appendChild(s), t.appendChild(a);
+  let l = null;
+  function c(p, g) {
+    const u = document.createElement("div");
+    u.className = "ab-editor-nav__thumb", p.id === l && u.classList.add("ab-editor-nav__thumb--active"), u.setAttribute("role", "button"), u.setAttribute("tabindex", "0"), u.setAttribute("aria-label", `סיבוב ${g + 1}`), u.dataset.roundId = p.id;
+    const _ = document.createElement("div");
+    if (_.className = "ab-editor-nav__num", _.textContent = g + 1, u.appendChild(_), p.correctEmoji) {
+      const f = document.createElement("div");
+      f.className = "ab-editor-nav__emoji", f.textContent = p.correctEmoji, u.appendChild(f);
     }
-    if (b.target) {
-      const p = document.createElement("div");
-      p.className = "ab-editor-nav__letter", p.textContent = b.target, d.appendChild(p);
+    if (p.target) {
+      const f = document.createElement("div");
+      f.className = "ab-editor-nav__letter", f.textContent = p.target, u.appendChild(f);
     }
-    return d.addEventListener("click", () => n(b.id)), d.addEventListener("keydown", (p) => {
-      (p.key === "Enter" || p.key === " ") && (p.preventDefault(), n(b.id));
-    }), d;
+    return u.addEventListener("click", () => n(p.id)), u.addEventListener("keydown", (f) => {
+      (f.key === "Enter" || f.key === " ") && (f.preventDefault(), n(p.id));
+    }), u;
   }
-  function u() {
-    s.innerHTML = "", e.rounds.forEach((b, f) => {
-      s.appendChild(l(b, f));
+  function m() {
+    r.innerHTML = "", e.rounds.forEach((p, g) => {
+      r.appendChild(c(p, g));
     });
   }
-  function h(b) {
-    c = b, s.querySelectorAll(".ab-editor-nav__thumb").forEach((f) => {
-      f.classList.toggle("ab-editor-nav__thumb--active", f.dataset.roundId === b);
+  function d(p) {
+    l = p, r.querySelectorAll(".ab-editor-nav__thumb").forEach((g) => {
+      g.classList.toggle("ab-editor-nav__thumb--active", g.dataset.roundId === p);
     });
   }
-  function _() {
-    o.remove();
+  function h() {
+    a.remove();
   }
-  return u(), { refresh: u, setActiveRound: h, destroy: _ };
+  return m(), { refresh: m, setActiveRound: d, destroy: h };
 }
-const le = {
+const ie = {
   "multiple-choice": [
     { key: "target", label: "אות יעד", type: "text", maxLength: 2 },
     { key: "correct", label: "תשובה נכונה", type: "text" },
@@ -1149,69 +1149,59 @@ const le = {
     { key: "correctEmoji", label: "אמוג'י", type: "emoji" }
   ]
 };
-function Ze(t, { gameId: e, onFieldChange: n, onDeleteRound: a, getEditableFields: o }) {
+function et(t, { onFieldChange: e, onDeleteRound: n, getEditableFields: o }) {
+  const a = document.createElement("div");
+  a.className = "ab-editor-inspector";
   const i = document.createElement("div");
-  i.className = "ab-editor-inspector";
-  const s = document.createElement("div");
-  s.className = "ab-editor-inspector__header", s.innerHTML = '<span class="ab-editor-inspector__title">✏️ ערוך סיבוב</span>', i.appendChild(s);
+  i.className = "ab-editor-inspector__header", i.innerHTML = '<span class="ab-editor-inspector__title">✏️ ערוך סיבוב</span>', a.appendChild(i);
   const r = document.createElement("div");
-  r.className = "ab-editor-inspector__body", i.appendChild(r);
-  const c = document.createElement("button");
-  c.className = "ab-editor-inspector__delete", c.textContent = "🗑 מחק סיבוב", i.appendChild(c), t.appendChild(i);
-  let l = null, u = null;
-  function h() {
-    u == null || u.destroy(), u = null, r.innerHTML = '<p class="ab-editor-inspector__empty">בחר סיבוב לעריכה</p>', c.hidden = !0, l = null;
+  r.className = "ab-editor-inspector__body", a.appendChild(r);
+  const s = document.createElement("button");
+  s.className = "ab-editor-inspector__delete", s.textContent = "🗑 מחק סיבוב", a.appendChild(s), t.appendChild(a);
+  let l = null;
+  function c() {
+    r.innerHTML = '<p class="ab-editor-inspector__empty">בחר סיבוב לעריכה</p>', s.hidden = !0, l = null;
   }
-  function _(f, d = "multiple-choice") {
-    u == null || u.destroy(), u = null, l = f.id, r.innerHTML = "", c.hidden = !1, ((o ? o(d) : null) || le[d] || le["multiple-choice"]).forEach((y) => {
-      const N = document.createElement("div");
-      N.className = "ab-editor-field";
-      const F = document.createElement("label");
-      if (F.className = "ab-editor-field__label", F.textContent = y.label, N.appendChild(F), y.type === "emoji") {
-        const g = document.createElement("div");
-        g.className = "ab-editor-field__emoji-row";
-        const S = document.createElement("div");
-        S.className = "ab-editor-field__emoji-preview", S.textContent = f[y.key] || "❓", g.appendChild(S);
-        const m = document.createElement("input");
-        m.className = "ab-editor-field__input", m.type = "text", m.value = f[y.key] || "", m.maxLength = 8, m.placeholder = "🐱", m.style.fontSize = "20px", m.addEventListener("input", () => {
-          S.textContent = m.value || "❓", n(l, y.key, m.value);
-        }), g.appendChild(m), N.appendChild(g);
+  function m(h, p = "multiple-choice") {
+    l = h.id, r.innerHTML = "", s.hidden = !1, ((o ? o(p) : null) || ie[p] || ie["multiple-choice"]).forEach((u) => {
+      const _ = document.createElement("div");
+      _.className = "ab-editor-field";
+      const f = document.createElement("label");
+      if (f.className = "ab-editor-field__label", f.textContent = u.label, _.appendChild(f), u.type === "emoji") {
+        const v = document.createElement("div");
+        v.className = "ab-editor-field__emoji-row";
+        const N = document.createElement("div");
+        N.className = "ab-editor-field__emoji-preview", N.textContent = h[u.key] || "❓", v.appendChild(N);
+        const y = document.createElement("input");
+        y.className = "ab-editor-field__input", y.type = "text", y.value = h[u.key] || "", y.maxLength = 8, y.placeholder = "🐱", y.style.fontSize = "20px", y.addEventListener("input", () => {
+          N.textContent = y.value || "❓", e(l, u.key, y.value);
+        }), v.appendChild(y), _.appendChild(v);
       } else {
-        const g = document.createElement("input");
-        g.className = "ab-editor-field__input", g.type = "text", g.value = f[y.key] || "", g.dir = "rtl", y.maxLength && (g.maxLength = y.maxLength), g.addEventListener("input", () => {
-          n(l, y.key, g.value);
-        }), N.appendChild(g);
+        const v = document.createElement("input");
+        v.className = "ab-editor-field__input", v.type = "text", v.value = h[u.key] || "", v.dir = "rtl", u.maxLength && (v.maxLength = u.maxLength), v.addEventListener("input", () => {
+          e(l, u.key, v.value);
+        }), _.appendChild(v);
       }
-      r.appendChild(N);
-    });
-    const p = document.createElement("div");
-    p.className = "ab-editor-field ab-editor-field--voice";
-    const C = document.createElement("div");
-    C.className = "ab-editor-field__label", C.textContent = "🎤 הקלטת קול לסיבוב", p.appendChild(C);
-    const R = document.createElement("p");
-    R.style.cssText = "font-size:11px;color:var(--ab-editor-muted);margin:2px 0 6px", R.textContent = "יושמע בזמן המשחק במקום קריאת-טקסט", p.appendChild(R), u = Ye(p, {
-      gameId: e,
-      voiceKey: f.id,
-      label: `הקלטת קול — סיבוב ${f.id}`
-    }), r.appendChild(p), c.onclick = () => {
-      confirm("למחוק את הסיבוב הזה?") && (a(l), h());
+      r.appendChild(_);
+    }), s.onclick = () => {
+      confirm("למחוק את הסיבוב הזה?") && (n(l), c());
     };
   }
-  function b() {
-    u == null || u.destroy(), i.remove();
+  function d() {
+    a.remove();
   }
-  return h(), { loadRound: _, clear: h, destroy: b };
+  return c(), { loadRound: m, clear: c, destroy: d };
 }
-let et = 0;
-function ce() {
-  return `round-${Date.now()}-${et++}`;
+let tt = 0;
+function re() {
+  return `round-${Date.now()}-${tt++}`;
 }
-class V {
+class U {
   /**
    * @param {object} schema - { id, version, meta, rounds, distractors }
    */
   constructor(e) {
-    this._id = e.id || "game", this._version = e.version || 1, this._meta = { title: "", type: "multiple-choice", ...e.meta }, this._rounds = (e.rounds || []).map((n) => ({ ...n, id: n.id || ce() })), this._distractors = e.distractors || [], this._handlers = [];
+    this._id = e.id || "game", this._version = e.version || 1, this._meta = { title: "", type: "multiple-choice", ...e.meta }, this._rounds = (e.rounds || []).map((n) => ({ ...n, id: n.id || re() })), this._distractors = e.distractors || [], this._handlers = [];
   }
   // ── Identity ────────────────────────────────────────────────────────────
   get id() {
@@ -1235,16 +1225,16 @@ class V {
   }
   // ── Rounds (write) ───────────────────────────────────────────────────────
   updateRound(e, n) {
-    const a = this.getRoundIndex(e);
-    a !== -1 && (this._rounds[a] = { ...this._rounds[a], ...n }, this._emit());
+    const o = this.getRoundIndex(e);
+    o !== -1 && (this._rounds[o] = { ...this._rounds[o], ...n }, this._emit());
   }
   addRound(e = null) {
-    const n = { id: ce(), target: "", correct: "", correctEmoji: "❓" };
+    const n = { id: re(), target: "", correct: "", correctEmoji: "❓" };
     if (e === null)
       this._rounds.push(n);
     else {
-      const a = this.getRoundIndex(e);
-      this._rounds.splice(a + 1, 0, n);
+      const o = this.getRoundIndex(e);
+      this._rounds.splice(o + 1, 0, n);
     }
     return this._emit(), n.id;
   }
@@ -1253,10 +1243,10 @@ class V {
     n === -1 || this._rounds.length <= 1 || (this._rounds.splice(n, 1), this._emit());
   }
   moveRound(e, n) {
-    const a = this.getRoundIndex(e);
-    if (a === -1) return;
-    const [o] = this._rounds.splice(a, 1);
-    this._rounds.splice(Math.max(0, Math.min(n, this._rounds.length)), 0, o), this._emit();
+    const o = this.getRoundIndex(e);
+    if (o === -1) return;
+    const [a] = this._rounds.splice(o, 1);
+    this._rounds.splice(Math.max(0, Math.min(n, this._rounds.length)), 0, a), this._emit();
   }
   // ── Change events ────────────────────────────────────────────────────────
   onChange(e) {
@@ -1280,7 +1270,7 @@ class V {
     };
   }
   static fromJSON(e) {
-    return new V(e);
+    return new U(e);
   }
   /**
    * Migration helper: convert a plain ROUNDS array into a GameData instance.
@@ -1289,37 +1279,183 @@ class V {
    * @param {object} meta - { title, type }
    * @param {object[]} [distractors]
    */
-  static fromRoundsArray(e, n, a = {}, o = []) {
-    return new V({ id: e, meta: a, rounds: n, distractors: o });
+  static fromRoundsArray(e, n, o = {}, a = []) {
+    return new U({ id: e, meta: o, rounds: n, distractors: a });
   }
 }
-const ue = "alefbet.editor.";
-function me(t) {
-  return Ue(`${ue}${t}`, null);
+const ce = "alefbet.editor.";
+function de(t) {
+  return le(`${ce}${t}`, null);
 }
-function tt(t) {
-  me(t.id).set(t.toJSON());
+function nt(t) {
+  de(t.id).set(t.toJSON());
 }
-function Ct(t) {
-  const e = me(t).get();
+function Bt(t) {
+  const e = de(t).get();
   if (!e) return null;
   try {
-    return V.fromJSON(e);
+    return U.fromJSON(e);
   } catch {
     return null;
   }
 }
-function Rt(t) {
+function jt(t) {
   try {
-    localStorage.removeItem(`${ue}${t}`);
+    localStorage.removeItem(`${ce}${t}`);
   } catch {
   }
 }
-function nt(t) {
-  const e = JSON.stringify(t.toJSON(), null, 2), n = new Blob([e], { type: "application/json;charset=utf-8" }), a = URL.createObjectURL(n), o = document.createElement("a");
-  o.href = a, o.download = `${t.id}-rounds.json`, o.click(), URL.revokeObjectURL(a);
+function at(t) {
+  const e = JSON.stringify(t.toJSON(), null, 2), n = new Blob([e], { type: "application/json;charset=utf-8" }), o = URL.createObjectURL(n), a = document.createElement("a");
+  a.href = o, a.download = `${t.id}-rounds.json`, a.click(), URL.revokeObjectURL(o);
 }
-class St {
+const ot = [
+  {
+    id: "instructions",
+    label: "📝 הוראות",
+    slots: [
+      { key: "instruction-welcome", label: "ברוכים הבאים" },
+      { key: "instruction-how-to", label: "איך משחקים" },
+      { key: "instruction-complete", label: "סיום המשחק" }
+    ]
+  },
+  {
+    id: "feedback",
+    label: "✅ משוב",
+    slots: [
+      { key: "feedback-correct", label: "תשובה נכונה — כל הכבוד!" },
+      { key: "feedback-wrong", label: "תשובה שגויה" },
+      { key: "feedback-try-again", label: "נסה שוב" },
+      { key: "feedback-encourage", label: "עידוד כללי" }
+    ]
+  },
+  {
+    id: "nikud",
+    label: "◌ ניקוד",
+    slots: [
+      { key: "nikud-patah", label: "פַּתַח" },
+      { key: "nikud-kamatz", label: "קָמַץ" },
+      { key: "nikud-hiriq", label: "חִירִיק" },
+      { key: "nikud-tsere", label: "צֵרֵי" },
+      { key: "nikud-segol", label: "סֶגּוֹל" },
+      { key: "nikud-holam", label: "חוֹלָם" },
+      { key: "nikud-shuruq", label: "שׁוּרוּק" }
+    ]
+  }
+];
+function it(t) {
+  return t.trim().replace(/\s+/g, "-").replace(/[^a-z0-9\u05D0-\u05EA_-]/gi, "").toLowerCase() || `custom-${Date.now()}`;
+}
+function rt(t) {
+  return le(`alefbet.audio-manager.${t}.custom`, []);
+}
+function st(t, e = null) {
+  var c;
+  (c = document.getElementById("ab-audio-manager")) == null || c.remove();
+  const n = document.createElement("div");
+  n.id = "ab-audio-manager", n.className = "ab-am-modal", n.setAttribute("role", "dialog"), n.setAttribute("aria-modal", "true"), n.setAttribute("aria-label", "מנהל הקלטות"), n.innerHTML = `
+    <div class="ab-am-backdrop"></div>
+    <div class="ab-am-box">
+      <div class="ab-am-header">
+        <span class="ab-am-title">🎤 מנהל הקלטות</span>
+        <span class="ab-am-subtitle">כל ההקלטות נשמרות בדפדפן וניתן להשתמש בהן דרך <code>playVoice('${t}', voiceKey)</code></span>
+        <button class="ab-am-close" aria-label="סגור">✕</button>
+      </div>
+      <div class="ab-am-body" id="ab-am-body"></div>
+    </div>
+  `, document.body.appendChild(n);
+  const o = n.querySelector("#ab-am-body"), a = n.querySelector(".ab-am-close"), i = n.querySelector(".ab-am-backdrop"), r = [], s = [...ot];
+  e && e.rounds.length > 0 && s.splice(1, 0, {
+    // insert after Instructions
+    id: "rounds",
+    label: "🔤 שאלות / סיבובים",
+    slots: e.rounds.map((m, d) => ({
+      key: m.id,
+      label: `סיבוב ${d + 1}${m.target ? " — " + m.target : ""}${m.correct ? " (" + m.correct + ")" : ""}`
+    }))
+  }), s.forEach((m) => {
+    o.appendChild(lt(m, t, r));
+  }), o.appendChild(ct(t, r));
+  function l() {
+    r.forEach((m) => m.destroy()), n.remove();
+  }
+  a.addEventListener("click", l), i.addEventListener("click", l), document.addEventListener("keydown", function m(d) {
+    d.key === "Escape" && (l(), document.removeEventListener("keydown", m));
+  });
+}
+function lt(t, e, n) {
+  const o = document.createElement("section");
+  o.className = "ab-am-section";
+  const a = document.createElement("button");
+  a.className = "ab-am-section__heading", a.setAttribute("aria-expanded", "true"), a.innerHTML = `<span>${t.label}</span><span class="ab-am-chevron">▾</span>`, o.appendChild(a);
+  const i = document.createElement("div");
+  return i.className = "ab-am-grid", o.appendChild(i), t.slots.forEach((r) => {
+    i.appendChild(ue(e, r.key, r.label, n));
+  }), a.addEventListener("click", () => {
+    const r = a.getAttribute("aria-expanded") === "true";
+    a.setAttribute("aria-expanded", String(!r)), i.hidden = r, a.querySelector(".ab-am-chevron").textContent = r ? "▸" : "▾";
+  }), o;
+}
+function ct(t, e) {
+  const n = rt(t), o = document.createElement("section");
+  o.className = "ab-am-section";
+  const a = document.createElement("button");
+  a.className = "ab-am-section__heading", a.setAttribute("aria-expanded", "true"), a.innerHTML = '<span>➕ מותאם אישית</span><span class="ab-am-chevron">▾</span>', o.appendChild(a);
+  const i = document.createElement("div");
+  i.className = "ab-am-grid", o.appendChild(i);
+  function r() {
+    i.querySelectorAll(".ab-am-row").forEach((d) => {
+      const h = d._voiceBtn;
+      h && (e.splice(e.indexOf(h), 1), h.destroy());
+    }), i.innerHTML = "", n.get().forEach((d) => {
+      const h = ue(t, d.key, d.label, e, () => {
+        n.update((p) => p.filter((g) => g.key !== d.key)), r();
+      });
+      i.appendChild(h);
+    });
+  }
+  r();
+  const s = document.createElement("div");
+  s.className = "ab-am-add-row", s.innerHTML = `
+    <input class="ab-am-add-input" type="text" placeholder="שם ההקלטה... (למשל: שאלה ראשונה)" dir="rtl" />
+    <button class="ab-am-add-btn">+ הוסף</button>
+  `, o.appendChild(s);
+  const l = s.querySelector(".ab-am-add-input"), c = s.querySelector(".ab-am-add-btn");
+  function m() {
+    const d = l.value.trim();
+    if (!d) return;
+    const h = it(d);
+    if (n.get().some((p) => p.key === h)) {
+      l.select();
+      return;
+    }
+    n.update((p) => [...p, { key: h, label: d }]), l.value = "", r();
+  }
+  return c.addEventListener("click", m), l.addEventListener("keydown", (d) => {
+    d.key === "Enter" && m();
+  }), a.addEventListener("click", () => {
+    const d = a.getAttribute("aria-expanded") === "true";
+    a.setAttribute("aria-expanded", String(!d)), i.hidden = d, s.hidden = d, a.querySelector(".ab-am-chevron").textContent = d ? "▸" : "▾";
+  }), o;
+}
+function ue(t, e, n, o, a = null) {
+  const i = document.createElement("div");
+  i.className = "ab-am-row";
+  const r = document.createElement("div");
+  r.className = "ab-am-row__label", r.textContent = n;
+  const s = document.createElement("code");
+  s.className = "ab-am-row__key", s.textContent = e;
+  const l = document.createElement("div");
+  l.className = "ab-am-row__label-col", l.appendChild(r), l.appendChild(s);
+  const c = document.createElement("div");
+  if (c.className = "ab-am-row__ctrl", a) {
+    const d = document.createElement("button");
+    d.className = "ab-am-row__del", d.title = "הסר", d.setAttribute("aria-label", "הסר הקלטה"), d.textContent = "✕", d.addEventListener("click", a), c.appendChild(d);
+  }
+  const m = Ke(c, { gameId: t, voiceKey: e, label: n });
+  return o.push(m), i._voiceBtn = m, i.appendChild(l), i.appendChild(c), i;
+}
+class Ft {
   /**
    * @param {HTMLElement} container  — same container passed to GameShell
    * @param {import('./game-data.js').GameData} gameData
@@ -1328,25 +1464,25 @@ class St {
    *   getEditableFields?: (type: string) => object[],
    * }} options
    */
-  constructor(e, n, { restartGame: a, getEditableFields: o } = {}) {
-    this._container = e, this._gameData = n, this._restartGame = a, this._getEditableFields = o || null, this._mode = "play", this._overlay = null, this._navigator = null, this._inspector = null, this._toolbar = null, this._selectedId = null, requestAnimationFrame(() => this._injectToolbar());
+  constructor(e, n, { restartGame: o, getEditableFields: a } = {}) {
+    this._container = e, this._gameData = n, this._restartGame = o, this._getEditableFields = a || null, this._mode = "play", this._overlay = null, this._navigator = null, this._inspector = null, this._toolbar = null, this._selectedId = null, requestAnimationFrame(() => this._injectToolbar());
   }
   // ── Toolbar ──────────────────────────────────────────────────────────────
   _injectToolbar() {
     const e = this._container.querySelector(".game-header__spacer");
-    e && (this._toolbar = document.createElement("div"), this._toolbar.className = "ab-editor-toolbar", this._editBtn = this._makeBtn("✏️ ערוך", "ab-editor-btn--edit", () => this.enterEditMode()), this._toolbar.appendChild(this._editBtn), e.innerHTML = "", e.appendChild(this._toolbar));
+    e && (this._toolbar = document.createElement("div"), this._toolbar.className = "ab-editor-toolbar", this._editBtn = this._makeBtn("✏️ ערוך", "ab-editor-btn--edit", () => this.enterEditMode()), this._audioBtn = this._makeBtn("🎤 קול", "ab-editor-btn--audio", () => this._openAudioManager()), this._toolbar.append(this._editBtn, this._audioBtn), e.innerHTML = "", e.appendChild(this._toolbar));
   }
-  _makeBtn(e, n, a) {
-    const o = document.createElement("button");
-    return o.className = `ab-editor-btn ${n}`, o.innerHTML = e, o.addEventListener("click", a), o;
+  _makeBtn(e, n, o) {
+    const a = document.createElement("button");
+    return a.className = `ab-editor-btn ${n}`, a.innerHTML = e, a.addEventListener("click", o), a;
   }
   _setToolbarEditMode() {
     this._toolbar.innerHTML = "";
-    const e = this._makeBtn("▶ שחק", "ab-editor-btn--play", () => this.enterPlayMode()), n = this._makeBtn("+ הוסף", "ab-editor-btn--add", () => this._addRound()), a = this._makeBtn("💾 שמור", "ab-editor-btn--save", () => this._save()), o = this._makeBtn("⬇ ייצוא", "ab-editor-btn--export", () => nt(this._gameData));
-    this._toolbar.append(e, n, a, o);
+    const e = this._makeBtn("▶ שחק", "ab-editor-btn--play", () => this.enterPlayMode()), n = this._makeBtn("+ הוסף", "ab-editor-btn--add", () => this._addRound()), o = this._makeBtn("💾 שמור", "ab-editor-btn--save", () => this._save()), a = this._makeBtn("🎤 קול", "ab-editor-btn--audio", () => this._openAudioManager()), i = this._makeBtn("⬇ ייצוא", "ab-editor-btn--export", () => at(this._gameData));
+    this._toolbar.append(e, n, o, a, i);
   }
   _setToolbarPlayMode() {
-    this._toolbar.innerHTML = "", this._editBtn = this._makeBtn("✏️ ערוך", "ab-editor-btn--edit", () => this.enterEditMode()), this._toolbar.appendChild(this._editBtn);
+    this._toolbar.innerHTML = "", this._editBtn = this._makeBtn("✏️ ערוך", "ab-editor-btn--edit", () => this.enterEditMode()), this._audioBtn = this._makeBtn("🎤 קול", "ab-editor-btn--audio", () => this._openAudioManager()), this._toolbar.append(this._editBtn, this._audioBtn);
   }
   // ── Mode switching ────────────────────────────────────────────────────────
   enterEditMode() {
@@ -1354,19 +1490,18 @@ class St {
     this._mode = "edit", this._container.classList.add("ab-editor-active"), this._setToolbarEditMode();
     const e = this._container.querySelector(".game-body");
     if (!e) return;
-    this._overlay = Ke(e), this._overlay.show(), this._navigator = Qe(
+    this._overlay = Qe(e), this._overlay.show(), this._navigator = Ze(
       this._container,
       this._gameData,
       {
-        onSelectRound: (a) => this._selectRound(a),
-        onAddRound: (a) => this._addRound(a)
+        onSelectRound: (o) => this._selectRound(o),
+        onAddRound: (o) => this._addRound(o)
       }
-    ), this._inspector = Ze(
+    ), this._inspector = et(
       this._container,
       {
-        gameId: this._gameData.id,
-        onFieldChange: (a, o, i) => this._onFieldChange(a, o, i),
-        onDeleteRound: (a) => this._deleteRound(a),
+        onFieldChange: (o, a, i) => this._onFieldChange(o, a, i),
+        onDeleteRound: (o) => this._deleteRound(o),
         getEditableFields: this._getEditableFields
       }
     );
@@ -1374,34 +1509,38 @@ class St {
     n.length > 0 && this._selectRound(n[0].id);
   }
   enterPlayMode() {
-    var e, n, a, o;
-    this._mode !== "play" && (this._mode = "play", this._container.classList.remove("ab-editor-active"), this._setToolbarPlayMode(), (e = this._overlay) == null || e.destroy(), (n = this._navigator) == null || n.destroy(), (a = this._inspector) == null || a.destroy(), this._overlay = this._navigator = this._inspector = null, this._selectedId = null, (o = this._restartGame) == null || o.call(this, this._container));
+    var e, n, o, a;
+    this._mode !== "play" && (this._mode = "play", this._container.classList.remove("ab-editor-active"), this._setToolbarPlayMode(), (e = this._overlay) == null || e.destroy(), (n = this._navigator) == null || n.destroy(), (o = this._inspector) == null || o.destroy(), this._overlay = this._navigator = this._inspector = null, this._selectedId = null, (a = this._restartGame) == null || a.call(this, this._container));
   }
   // ── Round management ──────────────────────────────────────────────────────
   _selectRound(e) {
-    var a, o;
-    this._selectedId = e, (a = this._navigator) == null || a.setActiveRound(e);
+    var o, a;
+    this._selectedId = e, (o = this._navigator) == null || o.setActiveRound(e);
     const n = this._gameData.getRound(e);
-    n && ((o = this._inspector) == null || o.loadRound(n, this._gameData.meta.type));
+    n && ((a = this._inspector) == null || a.loadRound(n, this._gameData.meta.type));
   }
   _addRound(e = null) {
-    var a;
+    var o;
     const n = this._gameData.addRound(e ?? this._selectedId);
-    (a = this._navigator) == null || a.refresh(), this._selectRound(n);
+    (o = this._navigator) == null || o.refresh(), this._selectRound(n);
   }
   _deleteRound(e) {
-    var a;
-    this._gameData.removeRound(e), (a = this._navigator) == null || a.refresh();
+    var o;
+    this._gameData.removeRound(e), (o = this._navigator) == null || o.refresh();
     const n = this._gameData.rounds;
     n.length > 0 && this._selectRound(n[0].id);
   }
-  _onFieldChange(e, n, a) {
-    var o, i;
-    this._gameData.updateRound(e, { [n]: a }), (o = this._navigator) == null || o.refresh(), (i = this._navigator) == null || i.setActiveRound(e);
+  _onFieldChange(e, n, o) {
+    var a, i;
+    this._gameData.updateRound(e, { [n]: o }), (a = this._navigator) == null || a.refresh(), (i = this._navigator) == null || i.setActiveRound(e);
+  }
+  // ── Audio Manager ─────────────────────────────────────────────────────────
+  _openAudioManager() {
+    st(this._gameData.id, this._gameData);
   }
   // ── Save ──────────────────────────────────────────────────────────────────
   _save() {
-    tt(this._gameData), this._showToast("✅ נשמר!");
+    nt(this._gameData), this._showToast("✅ נשמר!");
   }
   _showToast(e) {
     const n = document.createElement("div");
@@ -1409,53 +1548,54 @@ class St {
   }
 }
 export {
-  pe as EventBus,
-  V as GameData,
-  St as GameEditor,
-  at as GameShell,
-  fe as GameState,
-  ye as addNikud,
-  U as animate,
-  Rt as clearGameData,
-  Et as createAppShell,
-  kt as createDragSource,
-  xt as createDropTarget,
-  ft as createFeedback,
-  Ue as createLocalState,
-  wt as createNikudBox,
-  ht as createOptionCards,
-  pt as createProgressBar,
-  it as createRoundManager,
-  rt as createSpeechListener,
-  Ye as createVoiceRecordButton,
-  qe as createVoiceRecorder,
-  gt as createZone,
-  Xe as deleteVoice,
-  nt as exportGameDataAsJSON,
-  lt as getLetter,
-  Me as getLettersByGroup,
-  we as getNikud,
-  Lt as hasVoice,
-  O as hebrewLetters,
-  vt as hideLoadingScreen,
-  yt as injectHeaderButton,
+  be as EventBus,
+  U as GameData,
+  Ft as GameEditor,
+  dt as GameShell,
+  ge as GameState,
+  we as addNikud,
+  P as animate,
+  jt as clearGameData,
+  Tt as createAppShell,
+  Rt as createDragSource,
+  At as createDropTarget,
+  wt as createFeedback,
+  le as createLocalState,
+  St as createNikudBox,
+  yt as createOptionCards,
+  kt as createProgressBar,
+  mt as createRoundManager,
+  pt as createSpeechListener,
+  Ke as createVoiceRecordButton,
+  ze as createVoiceRecorder,
+  xt as createZone,
+  Je as deleteVoice,
+  at as exportGameDataAsJSON,
+  ft as getLetter,
+  Pe as getLettersByGroup,
+  Ee as getNikud,
+  Mt as hasVoice,
+  I as hebrewLetters,
+  Ct as hideLoadingScreen,
+  Lt as injectHeaderButton,
   We as isVoiceRecordingSupported,
-  ut as letterWithNikud,
-  Nt as listVoiceKeys,
-  Ct as loadGameData,
-  ee as loadVoice,
-  st as matchNikudSound,
-  dt as nikudBaseLetters,
+  _t as letterWithNikud,
+  $t as listVoiceKeys,
+  Bt as loadGameData,
+  Y as loadVoice,
+  ht as matchNikudSound,
+  gt as nikudBaseLetters,
   q as nikudList,
-  Je as playVoice,
-  ot as preloadNikud,
-  ct as randomLetters,
-  mt as randomNikud,
-  tt as saveGameData,
-  Ge as saveVoice,
-  $e as showCompletionScreen,
-  _t as showLoadingScreen,
-  bt as showNikudSettingsDialog,
-  W as sounds,
-  Te as tts
+  Ye as playVoice,
+  ut as preloadNikud,
+  bt as randomLetters,
+  vt as randomNikud,
+  nt as saveGameData,
+  Xe as saveVoice,
+  st as showAudioManager,
+  Be as showCompletionScreen,
+  Nt as showLoadingScreen,
+  Et as showNikudSettingsDialog,
+  H as sounds,
+  $e as tts
 };

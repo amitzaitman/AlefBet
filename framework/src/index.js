@@ -68,3 +68,4 @@ export { createVoiceRecordButton } from './ui/voice-record-button.js';
 export { GameEditor }                                           from './editor/game-editor.js';
 export { GameData }                                             from './editor/game-data.js';
 export { saveGameData, loadGameData, clearGameData, exportGameDataAsJSON } from './editor/editor-storage.js';
+export { showAudioManager }                                     from './editor/audio-manager.js';

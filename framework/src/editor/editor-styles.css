@@ -328,6 +328,253 @@
   to   { opacity: 0; }
 }
 
+/* ── Audio Manager modal ────────────────────────────────────────────────── */
+.ab-am-modal {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--ab-editor-z) + 200);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ab-am-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+}
+
+.ab-am-box {
+  position: relative;
+  background: var(--ab-editor-surface);
+  border-radius: 16px;
+  width: min(680px, 96vw);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+  overflow: hidden;
+  direction: rtl;
+}
+
+.ab-am-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--ab-editor-border);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 2px 12px;
+  flex-shrink: 0;
+}
+
+.ab-am-title {
+  font-size: 17px;
+  font-weight: 900;
+  color: var(--ab-editor-accent);
+}
+
+.ab-am-subtitle {
+  font-size: 11px;
+  color: var(--ab-editor-muted);
+  grid-column: 1;
+}
+
+.ab-am-subtitle code {
+  background: #f3f4f6;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 10px;
+  direction: ltr;
+  display: inline-block;
+}
+
+.ab-am-close {
+  grid-row: 1;
+  grid-column: 2;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 50%;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--ab-editor-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
+  transition: background 0.15s;
+}
+
+.ab-am-close:hover { background: var(--ab-editor-border); }
+
+.ab-am-body {
+  overflow-y: auto;
+  padding: 12px 0 16px;
+  flex: 1;
+}
+
+/* Section (category) */
+.ab-am-section {
+  border-bottom: 1px solid var(--ab-editor-border);
+}
+
+.ab-am-section:last-child { border-bottom: none; }
+
+.ab-am-section__heading {
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ab-editor-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: right;
+  transition: background 0.12s;
+}
+
+.ab-am-section__heading:hover { background: #f9fafb; }
+
+.ab-am-chevron {
+  font-size: 12px;
+  color: var(--ab-editor-muted);
+  margin-inline-start: 8px;
+}
+
+/* Grid of slot rows */
+.ab-am-grid {
+  padding: 0 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Single slot row */
+.ab-am-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f9fafb;
+  border: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.ab-am-row:has(.ab-voice-btn--play) {
+  border-color: #bbf7d0;   /* green tint when recording exists */
+  background: #f0fdf4;
+}
+
+.ab-am-row__label-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ab-am-row__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ab-editor-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ab-am-row__key {
+  font-size: 10px;
+  color: var(--ab-editor-muted);
+  direction: ltr;
+  text-align: left;
+  background: #f3f4f6;
+  padding: 1px 5px;
+  border-radius: 4px;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ab-am-row__ctrl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ab-am-row__del {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  font-size: 11px;
+  color: #d1d5db;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.ab-am-row__del:hover { color: #dc2626; background: #fee2e2; }
+
+/* Add custom slot row */
+.ab-am-add-row {
+  display: flex;
+  gap: 8px;
+  padding: 6px 22px 10px;
+  align-items: center;
+}
+
+.ab-am-add-input {
+  flex: 1;
+  padding: 7px 10px;
+  border: 2px solid var(--ab-editor-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  direction: rtl;
+  outline: none;
+  transition: border-color 0.18s;
+}
+
+.ab-am-add-input:focus { border-color: var(--ab-editor-accent); }
+
+.ab-am-add-btn {
+  padding: 7px 14px;
+  background: var(--ab-editor-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.ab-am-add-btn:hover { background: var(--ab-editor-accent-dark); }
+
+/* Audio manager toolbar button */
+.ab-editor-btn--audio {
+  background: #f3f4f6;
+  color: var(--ab-editor-text);
+  border: 1.5px solid var(--ab-editor-border);
+}
+
+.ab-editor-btn--audio:hover { background: var(--ab-editor-border); }
+
 /* ── Voice recording button ─────────────────────────────────────────────── */
 .ab-voice-btn-wrap {
   display: flex;

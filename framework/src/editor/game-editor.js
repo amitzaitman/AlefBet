@@ -8,6 +8,7 @@ import { createEditorOverlay }   from './editor-overlay.js';
 import { createSlideNavigator }  from './slide-navigator.js';
 import { createRoundInspector }  from './round-inspector.js';
 import { saveGameData, exportGameDataAsJSON } from './editor-storage.js';
+import { showAudioManager }      from './audio-manager.js';
 
 export class GameEditor {
   /**
@@ -44,8 +45,9 @@ export class GameEditor {
     this._toolbar = document.createElement('div');
     this._toolbar.className = 'ab-editor-toolbar';
 
-    this._editBtn = this._makeBtn('✏️ ערוך', 'ab-editor-btn--edit', () => this.enterEditMode());
-    this._toolbar.appendChild(this._editBtn);
+    this._editBtn  = this._makeBtn('✏️ ערוך', 'ab-editor-btn--edit',  () => this.enterEditMode());
+    this._audioBtn = this._makeBtn('🎤 קול',  'ab-editor-btn--audio', () => this._openAudioManager());
+    this._toolbar.append(this._editBtn, this._audioBtn);
 
     spacer.innerHTML = '';
     spacer.appendChild(this._toolbar);
@@ -64,14 +66,16 @@ export class GameEditor {
     const playBtn   = this._makeBtn('▶ שחק',   'ab-editor-btn--play',   () => this.enterPlayMode());
     const addBtn    = this._makeBtn('+ הוסף',   'ab-editor-btn--add',    () => this._addRound());
     const saveBtn   = this._makeBtn('💾 שמור',  'ab-editor-btn--save',   () => this._save());
+    const audioBtn  = this._makeBtn('🎤 קול',   'ab-editor-btn--audio',  () => this._openAudioManager());
     const exportBtn = this._makeBtn('⬇ ייצוא',  'ab-editor-btn--export', () => exportGameDataAsJSON(this._gameData));
-    this._toolbar.append(playBtn, addBtn, saveBtn, exportBtn);
+    this._toolbar.append(playBtn, addBtn, saveBtn, audioBtn, exportBtn);
   }
 
   _setToolbarPlayMode() {
     this._toolbar.innerHTML = '';
-    this._editBtn = this._makeBtn('✏️ ערוך', 'ab-editor-btn--edit', () => this.enterEditMode());
-    this._toolbar.appendChild(this._editBtn);
+    this._editBtn  = this._makeBtn('✏️ ערוך', 'ab-editor-btn--edit',  () => this.enterEditMode());
+    this._audioBtn = this._makeBtn('🎤 קול',  'ab-editor-btn--audio', () => this._openAudioManager());
+    this._toolbar.append(this._editBtn, this._audioBtn);
   }
 
   // ── Mode switching ────────────────────────────────────────────────────────
@@ -103,7 +107,6 @@ export class GameEditor {
     this._inspector = createRoundInspector(
       this._container,
       {
-        gameId:           this._gameData.id,
         onFieldChange:    (id, key, val) => this._onFieldChange(id, key, val),
         onDeleteRound:    id => this._deleteRound(id),
         getEditableFields: this._getEditableFields,
@@ -163,6 +166,12 @@ export class GameEditor {
     this._gameData.updateRound(id, { [key]: value });
     this._navigator?.refresh();
     this._navigator?.setActiveRound(id);
+  }
+
+  // ── Audio Manager ─────────────────────────────────────────────────────────
+
+  _openAudioManager() {
+    showAudioManager(this._gameData.id, this._gameData);
   }
 
   // ── Save ──────────────────────────────────────────────────────────────────

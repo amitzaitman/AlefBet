@@ -1,9 +1,8 @@
 /**
  * בודק סיבוב — חלונית עריכת שדות הסיבוב הנוכחי
  * מוצב בצד inline-end (שמאל ב-RTL)
+ * הקלטות קוליות מנוהלות דרך מנהל ההקלטות (audio-manager.js)
  */
-
-import { createVoiceRecordButton } from '../ui/voice-record-button.js';
 
 /**
  * Default field specs per game type.
@@ -25,14 +24,13 @@ const DEFAULT_FIELDS = {
 /**
  * @param {HTMLElement} mountEl
  * @param {{
- *   gameId:            string,
  *   onFieldChange:     (roundId: string, key: string, value: string) => void,
  *   onDeleteRound:     (roundId: string) => void,
  *   getEditableFields?: (type: string) => object[]
  * }} callbacks
  * @returns {{ loadRound(round, gameType), clear(), destroy() }}
  */
-export function createRoundInspector(mountEl, { gameId, onFieldChange, onDeleteRound, getEditableFields }) {
+export function createRoundInspector(mountEl, { onFieldChange, onDeleteRound, getEditableFields }) {
   const panel = document.createElement('div');
   panel.className = 'ab-editor-inspector';
 
@@ -53,20 +51,14 @@ export function createRoundInspector(mountEl, { gameId, onFieldChange, onDeleteR
   mountEl.appendChild(panel);
 
   let currentRoundId = null;
-  let _voiceBtn = null;
 
   function clear() {
-    _voiceBtn?.destroy();
-    _voiceBtn = null;
     body.innerHTML = `<p class="ab-editor-inspector__empty">בחר סיבוב לעריכה</p>`;
     deleteBtn.hidden = true;
     currentRoundId = null;
   }
 
   function loadRound(round, gameType = 'multiple-choice') {
-    _voiceBtn?.destroy();
-    _voiceBtn = null;
-
     currentRoundId = round.id;
     body.innerHTML = '';
     deleteBtn.hidden = false;
@@ -123,28 +115,6 @@ export function createRoundInspector(mountEl, { gameId, onFieldChange, onDeleteR
       body.appendChild(fieldEl);
     });
 
-    // ── Voice recording section ────────────────────────────────────────────
-    const voiceField = document.createElement('div');
-    voiceField.className = 'ab-editor-field ab-editor-field--voice';
-
-    const voiceLabel = document.createElement('div');
-    voiceLabel.className = 'ab-editor-field__label';
-    voiceLabel.textContent = '🎤 הקלטת קול לסיבוב';
-    voiceField.appendChild(voiceLabel);
-
-    const voiceDesc = document.createElement('p');
-    voiceDesc.style.cssText = 'font-size:11px;color:var(--ab-editor-muted);margin:2px 0 6px';
-    voiceDesc.textContent = 'יושמע בזמן המשחק במקום קריאת-טקסט';
-    voiceField.appendChild(voiceDesc);
-
-    _voiceBtn = createVoiceRecordButton(voiceField, {
-      gameId,
-      voiceKey: round.id,
-      label: `הקלטת קול — סיבוב ${round.id}`,
-    });
-
-    body.appendChild(voiceField);
-
     // ── Delete ─────────────────────────────────────────────────────────────
     deleteBtn.onclick = () => {
       if (confirm('למחוק את הסיבוב הזה?')) {
@@ -155,7 +125,6 @@ export function createRoundInspector(mountEl, { gameId, onFieldChange, onDeleteR
   }
 
   function destroy() {
-    _voiceBtn?.destroy();
     panel.remove();
   }
 
