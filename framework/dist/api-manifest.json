@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-26T19:25:19.051Z",
+  "generatedAt": "2026-03-26T22:27:24.185Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -154,51 +154,6 @@
       "description": "מנהל הקלטות — Audio Manager\nחלונית מודלית לניהול כל ההקלטות הקוליות של המשחק.\nמאורגן בקטגוריות: הוראות, משוב, סיבובים, מותאם אישית.\nעובד עם מפתחות voiceKey שרירותיים — ניתן להשתמש בכל הקלטה\nבכל נקודה בקוד המשחק דרך playVoice(gameId, voiceKey).",
       "exports": [
         "showAudioManager"
-      ]
-    },
-    {
-      "path": "editor/editor-overlay.js",
-      "description": "שכבת-על שקופה מעל game-body — מקפיאה את המשחק במצב עריכה",
-      "exports": [
-        "createEditorOverlay"
-      ]
-    },
-    {
-      "path": "editor/editor-storage.js",
-      "description": "אחסון נתוני עורך המשחק ב-localStorage",
-      "exports": [
-        "saveGameData",
-        "loadGameData",
-        "clearGameData",
-        "exportGameDataAsJSON"
-      ]
-    },
-    {
-      "path": "editor/game-data.js",
-      "description": "GameData — מודל נתוני המשחק הניתן לעריכה\nמנהל סיבובים, אירועי שינוי, undo/redo ו-serialization לאחסון",
-      "exports": [
-        "GameData"
-      ]
-    },
-    {
-      "path": "editor/game-editor.js",
-      "description": "GameEditor — עורך משחק חי בסגנון TinyTap\nמוסיף כפתור \"ערוך / שחק\" לכותרת ומנהל את מצב העריכה\n\nקיצורי מקלדת בעריכה:\n  Ctrl/Cmd + S  — שמור\n  Ctrl/Cmd + Z  — בטל פעולה\n  Ctrl/Cmd + Y  — בצע שנית (גם Ctrl+Shift+Z)\n  Escape        — חזור למצב שחקיה",
-      "exports": [
-        "GameEditor"
-      ]
-    },
-    {
-      "path": "editor/round-inspector.js",
-      "description": "בודק סיבוב — חלונית עריכת שדות הסיבוב הנוכחי\nמוצב בצד inline-end (שמאל ב-RTL)\n\nתכונות:\n - שדות טקסט ואמוג'י לפי סוג המשחק\n - העלאת תמונה לכל סיבוב (נשמרת כ-data URL ב-round.image)\n - כפתור מחיקת סיבוב",
-      "exports": [
-        "createRoundInspector"
-      ]
-    },
-    {
-      "path": "editor/slide-navigator.js",
-      "description": "ניווט שקופיות — רשימת ממוזערים של כל סיבובי המשחק\nמוצב בצד inline-start (ימין ב-RTL)\nתומך בגרירה לשינוי סדר ושכפול סיבובים",
-      "exports": [
-        "createSlideNavigator"
       ]
     },
     {

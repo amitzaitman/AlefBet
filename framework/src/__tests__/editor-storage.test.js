@@ -27,11 +27,11 @@ afterEach(() => {
 });
 
 async function getStorage() {
-  return import('../editor/editor-storage.js');
+  return import('../editor/editor-storage.ts');
 }
 
 async function getGameData() {
-  const { GameData } = await import('../editor/game-data.js');
+  const { GameData } = await import('../editor/game-data.ts');
   return GameData;
 }
 

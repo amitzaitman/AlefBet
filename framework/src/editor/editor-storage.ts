@@ -1,28 +1,26 @@
 /**
- * אחסון נתוני עורך המשחק ב-localStorage
+ * editor-storage — persist GameData to localStorage.
  */
-
 import { createLocalState } from '../core/local-state.js';
 import { GameData } from './game-data.js';
+import type { GameDataJson } from './schemas.js';
 
 const KEY_PREFIX = 'alefbet.editor.';
 
-function stateFor(gameId) {
-  return createLocalState(`${KEY_PREFIX}${gameId}`, null);
+function stateFor(gameId: string) {
+  return createLocalState<GameDataJson | null>(`${KEY_PREFIX}${gameId}`, null);
 }
 
-/** שמור GameData ב-localStorage */
-export function saveGameData(gameData) {
+/** Save GameData to localStorage. */
+export function saveGameData(gameData: GameData): void {
   stateFor(gameData.id).set(gameData.toJSON());
 }
 
 /**
- * טען GameData שמורה לפי מזהה משחק.
- * מחזיר null אם אין נתונים שמורים.
- * @param {string} gameId
- * @returns {GameData|null}
+ * Load a saved GameData by game id.
+ * Returns null if nothing is stored or the stored JSON is corrupt.
  */
-export function loadGameData(gameId) {
+export function loadGameData(gameId: string): GameData | null {
   const raw = stateFor(gameId).get();
   if (!raw) return null;
   try {
@@ -32,18 +30,15 @@ export function loadGameData(gameId) {
   }
 }
 
-/** מחק נתונים שמורים לפי מזהה משחק */
-export function clearGameData(gameId) {
+/** Remove saved data for a game. */
+export function clearGameData(gameId: string): void {
   try {
     localStorage.removeItem(`${KEY_PREFIX}${gameId}`);
   } catch { /* ignore */ }
 }
 
-/**
- * ייצא GameData כקובץ JSON להורדה
- * @param {GameData} gameData
- */
-export function exportGameDataAsJSON(gameData) {
+/** Trigger a JSON file download of the game data. */
+export function exportGameDataAsJSON(gameData: GameData): void {
   const json = JSON.stringify(gameData.toJSON(), null, 2);
   const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
   const url  = URL.createObjectURL(blob);

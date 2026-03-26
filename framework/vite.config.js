@@ -7,13 +7,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig({
+  resolve: {
+    // Allow imports with .js extension to resolve .ts files (enables
+    // gradual JS→TS migration without updating every import path).
+    extensions: ['.ts', '.js', '.json', '.css'],
+  },
   test: {
     environment: 'node',
-    include: ['src/**/*.test.js'],
+    include: ['src/**/*.test.{js,ts}'],
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.js'),
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'AlefBet',
       fileName: 'alefbet',
       formats: ['es', 'umd'],

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GameData } from '../editor/game-data.js';
+import { GameData } from '../editor/game-data.ts';
 
 const SAMPLE_ROUNDS = [
   { id: 'r1', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' },
