@@ -235,6 +235,24 @@
       position: absolute;
     }
 
+    /* Baby Monitor icon */
+    .game-card__icon--baby-monitor {
+      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+    }
+
+    .icon--baby-emoji {
+      font-size: clamp(60px, 14dvmin, 90px);
+      position: absolute;
+    }
+
+    .game-card__play--local {
+      background: #6c757d;
+    }
+
+    .game-card:hover .game-card__play--local {
+      background: #5a6268;
+    }
+
     /* Section separator */
     .hub-separator {
       margin: clamp(20px, 4dvh, 36px) 0 clamp(8px, 2dvh, 16px) 0;
@@ -316,6 +334,18 @@
     <h2 class="hub-subtitle">כְּלֵי עֲזָר:</h2>
 
     <div class="games-grid">
+
+      <!-- Sonos Baby Monitor -->
+      <a href="apps/sonos-baby-monitor/public/" class="game-card">
+        <div class="game-card__icon game-card__icon--baby-monitor">
+          <span class="icon--baby-emoji">👶</span>
+        </div>
+        <div class="game-card__info">
+          <h3 class="game-card__name">מוֹנִיטוֹר תִּינוֹק Sonos</h3>
+          <p class="game-card__desc">מַעֲקָב אַחַר צְלִילִים בְּחֶדֶר הַתִּינוֹק דֶּרֶךְ מִיקְרוֹפוֹן Sonos — הַתְרָאוֹת בְּרַמְקוֹל בְּחֶדֶר הַהוֹרִים</p>
+        </div>
+        <span class="game-card__play game-card__play--local">הַפְעָלָה מְקוֹמִית ▶</span>
+      </a>
 
       <!-- Passover Cleaning App -->
       <a href="apps/passover-cleaning/" class="game-card">
