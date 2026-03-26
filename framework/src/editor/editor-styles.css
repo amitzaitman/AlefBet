@@ -672,6 +672,165 @@
   color: var(--ab-editor-accent);
 }
 
+/* ── Undo / Redo buttons ────────────────────────────────────────────────── */
+.ab-editor-btn--undo,
+.ab-editor-btn--redo {
+  background: #f3f4f6;
+  color: var(--ab-editor-text);
+  border: 1.5px solid var(--ab-editor-border);
+  font-size: 16px;
+  min-width: 32px;
+  padding: 5px 8px;
+}
+
+.ab-editor-btn--undo:hover:not(:disabled),
+.ab-editor-btn--redo:hover:not(:disabled) { background: var(--ab-editor-border); }
+
+.ab-editor-btn--undo:disabled,
+.ab-editor-btn--redo:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ── Navigator: drag grip ───────────────────────────────────────────────── */
+.ab-editor-nav__grip {
+  font-size: 13px;
+  color: #d1d5db;
+  cursor: grab;
+  line-height: 1;
+  padding: 2px;
+  border-radius: 3px;
+  transition: color 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ab-editor-nav__grip:hover { color: var(--ab-editor-accent); }
+.ab-editor-nav__grip.drag-source--dragging { cursor: grabbing; }
+
+/* ── Navigator: duplicate button ────────────────────────────────────────── */
+.ab-editor-nav__dup {
+  position: absolute;
+  top: 3px;
+  inset-inline-end: 3px;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--ab-editor-accent);
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+  padding: 0;
+}
+
+.ab-editor-nav__thumb {
+  position: relative; /* needed for absolute dup button */
+}
+
+.ab-editor-nav__thumb:hover .ab-editor-nav__dup,
+.ab-editor-nav__thumb--active .ab-editor-nav__dup {
+  opacity: 1;
+}
+
+.ab-editor-nav__dup:hover { background: rgba(124, 58, 237, 0.22); }
+
+/* ── Navigator: drop target highlight ──────────────────────────────────── */
+.ab-editor-nav__thumb.drop-target--hover {
+  border-color: var(--ab-editor-accent);
+  background: #f5f3ff;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.25);
+}
+
+/* ── Navigator: round with image ────────────────────────────────────────── */
+.ab-editor-nav__thumb--has-img {
+  background-size: cover;
+  background-position: center;
+}
+
+.ab-editor-nav__thumb--has-img .ab-editor-nav__num,
+.ab-editor-nav__thumb--has-img .ab-editor-nav__letter {
+  background: rgba(255,255,255,0.8);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+/* ── Inspector: image field ─────────────────────────────────────────────── */
+.ab-editor-field--image {
+  border-top: 1px solid var(--ab-editor-border);
+  padding-top: 14px;
+  margin-top: 4px;
+}
+
+.ab-editor-field__img-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.ab-editor-field__img-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  border: 2px dashed var(--ab-editor-border);
+  background-size: cover;
+  background-position: center;
+  background-color: #f9fafb;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.ab-editor-field__img-preview:not([style*="background-image"])::after {
+  content: '📷';
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.ab-editor-field__img-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ab-editor-btn--img-upload {
+  padding: 6px 10px;
+  font-size: 12px;
+  background: var(--ab-editor-accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 700;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.ab-editor-btn--img-upload:hover { background: var(--ab-editor-accent-dark); }
+
+.ab-editor-btn--img-clear {
+  padding: 5px 10px;
+  font-size: 12px;
+  background: transparent;
+  color: #dc2626;
+  border: 1.5px solid #fca5a5;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.ab-editor-btn--img-clear:hover { background: #fef2f2; }
+
 /* ── Mobile: collapse panels to bottom strips ───────────────────────────── */
 @media (max-width: 600px) {
   :root {

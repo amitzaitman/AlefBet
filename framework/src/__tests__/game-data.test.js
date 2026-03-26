@@ -248,6 +248,161 @@ describe('GameData toJSON / fromJSON', () => {
   });
 });
 
+// ── duplicateRound ────────────────────────────────────────────────────────────
+
+describe('GameData duplicateRound', () => {
+  it('inserts a copy immediately after the original', () => {
+    const gd = makeGame();
+    const newId = gd.duplicateRound('r1');
+    expect(gd.rounds).toHaveLength(3);
+    expect(gd.rounds[1].id).toBe(newId);
+    expect(gd.rounds[2].id).toBe('r2');
+  });
+
+  it('copy has all fields of the original but a unique id', () => {
+    const gd = makeGame();
+    const newId = gd.duplicateRound('r1');
+    const copy = gd.getRound(newId);
+    expect(copy.target).toBe('א');
+    expect(copy.correct).toBe('אַרְיֵה');
+    expect(newId).not.toBe('r1');
+  });
+
+  it('returns null for unknown id', () => {
+    expect(makeGame().duplicateRound('nope')).toBeNull();
+  });
+
+  it('emits a change event', () => {
+    const gd = makeGame();
+    const handler = vi.fn();
+    gd.onChange(handler);
+    gd.duplicateRound('r1');
+    expect(handler).toHaveBeenCalledOnce();
+  });
+});
+
+// ── undo / redo ───────────────────────────────────────────────────────────────
+
+describe('GameData undo / redo', () => {
+  it('canUndo is false before any mutation', () => {
+    expect(makeGame().canUndo).toBe(false);
+  });
+
+  it('canRedo is false before any undo', () => {
+    expect(makeGame().canRedo).toBe(false);
+  });
+
+  it('canUndo is true after a mutation', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' });
+    expect(gd.canUndo).toBe(true);
+  });
+
+  it('undo reverses an updateRound', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' });
+    gd.undo();
+    expect(gd.getRound('r1')?.target).toBe('א');
+  });
+
+  it('redo re-applies the undone change', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' });
+    gd.undo();
+    gd.redo();
+    expect(gd.getRound('r1')?.target).toBe('ג');
+  });
+
+  it('canUndo is true after redo', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' });
+    gd.undo();
+    gd.redo();
+    expect(gd.canUndo).toBe(true);
+  });
+
+  it('canRedo is false after a new mutation clears the redo stack', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' });
+    gd.undo();
+    gd.updateRound('r2', { target: 'ד' }); // new mutation
+    expect(gd.canRedo).toBe(false);
+  });
+
+  it('undo reverses addRound', () => {
+    const gd = makeGame();
+    gd.addRound();
+    gd.undo();
+    expect(gd.rounds).toHaveLength(2);
+  });
+
+  it('undo reverses removeRound', () => {
+    const gd = makeGame();
+    gd.removeRound('r1');
+    gd.undo();
+    expect(gd.rounds).toHaveLength(2);
+    expect(gd.getRound('r1')).not.toBeNull();
+  });
+
+  it('undo reverses duplicateRound', () => {
+    const gd = makeGame();
+    gd.duplicateRound('r1');
+    gd.undo();
+    expect(gd.rounds).toHaveLength(2);
+  });
+
+  it('undo emits a change event', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' });
+    const handler = vi.fn();
+    gd.onChange(handler);
+    gd.undo();
+    expect(handler).toHaveBeenCalledOnce();
+  });
+
+  it('redo emits a change event', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' });
+    gd.undo();
+    const handler = vi.fn();
+    gd.onChange(handler);
+    gd.redo();
+    expect(handler).toHaveBeenCalledOnce();
+  });
+
+  it('undo does nothing if canUndo is false', () => {
+    const gd = makeGame();
+    expect(() => gd.undo()).not.toThrow();
+    expect(gd.rounds).toHaveLength(2);
+  });
+
+  it('redo does nothing if canRedo is false', () => {
+    const gd = makeGame();
+    expect(() => gd.redo()).not.toThrow();
+    expect(gd.rounds).toHaveLength(2);
+  });
+
+  it('supports multiple undo steps', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' });
+    gd.updateRound('r1', { target: 'ד' });
+    gd.undo(); // back to 'ג'
+    gd.undo(); // back to 'א'
+    expect(gd.getRound('r1')?.target).toBe('א');
+  });
+
+  it('supports undo + redo chain', () => {
+    const gd = makeGame();
+    gd.updateRound('r1', { target: 'ג' }); // step 1
+    gd.updateRound('r1', { target: 'ד' }); // step 2
+    gd.undo(); // undo step 2 → 'ג'
+    gd.undo(); // undo step 1 → 'א'
+    gd.redo(); // redo step 1 → 'ג'
+    expect(gd.getRound('r1')?.target).toBe('ג');
+    expect(gd.canRedo).toBe(true);
+  });
+});
+
 // ── fromRoundsArray ──────────────────────────────────────────────────────────
 
 describe('GameData.fromRoundsArray', () => {

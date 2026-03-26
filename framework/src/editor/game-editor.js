@@ -1,6 +1,12 @@
 /**
  * GameEditor — עורך משחק חי בסגנון TinyTap
  * מוסיף כפתור "ערוך / שחק" לכותרת ומנהל את מצב העריכה
+ *
+ * קיצורי מקלדת בעריכה:
+ *   Ctrl/Cmd + S  — שמור
+ *   Ctrl/Cmd + Z  — בטל פעולה
+ *   Ctrl/Cmd + Y  — בצע שנית (גם Ctrl+Shift+Z)
+ *   Escape        — חזור למצב שחקיה
  */
 
 import './editor-styles.css';
@@ -14,7 +20,7 @@ export class GameEditor {
   /**
    * @param {HTMLElement} container  — same container passed to GameShell
    * @param {import('./game-data.js').GameData} gameData
-   * @param {{
+   * @param {{\
    *   restartGame:       (container: HTMLElement) => void,
    *   getEditableFields?: (type: string) => object[],
    * }} options
@@ -31,6 +37,10 @@ export class GameEditor {
     this._inspector  = null;
     this._toolbar    = null;
     this._selectedId = null;
+
+    this._undoBtn    = null;
+    this._redoBtn    = null;
+    this._shortcutHandler = null;
 
     // Wait for GameShell to finish building the DOM before injecting toolbar
     requestAnimationFrame(() => this._injectToolbar());
@@ -63,16 +73,27 @@ export class GameEditor {
 
   _setToolbarEditMode() {
     this._toolbar.innerHTML = '';
+
     const playBtn   = this._makeBtn('▶ שחק',   'ab-editor-btn--play',   () => this.enterPlayMode());
     const addBtn    = this._makeBtn('+ הוסף',   'ab-editor-btn--add',    () => this._addRound());
     const saveBtn   = this._makeBtn('💾 שמור',  'ab-editor-btn--save',   () => this._save());
     const audioBtn  = this._makeBtn('🎤 קול',   'ab-editor-btn--audio',  () => this._openAudioManager());
     const exportBtn = this._makeBtn('⬇ ייצוא',  'ab-editor-btn--export', () => exportGameDataAsJSON(this._gameData));
-    this._toolbar.append(playBtn, addBtn, saveBtn, audioBtn, exportBtn);
+
+    this._undoBtn = this._makeBtn('↩', 'ab-editor-btn--undo', () => this._undo());
+    this._undoBtn.title = 'בטל (Ctrl+Z)';
+
+    this._redoBtn = this._makeBtn('↪', 'ab-editor-btn--redo', () => this._redo());
+    this._redoBtn.title = 'בצע שנית (Ctrl+Y)';
+
+    this._toolbar.append(playBtn, addBtn, this._undoBtn, this._redoBtn, saveBtn, audioBtn, exportBtn);
+    this._refreshUndoButtons();
   }
 
   _setToolbarPlayMode() {
     this._toolbar.innerHTML = '';
+    this._undoBtn = null;
+    this._redoBtn = null;
     this._editBtn  = this._makeBtn('✏️ ערוך', 'ab-editor-btn--edit',  () => this.enterEditMode());
     this._audioBtn = this._makeBtn('🎤 קול',  'ab-editor-btn--audio', () => this._openAudioManager());
     this._toolbar.append(this._editBtn, this._audioBtn);
@@ -85,6 +106,7 @@ export class GameEditor {
     this._mode = 'edit';
     this._container.classList.add('ab-editor-active');
     this._setToolbarEditMode();
+    this._attachShortcuts();
 
     const gameBodyEl = this._container.querySelector('.game-body');
     if (!gameBodyEl) return;
@@ -98,8 +120,10 @@ export class GameEditor {
       this._container,
       this._gameData,
       {
-        onSelectRound: id => this._selectRound(id),
-        onAddRound:    afterId => this._addRound(afterId),
+        onSelectRound:    id       => this._selectRound(id),
+        onAddRound:       afterId  => this._addRound(afterId),
+        onDuplicateRound: id       => this._duplicateRound(id),
+        onMoveRound:      (id, to) => this._moveRound(id, to),
       }
     );
 
@@ -125,6 +149,7 @@ export class GameEditor {
     this._mode = 'play';
     this._container.classList.remove('ab-editor-active');
     this._setToolbarPlayMode();
+    this._detachShortcuts();
 
     this._overlay?.destroy();
     this._navigator?.destroy();
@@ -151,6 +176,15 @@ export class GameEditor {
     const newId = this._gameData.addRound(afterId ?? this._selectedId);
     this._navigator?.refresh();
     this._selectRound(newId);
+    this._refreshUndoButtons();
+  }
+
+  _duplicateRound(id) {
+    const newId = this._gameData.duplicateRound(id ?? this._selectedId);
+    if (!newId) return;
+    this._navigator?.refresh();
+    this._selectRound(newId);
+    this._refreshUndoButtons();
   }
 
   _deleteRound(id) {
@@ -160,12 +194,94 @@ export class GameEditor {
     if (rounds.length > 0) {
       this._selectRound(rounds[0].id);
     }
+    this._refreshUndoButtons();
+  }
+
+  _moveRound(id, toIndex) {
+    this._gameData.moveRound(id, toIndex);
+    this._navigator?.refresh();
+    this._navigator?.setActiveRound(id);
+    this._refreshUndoButtons();
   }
 
   _onFieldChange(id, key, value) {
     this._gameData.updateRound(id, { [key]: value });
     this._navigator?.refresh();
     this._navigator?.setActiveRound(id);
+    this._refreshUndoButtons();
+  }
+
+  // ── Undo / Redo ───────────────────────────────────────────────────────────
+
+  _undo() {
+    if (!this._gameData.canUndo) return;
+    this._gameData.undo();
+    this._navigator?.refresh();
+    this._resyncSelection();
+    this._refreshUndoButtons();
+    this._showToast('↩ בוטל');
+  }
+
+  _redo() {
+    if (!this._gameData.canRedo) return;
+    this._gameData.redo();
+    this._navigator?.refresh();
+    this._resyncSelection();
+    this._refreshUndoButtons();
+    this._showToast('↪ בוצע שנית');
+  }
+
+  /** Re-select the current round (or fall back to first) after undo/redo. */
+  _resyncSelection() {
+    const rounds = this._gameData.rounds;
+    const stillExists = rounds.find(r => r.id === this._selectedId);
+    if (stillExists) {
+      this._selectRound(this._selectedId);
+    } else if (rounds.length > 0) {
+      this._selectRound(rounds[0].id);
+    }
+  }
+
+  _refreshUndoButtons() {
+    if (this._undoBtn) this._undoBtn.disabled = !this._gameData.canUndo;
+    if (this._redoBtn) this._redoBtn.disabled = !this._gameData.canRedo;
+  }
+
+  // ── Keyboard shortcuts ────────────────────────────────────────────────────
+
+  _attachShortcuts() {
+    this._shortcutHandler = (e) => {
+      if (this._mode !== 'edit') return;
+      const ctrl = e.ctrlKey || e.metaKey;
+
+      if (e.key === 'Escape') {
+        this.enterPlayMode();
+        return;
+      }
+      if (ctrl && !e.shiftKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        this._save();
+        return;
+      }
+      if (ctrl && !e.shiftKey && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        this._undo();
+        return;
+      }
+      if (ctrl && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+        e.preventDefault();
+        this._redo();
+        return;
+      }
+    };
+    document.addEventListener('keydown', this._shortcutHandler);
+  }
+
+  _detachShortcuts() {
+    if (this._shortcutHandler) {
+      document.removeEventListener('keydown', this._shortcutHandler);
+      this._shortcutHandler = null;
+    }
   }
 
   // ── Audio Manager ─────────────────────────────────────────────────────────

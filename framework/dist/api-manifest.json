@@ -1,9 +1,19 @@
 {
-  "generatedAt": "2026-03-26T19:00:09.861Z",
+  "generatedAt": "2026-03-26T19:25:19.051Z",
   "version": "1.0.0",
   "modules": [
     {
+      "path": "__tests__/editor-storage.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
       "path": "__tests__/events.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
+      "path": "__tests__/game-data.test.js",
       "description": "",
       "exports": []
     },
@@ -29,6 +39,16 @@
     },
     {
       "path": "__tests__/state.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
+      "path": "__tests__/voice-recorder.test.js",
+      "description": "",
+      "exports": []
+    },
+    {
+      "path": "__tests__/voice-store.test.js",
       "description": "",
       "exports": []
     },
@@ -155,28 +175,28 @@
     },
     {
       "path": "editor/game-data.js",
-      "description": "GameData — מודל נתוני המשחק הניתן לעריכה\nמנהל סיבובים, אירועי שינוי, ו-serialization לאחסון",
+      "description": "GameData — מודל נתוני המשחק הניתן לעריכה\nמנהל סיבובים, אירועי שינוי, undo/redo ו-serialization לאחסון",
       "exports": [
         "GameData"
       ]
     },
     {
       "path": "editor/game-editor.js",
-      "description": "GameEditor — עורך משחק חי בסגנון TinyTap\nמוסיף כפתור \"ערוך / שחק\" לכותרת ומנהל את מצב העריכה",
+      "description": "GameEditor — עורך משחק חי בסגנון TinyTap\nמוסיף כפתור \"ערוך / שחק\" לכותרת ומנהל את מצב העריכה\n\nקיצורי מקלדת בעריכה:\n  Ctrl/Cmd + S  — שמור\n  Ctrl/Cmd + Z  — בטל פעולה\n  Ctrl/Cmd + Y  — בצע שנית (גם Ctrl+Shift+Z)\n  Escape        — חזור למצב שחקיה",
       "exports": [
         "GameEditor"
       ]
     },
     {
       "path": "editor/round-inspector.js",
-      "description": "בודק סיבוב — חלונית עריכת שדות הסיבוב הנוכחי\nמוצב בצד inline-end (שמאל ב-RTL)\nהקלטות קוליות מנוהלות דרך מנהל ההקלטות (audio-manager.js)",
+      "description": "בודק סיבוב — חלונית עריכת שדות הסיבוב הנוכחי\nמוצב בצד inline-end (שמאל ב-RTL)\n\nתכונות:\n - שדות טקסט ואמוג'י לפי סוג המשחק\n - העלאת תמונה לכל סיבוב (נשמרת כ-data URL ב-round.image)\n - כפתור מחיקת סיבוב",
       "exports": [
         "createRoundInspector"
       ]
     },
     {
       "path": "editor/slide-navigator.js",
-      "description": "ניווט שקופיות — רשימת ממוזערים של כל סיבובי המשחק\nמוצב בצד inline-start (ימין ב-RTL)",
+      "description": "ניווט שקופיות — רשימת ממוזערים של כל סיבובי המשחק\nמוצב בצד inline-start (ימין ב-RTL)\nתומך בגרירה לשינוי סדר ושכפול סיבובים",
       "exports": [
         "createSlideNavigator"
       ]
