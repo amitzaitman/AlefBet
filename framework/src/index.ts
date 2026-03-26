@@ -29,6 +29,7 @@ export { createFeedback }          from './ui/feedback.js';
 export { showCompletionScreen }    from './ui/completion-screen.js';
 export { showNikudSettingsDialog } from './ui/nikud-settings.js';
 export { createZone }              from './ui/interactive-zones.js';
+export { createZonePlayer }        from './ui/zone-player.js';
 export { showLoadingScreen, hideLoadingScreen } from './ui/loading-screen.js';
 export { injectHeaderButton }      from './ui/header-button.js';
 export { createNikudBox }          from './ui/nikud-box.js';
@@ -49,18 +50,21 @@ export { GameEditor }    from './editor/game-editor.js';
 export { GameData }      from './editor/game-data.js';
 export { saveGameData, loadGameData, clearGameData, exportGameDataAsJSON } from './editor/editor-storage.js';
 export { showAudioManager } from './editor/audio-manager.js';
+export { createZoneEditor } from './editor/zone-editor.js';
 
 // ===== Editor: schemas + field utilities (TypeScript consumers) =====
 export {
+  ZoneSchema,
   BaseRoundSchema,
   MultipleChoiceRoundSchema,
   DragMatchRoundSchema,
+  ZoneTapRoundSchema,
   GameMetaSchema,
   GameDataSchema,
   BUILTIN_ROUND_SCHEMAS,
 } from './editor/schemas.js';
 export type {
-  BaseRound, MultipleChoiceRound, DragMatchRound,
+  Zone, BaseRound, MultipleChoiceRound, DragMatchRound, ZoneTapRound,
   GameMeta, GameDataJson, RoundRecord,
 } from './editor/schemas.js';
 export { schemaToFields }  from './editor/schema-to-fields.js';

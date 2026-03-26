@@ -15,6 +15,9 @@ import { createSlideNavigator }  from './slide-navigator.js';
 import { createRoundInspector }  from './round-inspector.js';
 import { saveGameData, exportGameDataAsJSON } from './editor-storage.js';
 import { showAudioManager }      from './audio-manager.js';
+import { createZoneEditor }      from './zone-editor.js';
+import type { ZoneEditor }       from './zone-editor.js';
+import type { Zone }             from './schemas.js';
 import type { GameData }         from './game-data.js';
 
 export interface GameEditorOptions {
@@ -39,6 +42,8 @@ export class GameEditor {
   private _undoBtn: HTMLButtonElement | null = null;
   private _redoBtn: HTMLButtonElement | null = null;
   private _shortcutHandler: ((e: KeyboardEvent) => void) | null = null;
+  private _zoneEditor: ZoneEditor | null = null;
+  private _zoneModal: HTMLElement | null = null;
 
   constructor(container: HTMLElement, gameData: GameData, options: GameEditorOptions = {}) {
     this._container   = container;
@@ -88,6 +93,7 @@ export class GameEditor {
       this._makeBtn('+ הוסף', 'ab-editor-btn--add',    () => this._addRound()),
       this._undoBtn,
       this._redoBtn,
+      this._makeBtn('🔲 אזורים', 'ab-editor-btn--zones', () => this._openZoneEditor()),
       this._makeBtn('💾 שמור', 'ab-editor-btn--save',   () => this._save()),
       this._makeBtn('🎤 קול',  'ab-editor-btn--audio',  () => this._openAudioManager()),
       this._makeBtn('⬇ ייצוא','ab-editor-btn--export',  () => exportGameDataAsJSON(this._gameData)),
@@ -145,6 +151,7 @@ export class GameEditor {
     this._setToolbarPlayMode();
     this._detachShortcuts();
 
+    this._closeZoneEditor();
     this._overlay?.destroy();
     this._navigator?.destroy();
     this._inspector?.destroy();
@@ -251,6 +258,100 @@ export class GameEditor {
       document.removeEventListener('keydown', this._shortcutHandler);
       this._shortcutHandler = null;
     }
+  }
+
+  // ── Zone editor ──────────────────────────────────────────────────────────
+
+  private _openZoneEditor() {
+    if (!this._selectedId) {
+      this._showToast('בחרו סיבוב קודם');
+      return;
+    }
+    const round = this._gameData.getRound(this._selectedId);
+    if (!round) return;
+
+    if (!round.image) {
+      this._showToast('יש להוסיף תמונה לפני ציור אזורים');
+      return;
+    }
+
+    // Create modal backdrop
+    const modal = document.createElement('div');
+    modal.className = 'ab-ze-modal';
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'ab-ze-backdrop';
+    modal.appendChild(backdrop);
+
+    const box = document.createElement('div');
+    box.className = 'ab-ze-box';
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'ab-ze-header';
+    header.innerHTML = `
+      <span class="ab-ze-title">🔲 עריכת אזורים</span>
+      <span class="ab-ze-subtitle">ציירו מלבנים על התמונה וסמנו תשובות נכונות</span>
+    `;
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'ab-ze-close';
+    closeBtn.textContent = '\u2715';
+    closeBtn.addEventListener('click', () => this._closeZoneEditor());
+    header.appendChild(closeBtn);
+    box.appendChild(header);
+
+    // Image container for the zone editor
+    const imgContainer = document.createElement('div');
+    imgContainer.className = 'ab-ze-img-container';
+
+    const img = document.createElement('img');
+    img.className = 'ab-ze-img';
+    img.src = round.image as string;
+    img.alt = '';
+    img.draggable = false;
+    imgContainer.appendChild(img);
+    box.appendChild(imgContainer);
+
+    // Footer with done button
+    const footer = document.createElement('div');
+    footer.className = 'ab-ze-footer';
+    const doneBtn = document.createElement('button');
+    doneBtn.className = 'ab-editor-btn ab-editor-btn--play';
+    doneBtn.textContent = '\u2713 סיום';
+    doneBtn.addEventListener('click', () => this._closeZoneEditor());
+    footer.appendChild(doneBtn);
+    box.appendChild(footer);
+
+    modal.appendChild(box);
+    document.body.appendChild(modal);
+    this._zoneModal = modal;
+
+    // Wait for image to load, then attach zone editor
+    img.onload = () => {
+      const currentZones: Zone[] = (round.zones as Zone[] | undefined) ?? [];
+      this._zoneEditor = createZoneEditor(imgContainer, currentZones, {
+        onChange: (zones: Zone[]) => {
+          if (this._selectedId) {
+            this._gameData.updateRound(this._selectedId, { zones });
+            this._refreshUndoButtons();
+          }
+        },
+      });
+    };
+
+    // If image is cached, onload fires synchronously
+    if (img.complete && img.naturalWidth > 0) {
+      img.onload?.(new Event('load') as any);
+    }
+
+    backdrop.addEventListener('click', () => this._closeZoneEditor());
+  }
+
+  private _closeZoneEditor() {
+    this._zoneEditor?.destroy();
+    this._zoneEditor = null;
+    this._zoneModal?.remove();
+    this._zoneModal = null;
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

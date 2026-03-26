@@ -6,6 +6,21 @@
  */
 import { z } from 'zod';
 
+// ── Zone schema ──────────────────────────────────────────────────────────────
+
+/** A single interactive zone drawn on a slide image (percentages 0–100) */
+export const ZoneSchema = z.object({
+  id:      z.string(),
+  x:       z.number().min(0).max(100),
+  y:       z.number().min(0).max(100),
+  width:   z.number().min(0).max(100),
+  height:  z.number().min(0).max(100),
+  correct: z.boolean().default(false),
+  label:   z.string().optional(),
+});
+
+export type Zone = z.infer<typeof ZoneSchema>;
+
 // ── Round schemas ─────────────────────────────────────────────────────────────
 
 /**
@@ -15,6 +30,7 @@ import { z } from 'zod';
 export const BaseRoundSchema = z.object({
   id:    z.string(),
   image: z.string().optional(),
+  zones: z.array(ZoneSchema).optional(),
 }).passthrough();
 
 /** Multiple-choice game (e.g. letter-match-animals) */
@@ -51,11 +67,17 @@ export const GameDataSchema = z.object({
 export type BaseRound          = z.infer<typeof BaseRoundSchema>;
 export type MultipleChoiceRound = z.infer<typeof MultipleChoiceRoundSchema>;
 export type DragMatchRound     = z.infer<typeof DragMatchRoundSchema>;
+export type ZoneTapRound       = z.infer<typeof ZoneTapRoundSchema>;
 export type GameMeta           = z.infer<typeof GameMetaSchema>;
 export type GameDataJson       = z.infer<typeof GameDataSchema>;
 
 /** Any round record — open map with a required id */
 export type RoundRecord = Record<string, unknown> & { id: string };
+
+/** Zone-tap game (TinyTap-style: tap the correct zone on an image) */
+export const ZoneTapRoundSchema = BaseRoundSchema.extend({
+  instruction: z.string().optional().describe('הוראה'),
+});
 
 // ── Built-in round schema registry ───────────────────────────────────────────
 
@@ -63,4 +85,5 @@ export type RoundRecord = Record<string, unknown> & { id: string };
 export const BUILTIN_ROUND_SCHEMAS: Record<string, z.ZodObject<z.ZodRawShape>> = {
   'multiple-choice': MultipleChoiceRoundSchema,
   'drag-match':      DragMatchRoundSchema,
+  'zone-tap':        ZoneTapRoundSchema,
 };
