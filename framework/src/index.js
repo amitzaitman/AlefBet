@@ -59,6 +59,11 @@ export { createLocalState } from './core/local-state.js';
 // ===== App Shell [נוסף על ידי: passover-cleaning app] =====
 export { createAppShell } from './ui/app-shell.js';
 
+// ===== Audio: Voice Recording [נוסף על ידי: voice-recording] =====
+export { createVoiceRecorder, isVoiceRecordingSupported } from './audio/voice-recorder.js';
+export { saveVoice, loadVoice, deleteVoice, listVoiceKeys, playVoice, hasVoice } from './audio/voice-store.js';
+export { createVoiceRecordButton } from './ui/voice-record-button.js';
+
 // ===== Editor [נוסף על ידי: live-game-editing] =====
 export { GameEditor }                                           from './editor/game-editor.js';
 export { GameData }                                             from './editor/game-data.js';

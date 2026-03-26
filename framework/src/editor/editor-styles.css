@@ -328,6 +328,103 @@
   to   { opacity: 0; }
 }
 
+/* ── Voice recording button ─────────────────────────────────────────────── */
+.ab-voice-btn-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ab-voice-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.ab-voice-btn:active { transform: scale(0.92); }
+.ab-voice-btn:disabled { opacity: 0.5; cursor: default; }
+
+.ab-voice-btn--record,
+.ab-voice-btn--re-record {
+  background: #f3f4f6;
+  color: var(--ab-editor-text);
+  border: 1.5px solid var(--ab-editor-border);
+}
+
+.ab-voice-btn--record:hover,
+.ab-voice-btn--re-record:hover { background: var(--ab-editor-border); }
+
+.ab-voice-btn--stop {
+  background: #dc2626;
+  color: #fff;
+}
+
+.ab-voice-btn--stop:hover { background: #b91c1c; }
+
+.ab-voice-btn--play {
+  background: #16a34a;
+  color: #fff;
+}
+
+.ab-voice-btn--play:hover { background: #15803d; }
+
+.ab-voice-btn--delete {
+  background: transparent;
+  color: #dc2626;
+  border: 1.5px solid #fca5a5;
+  font-size: 13px;
+}
+
+.ab-voice-btn--delete:hover { background: #fef2f2; }
+
+/* Pulsing red dot while recording */
+.ab-voice-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #dc2626;
+  border-radius: 50%;
+  animation: ab-voice-pulse 1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes ab-voice-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+.ab-voice-timer {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: #dc2626;
+  font-weight: 700;
+  min-width: 28px;
+}
+
+.ab-voice-error {
+  font-size: 11px;
+  color: #dc2626;
+}
+
+.ab-voice-unsupported {
+  font-size: 11px;
+  color: var(--ab-editor-muted);
+}
+
+/* Voice field section inside the inspector */
+.ab-editor-field--voice .ab-editor-field__label {
+  color: var(--ab-editor-accent);
+}
+
 /* ── Mobile: collapse panels to bottom strips ───────────────────────────── */
 @media (max-width: 600px) {
   :root {

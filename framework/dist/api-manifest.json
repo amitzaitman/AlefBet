@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-26T18:39:26.634Z",
+  "generatedAt": "2026-03-26T18:51:28.779Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -52,6 +52,26 @@
       "description": "מנוע קריאת טקסט עברי\nמשתמש ב-Google Translate TTS לאיכות גבוהה יותר\nעם נפילה ל-Web Speech API כגיבוי",
       "exports": [
         "tts"
+      ]
+    },
+    {
+      "path": "audio/voice-recorder.js",
+      "description": "עטיפה ל-MediaRecorder API\nמאפשרת הקלטת קול ממיקרופון ומחזירה Blob",
+      "exports": [
+        "isVoiceRecordingSupported",
+        "createVoiceRecorder"
+      ]
+    },
+    {
+      "path": "audio/voice-store.js",
+      "description": "אחסון הקלטות קוליות ב-IndexedDB\nמשמש לשמירת הקלטות מורה לסיבובי משחק, הוראות וניקוד",
+      "exports": [
+        "saveVoice",
+        "loadVoice",
+        "deleteVoice",
+        "listVoiceKeys",
+        "playVoice",
+        "hasVoice"
       ]
     },
     {
@@ -238,6 +258,13 @@
       "description": "סרגל התקדמות ויזואלי\nמציג את ההתקדמות בסיבובי המשחק\n[נוסף על ידי: letter-match game]\n\n@param {HTMLElement} container - אלמנט המיכל\n@param {number} total - מספר הסיבובים הכולל\n@returns {{ update(current), destroy() }}",
       "exports": [
         "createProgressBar"
+      ]
+    },
+    {
+      "path": "ui/voice-record-button.js",
+      "description": "כפתור הקלטת קול\nמצבים: ריק → מקליט → יש הקלטה\nניתן להטמיע בכל מקום בממשק",
+      "exports": [
+        "createVoiceRecordButton"
       ]
     },
     {

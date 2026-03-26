@@ -103,8 +103,9 @@ export class GameEditor {
     this._inspector = createRoundInspector(
       this._container,
       {
-        onFieldChange:  (id, key, val) => this._onFieldChange(id, key, val),
-        onDeleteRound:  id => this._deleteRound(id),
+        gameId:           this._gameData.id,
+        onFieldChange:    (id, key, val) => this._onFieldChange(id, key, val),
+        onDeleteRound:    id => this._deleteRound(id),
         getEditableFields: this._getEditableFields,
       }
     );
