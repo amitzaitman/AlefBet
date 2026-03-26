@@ -1,0 +1,14 @@
+{
+  "name": "sonos-baby-monitor",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Use a Sonos speaker's mic as a baby monitor — detects sound and alerts via another Sonos speaker",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js --dev"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
