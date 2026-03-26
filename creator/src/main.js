@@ -7,6 +7,7 @@ import { ClaudeClient } from './claude-client.js';
 import { ChatUI } from './chat-ui.js';
 import { buildSystemPrompt } from './system-prompt.js';
 import { extractGameFiles, renderPreview, formatCodeOutput, downloadGame } from './game-preview.js';
+import { showPublishDialog } from './publish.js';
 
 // ── DOM refs ──────────────────────────────────────────────────────────────
 
@@ -20,6 +21,7 @@ const chatForm       = document.getElementById('chat-form');
 const chatInputEl    = document.getElementById('chat-input');
 const chatSendBtn    = document.getElementById('chat-send-btn');
 const chatMessagesEl = document.getElementById('chat-messages');
+const publishGameBtn = document.getElementById('publish-game-btn');
 const saveGameBtn    = document.getElementById('save-game-btn');
 const copyCodeBtn    = document.getElementById('copy-code-btn');
 
@@ -144,6 +146,7 @@ async function sendMessage(text) {
       renderGamePreview(files);
       updateCodeView(files);
       saveGameBtn.removeAttribute('hidden');
+      publishGameBtn.removeAttribute('hidden');
     }
 
   } catch (err) {
@@ -183,6 +186,11 @@ previewTabs.forEach(tab => {
 saveGameBtn.addEventListener('click', () => {
   if (!lastGameFiles) return;
   downloadGame(lastGameName, lastGameFiles);
+});
+
+publishGameBtn.addEventListener('click', () => {
+  if (!lastGameFiles) return;
+  showPublishDialog(lastGameName, lastGameFiles);
 });
 
 copyCodeBtn.addEventListener('click', async () => {

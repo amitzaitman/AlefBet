@@ -103,3 +103,67 @@ export function downloadGame(gameName, files) {
     URL.revokeObjectURL(url);
   });
 }
+
+/**
+ * Build a single self-contained HTML file with the framework and game inlined.
+ * Uses the UMD build so no ES module imports are needed in the output.
+ */
+export async function buildStandaloneHTML(gameName, files) {
+  const [frameworkJs, frameworkCss] = await Promise.all([
+    fetch('../framework/dist/alefbet.umd.cjs').then(r => r.text()),
+    fetch('../framework/dist/alefbet.css').then(r => r.text()),
+  ]);
+
+  const gameJs  = files['game.js']  || '';
+  const gameCss = files['game.css'] || '';
+
+  // Replace ES module import with destructure from window.AlefBet (UMD global)
+  const transformedJs = gameJs.replace(
+    /import\s*\{([^}]+)\}\s*from\s*['"][^'"]*alefbet[^'"]*['"]\s*;?/g,
+    (_, imports) => `const {${imports.trim()}} = window.AlefBet;`
+  );
+
+  const title = gameName || 'AlefBet Game';
+
+  return `<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;padding:0;font-family:'Heebo',Arial,sans-serif}
+  </style>
+  <style>${frameworkCss}</style>
+  <style>${gameCss}</style>
+</head>
+<body>
+  <div id="game"></div>
+  <script>${frameworkJs}</script>
+  <script>
+${transformedJs}
+
+if (typeof startGame === 'function') {
+  startGame(document.getElementById('game'));
+}
+  </script>
+</body>
+</html>`;
+}
+
+/** Download a single standalone HTML file containing the complete game */
+export function downloadStandaloneGame(gameName, html) {
+  const slug = (gameName || 'game')
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\u05D0-\u05EA-]/g, '') || 'game';
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${slug}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
