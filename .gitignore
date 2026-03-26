@@ -1,4 +1,5 @@
 node_modules/
+/dist/
 .claude/
 .a5c/
 build_log.txt
