@@ -15,6 +15,9 @@ import {
   getNikud,
   showLoadingScreen,
   hideLoadingScreen,
+  GameEditor,
+  GameData,
+  loadGameData,
 } from '../../framework/dist/alefbet.js';
 
 // ── Game data ─────────────────────────────────────────────────────────────
@@ -73,10 +76,20 @@ export async function startGame(container) {
 
   hideLoadingScreen(container);
 
+  // Load saved rounds (if teacher has edited them) or fall back to defaults
+  const savedData = loadGameData('letter-match-animals');
+  const activeRounds = savedData ? savedData.rounds : ROUNDS;
+
   const shell = new GameShell(container, {
-    totalRounds: ROUNDS.length,
+    totalRounds: activeRounds.length,
     title: getNikud('התאמת אותיות') || 'התאמת אותיות',
   });
+
+  // Live editing support
+  const gameData = GameData.fromRoundsArray('letter-match-animals', activeRounds, {
+    title: 'התאמת אותיות', type: 'multiple-choice',
+  }, DISTRACTORS);
+  new GameEditor(container, gameData, { restartGame: c => startGame(c) });
 
   let progressBar = null;
   let feedback = null;
@@ -136,10 +149,9 @@ export async function startGame(container) {
         const hasMore = shell.state.nextRound();
         if (hasMore) {
           currentRoundIndex++;
-          buildRoundUI(ROUNDS[currentRoundIndex]);
-          const nextName = getLetter(ROUNDS[currentRoundIndex].target)?.nameNikud || ROUNDS[currentRoundIndex].target;
+          buildRoundUI(activeRounds[currentRoundIndex]);
         } else {
-          showCompletionScreen(container, shell.state.score, ROUNDS.length, () => startGame(container));
+          showCompletionScreen(container, shell.state.score, activeRounds.length, () => startGame(container));
         }
       }, 1600);
 
@@ -163,13 +175,11 @@ export async function startGame(container) {
 
   shell.on('start', () => {
     shell.footerEl.innerHTML = '';
-    progressBar = createProgressBar(shell.footerEl, ROUNDS.length);
+    progressBar = createProgressBar(shell.footerEl, activeRounds.length);
     progressBar.update(0);
 
     currentRoundIndex = 0;
-    buildRoundUI(ROUNDS[currentRoundIndex]);
-
-    const firstName = getLetter(ROUNDS[0].target)?.nameNikud || ROUNDS[0].target;
+    buildRoundUI(activeRounds[currentRoundIndex]);
   });
 
   shell.start();

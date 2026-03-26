@@ -58,3 +58,8 @@ export { createLocalState } from './core/local-state.js';
 
 // ===== App Shell [נוסף על ידי: passover-cleaning app] =====
 export { createAppShell } from './ui/app-shell.js';
+
+// ===== Editor [נוסף על ידי: live-game-editing] =====
+export { GameEditor }                                           from './editor/game-editor.js';
+export { GameData }                                             from './editor/game-data.js';
+export { saveGameData, loadGameData, clearGameData, exportGameDataAsJSON } from './editor/editor-storage.js';

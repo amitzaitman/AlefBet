@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-26T11:36:55.016Z",
+  "generatedAt": "2026-03-26T18:39:26.634Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -107,6 +107,51 @@
         "nikudBaseLetters",
         "letterWithNikud",
         "randomNikud"
+      ]
+    },
+    {
+      "path": "editor/editor-overlay.js",
+      "description": "שכבת-על שקופה מעל game-body — מקפיאה את המשחק במצב עריכה",
+      "exports": [
+        "createEditorOverlay"
+      ]
+    },
+    {
+      "path": "editor/editor-storage.js",
+      "description": "אחסון נתוני עורך המשחק ב-localStorage",
+      "exports": [
+        "saveGameData",
+        "loadGameData",
+        "clearGameData",
+        "exportGameDataAsJSON"
+      ]
+    },
+    {
+      "path": "editor/game-data.js",
+      "description": "GameData — מודל נתוני המשחק הניתן לעריכה\nמנהל סיבובים, אירועי שינוי, ו-serialization לאחסון",
+      "exports": [
+        "GameData"
+      ]
+    },
+    {
+      "path": "editor/game-editor.js",
+      "description": "GameEditor — עורך משחק חי בסגנון TinyTap\nמוסיף כפתור \"ערוך / שחק\" לכותרת ומנהל את מצב העריכה",
+      "exports": [
+        "GameEditor"
+      ]
+    },
+    {
+      "path": "editor/round-inspector.js",
+      "description": "בודק סיבוב — חלונית עריכת שדות הסיבוב הנוכחי\nמוצב בצד inline-end (שמאל ב-RTL)",
+      "exports": [
+        "createRoundInspector"
+      ]
+    },
+    {
+      "path": "editor/slide-navigator.js",
+      "description": "ניווט שקופיות — רשימת ממוזערים של כל סיבובי המשחק\nמוצב בצד inline-start (ימין ב-RTL)",
+      "exports": [
+        "createSlideNavigator"
       ]
     },
     {

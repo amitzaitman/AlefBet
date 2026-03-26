@@ -23,6 +23,8 @@ import {
   hideLoadingScreen,
   injectHeaderButton,
   createNikudBox,
+  GameEditor,
+  GameData,
 } from '../../framework/dist/alefbet.js';
 
 const STATIC_TEXTS = [
@@ -57,6 +59,10 @@ export async function startGame(container) {
   });
 
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
+
+  // Live editing support (nikud-match rounds are procedurally generated, expose meta only)
+  const gameData = GameData.fromRoundsArray('nikud-match', [], { title: 'לימוד ניקוד', type: 'drag-match' });
+  new GameEditor(container, gameData, { restartGame: c => startGame(c) });
 
   let progressBar = null;
   let roundIndex = 0;
