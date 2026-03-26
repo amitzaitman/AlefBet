@@ -408,7 +408,7 @@ function TaskCard({ task, familyMembers, expanded, onToggleExpand, onToggleDone,
                   ? 'bg-pesach-100 border-pesach-400 hover:bg-pesach-200'
                   : 'bg-white border-gray-300 hover:border-pesach-400 hover:bg-pesach-50'
             }`}
-            title={isDone ? 'סמן כלא הושלם' : 'סמן כהושלם'}
+            title={isDone ? 'סמן כממתינה' : task.status === 'in-progress' ? 'סמן כהושלם' : 'סמן כבביצוע'}
           >
             {isDone && (
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -567,7 +567,7 @@ export default function TasksPage() {
 
   const toggleDone = useCallback((task: CleaningTask) => {
     const next: Record<TaskStatus, TaskStatus> = {
-      pending: 'done',
+      pending: 'in-progress',
       'in-progress': 'done',
       done: 'pending',
     };

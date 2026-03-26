@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-09T22:15:02.021Z",
+  "generatedAt": "2026-03-26T11:36:55.016Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -69,6 +69,13 @@
       ]
     },
     {
+      "path": "core/local-state.js",
+      "description": "מנהל מצב מקומי — שמירה ב-localStorage עם הודעה לנרשמים\n\n@param {string} storageKey - המפתח לשמירה ב-localStorage\n@param {*} defaultValue - ערך ברירת המחדל אם אין נתונים שמורים\n@returns {{ get, set, update, subscribe }}\n\n@example\nconst state = createLocalState('myApp:tasks', []);\nstate.subscribe(tasks => console.log('עודכן:', tasks));\nstate.set([{ id: 1, done: false }]);\nstate.update(tasks => tasks.map(t => ({ ...t, done: true })));",
+      "exports": [
+        "createLocalState"
+      ]
+    },
+    {
       "path": "core/round-manager.js",
       "description": "מנהל סיבובים\nעוזר משותף לניהול זרימת תשובה נכונה / שגויה בין סיבובים",
       "exports": [
@@ -118,6 +125,13 @@
       ]
     },
     {
+      "path": "ui/app-shell.js",
+      "description": "מעטפת אפליקציה רב-לשונית — כותרת, ניווט טאבים, ניווט תחתון לנייד\n\nמיועדת לאפליקציות שירות (לא משחקים) עם ניווט רב-טאבים.\nשונה מ-GameShell: אין ניהול סיבובים — רק מבנה ניווט.\n\n@param {HTMLElement} container - אלמנט המיכל של האפליקציה\n@param {object} config - הגדרות האפליקציה\n@param {string} config.title - כותרת ראשית\n@param {string} [config.subtitle] - כותרת משנה (אופציונלית)\n@param {Array<{id: string, label: string, icon: string}>} config.tabs - רשימת טאבים\n@param {string} [config.homeUrl] - כתובת דף הבית (לכפתור 🏠)\n@param {Function} [config.onTabChange] - קולבק בעת החלפת טאב: fn(tabId)\n@returns {{ contentEl: HTMLElement, setSubtitle(text: string): void, setActiveTab(tabId: string): void }}\n\n@example\nconst shell = createAppShell(document.getElementById('app'), {\n  title: 'ניהול משימות',\n  subtitle: 'פסח תשפ״ו',\n  tabs: [\n    { id: 'rooms', label: 'חדרים', icon: '🏠' },\n    { id: 'tasks', label: 'משימות', icon: '✅' },\n  ],\n  homeUrl: '../../index.html',\n  onTabChange: id => renderTab(id),\n});\nshell.setSubtitle('3 משימות נותרו');\nshell.setActiveTab('tasks');",
+      "exports": [
+        "createAppShell"
+      ]
+    },
+    {
       "path": "ui/completion-screen.js",
       "description": "מסך סיום המשחק\nמציג כוכבים, ניקוד וכפתור לשחק שוב\n[נוסף על ידי: letter-match game]\n\n@param {HTMLElement} container - אלמנט המיכל\n@param {number} score - ניקוד שהושג\n@param {number} totalRounds - מספר הסיבובים הכולל\n@param {function} onReplay - קולבק לחזרה על המשחק",
       "exports": [
@@ -155,7 +169,7 @@
     },
     {
       "path": "ui/nikud-box.js",
-      "description": "קופסת ניקוד — תצוגת ריבוע ריק עם סימן ניקוד במיקום הנכון\nשימושי להצגת סימן ניקוד בלי אות — למשחקי התאמה, בחירה ולימוד\n[נוסף על ידי: nikud-match game]",
+      "description": "קופסת ניקוד — ריבוע ריק (מסמל אות) עם סימן ניקוד מחוצה לו\n[נוסף על ידי: nikud-match game]",
       "exports": [
         "createNikudBox"
       ]

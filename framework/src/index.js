@@ -52,3 +52,9 @@ export { createDragSource, createDropTarget } from './input/drag.js';
 
 // ===== Utils [נוסף על ידי: nikud support] =====
 export { addNikud, getNikud, preloadNikud } from './utils/nakdan.js';
+
+// ===== State [נוסף על ידי: passover-cleaning app] =====
+export { createLocalState } from './core/local-state.js';
+
+// ===== App Shell [נוסף על ידי: passover-cleaning app] =====
+export { createAppShell } from './ui/app-shell.js';
