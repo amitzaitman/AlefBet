@@ -1561,3 +1561,102 @@
   0%, 100% { fill: transparent; stroke: transparent; }
   50%      { fill: rgba(34, 197, 94, 0.2); stroke: rgba(34, 197, 94, 0.7); stroke-width: 2; }
 }
+
+/* ==========================================================================
+   Mobile overrides for zone editor, template picker, and zone player
+   ========================================================================== */
+@media (max-width: 600px) {
+  /* Zone editor modal — full screen on mobile */
+  .ab-ze-box {
+    width: 100vw;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+
+  .ab-ze-header {
+    padding: 10px 12px 8px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .ab-ze-title { font-size: 15px; }
+  .ab-ze-subtitle { font-size: 11px; }
+
+  .ab-ze-img-container { min-height: 200px; }
+  .ab-ze-img { max-height: 55dvh; }
+
+  .ab-ze-footer { padding: 8px 12px; }
+
+  /* Toolbar — compact on mobile */
+  .ab-ze-toolbar {
+    top: 4px;
+    gap: 4px;
+  }
+
+  .ab-ze-tool-btn {
+    padding: 3px 7px;
+    font-size: 11px;
+  }
+
+  .ab-ze-toolbar__hint {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* Zone detail panel — wider and closer */
+  .ab-ze-panel {
+    min-width: 150px;
+    max-width: 200px;
+    padding: 6px;
+  }
+
+  .ab-ze-panel__input {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  /* Template picker — full screen on mobile */
+  .ab-tpl-box {
+    width: 100vw;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+
+  .ab-tpl-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .ab-tpl-card {
+    padding: 8px 6px;
+  }
+
+  .ab-tpl-card__label { font-size: 12px; }
+  .ab-tpl-card__desc { font-size: 10px; }
+
+  /* Zone player — ensure full width on mobile */
+  .ab-zp-wrap {
+    border-radius: 0;
+  }
+
+  .ab-zp-image {
+    border-radius: 0;
+  }
+
+  .ab-zp-zone__label {
+    font-size: 10px;
+    padding: 1px 5px;
+  }
+
+  /* Editor toolbar — allow wrapping */
+  .ab-editor-toolbar {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .ab-editor-btn {
+    padding: 4px 7px;
+    font-size: 12px;
+  }
+}
