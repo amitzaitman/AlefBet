@@ -330,6 +330,7 @@ export class GameEditor {
     img.onload = () => {
       const currentZones: Zone[] = (round.zones as Zone[] | undefined) ?? [];
       this._zoneEditor = createZoneEditor(imgContainer, currentZones, {
+        gameId: this._gameData.id,
         onChange: (zones: Zone[]) => {
           if (this._selectedId) {
             this._gameData.updateRound(this._selectedId, { zones });

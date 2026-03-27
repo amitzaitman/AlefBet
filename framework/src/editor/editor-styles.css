@@ -1154,6 +1154,60 @@
 .ab-ze-zone__handle--sw { bottom: -5px; left: -5px; cursor: sw-resize; }
 .ab-ze-zone__handle--se { bottom: -5px; right: -5px; cursor: se-resize; }
 
+/* ── Zone detail panel (label + audio, below selected zone) ────────────── */
+.ab-ze-panel {
+  position: absolute;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+  max-width: 260px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.ab-ze-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ab-ze-panel__input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.ab-ze-panel__input::placeholder { color: rgba(255,255,255,0.4); }
+.ab-ze-panel__input:focus { border-color: #fbbf24; }
+
+.ab-ze-panel__audio-label {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Voice buttons inside zone panel — smaller styling */
+.ab-ze-panel .ab-voice-btn-wrap {
+  flex: 1;
+}
+
+.ab-ze-panel .ab-voice-btn {
+  width: 28px;
+  height: 28px;
+  font-size: 12px;
+}
+
 
 /* ==========================================================================
    Zone Player — tappable zones during play mode
@@ -1250,4 +1304,42 @@
 @keyframes ab-zp-reveal {
   0%   { opacity: 0; }
   100% { opacity: 1; }
+}
+
+/* ── Soundboard mode ───────────────────────────────────────────────────── */
+.ab-zp-zone--soundboard {
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+.ab-zp-zone--soundboard:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.ab-zp-zone__label {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Tap pulse in soundboard mode */
+.ab-zp-zone--tapped {
+  animation: ab-zp-tap-pulse 0.4s ease;
+}
+
+@keyframes ab-zp-tap-pulse {
+  0%   { background: rgba(124, 58, 237, 0.4); transform: scale(1); }
+  50%  { background: rgba(124, 58, 237, 0.6); transform: scale(1.03); }
+  100% { background: rgba(255, 255, 255, 0.08); transform: scale(1); }
 }

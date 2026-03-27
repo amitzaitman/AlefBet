@@ -12,6 +12,7 @@
  */
 
 import type { Zone } from './schemas.js';
+import { createVoiceRecordButton } from '../ui/voice-record-button.js';
 
 let _zoneIdCounter = 0;
 function generateZoneId(): string {
@@ -23,6 +24,8 @@ function generateZoneId(): string {
 export interface ZoneEditorOptions {
   /** Called whenever zones change (add, move, resize, delete, toggle correct) */
   onChange: (zones: Zone[]) => void;
+  /** Game ID for voice storage (enables per-zone audio recording) */
+  gameId?: string;
 }
 
 export interface ZoneEditor {
@@ -40,11 +43,12 @@ export function createZoneEditor(
   /** The image container element to overlay */
   container: HTMLElement,
   initialZones: Zone[],
-  { onChange }: ZoneEditorOptions,
+  { onChange, gameId }: ZoneEditorOptions,
 ): ZoneEditor {
 
   let zones: Zone[] = structuredClone(initialZones);
   let selectedId: string | null = null;
+  let _voiceBtns: Array<{ destroy(): void }> = [];
   let drawState: {
     startX: number; startY: number;
     curX: number;   curY: number;
@@ -95,8 +99,13 @@ export function createZoneEditor(
   // ── Rendering ────────────────────────────────────────────────────────────
 
   function render() {
+    // Destroy old voice buttons
+    _voiceBtns.forEach(b => b.destroy());
+    _voiceBtns = [];
+
     // Remove old zone elements (keep draw rect and toolbar)
     overlay.querySelectorAll('.ab-ze-zone').forEach(el => el.remove());
+    overlay.querySelectorAll('.ab-ze-panel').forEach(el => el.remove());
 
     zones.forEach(zone => {
       const el = document.createElement('div');
@@ -183,6 +192,52 @@ export function createZoneEditor(
       });
 
       overlay.appendChild(el);
+
+      // ── Detail panel for selected zone (label + audio) ────────────
+      if (zone.id === selectedId) {
+        const panel = document.createElement('div');
+        panel.className = 'ab-ze-panel';
+        // Position below the zone
+        panel.style.left = `${zone.x}%`;
+        panel.style.top  = `${zone.y + zone.height + 1}%`;
+
+        // Label input
+        const labelRow = document.createElement('div');
+        labelRow.className = 'ab-ze-panel__row';
+        const labelInput = document.createElement('input');
+        labelInput.className = 'ab-ze-panel__input';
+        labelInput.type = 'text';
+        labelInput.dir = 'rtl';
+        labelInput.placeholder = 'תווית (למשל: חתול)';
+        labelInput.value = zone.label || '';
+        labelInput.addEventListener('pointerdown', e => e.stopPropagation());
+        labelInput.addEventListener('input', () => {
+          zone.label = labelInput.value || undefined;
+          emit();
+        });
+        labelRow.appendChild(labelInput);
+        panel.appendChild(labelRow);
+
+        // Audio record button (if gameId provided)
+        if (gameId) {
+          const audioRow = document.createElement('div');
+          audioRow.className = 'ab-ze-panel__row';
+          const audioLabel = document.createElement('span');
+          audioLabel.className = 'ab-ze-panel__audio-label';
+          audioLabel.textContent = '🎤';
+          audioRow.appendChild(audioLabel);
+          const btn = createVoiceRecordButton(audioRow, {
+            gameId,
+            voiceKey: `zone-${zone.id}`,
+            label: `הקלטה לאזור ${zone.label || zone.id}`,
+          });
+          _voiceBtns.push(btn);
+          panel.appendChild(audioRow);
+        }
+
+        panel.addEventListener('pointerdown', e => e.stopPropagation());
+        overlay.appendChild(panel);
+      }
     });
   }
 
