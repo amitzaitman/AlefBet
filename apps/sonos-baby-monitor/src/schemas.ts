@@ -14,6 +14,11 @@ export const SonosSpeakerSchema = z.object({
 
 export type SonosSpeaker = z.infer<typeof SonosSpeakerSchema>;
 
+// ─── Mic Source ─────────────────────────────────────────────────────────────
+
+export const MicSourceSchema = z.enum(['sonos', 'device']);
+export type MicSource = z.infer<typeof MicSourceSchema>;
+
 // ─── Monitor Settings ───────────────────────────────────────────────────────
 
 export const MonitorSettingsSchema = z.object({
@@ -49,6 +54,7 @@ export const AudioLevelSourceSchema = z.enum([
   'diagnostics',
   'event',
   'polling',
+  'device-mic',
 ]);
 
 export type AudioLevelSource = z.infer<typeof AudioLevelSourceSchema>;

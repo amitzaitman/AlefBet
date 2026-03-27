@@ -38,3 +38,13 @@ export async function startMonitoring(): Promise<{ ok?: boolean; error?: string 
 export async function stopMonitoring(): Promise<void> {
   await fetch('/api/stop', { method: 'POST' });
 }
+
+export async function sendAlert(
+  ip: string, port: number, volume: number, audioUrl: string,
+): Promise<void> {
+  await fetch('/api/alert', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ip, port, volume, audioUrl }),
+  });
+}

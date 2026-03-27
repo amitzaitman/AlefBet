@@ -330,6 +330,77 @@ input[type="range"] {
   margin-top: 0.5rem;
 }
 
+/* Mic Source Toggle */
+.mic-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.mic-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.9rem 0.5rem;
+  background: rgba(0,0,0,0.2);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.mic-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.mic-btn-active {
+  border-color: var(--primary);
+  background: rgba(108, 99, 255, 0.1);
+  color: var(--text);
+}
+
+.mic-btn-icon {
+  font-size: 1.5rem;
+}
+
+.mic-btn-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.mic-btn-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.mic-btn-active .mic-btn-desc {
+  color: var(--primary);
+}
+
+/* Device Mic Info */
+.device-mic-info {
+  background: rgba(108, 99, 255, 0.06);
+  border: 1px solid rgba(108, 99, 255, 0.15);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.device-mic-info p {
+  margin-bottom: 0.4rem;
+}
+
+.device-mic-info p:last-child {
+  margin-bottom: 0;
+}
+
 /* Speakers */
 .speaker-section {
   margin-top: 1rem;

@@ -47,11 +47,19 @@ export class BabyMonitor {
   // ─── Settings ───────────────────────────────────────────────────────────
 
   updateSettings(raw: Partial<MonitorSettings>): void {
-    const parsed = MonitorSettingsSchema.partial().parse(raw);
-    if (parsed.threshold !== undefined) this.threshold = parsed.threshold;
-    if (parsed.cooldownMs !== undefined) this.cooldownMs = parsed.cooldownMs;
-    if (parsed.alertVolume !== undefined) this.alertVolume = parsed.alertVolume;
-    if (parsed.alertSoundUrl !== undefined) this.alertSoundUrl = parsed.alertSoundUrl;
+    // Validate each field individually — avoid Zod v4 .partial() applying defaults
+    if ('threshold' in raw && raw.threshold !== undefined) {
+      this.threshold = MonitorSettingsSchema.shape.threshold.parse(raw.threshold);
+    }
+    if ('cooldownMs' in raw && raw.cooldownMs !== undefined) {
+      this.cooldownMs = MonitorSettingsSchema.shape.cooldownMs.parse(raw.cooldownMs);
+    }
+    if ('alertVolume' in raw && raw.alertVolume !== undefined) {
+      this.alertVolume = MonitorSettingsSchema.shape.alertVolume.parse(raw.alertVolume);
+    }
+    if ('alertSoundUrl' in raw && raw.alertSoundUrl !== undefined) {
+      this.alertSoundUrl = MonitorSettingsSchema.shape.alertSoundUrl.parse(raw.alertSoundUrl);
+    }
   }
 
   getState(): MonitorState {
@@ -160,7 +168,8 @@ export class BabyMonitor {
     if (now - this.lastAlertTime < this.cooldownMs) return;
     this.lastAlertTime = now;
 
-    const message = `Sound detected (${level}%) in ${this.babySpeaker!.roomName}!`;
+    const roomName = this.babySpeaker?.roomName ?? 'unknown';
+    const message = `Sound detected (${level}%) in ${roomName}!`;
     this.broadcast({ type: 'alert', level, timestamp: new Date().toISOString(), message });
     console.log(`ALERT: ${message}`);
 

@@ -9,7 +9,7 @@ import {
   MonitorSettingsSchema,
 } from './schemas.ts';
 import { discoverSonos, getSonosDeviceInfo } from './sonos-discovery.ts';
-import { getVolume, setVolume } from './sonos-control.ts';
+import { getVolume, setVolume, playAlert } from './sonos-control.ts';
 import { BabyMonitor } from './baby-monitor.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -95,7 +95,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
 
     if (route === '/api/settings' && req.method === 'POST') {
       const body = JSON.parse(await readBody(req));
-      monitor.updateSettings(MonitorSettingsSchema.partial().parse(body));
+      monitor.updateSettings(body);
       json(res, { ok: true });
       return true;
     }
@@ -108,6 +108,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
 
     if (route === '/api/stop' && req.method === 'POST') {
       monitor.stopMonitoring();
+      json(res, { ok: true });
+      return true;
+    }
+
+    // Alert endpoint for device-mic mode (client triggers alert on Sonos)
+    if (route === '/api/alert' && req.method === 'POST') {
+      const body = JSON.parse(await readBody(req));
+      const { ip, port = 1400, volume = 30, audioUrl } = body;
+      if (ip && audioUrl) {
+        await playAlert(ip, port, volume, audioUrl);
+      }
       json(res, { ok: true });
       return true;
     }

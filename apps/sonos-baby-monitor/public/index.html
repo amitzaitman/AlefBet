@@ -12,7 +12,7 @@
     <header class="header">
       <div class="logo">&#x1f476;</div>
       <h1>Sonos Baby Monitor</h1>
-      <p class="subtitle">Sonos mic listens &middot; Sonos speaker alerts</p>
+      <p class="subtitle">Monitor baby's room &middot; Alert via Sonos</p>
     </header>
 
     <!-- Status Banner -->
@@ -36,22 +36,61 @@
       </div>
     </section>
 
-    <!-- Speaker Selection -->
+    <!-- Mic Source Selection -->
     <section class="card">
-      <h2>1. Select Speakers</h2>
-      <button id="btn-discover" class="btn btn-secondary btn-block">
-        <span class="btn-icon">&#x1f50d;</span> Discover Sonos Speakers
-      </button>
-      <span id="discover-status" class="status-hint"></span>
+      <h2>1. Choose Microphone</h2>
+      <div class="mic-toggle">
+        <button id="btn-mic-sonos" class="mic-btn mic-btn-active" data-source="sonos">
+          <span class="mic-btn-icon">&#x1f50a;</span>
+          <span class="mic-btn-label">Sonos Mic</span>
+          <span class="mic-btn-desc">Speaker in baby's room</span>
+        </button>
+        <button id="btn-mic-device" class="mic-btn" data-source="device">
+          <span class="mic-btn-icon">&#x1f4f1;</span>
+          <span class="mic-btn-label">Device Mic</span>
+          <span class="mic-btn-desc">This phone / tablet</span>
+        </button>
+      </div>
 
-      <div id="speakers-container" style="display:none">
-        <div class="speaker-section">
-          <h3>Baby Room <small>(mic source)</small></h3>
-          <div id="baby-speakers" class="speakers-list"></div>
+      <!-- Sonos-specific: discover + select baby speaker -->
+      <div id="sonos-mic-section">
+        <div class="control-group">
+          <button id="btn-discover" class="btn btn-secondary btn-block">
+            <span class="btn-icon">&#x1f50d;</span> Discover Sonos Speakers
+          </button>
+          <span id="discover-status" class="status-hint"></span>
         </div>
-        <div class="speaker-section">
-          <h3>Parent Room <small>(alert output)</small></h3>
-          <div id="parent-speakers" class="speakers-list"></div>
+
+        <div id="speakers-container" style="display:none">
+          <div class="speaker-section">
+            <h3>Baby Room <small>(mic source)</small></h3>
+            <div id="baby-speakers" class="speakers-list"></div>
+          </div>
+          <div class="speaker-section">
+            <h3>Parent Room <small>(alert output)</small></h3>
+            <div id="parent-speakers" class="speakers-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device mic info -->
+      <div id="device-mic-section" style="display:none">
+        <div class="device-mic-info">
+          <p>&#x1f3a4; Place this device in the baby's room.</p>
+          <p>Sound is detected using this device's microphone. No server needed for monitoring — alerts come via browser notifications.</p>
+          <p>Optionally, discover Sonos speakers below to also play alerts on a parent room speaker.</p>
+        </div>
+        <div class="control-group">
+          <button id="btn-discover-device" class="btn btn-secondary btn-block">
+            <span class="btn-icon">&#x1f50d;</span> Discover Sonos Speakers (optional)
+          </button>
+          <span id="discover-status-device" class="status-hint"></span>
+        </div>
+        <div id="speakers-container-device" style="display:none">
+          <div class="speaker-section">
+            <h3>Parent Room <small>(alert output, optional)</small></h3>
+            <div id="parent-speakers-device" class="speakers-list"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -80,21 +119,23 @@
         </div>
       </div>
 
-      <div class="control-group">
-        <label for="alert-volume">Alert Volume on Parent Speaker</label>
-        <input type="range" id="alert-volume" min="5" max="100" value="30">
-        <div class="range-labels">
-          <span>Quiet</span>
-          <span id="alert-volume-value">30%</span>
-          <span>Loud</span>
+      <div id="sonos-alert-settings">
+        <div class="control-group">
+          <label for="alert-volume">Alert Volume on Parent Speaker</label>
+          <input type="range" id="alert-volume" min="5" max="100" value="30">
+          <div class="range-labels">
+            <span>Quiet</span>
+            <span id="alert-volume-value">30%</span>
+            <span>Loud</span>
+          </div>
         </div>
-      </div>
 
-      <div class="control-group">
-        <label for="alert-sound">Alert Sound URL <small>(MP3, optional)</small></label>
-        <input type="text" id="alert-sound" class="input"
-          placeholder="https://example.com/baby-alert.mp3">
-        <small class="hint">MP3 URL accessible on your network. Leave empty for browser-only notification.</small>
+        <div class="control-group">
+          <label for="alert-sound">Alert Sound URL <small>(MP3, optional)</small></label>
+          <input type="text" id="alert-sound" class="input"
+            placeholder="https://example.com/baby-alert.mp3">
+          <small class="hint">MP3 URL accessible on your network. Leave empty for browser-only notification.</small>
+        </div>
       </div>
     </section>
 
@@ -115,7 +156,7 @@
     <section class="card">
       <h2>Event Log</h2>
       <div id="event-log" class="event-log">
-        <div class="log-entry log-info">Ready. Select speakers and start monitoring.</div>
+        <div class="log-entry log-info">Ready. Choose a microphone and start monitoring.</div>
       </div>
     </section>
   </div>
