@@ -16,6 +16,7 @@ import { createRoundInspector }  from './round-inspector.js';
 import { saveGameData, exportGameDataAsJSON } from './editor-storage.js';
 import { showAudioManager }      from './audio-manager.js';
 import { createZoneEditor }      from './zone-editor.js';
+import { showTemplatePicker }    from './activity-templates.js';
 import type { ZoneEditor }       from './zone-editor.js';
 import type { Zone }             from './schemas.js';
 import type { GameData }         from './game-data.js';
@@ -312,9 +313,24 @@ export class GameEditor {
     imgContainer.appendChild(img);
     box.appendChild(imgContainer);
 
-    // Footer with done button
+    // Footer with template + done buttons
     const footer = document.createElement('div');
     footer.className = 'ab-ze-footer';
+
+    const tplBtn = document.createElement('button');
+    tplBtn.className = 'ab-editor-btn ab-editor-btn--zones';
+    tplBtn.textContent = '📐 תבנית';
+    tplBtn.addEventListener('click', () => {
+      showTemplatePicker((zones: Zone[]) => {
+        if (this._selectedId) {
+          this._gameData.updateRound(this._selectedId, { zones });
+          this._refreshUndoButtons();
+          this._zoneEditor?.setZones(zones);
+        }
+      });
+    });
+    footer.appendChild(tplBtn);
+
     const doneBtn = document.createElement('button');
     doneBtn.className = 'ab-editor-btn ab-editor-btn--play';
     doneBtn.textContent = '\u2713 סיום';

@@ -1,47 +1,52 @@
 /**
  * zone-player — renders tappable zones over a slide image during play.
  *
- * Supports two modes:
- *   'quiz'       — students tap correct zones; wrong taps shake (default)
- *   'soundboard' — no right/wrong; tap any zone to hear its audio
+ * Supports:
+ *   mode: 'quiz'       — tap correct zones; wrong taps shake (default)
+ *   mode: 'soundboard' — tap any zone to hear audio, no right/wrong
  *
- * Per-zone audio: if gameId is provided, tapping a zone plays its
- * recorded audio from the voice store (key: "zone-{zone.id}").
+ * Zone shapes: 'rect' (default) and 'polygon' (freeform SVG).
  *
- * Question audio: if gameId + roundId are provided, the round's
- * instruction audio plays automatically when the player loads.
+ * Auto-hint: after `hintAfter` wrong taps (default 3), correct zones
+ * blink briefly to guide the student. Set hintAfter=0 to disable.
  *
- * Usage:
- *   const zp = createZonePlayer(containerEl, {
- *     image: 'data:image/...',
- *     zones: [ { id, x, y, width, height, correct, label } ],
- *     mode: 'quiz',            // or 'soundboard'
- *     gameId: 'my-game',       // enables per-zone audio
- *     roundId: 'round-123',    // enables auto-play instruction audio
- *     onCorrect(zone)  { ... },
- *     onWrong(zone)    { ... },
- *     onAllCorrect()   { ... },
- *     onZoneTap(zone)  { ... },  // called in any mode
- *   });
- *   zp.destroy();
+ * Per-zone audio: if gameId provided, plays voice store audio on tap.
+ * Instruction audio: if gameId + roundId, auto-plays on load.
  */
 
 import { playVoice } from '../audio/voice-store.js';
 
 /**
+ * Build SVG polygon points attr from zone points relative to bounding box.
+ * @param {Array<{x:number,y:number}>} pts
+ * @param {number} zx zone x
+ * @param {number} zy zone y
+ * @param {number} zw zone width
+ * @param {number} zh zone height
+ */
+function _svgPtsAttr(pts, zx, zy, zw, zh) {
+  return pts.map(p => {
+    const lx = zw > 0 ? ((p.x - zx) / zw) * 100 : 0;
+    const ly = zh > 0 ? ((p.y - zy) / zh) * 100 : 0;
+    return `${lx},${ly}`;
+  }).join(' ');
+}
+
+/**
  * @param {HTMLElement} container
  * @param {Object} config
- * @param {string} config.image — image URL or data-URL
- * @param {Array<{id:string, x:number, y:number, width:number, height:number, correct:boolean, label?:string}>} config.zones
+ * @param {string} config.image
+ * @param {Array} config.zones
  * @param {'quiz'|'soundboard'} [config.mode='quiz']
- * @param {string}   [config.gameId]   — game ID for voice playback
- * @param {string}   [config.roundId]  — round ID for instruction audio
- * @param {Function} [config.onCorrect] — called with zone when correct zone tapped (quiz mode)
- * @param {Function} [config.onWrong]   — called with zone when wrong zone tapped (quiz mode)
- * @param {Function} [config.onAllCorrect] — called when all correct zones found (quiz mode)
- * @param {Function} [config.onZoneTap]  — called with zone on any tap (any mode)
- * @param {boolean}  [config.showZones=false] — if true, zones are visible (debug/hint mode)
- * @param {boolean}  [config.autoPlayInstruction=true] — auto-play round instruction audio on load
+ * @param {string}   [config.gameId]
+ * @param {string}   [config.roundId]
+ * @param {Function} [config.onCorrect]
+ * @param {Function} [config.onWrong]
+ * @param {Function} [config.onAllCorrect]
+ * @param {Function} [config.onZoneTap]
+ * @param {boolean}  [config.showZones=false]
+ * @param {boolean}  [config.autoPlayInstruction=true]
+ * @param {number}   [config.hintAfter=3] — wrong taps before auto-hint (0=disabled)
  */
 export function createZonePlayer(container, config) {
   const {
@@ -56,6 +61,7 @@ export function createZonePlayer(container, config) {
     onZoneTap,
     showZones = false,
     autoPlayInstruction = true,
+    hintAfter = 3,
   } = config;
 
   const isSoundboard = mode === 'soundboard';
@@ -63,7 +69,6 @@ export function createZonePlayer(container, config) {
   const wrap = document.createElement('div');
   wrap.className = 'ab-zp-wrap';
 
-  // Background image
   const img = document.createElement('img');
   img.className = 'ab-zp-image';
   img.src = image;
@@ -71,7 +76,6 @@ export function createZonePlayer(container, config) {
   img.draggable = false;
   wrap.appendChild(img);
 
-  // Zone overlay layer
   const layer = document.createElement('div');
   layer.className = 'ab-zp-layer';
   wrap.appendChild(layer);
@@ -79,20 +83,42 @@ export function createZonePlayer(container, config) {
   container.appendChild(wrap);
 
   const found = new Set();
+  let wrongCount = 0;
   let _playing = false;
+  let _hintShown = false;
 
-  // ── Play zone audio ──────────────────────────────────────────────────────
+  // ── Play zone audio ────────────────────────────────────────────────────
 
   async function _playZoneAudio(zoneId) {
     if (!gameId || _playing) return;
     _playing = true;
-    try {
-      await playVoice(gameId, `zone-${zoneId}`);
-    } catch { /* no audio stored — that's fine */ }
+    try { await playVoice(gameId, `zone-${zoneId}`); } catch { /* ok */ }
     _playing = false;
   }
 
-  // ── Render zone elements ─────────────────────────────────────────────────
+  // ── Auto-hint ──────────────────────────────────────────────────────────
+
+  function _maybeShowHint() {
+    if (_hintShown || hintAfter <= 0 || isSoundboard) return;
+    if (wrongCount < hintAfter) return;
+    _hintShown = true;
+
+    // Briefly blink correct zones
+    const els = layer.querySelectorAll('.ab-zp-zone');
+    els.forEach((el, i) => {
+      if (zones[i]?.correct && !found.has(zones[i].id)) {
+        el.classList.add('ab-zp-zone--hint');
+      }
+    });
+    setTimeout(() => {
+      els.forEach(el => el.classList.remove('ab-zp-zone--hint'));
+      // Allow another hint after more wrong attempts
+      _hintShown = false;
+      wrongCount = 0;
+    }, 1500);
+  }
+
+  // ── Render zones ───────────────────────────────────────────────────────
 
   zones.forEach(zone => {
     const el = document.createElement('button');
@@ -105,7 +131,17 @@ export function createZonePlayer(container, config) {
     el.style.height = `${zone.height}%`;
     el.setAttribute('aria-label', zone.label || (zone.correct ? 'correct zone' : 'zone'));
 
-    // Show label in soundboard mode
+    // Polygon: SVG clip-path for non-rectangular hit area
+    if (zone.shape === 'polygon' && zone.points && zone.points.length >= 3) {
+      const uid = `zp-clip-${zone.id}`;
+      el.innerHTML = `<svg class="ab-zp-zone__poly-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs><clipPath id="${uid}"><polygon points="${_svgPtsAttr(zone.points, zone.x, zone.y, zone.width, zone.height)}"/></clipPath></defs>
+        <rect x="0" y="0" width="100" height="100" clip-path="url(#${uid})" fill="transparent"/>
+      </svg>`;
+      el.classList.add('ab-zp-zone--poly');
+    }
+
+    // Label in soundboard mode
     if (isSoundboard && zone.label) {
       const labelEl = document.createElement('span');
       labelEl.className = 'ab-zp-zone__label';
@@ -115,12 +151,9 @@ export function createZonePlayer(container, config) {
 
     el.addEventListener('click', () => {
       if (onZoneTap) onZoneTap(zone);
-
-      // Play zone audio regardless of mode
       _playZoneAudio(zone.id);
 
       if (isSoundboard) {
-        // Soundboard: just pulse animation on tap
         el.classList.add('ab-zp-zone--tapped');
         setTimeout(() => el.classList.remove('ab-zp-zone--tapped'), 400);
         return;
@@ -133,71 +166,59 @@ export function createZonePlayer(container, config) {
         found.add(zone.id);
         el.classList.add('ab-zp-zone--correct');
         if (onCorrect) onCorrect(zone);
-
-        // Check if all correct zones found
         const totalCorrect = zones.filter(z => z.correct).length;
         if (found.size >= totalCorrect && onAllCorrect) {
           onAllCorrect();
         }
       } else {
         el.classList.add('ab-zp-zone--wrong');
+        wrongCount++;
         if (onWrong) onWrong(zone);
-        // Remove wrong state after animation
         setTimeout(() => el.classList.remove('ab-zp-zone--wrong'), 600);
+        _maybeShowHint();
       }
     });
 
     layer.appendChild(el);
   });
 
-  // ── Auto-play instruction audio ──────────────────────────────────────────
+  // ── Auto-play instruction audio ────────────────────────────────────────
 
   if (autoPlayInstruction && gameId && roundId) {
-    // Small delay to let the UI settle before speaking
-    setTimeout(() => {
-      playVoice(gameId, roundId).catch(() => {});
-    }, 400);
+    setTimeout(() => { playVoice(gameId, roundId).catch(() => {}); }, 400);
   }
 
-  // ── Public API ───────────────────────────────────────────────────────────
+  // ── Public API ─────────────────────────────────────────────────────────
 
   return {
-    /** Play the round instruction audio on demand */
     async playInstruction() {
-      if (gameId && roundId) {
-        return playVoice(gameId, roundId);
-      }
+      if (gameId && roundId) return playVoice(gameId, roundId);
       return false;
     },
 
-    /** Play a specific zone's audio */
     async playZoneAudio(zoneId) {
-      if (gameId) {
-        return playVoice(gameId, `zone-${zoneId}`);
-      }
+      if (gameId) return playVoice(gameId, `zone-${zoneId}`);
       return false;
     },
 
-    /** Highlight all correct zones (hint/reveal) */
     revealCorrect() {
       layer.querySelectorAll('.ab-zp-zone').forEach((el, i) => {
         if (zones[i]?.correct) el.classList.add('ab-zp-zone--revealed');
       });
     },
 
-    /** Reset all found state */
     reset() {
       found.clear();
+      wrongCount = 0;
+      _hintShown = false;
       layer.querySelectorAll('.ab-zp-zone').forEach(el => {
         el.classList.remove(
           'ab-zp-zone--correct', 'ab-zp-zone--wrong',
-          'ab-zp-zone--revealed', 'ab-zp-zone--tapped',
+          'ab-zp-zone--revealed', 'ab-zp-zone--tapped', 'ab-zp-zone--hint',
         );
       });
     },
 
-    destroy() {
-      wrap.remove();
-    },
+    destroy() { wrap.remove(); },
   };
 }

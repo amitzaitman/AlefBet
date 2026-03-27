@@ -51,9 +51,12 @@ export { GameData }      from './editor/game-data.js';
 export { saveGameData, loadGameData, clearGameData, exportGameDataAsJSON } from './editor/editor-storage.js';
 export { showAudioManager } from './editor/audio-manager.js';
 export { createZoneEditor } from './editor/zone-editor.js';
+export type { DrawTool }   from './editor/zone-editor.js';
+export { showTemplatePicker, ACTIVITY_TEMPLATES } from './editor/activity-templates.js';
 
 // ===== Editor: schemas + field utilities (TypeScript consumers) =====
 export {
+  PointSchema,
   ZoneSchema,
   BaseRoundSchema,
   MultipleChoiceRoundSchema,
@@ -64,7 +67,7 @@ export {
   BUILTIN_ROUND_SCHEMAS,
 } from './editor/schemas.js';
 export type {
-  Zone, BaseRound, MultipleChoiceRound, DragMatchRound, ZoneTapRound,
+  Point, Zone, BaseRound, MultipleChoiceRound, DragMatchRound, ZoneTapRound,
   GameMeta, GameDataJson, RoundRecord,
 } from './editor/schemas.js';
 export { schemaToFields }  from './editor/schema-to-fields.js';

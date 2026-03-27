@@ -8,13 +8,32 @@ import { z } from 'zod';
 
 // ── Zone schema ──────────────────────────────────────────────────────────────
 
-/** A single interactive zone drawn on a slide image (percentages 0–100) */
+/** A single [x,y] point in percentage coordinates (0–100) */
+export const PointSchema = z.object({
+  x: z.number().min(0).max(100),
+  y: z.number().min(0).max(100),
+});
+
+export type Point = z.infer<typeof PointSchema>;
+
+/**
+ * A single interactive zone drawn on a slide image (percentages 0–100).
+ *
+ * shape:
+ *   'rect'    — defined by x/y/width/height (default, backwards-compatible)
+ *   'polygon' — defined by points[] array (freeform tracing)
+ *
+ * For polygons, x/y/width/height are computed from the bounding box on save
+ * so that hit-testing and positioning still work generically.
+ */
 export const ZoneSchema = z.object({
   id:      z.string(),
+  shape:   z.enum(['rect', 'polygon']).default('rect'),
   x:       z.number().min(0).max(100),
   y:       z.number().min(0).max(100),
   width:   z.number().min(0).max(100),
   height:  z.number().min(0).max(100),
+  points:  z.array(PointSchema).optional(),
   correct: z.boolean().default(false),
   label:   z.string().optional(),
 });

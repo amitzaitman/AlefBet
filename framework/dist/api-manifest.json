@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-27T05:42:50.526Z",
+  "generatedAt": "2026-03-27T05:52:37.962Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -251,7 +251,7 @@
     },
     {
       "path": "ui/zone-player.js",
-      "description": "zone-player — renders tappable zones over a slide image during play.\n\nSupports two modes:\n  'quiz'       — students tap correct zones; wrong taps shake (default)\n  'soundboard' — no right/wrong; tap any zone to hear its audio\n\nPer-zone audio: if gameId is provided, tapping a zone plays its\nrecorded audio from the voice store (key: \"zone-{zone.id}\").\n\nQuestion audio: if gameId + roundId are provided, the round's\ninstruction audio plays automatically when the player loads.\n\nUsage:\n  const zp = createZonePlayer(containerEl, {\n    image: 'data:image/...',\n    zones: [ { id, x, y, width, height, correct, label } ],\n    mode: 'quiz',            // or 'soundboard'\n    gameId: 'my-game',       // enables per-zone audio\n    roundId: 'round-123',    // enables auto-play instruction audio\n    onCorrect(zone)  { ... },\n    onWrong(zone)    { ... },\n    onAllCorrect()   { ... },\n    onZoneTap(zone)  { ... },  // called in any mode\n  });\n  zp.destroy();",
+      "description": "zone-player — renders tappable zones over a slide image during play.\n\nSupports:\n  mode: 'quiz'       — tap correct zones; wrong taps shake (default)\n  mode: 'soundboard' — tap any zone to hear audio, no right/wrong\n\nZone shapes: 'rect' (default) and 'polygon' (freeform SVG).\n\nAuto-hint: after `hintAfter` wrong taps (default 3), correct zones\nblink briefly to guide the student. Set hintAfter=0 to disable.\n\nPer-zone audio: if gameId provided, plays voice store audio on tap.\nInstruction audio: if gameId + roundId, auto-plays on load.",
       "exports": [
         "createZonePlayer"
       ]
