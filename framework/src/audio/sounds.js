@@ -61,4 +61,12 @@ export const sounds = {
   click() {
     _playTone(900, 0.04, 'sine', 0.12);
   },
+
+  /** צליל התראה — דחוף, יורד */
+  alert() {
+    _playTone(880, 0.15, 'square', 0.25);                 // A5
+    setTimeout(() => _playTone(740, 0.15, 'square', 0.25), 150);  // F#5
+    setTimeout(() => _playTone(880, 0.15, 'square', 0.25), 300);  // A5
+    setTimeout(() => _playTone(587, 0.3, 'square', 0.2), 450);    // D5
+  },
 };

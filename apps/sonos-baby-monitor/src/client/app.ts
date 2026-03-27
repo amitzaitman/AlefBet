@@ -1,7 +1,31 @@
 import type { SonosSpeaker, WSMessage, MicSource } from '../schemas.ts';
+import { createLocalState } from '../../../../framework/src/core/local-state.js';
+import { sounds } from '../../../../framework/src/audio/sounds.js';
 import { Visualizer } from './visualizer.ts';
 import { DeviceMic } from './device-mic.ts';
 import * as api from './sonos-api.ts';
+
+// ─── Persisted settings (survives page refresh) ─────────────────────────────
+
+interface PersistedSettings {
+  micSource: MicSource;
+  threshold: number;
+  cooldownSec: number;
+  alertVolume: number;
+  alertSound: string;
+  babySpeaker: SonosSpeaker | null;
+  parentSpeaker: SonosSpeaker | null;
+}
+
+const savedSettings = createLocalState('sonos-monitor:settings', {
+  micSource: 'sonos',
+  threshold: 40,
+  cooldownSec: 30,
+  alertVolume: 30,
+  alertSound: '',
+  babySpeaker: null,
+  parentSpeaker: null,
+});
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
@@ -19,19 +43,32 @@ interface AppState {
   lastAlertTime: number;
 }
 
+const saved = savedSettings.get();
 const state: AppState = {
-  micSource: 'sonos',
+  micSource: saved.micSource,
   speakers: [],
-  babySpeaker: null,
-  parentSpeaker: null,
+  babySpeaker: saved.babySpeaker,
+  parentSpeaker: saved.parentSpeaker,
   monitoring: false,
-  threshold: 40,
-  cooldownSec: 30,
-  alertVolume: 30,
-  alertSound: '',
+  threshold: saved.threshold,
+  cooldownSec: saved.cooldownSec,
+  alertVolume: saved.alertVolume,
+  alertSound: saved.alertSound,
   currentLevel: 0,
   lastAlertTime: 0,
 };
+
+function persistSettings(): void {
+  savedSettings.set({
+    micSource: state.micSource,
+    threshold: state.threshold,
+    cooldownSec: state.cooldownSec,
+    alertVolume: state.alertVolume,
+    alertSound: state.alertSound,
+    babySpeaker: state.babySpeaker,
+    parentSpeaker: state.parentSpeaker,
+  });
+}
 
 let ws: WebSocket | null = null;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -82,6 +119,7 @@ const viz = new Visualizer(dom.visualizer);
 
 function setMicSource(source: MicSource): void {
   state.micSource = source;
+  persistSettings();
 
   dom.btnMicSonos.classList.toggle('mic-btn-active', source === 'sonos');
   dom.btnMicDevice.classList.toggle('mic-btn-active', source === 'device');
@@ -210,8 +248,12 @@ async function handleDeviceMicAlert(level: number): Promise<void> {
       );
       addLog(`Alert played on ${state.parentSpeaker.roomName}`, 'success');
     } catch {
-      // Server not available — browser notification only
+      // Server not available — play local alert tone as fallback
+      sounds.alert();
     }
+  } else {
+    // No Sonos speaker or alert URL — play local alert tone
+    sounds.alert();
   }
 
   setTimeout(() => {
@@ -309,6 +351,7 @@ function renderSpeakers(list: SonosSpeaker[], container: HTMLElement, role: Spea
         await api.setParentSpeaker(sp);
         addLog(`Parent room: ${sp.roomName}`, 'success');
       }
+      persistSettings();
       renderSpeakers(list, container, role);
     });
     container.appendChild(el);
@@ -415,23 +458,27 @@ dom.sensitivity.addEventListener('input', () => {
   state.threshold = parseInt(dom.sensitivity.value);
   dom.sensitivityVal.textContent = `${state.threshold}%`;
   dom.thresholdMarker.style.left = `${state.threshold}%`;
+  persistSettings();
   if (state.micSource === 'sonos') pushSettings();
 });
 
 dom.cooldown.addEventListener('input', () => {
   state.cooldownSec = parseInt(dom.cooldown.value);
   dom.cooldownVal.textContent = `${state.cooldownSec}s`;
+  persistSettings();
   if (state.micSource === 'sonos') pushSettings();
 });
 
 dom.alertVolume.addEventListener('input', () => {
   state.alertVolume = parseInt(dom.alertVolume.value);
   dom.alertVolumeVal.textContent = `${state.alertVolume}%`;
+  persistSettings();
   if (state.micSource === 'sonos') pushSettings();
 });
 
 dom.alertSound.addEventListener('change', () => {
   state.alertSound = dom.alertSound.value.trim();
+  persistSettings();
   if (state.micSource === 'sonos') pushSettings();
 });
 
@@ -447,6 +494,17 @@ function renderLoop(): void {
 // ─── Init ────────────────────────────────────────────────────────────────────
 
 if (Notification.permission === 'default') Notification.requestPermission();
+
+// Restore UI from saved settings
+dom.sensitivity.value = String(state.threshold);
+dom.sensitivityVal.textContent = `${state.threshold}%`;
+dom.thresholdMarker.style.left = `${state.threshold}%`;
+dom.cooldown.value = String(state.cooldownSec);
+dom.cooldownVal.textContent = `${state.cooldownSec}s`;
+dom.alertVolume.value = String(state.alertVolume);
+dom.alertVolumeVal.textContent = `${state.alertVolume}%`;
+dom.alertSound.value = state.alertSound;
+setMicSource(state.micSource);
 
 // Try connecting to server (works in local mode, silently fails on static hosting)
 connectWS();

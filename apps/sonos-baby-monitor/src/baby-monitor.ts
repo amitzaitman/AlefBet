@@ -1,4 +1,5 @@
 import type { WebSocket } from 'ws';
+import { EventBus } from '../../../framework/src/core/events.js';
 import {
   MonitorSettingsSchema,
   type SonosSpeaker,
@@ -20,6 +21,9 @@ export class BabyMonitor {
   currentLevel = 0;
   micAvailable = false;
 
+  /** EventBus for decoupled event dispatch */
+  readonly events = new EventBus();
+
   private threshold = 40;
   private cooldownMs = 30000;
   private alertVolume = 30;
@@ -27,21 +31,31 @@ export class BabyMonitor {
   private lastAlertTime = 0;
   private pollInterval: ReturnType<typeof setInterval> | null = null;
   private eventSubId: string | null = null;
-  private listeners = new Set<WebSocket>();
 
-  // ─── WebSocket management ───────────────────────────────────────────────
+  // ─── WebSocket adapter ────────────────────────────────────────────────
 
   addListener(ws: WebSocket): void {
-    this.listeners.add(ws);
     ws.send(JSON.stringify({ type: 'state', ...this.getState() } satisfies WSMessage));
-    ws.on('close', () => this.listeners.delete(ws));
+
+    const handler = (msg: WSMessage) => {
+      if (ws.readyState === 1) ws.send(JSON.stringify(msg));
+    };
+
+    // Subscribe to all event types
+    const eventTypes = ['level', 'status', 'alert', 'log', 'error'] as const;
+    for (const type of eventTypes) {
+      this.events.on(type, handler);
+    }
+
+    ws.on('close', () => {
+      for (const type of eventTypes) {
+        this.events.off(type, handler);
+      }
+    });
   }
 
   private broadcast(msg: WSMessage): void {
-    const data = JSON.stringify(msg);
-    for (const ws of this.listeners) {
-      if (ws.readyState === 1) ws.send(data);
-    }
+    this.events.emit(msg.type, msg);
   }
 
   // ─── Settings ───────────────────────────────────────────────────────────
