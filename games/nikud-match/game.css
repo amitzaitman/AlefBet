@@ -113,3 +113,35 @@
 }
 
 /* Animations: using framework @keyframes (ab-zone-in, ab-pop, ab-hint-pulse) from alefbet.css */
+
+/* ── Mobile: stack vertically on narrow phones ─────────────────────────── */
+@media (max-width: 480px) {
+  .nm-arena {
+    flex-direction: column;
+    min-height: auto;
+    gap: clamp(8px, 2dvmin, 14px);
+    padding: clamp(8px, 2dvmin, 14px);
+  }
+
+  .nm-zone {
+    flex-direction: row;
+    padding: clamp(10px, 2.5dvmin, 18px);
+    gap: clamp(6px, 1.5dvmin, 10px);
+  }
+
+  .nm-center {
+    min-width: auto;
+    flex-direction: row;
+    gap: clamp(8px, 2dvmin, 14px);
+  }
+
+  .nm-hint {
+    font-size: clamp(18px, 5dvmin, 28px);
+  }
+
+  .nm-letter {
+    width: clamp(80px, 22dvmin, 120px);
+    height: clamp(80px, 22dvmin, 120px);
+    font-size: clamp(40px, 14dvmin, 72px);
+  }
+}
