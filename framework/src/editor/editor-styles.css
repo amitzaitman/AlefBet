@@ -1569,8 +1569,10 @@
   /* Zone editor modal — full screen on mobile */
   .ab-ze-box {
     width: 100vw;
+    height: 100dvh;
     max-height: 100dvh;
     border-radius: 0;
+    margin: 0;
   }
 
   .ab-ze-header {
@@ -1618,8 +1620,10 @@
   /* Template picker — full screen on mobile */
   .ab-tpl-box {
     width: 100vw;
+    height: 100dvh;
     max-height: 100dvh;
     border-radius: 0;
+    margin: 0;
   }
 
   .ab-tpl-grid {
