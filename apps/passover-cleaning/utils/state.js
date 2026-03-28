@@ -1,4 +1,4 @@
-import { createLocalState } from '../../framework/dist/alefbet.js';
+import { createLocalState } from '../../../framework/dist/alefbet.js';
 import { defaultTasks } from '../data/default-tasks.js';
 
 const STORAGE_KEY = 'passover-cleaning-state';
