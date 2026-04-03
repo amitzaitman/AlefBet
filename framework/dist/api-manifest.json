@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-28T17:36:43.357Z",
+  "generatedAt": "2026-04-03T13:33:56.457Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -173,21 +173,21 @@
     },
     {
       "path": "ui/app-shell.js",
-      "description": "מעטפת אפליקציה רב-לשונית — כותרת, ניווט טאבים, ניווט תחתון לנייד\n\nמיועדת לאפליקציות שירות (לא משחקים) עם ניווט רב-טאבים.\nשונה מ-GameShell: אין ניהול סיבובים — רק מבנה ניווט.\n\n@param {HTMLElement} container - אלמנט המיכל של האפליקציה\n@param {object} config - הגדרות האפליקציה\n@param {string} config.title - כותרת ראשית\n@param {string} [config.subtitle] - כותרת משנה (אופציונלית)\n@param {Array<{id: string, label: string, icon: string}>} config.tabs - רשימת טאבים\n@param {string} [config.homeUrl] - כתובת דף הבית (לכפתור 🏠)\n@param {Function} [config.onTabChange] - קולבק בעת החלפת טאב: fn(tabId)\n@returns {{ contentEl: HTMLElement, setSubtitle(text: string): void, setActiveTab(tabId: string): void }}\n\n@example\nconst shell = createAppShell(document.getElementById('app'), {\n  title: 'ניהול משימות',\n  subtitle: 'פסח תשפ״ו',\n  tabs: [\n    { id: 'rooms', label: 'חדרים', icon: '🏠' },\n    { id: 'tasks', label: 'משימות', icon: '✅' },\n  ],\n  homeUrl: '../../index.html',\n  onTabChange: id => renderTab(id),\n});\nshell.setSubtitle('3 משימות נותרו');\nshell.setActiveTab('tasks');",
+      "description": "מעטפת אפליקציה רב-לשונית — כותרת, ניווט טאבים, ניווט תחתון לנייד\n\n@param {HTMLElement} container\n@param {object} config\n@param {string} config.title\n@param {string} [config.subtitle]\n@param {Array<{id: string, label: string, icon: string}>} config.tabs\n@param {string} [config.homeUrl]\n@param {Function} [config.onTabChange]\n@returns {{ contentEl: HTMLElement, setSubtitle(text): void, setActiveTab(tabId): void }}",
       "exports": [
         "createAppShell"
       ]
     },
     {
       "path": "ui/completion-screen.js",
-      "description": "מסך סיום המשחק\nמציג כוכבים, ניקוד וכפתור לשחק שוב\n[נוסף על ידי: letter-match game]\n\n@param {HTMLElement} container - אלמנט המיכל\n@param {number} score - ניקוד שהושג\n@param {number} totalRounds - מספר הסיבובים הכולל\n@param {function} onReplay - קולבק לחזרה על המשחק",
+      "description": "מסך סיום המשחק\nמציג כוכבים, ניקוד וכפתור לשחק שוב\n\n@param {HTMLElement} container\n@param {number} score\n@param {number} totalRounds\n@param {function} onReplay",
       "exports": [
         "showCompletionScreen"
       ]
     },
     {
       "path": "ui/feedback.js",
-      "description": "משוב ויזואלי ושמעי למשחקים\nמשלב אנימציות וצלילים לתגובות נכון / טעות / רמז\n[נוסף על ידי: letter-match game]\n\n@param {HTMLElement} container - אלמנט המיכל\n@returns {{ correct(text?), wrong(text?), hint(text), destroy() }}",
+      "description": "משוב ויזואלי ושמעי למשחקים\nמשלב אנימציות וצלילים לתגובות נכון / טעות / רמז\n\n@param {HTMLElement} container - אלמנט המיכל\n@returns {{ correct(text?), wrong(text?), hint(text), destroy() }}",
       "exports": [
         "createFeedback"
       ]
@@ -208,7 +208,7 @@
     },
     {
       "path": "ui/loading-screen.js",
-      "description": "מסך טעינה פשוט\nמציג הודעת טעינה ממורכזת בתוך מיכל נתון",
+      "description": "מסך טעינה פשוט",
       "exports": [
         "showLoadingScreen",
         "hideLoadingScreen"
@@ -216,42 +216,42 @@
     },
     {
       "path": "ui/nikud-box.js",
-      "description": "קופסת ניקוד — ריבוע ריק (מסמל אות) עם סימן ניקוד מחוצה לו\n[נוסף על ידי: nikud-match game]",
+      "description": "קופסת ניקוד — ריבוע ריק (מסמל אות) עם סימן ניקוד מחוצה לו",
       "exports": [
         "createNikudBox"
       ]
     },
     {
       "path": "ui/nikud-settings.js",
-      "description": "דיאלוג לבחירת ניקוד פעיל\r\n[נוסף על ידי: nikud-match ו-nikud-speak]",
+      "description": "דיאלוג לבחירת ניקוד פעיל",
       "exports": [
         "showNikudSettingsDialog"
       ]
     },
     {
       "path": "ui/option-cards.js",
-      "description": "כרטיסי בחירה למשחקי התאמה\nמציג רשת של כרטיסים עם אימוג'י וטקסט, תומך בלחיצה ובמגע\n[נוסף על ידי: letter-match game]\n\n@param {HTMLElement} container - אלמנט המיכל\n@param {Array<{id, text, emoji}>} options - רשימת האפשרויות\n@param {function} onSelect - קולבק שנקרא עם האפשרות שנבחרה\n@returns {{ highlight(id, type), disable(), reset(), destroy() }}",
+      "description": "כרטיסי בחירה למשחקי התאמה\nמציג רשת של כרטיסים עם אמוג'י וטקסט, תומך בלחיצה ובמגע\n\n@param {HTMLElement} container - אלמנט המיכל\n@param {Array<{id, text, emoji}>} options - רשימת האפשרויות\n@param {function} onSelect - קולבק שנקרא עם האפשרות שנבחרה\n@returns {{ highlight(id, type), disable(), reset(), destroy() }}",
       "exports": [
         "createOptionCards"
       ]
     },
     {
       "path": "ui/progress-bar.js",
-      "description": "סרגל התקדמות ויזואלי\nמציג את ההתקדמות בסיבובי המשחק\n[נוסף על ידי: letter-match game]\n\n@param {HTMLElement} container - אלמנט המיכל\n@param {number} total - מספר הסיבובים הכולל\n@returns {{ update(current), destroy() }}",
+      "description": "סרגל התקדמות ויזואלי\nמציג את ההתקדמות בסיבובי המשחק",
       "exports": [
         "createProgressBar"
       ]
     },
     {
       "path": "ui/voice-record-button.js",
-      "description": "כפתור הקלטת קול\nמצבים: ריק → מקליט → יש הקלטה\nניתן להטמיע בכל מקום בממשק",
+      "description": "כפתור הקלטת קול\nמצבים: idle → recording → has-voice",
       "exports": [
         "createVoiceRecordButton"
       ]
     },
     {
       "path": "ui/zone-player.js",
-      "description": "zone-player — renders tappable zones over a slide image during play.\n\nSupports:\n  mode: 'quiz'       — tap correct zones; wrong taps shake (default)\n  mode: 'soundboard' — tap any zone to hear audio, no right/wrong\n\nZone shapes: 'rect' (default) and 'polygon' (freeform SVG).\n\nAuto-hint: after `hintAfter` wrong taps (default 3), correct zones\nblink briefly to guide the student. Set hintAfter=0 to disable.\n\nPer-zone audio: if gameId provided, plays voice store audio on tap.\nInstruction audio: if gameId + roundId, auto-plays on load.",
+      "description": "zone-player — renders tappable zones over a slide image during play.\n\nSupports:\n  mode: 'quiz'       — tap correct zones; wrong taps shake (default)\n  mode: 'soundboard' — tap any zone to hear audio, no right/wrong\n\nZone shapes: 'rect' (default) and 'polygon' (freeform SVG).\n\nAuto-hint: after `hintAfter` wrong taps (default 3), correct zones\nblink briefly to guide the student. Set hintAfter=0 to disable.",
       "exports": [
         "createZonePlayer"
       ]
