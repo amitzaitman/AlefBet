@@ -1,14 +1,7 @@
 /**
  * activity-templates — pre-built zone layouts for quick game creation.
- *
- * Teachers pick a template, and it pre-populates the round with
- * positioned zones. Each template defines zone placements as
- * percentage-based rectangles.
- *
- * Usage:
- *   showTemplatePicker(zones => { ... });
  */
-
+import { LitElement, html } from 'lit';
 import type { Zone } from './schemas.js';
 
 let _tplIdCounter = 0;
@@ -16,7 +9,7 @@ function _zid(): string {
   return `tpl-zone-${Date.now()}-${_tplIdCounter++}`;
 }
 
-// ── Template definitions ─────────────────────────────────────────────────────
+// ── Template definitions ──────────────────────────────────────────────────────
 
 export interface ActivityTemplate {
   id:          string;
@@ -124,91 +117,82 @@ export const ACTIVITY_TEMPLATES: ActivityTemplate[] = [
   },
 ];
 
-// ── Template picker UI ───────────────────────────────────────────────────────
+// ── Web Component ─────────────────────────────────────────────────────────────
+
+class AbTemplatePicker extends LitElement {
+  static properties = {
+    _open: { state: true },
+  };
+
+  createRenderRoot() { return this; }
+
+  constructor() {
+    super();
+    this._open = false;
+    this._onSelect = null as ((zones: Zone[]) => void) | null;
+  }
+
+  open(onSelect: (zones: Zone[]) => void): void {
+    this._onSelect = onSelect;
+    this._open = true;
+  }
+
+  private _select(tpl: ActivityTemplate): void {
+    const zones: Zone[] = tpl.zones.map(z => ({ ...z, id: _zid() } as Zone));
+    this._onSelect?.(zones);
+    this._open = false;
+  }
+
+  render() {
+    if (!this._open) return html``;
+    return html`
+      <div class="ab-tpl-backdrop" @click=${() => { this._open = false; }}></div>
+      <div class="ab-tpl-box">
+        <div class="ab-tpl-header">
+          <span class="ab-tpl-title">📐 בחרו תבנית</span>
+          <button class="ab-ze-close" aria-label="סגור"
+                  @click=${() => { this._open = false; }}>✕</button>
+        </div>
+        <div class="ab-tpl-grid">
+          ${ACTIVITY_TEMPLATES.map(tpl => html`
+            <button class="ab-tpl-card" @click=${() => this._select(tpl)}>
+              <div class="ab-tpl-card__preview">
+                ${tpl.zones.map(z => html`
+                  <div class=${'ab-tpl-card__zone' + (z.correct ? ' ab-tpl-card__zone--correct' : '')}
+                       style="left:${z.x}%;top:${z.y}%;width:${z.width}%;height:${z.height}%">
+                  </div>
+                `)}
+              </div>
+              <div class="ab-tpl-card__label">
+                <span class="ab-tpl-card__icon">${tpl.icon}</span> ${tpl.nameHe}
+              </div>
+              <div class="ab-tpl-card__desc">${tpl.description}</div>
+            </button>
+          `)}
+        </div>
+      </div>
+    `;
+  }
+}
+
+customElements.define('ab-template-picker', AbTemplatePicker);
+
+// ── Singleton + public API ────────────────────────────────────────────────────
+
+let _instance: AbTemplatePicker | null = null;
+
+function _getInstance(): AbTemplatePicker {
+  if (!_instance) {
+    _instance = document.createElement('ab-template-picker') as AbTemplatePicker;
+    document.body.appendChild(_instance);
+  }
+  return _instance;
+}
 
 /**
  * Show a modal picker for activity templates.
  * @param onSelect — called with the generated zones (with IDs) when a template is chosen
  */
 export function showTemplatePicker(onSelect: (zones: Zone[]) => void): void {
-  document.getElementById('ab-tpl-picker')?.remove();
-
-  const modal = document.createElement('div');
-  modal.id = 'ab-tpl-picker';
-  modal.className = 'ab-tpl-modal';
-  modal.setAttribute('role', 'dialog');
-  modal.setAttribute('aria-modal', 'true');
-  modal.setAttribute('aria-label', 'בחירת תבנית');
-
-  const backdrop = document.createElement('div');
-  backdrop.className = 'ab-tpl-backdrop';
-  modal.appendChild(backdrop);
-
-  const box = document.createElement('div');
-  box.className = 'ab-tpl-box';
-
-  // Header
-  const header = document.createElement('div');
-  header.className = 'ab-tpl-header';
-  header.innerHTML = `<span class="ab-tpl-title">📐 בחרו תבנית</span>`;
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'ab-ze-close';
-  closeBtn.textContent = '\u2715';
-  closeBtn.addEventListener('click', close);
-  header.appendChild(closeBtn);
-  box.appendChild(header);
-
-  // Grid
-  const grid = document.createElement('div');
-  grid.className = 'ab-tpl-grid';
-
-  ACTIVITY_TEMPLATES.forEach(tpl => {
-    const card = document.createElement('button');
-    card.className = 'ab-tpl-card';
-    card.addEventListener('click', () => {
-      const zones: Zone[] = tpl.zones.map(z => ({
-        ...z,
-        id: _zid(),
-      } as Zone));
-      onSelect(zones);
-      close();
-    });
-
-    // Preview: mini visual of zones
-    const preview = document.createElement('div');
-    preview.className = 'ab-tpl-card__preview';
-    tpl.zones.forEach(z => {
-      const dot = document.createElement('div');
-      dot.className = 'ab-tpl-card__zone';
-      if (z.correct) dot.classList.add('ab-tpl-card__zone--correct');
-      dot.style.left   = `${z.x}%`;
-      dot.style.top    = `${z.y}%`;
-      dot.style.width  = `${z.width}%`;
-      dot.style.height = `${z.height}%`;
-      preview.appendChild(dot);
-    });
-    card.appendChild(preview);
-
-    const label = document.createElement('div');
-    label.className = 'ab-tpl-card__label';
-    label.innerHTML = `<span class="ab-tpl-card__icon">${tpl.icon}</span> ${tpl.nameHe}`;
-    card.appendChild(label);
-
-    const desc = document.createElement('div');
-    desc.className = 'ab-tpl-card__desc';
-    desc.textContent = tpl.description;
-    card.appendChild(desc);
-
-    grid.appendChild(card);
-  });
-
-  box.appendChild(grid);
-  modal.appendChild(box);
-  document.body.appendChild(modal);
-
-  function close() { modal.remove(); }
-  backdrop.addEventListener('click', close);
-  document.addEventListener('keydown', function onKey(e: KeyboardEvent) {
-    if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey); }
-  });
+  _getInstance().open(onSelect);
 }

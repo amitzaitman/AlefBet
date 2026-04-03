@@ -3,6 +3,7 @@
  * Positioned at inline-start (right in RTL).
  * Supports drag-to-reorder (grip handle) and duplicate (hover button).
  */
+import { LitElement, html, PropertyValues } from 'lit';
 import { createDragSource, createDropTarget } from '../input/drag.js';
 import type { GameData } from './game-data.js';
 
@@ -14,131 +15,137 @@ interface SlideNavigatorCallbacks {
 }
 
 export interface SlideNavigator {
-  refresh():           void;
+  refresh():             void;
   setActiveRound(id: string): void;
-  destroy():           void;
+  destroy():             void;
 }
+
+// ── Web Component ─────────────────────────────────────────────────────────────
+
+class AbSlideNavigator extends LitElement {
+  static properties = {
+    _rounds:   { state: true },
+    _activeId: { state: true },
+  };
+
+  createRenderRoot() { return this; }
+
+  constructor() {
+    super();
+    this._rounds   = [] as Array<Record<string, unknown> & { id: string }>;
+    this._activeId = null as string | null;
+    this._gameData = null as GameData | null;
+    this._onSelectRound    = null as ((id: string) => void) | null;
+    this._onAddRound       = null as ((afterId: string | null) => void) | null;
+    this._onDuplicateRound = null as ((id: string) => void) | null;
+    this._onMoveRound      = null as ((id: string, toIndex: number) => void) | null;
+    this._ddCleanup        = [] as Array<{ destroy(): void }>;
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._ddCleanup.forEach(d => d.destroy());
+    this._ddCleanup = [];
+  }
+
+  // Re-setup drag/drop only when the rounds list actually changes.
+  updated(changedProps: PropertyValues) {
+    if (changedProps.has('_rounds')) {
+      this._ddCleanup.forEach(d => d.destroy());
+      this._ddCleanup = [];
+
+      this.querySelectorAll<HTMLElement>('.ab-editor-nav__thumb').forEach((thumb, i) => {
+        const round = this._rounds[i];
+        if (!round) return;
+
+        const grip = thumb.querySelector<HTMLElement>('.ab-editor-nav__grip');
+        if (grip) {
+          this._ddCleanup.push(createDragSource(grip, { roundId: round.id }));
+        }
+
+        this._ddCleanup.push(
+          createDropTarget(thumb, ({ data }: { data: { roundId: string } }) => {
+            if (data.roundId !== round.id) {
+              this._onMoveRound?.(data.roundId, this._gameData!.getRoundIndex(round.id));
+            }
+          }),
+        );
+      });
+    }
+  }
+
+  render() {
+    return html`
+      <div class="ab-editor-nav" aria-label="ניווט סיבובים">
+        <div class="ab-editor-nav__header">סיבובים</div>
+        <div class="ab-editor-nav__list">
+          ${this._rounds.map((round, i) => this._renderThumb(round, i))}
+        </div>
+        <button class="ab-editor-nav__add"
+                @click=${() => this._onAddRound?.(null)}>+ הוסף</button>
+      </div>
+    `;
+  }
+
+  private _renderThumb(round: Record<string, unknown> & { id: string }, index: number) {
+    const isActive = round.id === this._activeId;
+    return html`
+      <div
+        class=${'ab-editor-nav__thumb' + (isActive ? ' ab-editor-nav__thumb--active' : '')
+          + (round.image ? ' ab-editor-nav__thumb--has-img' : '')}
+        role="button"
+        tabindex="0"
+        aria-label=${`סיבוב ${index + 1}`}
+        data-round-id=${round.id}
+        style=${round.image ? `background-image:url(${round.image as string})` : ''}
+        @click=${() => this._onSelectRound?.(round.id)}
+        @keydown=${(e: KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this._onSelectRound?.(round.id);
+          }
+        }}
+      >
+        <div class="ab-editor-nav__grip" aria-hidden="true" title="גרור לשינוי סדר">⠿</div>
+        <div class="ab-editor-nav__num">${index + 1}</div>
+        ${!round.image && round.correctEmoji ? html`
+          <div class="ab-editor-nav__emoji">${round.correctEmoji}</div>
+        ` : ''}
+        ${round.target ? html`
+          <div class="ab-editor-nav__letter">${round.target}</div>
+        ` : ''}
+        <button class="ab-editor-nav__dup" title="שכפל סיבוב" aria-label="שכפל סיבוב"
+                @click=${(e: Event) => { e.stopPropagation(); this._onDuplicateRound?.(round.id); }}>
+          ⧉
+        </button>
+      </div>
+    `;
+  }
+}
+
+customElements.define('ab-slide-navigator', AbSlideNavigator);
+
+// ── Factory function (backward-compatible) ────────────────────────────────────
 
 export function createSlideNavigator(
   mountEl:  HTMLElement,
   gameData: GameData,
   { onSelectRound, onAddRound, onDuplicateRound, onMoveRound }: SlideNavigatorCallbacks,
 ): SlideNavigator {
+  const el = document.createElement('ab-slide-navigator') as AbSlideNavigator;
+  el._gameData          = gameData;
+  el._rounds            = [...gameData.rounds] as Array<Record<string, unknown> & { id: string }>;
+  el._onSelectRound     = onSelectRound;
+  el._onAddRound        = onAddRound;
+  el._onDuplicateRound  = onDuplicateRound;
+  el._onMoveRound       = onMoveRound;
+  mountEl.appendChild(el);
 
-  const panel = document.createElement('div');
-  panel.className = 'ab-editor-nav';
-  panel.setAttribute('aria-label', 'ניווט סיבובים');
-
-  const header = document.createElement('div');
-  header.className = 'ab-editor-nav__header';
-  header.textContent = 'סיבובים';
-  panel.appendChild(header);
-
-  const list = document.createElement('div');
-  list.className = 'ab-editor-nav__list';
-  panel.appendChild(list);
-
-  const addBtn = document.createElement('button');
-  addBtn.className = 'ab-editor-nav__add';
-  addBtn.textContent = '+ הוסף';
-  addBtn.addEventListener('click', () => onAddRound(null));
-  panel.appendChild(addBtn);
-
-  mountEl.appendChild(panel);
-
-  let activeId: string | null = null;
-  let _dragDropItems: Array<{ destroy(): void }> = [];
-
-  function _clearDragDrop() {
-    _dragDropItems.forEach(item => item.destroy());
-    _dragDropItems = [];
-  }
-
-  function buildThumbnail(round: Record<string, unknown> & { id: string }, index: number): HTMLElement {
-    const thumb = document.createElement('div');
-    thumb.className = 'ab-editor-nav__thumb';
-    if (round.id === activeId) thumb.classList.add('ab-editor-nav__thumb--active');
-    thumb.setAttribute('role', 'button');
-    thumb.setAttribute('tabindex', '0');
-    thumb.setAttribute('aria-label', `סיבוב ${index + 1}`);
-    thumb.dataset.roundId = round.id;
-
-    if (round.image) {
-      thumb.style.backgroundImage = `url(${round.image as string})`;
-      thumb.classList.add('ab-editor-nav__thumb--has-img');
-    }
-
-    // Drag grip — only this element is the drag source so clicks still select
-    const grip = document.createElement('div');
-    grip.className = 'ab-editor-nav__grip';
-    grip.innerHTML = '⠿';
-    grip.setAttribute('aria-hidden', 'true');
-    grip.title = 'גרור לשינוי סדר';
-    thumb.appendChild(grip);
-
-    const num = document.createElement('div');
-    num.className = 'ab-editor-nav__num';
-    num.textContent = String(index + 1);
-    thumb.appendChild(num);
-
-    if (round.correctEmoji && !round.image) {
-      const emoji = document.createElement('div');
-      emoji.className = 'ab-editor-nav__emoji';
-      emoji.textContent = round.correctEmoji as string;
-      thumb.appendChild(emoji);
-    }
-
-    if (round.target) {
-      const letter = document.createElement('div');
-      letter.className = 'ab-editor-nav__letter';
-      letter.textContent = round.target as string;
-      thumb.appendChild(letter);
-    }
-
-    // Duplicate button — visible on hover
-    const dupBtn = document.createElement('button');
-    dupBtn.className = 'ab-editor-nav__dup';
-    dupBtn.innerHTML = '⧉';
-    dupBtn.title = 'שכפל סיבוב';
-    dupBtn.setAttribute('aria-label', 'שכפל סיבוב');
-    dupBtn.addEventListener('click', e => { e.stopPropagation(); onDuplicateRound(round.id); });
-    thumb.appendChild(dupBtn);
-
-    thumb.addEventListener('click', () => onSelectRound(round.id));
-    thumb.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelectRound(round.id); }
-    });
-
-    // Drag source on grip only
-    _dragDropItems.push(createDragSource(grip, { roundId: round.id }));
-
-    // Drop target on whole thumb
-    _dragDropItems.push(createDropTarget(thumb, ({ data }: { data: { roundId: string } }) => {
-      if (data.roundId === round.id) return;
-      onMoveRound(data.roundId, gameData.getRoundIndex(round.id));
-    }));
-
-    return thumb;
-  }
-
-  function refresh() {
-    _clearDragDrop();
-    list.innerHTML = '';
-    gameData.rounds.forEach((round, i) => list.appendChild(buildThumbnail(round, i)));
-  }
-
-  function setActiveRound(id: string) {
-    activeId = id;
-    list.querySelectorAll<HTMLElement>('.ab-editor-nav__thumb').forEach(el => {
-      el.classList.toggle('ab-editor-nav__thumb--active', el.dataset.roundId === id);
-    });
-  }
-
-  function destroy() {
-    _clearDragDrop();
-    panel.remove();
-  }
-
-  refresh();
-  return { refresh, setActiveRound, destroy };
+  return {
+    refresh() {
+      el._rounds = [...gameData.rounds] as Array<Record<string, unknown> & { id: string }>;
+    },
+    setActiveRound(id: string) { el._activeId = id; },
+    destroy()                  { el.remove(); },
+  };
 }
