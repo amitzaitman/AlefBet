@@ -9,21 +9,10 @@
  *
  * Auto-hint: after `hintAfter` wrong taps (default 3), correct zones
  * blink briefly to guide the student. Set hintAfter=0 to disable.
- *
- * Per-zone audio: if gameId provided, plays voice store audio on tap.
- * Instruction audio: if gameId + roundId, auto-plays on load.
  */
-
+import { LitElement, html } from 'lit';
 import { playVoice } from '../audio/voice-store.js';
 
-/**
- * Build SVG polygon points attr from zone points relative to bounding box.
- * @param {Array<{x:number,y:number}>} pts
- * @param {number} zx zone x
- * @param {number} zy zone y
- * @param {number} zw zone width
- * @param {number} zh zone height
- */
 function _svgPtsAttr(pts, zx, zy, zw, zh) {
   return pts.map(p => {
     const lx = zw > 0 ? ((p.x - zx) / zw) * 100 : 0;
@@ -32,21 +21,206 @@ function _svgPtsAttr(pts, zx, zy, zw, zh) {
   }).join(' ');
 }
 
+class AbZonePlayer extends LitElement {
+  static properties = {
+    image:               { type: String },
+    zones:               { type: Array },
+    mode:                { type: String },
+    gameId:              { type: String },
+    roundId:             { type: String },
+    showZones:           { type: Boolean },
+    autoPlayInstruction: { type: Boolean },
+    hintAfter:           { type: Number },
+    _found:              { state: true },
+    _wrongZones:         { state: true },
+    _tappedZones:        { state: true },
+    _hintZones:          { state: true },
+    _revealedZones:      { state: true },
+    _wrongCount:         { state: true },
+    _hintShown:          { state: true },
+  };
+
+  createRenderRoot() { return this; }
+
+  constructor() {
+    super();
+    this.image = '';
+    this.zones = [];
+    this.mode = 'quiz';
+    this.gameId = null;
+    this.roundId = null;
+    this.showZones = false;
+    this.autoPlayInstruction = true;
+    this.hintAfter = 3;
+    this._found = new Set();
+    this._wrongZones = new Set();
+    this._tappedZones = new Set();
+    this._hintZones = new Set();
+    this._revealedZones = new Set();
+    this._wrongCount = 0;
+    this._hintShown = false;
+    this._playing = false;
+    this._onCorrect = null;
+    this._onWrong = null;
+    this._onAllCorrect = null;
+    this._onZoneTap = null;
+  }
+
+  firstUpdated() {
+    if (this.autoPlayInstruction && this.gameId && this.roundId) {
+      setTimeout(() => playVoice(this.gameId, this.roundId).catch(() => {}), 400);
+    }
+  }
+
+  async _playZoneAudio(zoneId) {
+    if (!this.gameId || this._playing) return;
+    this._playing = true;
+    try { await playVoice(this.gameId, `zone-${zoneId}`); } catch { /* ok */ }
+    this._playing = false;
+  }
+
+  _maybeShowHint() {
+    if (this._hintShown || this.hintAfter <= 0 || this.mode === 'soundboard') return;
+    if (this._wrongCount < this.hintAfter) return;
+    this._hintShown = true;
+
+    const correctUnsolved = this.zones
+      .filter(z => z.correct && !this._found.has(z.id))
+      .map(z => z.id);
+    this._hintZones = new Set(correctUnsolved);
+
+    setTimeout(() => {
+      this._hintZones = new Set();
+      this._hintShown = false;
+      this._wrongCount = 0;
+    }, 1500);
+  }
+
+  _handleZoneTap(zone) {
+    this._onZoneTap?.(zone);
+    this._playZoneAudio(zone.id);
+
+    if (this.mode === 'soundboard') {
+      const tapped = new Set(this._tappedZones);
+      tapped.add(zone.id);
+      this._tappedZones = tapped;
+      setTimeout(() => {
+        const t = new Set(this._tappedZones);
+        t.delete(zone.id);
+        this._tappedZones = t;
+      }, 400);
+      return;
+    }
+
+    // Quiz mode
+    if (this._found.has(zone.id)) return;
+
+    if (zone.correct) {
+      const found = new Set(this._found);
+      found.add(zone.id);
+      this._found = found;
+      this._onCorrect?.(zone);
+      const totalCorrect = this.zones.filter(z => z.correct).length;
+      if (found.size >= totalCorrect) this._onAllCorrect?.();
+    } else {
+      const wrong = new Set(this._wrongZones);
+      wrong.add(zone.id);
+      this._wrongZones = wrong;
+      this._wrongCount++;
+      this._onWrong?.(zone);
+      setTimeout(() => {
+        const w = new Set(this._wrongZones);
+        w.delete(zone.id);
+        this._wrongZones = w;
+      }, 600);
+      this._maybeShowHint();
+    }
+  }
+
+  _zoneClass(zone) {
+    const isSoundboard = this.mode === 'soundboard';
+    const cls = ['ab-zp-zone'];
+    if (this.showZones || isSoundboard) cls.push('ab-zp-zone--visible');
+    if (isSoundboard)                   cls.push('ab-zp-zone--soundboard');
+    if (zone.shape === 'polygon')       cls.push('ab-zp-zone--poly');
+    if (this._found.has(zone.id))       cls.push('ab-zp-zone--correct');
+    if (this._wrongZones.has(zone.id))  cls.push('ab-zp-zone--wrong');
+    if (this._tappedZones.has(zone.id)) cls.push('ab-zp-zone--tapped');
+    if (this._hintZones.has(zone.id))   cls.push('ab-zp-zone--hint');
+    if (this._revealedZones.has(zone.id)) cls.push('ab-zp-zone--revealed');
+    return cls.join(' ');
+  }
+
+  _renderZoneContent(zone) {
+    const parts = [];
+    if (zone.shape === 'polygon' && zone.points?.length >= 3) {
+      const uid = `zp-clip-${zone.id}`;
+      const pts = _svgPtsAttr(zone.points, zone.x, zone.y, zone.width, zone.height);
+      parts.push(html`
+        <svg class="ab-zp-zone__poly-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs><clipPath id=${uid}><polygon points=${pts}/></clipPath></defs>
+          <rect x="0" y="0" width="100" height="100" clip-path=${'url(#' + uid + ')'} fill="transparent"/>
+        </svg>`);
+    }
+    if (this.mode === 'soundboard' && zone.label) {
+      parts.push(html`<span class="ab-zp-zone__label">${zone.label}</span>`);
+    }
+    return parts;
+  }
+
+  // ── Public API ─────────────────────────────────────────────────────────────
+
+  async playInstruction() {
+    if (this.gameId && this.roundId) return playVoice(this.gameId, this.roundId);
+    return false;
+  }
+
+  async playZoneAudio(zoneId) {
+    if (this.gameId) return playVoice(this.gameId, `zone-${zoneId}`);
+    return false;
+  }
+
+  revealCorrect() {
+    const revealed = new Set(this._revealedZones);
+    this.zones.filter(z => z.correct).forEach(z => revealed.add(z.id));
+    this._revealedZones = revealed;
+  }
+
+  reset() {
+    this._found = new Set();
+    this._wrongZones = new Set();
+    this._tappedZones = new Set();
+    this._hintZones = new Set();
+    this._revealedZones = new Set();
+    this._wrongCount = 0;
+    this._hintShown = false;
+  }
+
+  render() {
+    return html`
+      <div class="ab-zp-wrap">
+        <img class="ab-zp-image" src=${this.image} alt="" draggable="false">
+        <div class="ab-zp-layer">
+          ${this.zones.map(zone => html`
+            <button
+              class=${this._zoneClass(zone)}
+              style="left:${zone.x}%; top:${zone.y}%; width:${zone.width}%; height:${zone.height}%"
+              aria-label=${zone.label || (zone.correct ? 'correct zone' : 'zone')}
+              @click=${() => this._handleZoneTap(zone)}
+            >${this._renderZoneContent(zone)}</button>
+          `)}
+        </div>
+      </div>
+    `;
+  }
+}
+
+customElements.define('ab-zone-player', AbZonePlayer);
+
 /**
  * @param {HTMLElement} container
  * @param {Object} config
- * @param {string} config.image
- * @param {Array} config.zones
- * @param {'quiz'|'soundboard'} [config.mode='quiz']
- * @param {string}   [config.gameId]
- * @param {string}   [config.roundId]
- * @param {Function} [config.onCorrect]
- * @param {Function} [config.onWrong]
- * @param {Function} [config.onAllCorrect]
- * @param {Function} [config.onZoneTap]
- * @param {boolean}  [config.showZones=false]
- * @param {boolean}  [config.autoPlayInstruction=true]
- * @param {number}   [config.hintAfter=3] — wrong taps before auto-hint (0=disabled)
+ * @returns {{ playInstruction(), playZoneAudio(id), revealCorrect(), reset(), destroy() }}
  */
 export function createZonePlayer(container, config) {
   const {
@@ -64,161 +238,26 @@ export function createZonePlayer(container, config) {
     hintAfter = 3,
   } = config;
 
-  const isSoundboard = mode === 'soundboard';
-
-  const wrap = document.createElement('div');
-  wrap.className = 'ab-zp-wrap';
-
-  const img = document.createElement('img');
-  img.className = 'ab-zp-image';
-  img.src = image;
-  img.alt = '';
-  img.draggable = false;
-  wrap.appendChild(img);
-
-  const layer = document.createElement('div');
-  layer.className = 'ab-zp-layer';
-  wrap.appendChild(layer);
-
-  container.appendChild(wrap);
-
-  const found = new Set();
-  let wrongCount = 0;
-  let _playing = false;
-  let _hintShown = false;
-
-  // ── Play zone audio ────────────────────────────────────────────────────
-
-  async function _playZoneAudio(zoneId) {
-    if (!gameId || _playing) return;
-    _playing = true;
-    try { await playVoice(gameId, `zone-${zoneId}`); } catch { /* ok */ }
-    _playing = false;
-  }
-
-  // ── Auto-hint ──────────────────────────────────────────────────────────
-
-  function _maybeShowHint() {
-    if (_hintShown || hintAfter <= 0 || isSoundboard) return;
-    if (wrongCount < hintAfter) return;
-    _hintShown = true;
-
-    // Briefly blink correct zones
-    const els = layer.querySelectorAll('.ab-zp-zone');
-    els.forEach((el, i) => {
-      if (zones[i]?.correct && !found.has(zones[i].id)) {
-        el.classList.add('ab-zp-zone--hint');
-      }
-    });
-    setTimeout(() => {
-      els.forEach(el => el.classList.remove('ab-zp-zone--hint'));
-      // Allow another hint after more wrong attempts
-      _hintShown = false;
-      wrongCount = 0;
-    }, 1500);
-  }
-
-  // ── Render zones ───────────────────────────────────────────────────────
-
-  zones.forEach(zone => {
-    const el = document.createElement('button');
-    el.className = 'ab-zp-zone';
-    if (showZones || isSoundboard) el.classList.add('ab-zp-zone--visible');
-    if (isSoundboard) el.classList.add('ab-zp-zone--soundboard');
-    el.style.left   = `${zone.x}%`;
-    el.style.top    = `${zone.y}%`;
-    el.style.width  = `${zone.width}%`;
-    el.style.height = `${zone.height}%`;
-    el.setAttribute('aria-label', zone.label || (zone.correct ? 'correct zone' : 'zone'));
-
-    // Polygon: SVG clip-path for non-rectangular hit area
-    if (zone.shape === 'polygon' && zone.points && zone.points.length >= 3) {
-      const uid = `zp-clip-${zone.id}`;
-      el.innerHTML = `<svg class="ab-zp-zone__poly-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <defs><clipPath id="${uid}"><polygon points="${_svgPtsAttr(zone.points, zone.x, zone.y, zone.width, zone.height)}"/></clipPath></defs>
-        <rect x="0" y="0" width="100" height="100" clip-path="url(#${uid})" fill="transparent"/>
-      </svg>`;
-      el.classList.add('ab-zp-zone--poly');
-    }
-
-    // Label in soundboard mode
-    if (isSoundboard && zone.label) {
-      const labelEl = document.createElement('span');
-      labelEl.className = 'ab-zp-zone__label';
-      labelEl.textContent = zone.label;
-      el.appendChild(labelEl);
-    }
-
-    el.addEventListener('click', () => {
-      if (onZoneTap) onZoneTap(zone);
-      _playZoneAudio(zone.id);
-
-      if (isSoundboard) {
-        el.classList.add('ab-zp-zone--tapped');
-        setTimeout(() => el.classList.remove('ab-zp-zone--tapped'), 400);
-        return;
-      }
-
-      // Quiz mode
-      if (found.has(zone.id)) return;
-
-      if (zone.correct) {
-        found.add(zone.id);
-        el.classList.add('ab-zp-zone--correct');
-        if (onCorrect) onCorrect(zone);
-        const totalCorrect = zones.filter(z => z.correct).length;
-        if (found.size >= totalCorrect && onAllCorrect) {
-          onAllCorrect();
-        }
-      } else {
-        el.classList.add('ab-zp-zone--wrong');
-        wrongCount++;
-        if (onWrong) onWrong(zone);
-        setTimeout(() => el.classList.remove('ab-zp-zone--wrong'), 600);
-        _maybeShowHint();
-      }
-    });
-
-    layer.appendChild(el);
-  });
-
-  // ── Auto-play instruction audio ────────────────────────────────────────
-
-  if (autoPlayInstruction && gameId && roundId) {
-    setTimeout(() => { playVoice(gameId, roundId).catch(() => {}); }, 400);
-  }
-
-  // ── Public API ─────────────────────────────────────────────────────────
+  const el = document.createElement('ab-zone-player');
+  el.image = image;
+  el.zones = zones;
+  el.mode = mode;
+  el.gameId = gameId;
+  el.roundId = roundId;
+  el.showZones = showZones;
+  el.autoPlayInstruction = autoPlayInstruction;
+  el.hintAfter = hintAfter;
+  el._onCorrect = onCorrect;
+  el._onWrong = onWrong;
+  el._onAllCorrect = onAllCorrect;
+  el._onZoneTap = onZoneTap;
+  container.appendChild(el);
 
   return {
-    async playInstruction() {
-      if (gameId && roundId) return playVoice(gameId, roundId);
-      return false;
-    },
-
-    async playZoneAudio(zoneId) {
-      if (gameId) return playVoice(gameId, `zone-${zoneId}`);
-      return false;
-    },
-
-    revealCorrect() {
-      layer.querySelectorAll('.ab-zp-zone').forEach((el, i) => {
-        if (zones[i]?.correct) el.classList.add('ab-zp-zone--revealed');
-      });
-    },
-
-    reset() {
-      found.clear();
-      wrongCount = 0;
-      _hintShown = false;
-      layer.querySelectorAll('.ab-zp-zone').forEach(el => {
-        el.classList.remove(
-          'ab-zp-zone--correct', 'ab-zp-zone--wrong',
-          'ab-zp-zone--revealed', 'ab-zp-zone--tapped', 'ab-zp-zone--hint',
-        );
-      });
-    },
-
-    destroy() { wrap.remove(); },
+    playInstruction:       () => el.playInstruction(),
+    playZoneAudio: (id)    => el.playZoneAudio(id),
+    revealCorrect:         () => el.revealCorrect(),
+    reset:                 () => el.reset(),
+    destroy:               () => el.remove(),
   };
 }

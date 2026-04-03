@@ -1,41 +1,53 @@
 /**
  * סרגל התקדמות ויזואלי
  * מציג את ההתקדמות בסיבובי המשחק
- * [נוסף על ידי: letter-match game]
- *
+ */
+import { LitElement, html } from 'lit';
+
+class AbProgressBar extends LitElement {
+  static properties = {
+    total:   { type: Number },
+    current: { type: Number },
+  };
+
+  createRenderRoot() { return this; }
+
+  constructor() {
+    super();
+    this.total = 0;
+    this.current = 0;
+  }
+
+  render() {
+    const pct = this.total > 0 ? Math.round((this.current / this.total) * 100) : 0;
+    return html`
+      <div class="progress-bar"
+           role="progressbar"
+           aria-valuemin="0"
+           aria-valuemax=${this.total}
+           aria-valuenow=${this.current}>
+        <div class="progress-bar__track">
+          <div class="progress-bar__fill" style="width:${pct}%"></div>
+        </div>
+        <span class="progress-bar__label">${this.current} / ${this.total}</span>
+      </div>
+    `;
+  }
+}
+
+customElements.define('ab-progress-bar', AbProgressBar);
+
+/**
  * @param {HTMLElement} container - אלמנט המיכל
  * @param {number} total - מספר הסיבובים הכולל
  * @returns {{ update(current), destroy() }}
  */
 export function createProgressBar(container, total) {
-  const bar = document.createElement('div');
-  bar.className = 'progress-bar';
-  bar.setAttribute('role', 'progressbar');
-  bar.setAttribute('aria-valuemin', '0');
-  bar.setAttribute('aria-valuemax', String(total));
-  bar.innerHTML = `
-    <div class="progress-bar__track">
-      <div class="progress-bar__fill" style="width: 0%"></div>
-    </div>
-    <span class="progress-bar__label">0 / ${total}</span>
-  `;
-  container.appendChild(bar);
-
-  const fill = bar.querySelector('.progress-bar__fill');
-  const label = bar.querySelector('.progress-bar__label');
-
+  const el = document.createElement('ab-progress-bar');
+  el.total = total;
+  container.appendChild(el);
   return {
-    /** עדכן את ההתקדמות */
-    update(current) {
-      const pct = Math.round((current / total) * 100);
-      fill.style.width = `${pct}%`;
-      label.textContent = `${current} / ${total}`;
-      bar.setAttribute('aria-valuenow', String(current));
-    },
-
-    /** הסר את הרכיב */
-    destroy() {
-      bar.remove();
-    },
+    update(current) { el.current = current; },
+    destroy()       { el.remove(); },
   };
 }

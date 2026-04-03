@@ -1,58 +1,78 @@
 /**
  * משוב ויזואלי ושמעי למשחקים
  * משלב אנימציות וצלילים לתגובות נכון / טעות / רמז
- * [נוסף על ידי: letter-match game]
  *
  * @param {HTMLElement} container - אלמנט המיכל
  * @returns {{ correct(text?), wrong(text?), hint(text), destroy() }}
  */
+import { LitElement, html } from 'lit';
 import { sounds } from '../audio/sounds.js';
 import { animate } from '../render/animations.js';
 
-export function createFeedback(container) {
-  const el = document.createElement('div');
-  el.className = 'feedback-message';
-  el.setAttribute('aria-live', 'polite');
-  el.setAttribute('role', 'status');
-  container.appendChild(el);
+class AbFeedback extends LitElement {
+  static properties = {
+    _text: { state: true },
+    _type: { state: true },
+    _anim: { state: true },
+  };
 
-  let _timer = null;
+  createRenderRoot() { return this; }
 
-  function show(text, type, duration = 1800) {
-    clearTimeout(_timer);
-    el.textContent = text;
-    el.className = `feedback-message feedback-message--${type}`;
-    _timer = setTimeout(() => {
-      el.textContent = '';
-      el.className = 'feedback-message';
+  constructor() {
+    super();
+    this._text = '';
+    this._type = '';
+    this._anim = null;
+    this._timer = null;
+  }
+
+  updated(changed) {
+    if (changed.has('_anim') && this._anim) {
+      const el = this.querySelector('.feedback-message');
+      if (el) animate(el, this._anim);
+    }
+  }
+
+  _show(text, type, anim, duration = 1800) {
+    clearTimeout(this._timer);
+    this._text = text;
+    this._type = type;
+    this._anim = anim;
+    this._timer = setTimeout(() => {
+      this._text = '';
+      this._type = '';
     }, duration);
   }
 
+  correct(text = '!כָּל הַכָּבוֹד') { sounds.correct(); this._show(text, 'correct', 'bounce'); }
+  wrong(text = 'נַסֵּה שׁוּב')       { sounds.wrong();   this._show(text, 'wrong',   'pulse'); }
+  hint(text)                         {                    this._show(text, 'hint',    'pulse'); }
+
+  destroy() {
+    clearTimeout(this._timer);
+    this.remove();
+  }
+
+  render() {
+    return html`
+      <div
+        class=${'feedback-message' + (this._type ? ` feedback-message--${this._type}` : '')}
+        aria-live="polite"
+        role="status"
+      >${this._text}</div>
+    `;
+  }
+}
+
+customElements.define('ab-feedback', AbFeedback);
+
+export function createFeedback(container) {
+  const el = document.createElement('ab-feedback');
+  container.appendChild(el);
   return {
-    /** הצג משוב חיובי */
-    correct(text = '!כָּל הַכָּבוֹד') {
-      sounds.correct();
-      show(text, 'correct');
-      animate(el, 'bounce');
-    },
-
-    /** הצג עידוד — נסה שוב */
-    wrong(text = 'נַסֵּה שׁוּב') {
-      sounds.wrong();
-      show(text, 'wrong');
-      animate(el, 'pulse');
-    },
-
-    /** הצג רמז */
-    hint(text) {
-      show(text, 'hint');
-      animate(el, 'pulse');
-    },
-
-    /** הסר את הרכיב */
-    destroy() {
-      clearTimeout(_timer);
-      el.remove();
-    },
+    correct: (text) => el.correct(text),
+    wrong:   (text) => el.wrong(text),
+    hint:    (text) => el.hint(text),
+    destroy: ()     => el.destroy(),
   };
 }

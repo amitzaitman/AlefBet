@@ -1,96 +1,118 @@
 /**
  * דיאלוג לבחירת ניקוד פעיל
- * [נוסף על ידי: nikud-match ו-nikud-speak]
  */
-
+import { LitElement, html } from 'lit';
 import { nikudList } from '../data/nikud.js';
 import { tts } from '../audio/tts.js';
 
-/**
- * מציג דיאלוג הגדרות לבחירת ניקוד מותר.
- * שומר את הבחירה ב-URL (query parameter: allowedNikud) ומפעיל את הפונקציה onSave(container).
- * 
- * @param {HTMLElement} container - אלמנט המשחק, מועבר כפרמטר ל-onSave
- * @param {Function} onSave - פונקציה להפעלה מחדש של המשחק (למשל: startGame)
- */
-export function showNikudSettingsDialog(container, onSave) {
-    let modal = document.getElementById('nikud-settings');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'nikud-settings';
-        Object.assign(modal.style, {
-            position: 'fixed', top: 0, left: 0, right: '0px', bottom: '0px',
-            background: 'rgba(0,0,0,0.5)', zIndex: 9999,
-            display: 'flex', justifyContent: 'center', alignItems: 'center'
-        });
-        document.body.appendChild(modal);
+class AbNikudSettingsDialog extends LitElement {
+  static properties = {
+    _open:    { state: true },
+    _rate:    { state: true },
+    _checked: { state: true },
+  };
+
+  createRenderRoot() { return this; }
+
+  constructor() {
+    super();
+    this._open = false;
+    this._rate = 0.5;
+    this._checked = new Set();
+    this._container = null;
+    this._onSave = null;
+  }
+
+  open(container, onSave) {
+    this._container = container;
+    this._onSave = onSave;
+    const allowed = new URLSearchParams(window.location.search).get('allowedNikud')?.split(',') ?? [];
+    this._checked = new Set(
+      nikudList
+        .filter(n => allowed.length === 0 || allowed.includes(n.id) || allowed.includes(n.name))
+        .map(n => n.id)
+    );
+    this._rate = parseFloat(localStorage.getItem('alefbet.nikudRate')) || 0.5;
+    this._open = true;
+  }
+
+  _save() {
+    localStorage.setItem('alefbet.nikudRate', this._rate);
+    tts.setNikudEmphasis({ rate: this._rate });
+
+    const checked = [...this._checked];
+    const url = new URL(window.location);
+    if (checked.length > 0 && checked.length < nikudList.length) {
+      url.searchParams.set('allowedNikud', checked.join(','));
+    } else {
+      url.searchParams.delete('allowedNikud');
     }
+    url.searchParams.delete('excludedNikud');
+    window.history.replaceState({}, '', url);
 
-    const searchParams = new URLSearchParams(window.location.search);
-    const allowed = searchParams.get('allowedNikud') ? searchParams.get('allowedNikud').split(',') : [];
+    this._open = false;
+    this._onSave?.(this._container);
+  }
 
-    let content = `
-    <div style="background:white; padding:1.5rem; border-radius:1rem; min-width:300px; text-align:center; color:#333; font-family:Heebo,Arial; direction:rtl;">
-      <h2 style="margin-top:0">בחר ניקוד</h2>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:1rem 0; text-align:right;">
-  `;
+  _toggleNikud(id) {
+    const next = new Set(this._checked);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    this._checked = next;
+  }
 
-    nikudList.forEach(n => {
-        const isChecked = allowed.length === 0 || allowed.includes(n.id) || allowed.includes(n.name);
-        content += `
-      <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-        <input type="checkbox" value="${n.id}" class="nikud-filter-cb" ${isChecked ? 'checked' : ''} style="width:1.2rem;height:1.2rem;">
-        <span>${n.nameNikud}</span>
-      </label>
-    `;
-    });
-
-    const savedRate = parseFloat(localStorage.getItem('alefbet.nikudRate')) || 0.5;
-
-    content += `
-      </div>
-      <div style="margin:1rem 0; text-align:right;">
-        <label style="font-weight:700; font-size:0.95rem;">מהירות הגייה: <span id="nikud-rate-val">${savedRate}</span></label>
-        <input type="range" id="nikud-rate-slider" min="0.3" max="1.5" step="0.1" value="${savedRate}" style="width:100%; margin-top:0.3rem; accent-color:#4f67ff;">
-        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888;">
-          <span>אִטִּי</span>
-          <span>מָהִיר</span>
+  render() {
+    if (!this._open) return html``;
+    return html`
+      <div class="ab-nikud-dialog-backdrop">
+        <div class="ab-nikud-dialog">
+          <h2 style="margin-top:0">בחר ניקוד</h2>
+          <div class="ab-nikud-dialog__grid">
+            ${nikudList.map(n => html`
+              <label class="ab-nikud-dialog__label">
+                <input type="checkbox"
+                       .checked=${this._checked.has(n.id)}
+                       @change=${() => this._toggleNikud(n.id)}
+                       class="ab-nikud-dialog__cb">
+                <span>${n.nameNikud}</span>
+              </label>
+            `)}
+          </div>
+          <div class="ab-nikud-dialog__rate">
+            <label class="ab-nikud-dialog__rate-label">
+              מהירות הגייה: <span>${this._rate}</span>
+            </label>
+            <input type="range" min="0.3" max="1.5" step="0.1"
+                   .value=${String(this._rate)}
+                   @input=${e => { this._rate = parseFloat(e.target.value); }}
+                   class="ab-nikud-dialog__slider">
+            <div class="ab-nikud-dialog__rate-hints">
+              <span>אִטִּי</span><span>מָהִיר</span>
+            </div>
+          </div>
+          <button class="ab-nikud-dialog__save" @click=${() => this._save()}>שמור והתחל מחדש</button>
+          <button class="ab-nikud-dialog__cancel" @click=${() => { this._open = false; }}>ביטול</button>
         </div>
       </div>
-      <button id="save-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#4f67ff; color:white; border:none; font-size:1.1rem; cursor:pointer;">שמור והתחל מחדש</button>
-      <button id="close-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#ddd; color:#333; border:none; font-size:1.1rem; cursor:pointer; margin-right:0.5rem;">ביטול</button>
-    </div>
-  `;
+    `;
+  }
+}
 
-    modal.innerHTML = content;
-    modal.style.display = 'flex';
+customElements.define('ab-nikud-settings-dialog', AbNikudSettingsDialog);
 
-    const rateSlider = document.getElementById('nikud-rate-slider');
-    const rateVal = document.getElementById('nikud-rate-val');
-    rateSlider.oninput = () => { rateVal.textContent = rateSlider.value; };
+let _instance = null;
 
-    document.getElementById('save-settings-btn').onclick = () => {
-        const rate = parseFloat(rateSlider.value);
-        localStorage.setItem('alefbet.nikudRate', rate);
-        tts.setNikudEmphasis({ rate });
-        const checked = Array.from(modal.querySelectorAll('.nikud-filter-cb'))
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
+function _getInstance() {
+  if (!_instance) {
+    _instance = document.createElement('ab-nikud-settings-dialog');
+    document.body.appendChild(_instance);
+  }
+  return _instance;
+}
 
-        const url = new URL(window.location);
-        if (checked.length > 0 && checked.length < nikudList.length) {
-            url.searchParams.set('allowedNikud', checked.join(','));
-        } else {
-            url.searchParams.delete('allowedNikud');
-        }
-        url.searchParams.delete('excludedNikud');
-
-        modal.style.display = 'none';
-        window.history.replaceState({}, '', url);
-        if (onSave) onSave(container);
-    };
-
-    document.getElementById('close-settings-btn').onclick = () => {
-        modal.style.display = 'none';
-    };
+/**
+ * @param {HTMLElement} container
+ * @param {Function} onSave
+ */
+export function showNikudSettingsDialog(container, onSave) {
+  _getInstance().open(container, onSave);
 }

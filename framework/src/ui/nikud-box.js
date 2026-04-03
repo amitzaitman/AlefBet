@@ -1,29 +1,44 @@
 /**
  * קופסת ניקוד — ריבוע ריק (מסמל אות) עם סימן ניקוד מחוצה לו
- * [נוסף על ידי: nikud-match game]
  */
+import { LitElement, html } from 'lit';
+
+class AbNikudBox extends LitElement {
+  static properties = {
+    nikud: { type: Object },
+    size:  { type: String },
+  };
+
+  createRenderRoot() { return this; }
+
+  constructor() {
+    super();
+    this.nikud = null;
+    this.size = 'md';
+  }
+
+  render() {
+    if (!this.nikud) return html``;
+    return html`
+      <div class=${'ab-nikud-box ab-nikud-box--' + this.size + ' ab-nikud-box--' + this.nikud.id}>
+        <div class="ab-nikud-box__box"></div>
+        <div class="ab-nikud-box__mark">${this.nikud.symbol}</div>
+      </div>
+    `;
+  }
+}
+
+customElements.define('ab-nikud-box', AbNikudBox);
 
 /**
- * צור אלמנט DOM של קופסת ניקוד
- * הריבוע מסמל מקום לאות, וסימן הניקוד מוצג מחוצה לו במיקום הנכון
- * @param {object} nikud — אובייקט ניקוד מ-nikudList (חייב id ו-symbol)
+ * @param {object} nikud — אובייקט ניקוד מ-nikudList
  * @param {object} [opts]
- * @param {string} [opts.size] — 'sm' | 'md' | 'lg' (ברירת מחדל 'md')
+ * @param {string} [opts.size] — 'sm' | 'md' | 'lg'
  * @returns {HTMLElement}
  */
 export function createNikudBox(nikud, { size = 'md' } = {}) {
-  const wrapper = document.createElement('div');
-  wrapper.className = `ab-nikud-box ab-nikud-box--${size} ab-nikud-box--${nikud.id}`;
-
-  const box = document.createElement('div');
-  box.className = 'ab-nikud-box__box';
-
-  const mark = document.createElement('div');
-  mark.className = 'ab-nikud-box__mark';
-  mark.textContent = nikud.symbol;
-
-  wrapper.appendChild(box);
-  wrapper.appendChild(mark);
-
-  return wrapper;
+  const el = document.createElement('ab-nikud-box');
+  el.nikud = nikud;
+  el.size = size;
+  return el;
 }

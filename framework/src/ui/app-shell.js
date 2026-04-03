@@ -1,32 +1,88 @@
 /**
  * מעטפת אפליקציה רב-לשונית — כותרת, ניווט טאבים, ניווט תחתון לנייד
  *
- * מיועדת לאפליקציות שירות (לא משחקים) עם ניווט רב-טאבים.
- * שונה מ-GameShell: אין ניהול סיבובים — רק מבנה ניווט.
- *
- * @param {HTMLElement} container - אלמנט המיכל של האפליקציה
- * @param {object} config - הגדרות האפליקציה
- * @param {string} config.title - כותרת ראשית
- * @param {string} [config.subtitle] - כותרת משנה (אופציונלית)
- * @param {Array<{id: string, label: string, icon: string}>} config.tabs - רשימת טאבים
- * @param {string} [config.homeUrl] - כתובת דף הבית (לכפתור 🏠)
- * @param {Function} [config.onTabChange] - קולבק בעת החלפת טאב: fn(tabId)
- * @returns {{ contentEl: HTMLElement, setSubtitle(text: string): void, setActiveTab(tabId: string): void }}
- *
- * @example
- * const shell = createAppShell(document.getElementById('app'), {
- *   title: 'ניהול משימות',
- *   subtitle: 'פסח תשפ״ו',
- *   tabs: [
- *     { id: 'rooms', label: 'חדרים', icon: '🏠' },
- *     { id: 'tasks', label: 'משימות', icon: '✅' },
- *   ],
- *   homeUrl: '../../index.html',
- *   onTabChange: id => renderTab(id),
- * });
- * shell.setSubtitle('3 משימות נותרו');
- * shell.setActiveTab('tasks');
+ * @param {HTMLElement} container
+ * @param {object} config
+ * @param {string} config.title
+ * @param {string} [config.subtitle]
+ * @param {Array<{id: string, label: string, icon: string}>} config.tabs
+ * @param {string} [config.homeUrl]
+ * @param {Function} [config.onTabChange]
+ * @returns {{ contentEl: HTMLElement, setSubtitle(text): void, setActiveTab(tabId): void }}
  */
+import { LitElement, html } from 'lit';
+
+class AbAppShell extends LitElement {
+  static properties = {
+    title:      { type: String },
+    subtitle:   { type: String },
+    tabs:       { type: Array },
+    homeUrl:    { type: String },
+    _activeTab: { state: true },
+  };
+
+  createRenderRoot() { return this; }
+
+  constructor() {
+    super();
+    this.title = '';
+    this.subtitle = '';
+    this.tabs = [];
+    this.homeUrl = null;
+    this._activeTab = null;
+    this._onTabChange = null;
+  }
+
+  _handleTabClick(tabId) {
+    this._activeTab = tabId;
+    this._onTabChange?.(tabId);
+  }
+
+  render() {
+    const { title, subtitle, tabs, homeUrl, _activeTab } = this;
+    return html`
+      <header class="ab-app-header">
+        <div class="ab-app-header-text">
+          <h1 class="ab-app-title">${title}</h1>
+          <span class="ab-app-subtitle">${subtitle}</span>
+        </div>
+        ${homeUrl ? html`<a href=${homeUrl} class="ab-app-back-link" aria-label="דף הבית">🏠</a>` : ''}
+      </header>
+      <nav class="ab-app-tabs" role="tablist" aria-label="ניווט ראשי">
+        ${tabs.map(tab => html`
+          <button
+            class=${'ab-app-tab' + (_activeTab === tab.id ? ' ab-active' : '')}
+            data-tab=${tab.id}
+            aria-selected=${_activeTab === tab.id ? 'true' : 'false'}
+            role="tab"
+            @click=${() => this._handleTabClick(tab.id)}
+          >
+            <span class="ab-app-tab-icon">${tab.icon}</span>
+            <span class="ab-app-tab-label">${tab.label}</span>
+          </button>
+        `)}
+      </nav>
+      <main class="ab-app-content"></main>
+      <nav class="ab-app-bottom-nav" role="tablist" aria-label="ניווט תחתון">
+        ${tabs.map(tab => html`
+          <button
+            class=${'ab-app-nav-item' + (_activeTab === tab.id ? ' ab-active' : '')}
+            data-tab=${tab.id}
+            aria-selected=${_activeTab === tab.id ? 'true' : 'false'}
+            role="tab"
+            @click=${() => this._handleTabClick(tab.id)}
+          >
+            <span class="ab-app-nav-icon">${tab.icon}</span>
+            <span class="ab-app-nav-label">${tab.label}</span>
+          </button>
+        `)}
+      </nav>
+    `;
+  }
+}
+
+customElements.define('ab-app-shell', AbAppShell);
+
 export function createAppShell(container, config = {}) {
   const {
     title = '',
@@ -36,110 +92,20 @@ export function createAppShell(container, config = {}) {
     onTabChange = null,
   } = config;
 
-  // ── בנה את מבנה ה-HTML ────────────────────────────────────────────────────
-
   container.classList.add('ab-app');
 
-  const backLink = homeUrl
-    ? `<a href="${homeUrl}" class="ab-app-back-link" aria-label="דף הבית">🏠</a>`
-    : '';
-
-  const subtitleHtml = subtitle
-    ? `<span class="ab-app-subtitle">${subtitle}</span>`
-    : '<span class="ab-app-subtitle"></span>';
-
-  const tabButtonsHtml = tabs
-    .map(
-      tab =>
-        `<button class="ab-app-tab" data-tab="${tab.id}" aria-selected="false" role="tab">` +
-        `<span class="ab-app-tab-icon">${tab.icon}</span>` +
-        `<span class="ab-app-tab-label">${tab.label}</span>` +
-        `</button>`
-    )
-    .join('');
-
-  const navItemsHtml = tabs
-    .map(
-      tab =>
-        `<button class="ab-app-nav-item" data-tab="${tab.id}" aria-selected="false" role="tab">` +
-        `<span class="ab-app-nav-icon">${tab.icon}</span>` +
-        `<span class="ab-app-nav-label">${tab.label}</span>` +
-        `</button>`
-    )
-    .join('');
-
-  container.innerHTML = `
-    <header class="ab-app-header">
-      <div class="ab-app-header-text">
-        <h1 class="ab-app-title">${title}</h1>
-        ${subtitleHtml}
-      </div>
-      ${backLink}
-    </header>
-    <nav class="ab-app-tabs" role="tablist" aria-label="ניווט ראשי">
-      ${tabButtonsHtml}
-    </nav>
-    <main class="ab-app-content"></main>
-    <nav class="ab-app-bottom-nav" role="tablist" aria-label="ניווט תחתון">
-      ${navItemsHtml}
-    </nav>
-  `;
-
-  // ── שמירת הפניות לאלמנטים ─────────────────────────────────────────────────
-
-  const subtitleEl = container.querySelector('.ab-app-subtitle');
-  const contentEl  = container.querySelector('.ab-app-content');
-
-  // ── טיפול באירועי לחיצה על טאבים ─────────────────────────────────────────
-
-  function _handleTabClick(tabId) {
-    _setActiveTab(tabId);
-    if (typeof onTabChange === 'function') onTabChange(tabId);
-  }
-
-  container.querySelectorAll('.ab-app-tab, .ab-app-nav-item').forEach(btn => {
-    btn.addEventListener('click', () => _handleTabClick(btn.dataset.tab));
-  });
-
-  // ── פונקציות פנימיות ──────────────────────────────────────────────────────
-
-  /**
-   * הגדר את הטאב הפעיל (מעדכן גם את שורת הטאבים וגם ניווט תחתון)
-   * @param {string} tabId
-   */
-  function _setActiveTab(tabId) {
-    container.querySelectorAll('.ab-app-tab, .ab-app-nav-item').forEach(btn => {
-      const isActive = btn.dataset.tab === tabId;
-      btn.classList.toggle('ab-active', isActive);
-      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-    });
-  }
-
-  // הפעל את הטאב הראשון כברירת מחדל
-  if (tabs.length > 0) {
-    _setActiveTab(tabs[0].id);
-  }
-
-  // ── ממשק ציבורי ───────────────────────────────────────────────────────────
+  const el = document.createElement('ab-app-shell');
+  el.title = title;
+  el.subtitle = subtitle;
+  el.tabs = tabs;
+  el.homeUrl = homeUrl;
+  el._onTabChange = onTabChange;
+  el._activeTab = tabs.length > 0 ? tabs[0].id : null;
+  container.appendChild(el);
 
   return {
-    /** אלמנט תוכן הראשי — כאן מרנדרים את תוכן הטאב הנוכחי */
-    contentEl,
-
-    /**
-     * עדכן את כותרת המשנה
-     * @param {string} text - הטקסט החדש לכותרת המשנה
-     */
-    setSubtitle(text) {
-      subtitleEl.textContent = text;
-    },
-
-    /**
-     * הגדר את הטאב הפעיל באופן תכנותי
-     * @param {string} tabId - מזהה הטאב להפעלה
-     */
-    setActiveTab(tabId) {
-      _setActiveTab(tabId);
-    },
+    get contentEl() { return el.querySelector('.ab-app-content'); },
+    setSubtitle(text) { el.subtitle = text; },
+    setActiveTab(tabId) { el._activeTab = tabId; },
   };
 }

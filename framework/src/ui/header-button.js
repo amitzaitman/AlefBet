@@ -1,24 +1,51 @@
 /**
  * הזרקת כפתור לכותרת המשחק
  */
+import { LitElement, html } from 'lit';
+
+class AbHeaderBtn extends LitElement {
+  static properties = {
+    icon:      { type: String },
+    ariaLabel: { type: String },
+  };
+
+  createRenderRoot() { return this; }
+
+  constructor() {
+    super();
+    this.icon = '';
+    this.ariaLabel = '';
+    this._onClick = null;
+  }
+
+  render() {
+    return html`
+      <button
+        class="ab-header-btn"
+        aria-label=${this.ariaLabel}
+        @click=${() => this._onClick?.()}
+      >${this.icon}</button>
+    `;
+  }
+}
+
+customElements.define('ab-header-btn', AbHeaderBtn);
 
 /**
- * הוסף כפתור לאזור הכותרת
  * @param {HTMLElement} container — מיכל המשחק
- * @param {string} icon — אייקון (אמוג'י או HTML)
- * @param {string} ariaLabel — תווית נגישות
- * @param {Function} onClick — פעולה בלחיצה
+ * @param {string} icon
+ * @param {string} ariaLabel
+ * @param {Function} onClick
  * @returns {HTMLElement|null}
  */
 export function injectHeaderButton(container, icon, ariaLabel, onClick) {
   const spacer = container.querySelector('.game-header__spacer');
   if (!spacer) return null;
-  const btn = document.createElement('button');
-  btn.className = 'ab-header-btn';
-  btn.setAttribute('aria-label', ariaLabel);
-  btn.textContent = icon;
-  btn.onclick = onClick;
+  const el = document.createElement('ab-header-btn');
+  el.icon = icon;
+  el.ariaLabel = ariaLabel;
+  el._onClick = onClick;
   spacer.innerHTML = '';
-  spacer.appendChild(btn);
-  return btn;
+  spacer.appendChild(el);
+  return el;
 }
