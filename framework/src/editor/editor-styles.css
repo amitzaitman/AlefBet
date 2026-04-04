@@ -1653,14 +1653,14 @@
     padding: 1px 5px;
   }
 
-  /* Editor toolbar — allow wrapping */
-  .ab-editor-toolbar {
-    flex-wrap: wrap;
-    gap: 4px;
+  /* Editor toolbar — hide edit button on mobile (edit mode not supported) */
+  .ab-editor-btn--edit {
+    display: none;
   }
 
-  .ab-editor-btn {
-    padding: 4px 7px;
-    font-size: 12px;
+  /* Hide editor panels if somehow in edit mode on mobile */
+  .ab-editor-active .ab-editor-nav,
+  .ab-editor-active .ab-editor-inspector {
+    display: none;
   }
 }

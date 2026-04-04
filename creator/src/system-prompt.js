@@ -90,7 +90,7 @@ import { GameShell, tts, hebrewLetters, createOptionCards, createFeedback, creat
 <html dir="rtl" lang="he">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>שֵׁם הַמִּשְׂחָק</title>
   <link rel="stylesheet" href="../../framework/dist/alefbet.css">
   <link rel="stylesheet" href="game.css">
