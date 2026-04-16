@@ -1,7 +1,7 @@
 # AlefBet — משחקים חינוכיים לעברית
 **Hebrew Educational Games for Children (Ages 3–8)**
 
-A growing framework for creating interactive Hebrew literacy games. Teachers use the built-in **Creator** tool to generate new games by chatting with Claude in Hebrew — no coding required.
+A growing framework for creating interactive Hebrew literacy games. Each game is a small folder that imports from the shared framework bundle.
 
 **🌐 Play online:** [amitzaitman.github.io/AlefBet](https://amitzaitman.github.io/AlefBet/) (hosted on GitHub Pages)
 
@@ -70,14 +70,8 @@ npm run build        # build the framework → framework/dist/
 
 ### After changing framework source
 ```bash
-npm run build        # rebuilds alefbet.js, alefbet.css, api-manifest.json
+npm run build        # rebuilds alefbet.js and alefbet.css
 ```
-
-### Creator App (AI game generator)
-```bash
-npm run dev:creator  # starts Vite dev server at http://localhost:3000
-```
-Enter your [Anthropic API key](https://console.anthropic.com/) in the modal, then chat in Hebrew to generate new games.
 
 ---
 
@@ -116,23 +110,13 @@ AlefBet/
 │   │   │   └── nakdan.js           Auto-nikud via Dicta API (cached)
 │   │   └── styles/
 │   │       └── alefbet.css         RTL base, Hebrew fonts, dynamic layout
-│   ├── dist/                   ← Built output (committed for easy game loading)
-│   │   ├── alefbet.js
-│   │   ├── alefbet.umd.cjs
-│   │   ├── alefbet.css
-│   │   └── api-manifest.json   ← Auto-generated module manifest for Creator
-│   └── scripts/
-│       └── generate-manifest.js
+│   └── dist/                   ← Built output (committed for easy game loading)
+│       ├── alefbet.js
+│       ├── alefbet.umd.cjs
+│       └── alefbet.css
 │
-├── creator/                    ← Educator's AI-powered game creation tool
-│   ├── index.html
-│   └── src/
-│       ├── main.js
-│       ├── chat-ui.js          Hebrew chat interface
-│       ├── claude-client.js    Anthropic API (streaming, browser-side)
-│       ├── system-prompt.js    Dynamic prompt built from api-manifest.json
-│       ├── game-preview.js     Live game preview in sandboxed iframe
-│       └── styles/creator.css
+├── apps/                       ← Larger multi-page apps
+│   └── passover-cleaning/
 │
 └── games/                      ← Each game is an independent folder
     ├── _template/              ← Copy this to start a new game
@@ -150,15 +134,13 @@ AlefBet/
 3. Open `http://localhost:8080/games/my-game/` to test
 4. Add a card for it in `index.html`
 
-Or use the **Creator** app to have Claude generate the game for you.
-
 ### Framework Growth Pattern
 When a game needs a feature that doesn't exist yet:
 1. Create a new module in `framework/src/<category>/<module>.js`
 2. Export named functions — no default exports
 3. Add JSDoc comments in Hebrew
-4. Add the export to `framework/src/index.js`
-5. Run `npm run build` — the api-manifest updates automatically
+4. Add the export to `framework/src/index.ts`
+5. Run `npm run build` to refresh `framework/dist/`
 
 ---
 
@@ -190,8 +172,6 @@ All Hebrew text is automatically vowelized using the **Dicta Nakdan API**:
 | Layer | Technology |
 |-------|-----------|
 | Framework build | Vite (library mode, ESM + UMD) |
-| Creator dev server | Vite |
-| AI generation | Anthropic Claude API (streaming) |
 | Hebrew TTS | Google Translate TTS (Web Speech API fallback) |
 | Hebrew nikud | Dicta Nakdan API |
 | Sounds | Web Audio API |

@@ -12,7 +12,7 @@
     "./dist/alefbet.css": "./dist/alefbet.css"
   },
   "scripts": {
-    "build": "vite build && node scripts/generate-manifest.js",
+    "build": "vite build",
     "dev": "vite build --watch",
     "test": "vitest run"
   },
