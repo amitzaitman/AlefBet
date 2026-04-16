@@ -33,7 +33,6 @@ export { createZonePlayer }        from './ui/zone-player.js';
 export { showLoadingScreen, hideLoadingScreen } from './ui/loading-screen.js';
 export { injectHeaderButton }      from './ui/header-button.js';
 export { createNikudBox }          from './ui/nikud-box.js';
-export { createAppShell }          from './ui/app-shell.js';
 export { createVoiceRecordButton } from './ui/voice-record-button.js';
 
 // ===== Render =====

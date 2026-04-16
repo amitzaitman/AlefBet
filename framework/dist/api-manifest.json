@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-28T17:36:43.357Z",
+  "generatedAt": "2026-04-16T17:11:32.247Z",
   "version": "1.0.0",
   "modules": [
     {
@@ -169,13 +169,6 @@
       "description": "אנימציות CSS לרכיבי המשחק\nמשתמש ב-Web Animations API\n[נוסף על ידי: letter-match game]\n\nסוגים זמינים: shake, bounce, pulse, fadeIn, confetti",
       "exports": [
         "animate"
-      ]
-    },
-    {
-      "path": "ui/app-shell.js",
-      "description": "מעטפת אפליקציה רב-לשונית — כותרת, ניווט טאבים, ניווט תחתון לנייד\n\nמיועדת לאפליקציות שירות (לא משחקים) עם ניווט רב-טאבים.\nשונה מ-GameShell: אין ניהול סיבובים — רק מבנה ניווט.\n\n@param {HTMLElement} container - אלמנט המיכל של האפליקציה\n@param {object} config - הגדרות האפליקציה\n@param {string} config.title - כותרת ראשית\n@param {string} [config.subtitle] - כותרת משנה (אופציונלית)\n@param {Array<{id: string, label: string, icon: string}>} config.tabs - רשימת טאבים\n@param {string} [config.homeUrl] - כתובת דף הבית (לכפתור 🏠)\n@param {Function} [config.onTabChange] - קולבק בעת החלפת טאב: fn(tabId)\n@returns {{ contentEl: HTMLElement, setSubtitle(text: string): void, setActiveTab(tabId: string): void }}\n\n@example\nconst shell = createAppShell(document.getElementById('app'), {\n  title: 'ניהול משימות',\n  subtitle: 'פסח תשפ״ו',\n  tabs: [\n    { id: 'rooms', label: 'חדרים', icon: '🏠' },\n    { id: 'tasks', label: 'משימות', icon: '✅' },\n  ],\n  homeUrl: '../../index.html',\n  onTabChange: id => renderTab(id),\n});\nshell.setSubtitle('3 משימות נותרו');\nshell.setActiveTab('tasks');",
-      "exports": [
-        "createAppShell"
       ]
     },
     {
