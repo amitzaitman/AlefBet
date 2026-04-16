@@ -46,7 +46,7 @@ function _svgPtsAttr(pts, zx, zy, zw, zh) {
  * @param {Function} [config.onZoneTap]
  * @param {boolean}  [config.showZones=false]
  * @param {boolean}  [config.autoPlayInstruction=true]
- * @param {number}   [config.hintAfter=3] — wrong taps before auto-hint (0=disabled)
+ * @param {number}   [config.hintAfter=3] - wrong taps before auto-hint (0=disabled)
  */
 export function createZonePlayer(container, config) {
   const {

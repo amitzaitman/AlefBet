@@ -37,7 +37,7 @@ const RESERVED = new Set(['id', 'image']);
 
 /** Unwrap ZodOptional / ZodDefault wrappers to reach the inner type */
 function unwrap(field: z.ZodTypeAny): z.ZodTypeAny {
-  if (field instanceof z.ZodOptional) return unwrap(field.unwrap());
+  if (field instanceof z.ZodOptional) return unwrap(field.unwrap() as z.ZodTypeAny);
   if (field instanceof z.ZodDefault)  return unwrap(field._def.innerType as z.ZodTypeAny);
   return field;
 }

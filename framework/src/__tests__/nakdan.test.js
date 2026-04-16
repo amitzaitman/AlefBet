@@ -12,7 +12,8 @@ function mockResponse(words) {
     json: async () => ({
       data: words.map(w => ({
         sep: false,
-        str: w.replace(/[^\u05D0-\u05EA\u05B0-\u05C7]/g, ''),
+        // eslint-disable-next-line no-misleading-character-class
+        str: w.replace(/[^\u05D0-\u05EA\u05B0-\u05C7]/gu, ''),
         nakdan: { options: [{ w }] },
       })),
     }),

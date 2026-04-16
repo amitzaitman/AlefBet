@@ -6,9 +6,9 @@
 /**
  * צור אלמנט DOM של קופסת ניקוד
  * הריבוע מסמל מקום לאות, וסימן הניקוד מוצג מחוצה לו במיקום הנכון
- * @param {object} nikud — אובייקט ניקוד מ-nikudList (חייב id ו-symbol)
+ * @param {object} nikud - אובייקט ניקוד מ-nikudList (חייב id ו-symbol)
  * @param {object} [opts]
- * @param {string} [opts.size] — 'sm' | 'md' | 'lg' (ברירת מחדל 'md')
+ * @param {string} [opts.size] - 'sm' | 'md' | 'lg' (ברירת מחדל 'md')
  * @returns {HTMLElement}
  */
 export function createNikudBox(nikud, { size = 'md' } = {}) {

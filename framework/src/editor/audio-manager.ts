@@ -185,7 +185,7 @@ function _buildCustomCategory(gameId, voiceBtns) {
   function renderSlots() {
     // Destroy existing voice buttons before re-rendering
     grid.querySelectorAll('.ab-am-row').forEach(row => {
-      const btn = row._voiceBtn;
+      const btn = (row as any)._voiceBtn;
       if (btn) { voiceBtns.splice(voiceBtns.indexOf(btn), 1); btn.destroy(); }
     });
     grid.innerHTML = '';
@@ -209,8 +209,8 @@ function _buildCustomCategory(gameId, voiceBtns) {
   `;
   section.appendChild(addRow);
 
-  const input  = addRow.querySelector('.ab-am-add-input');
-  const addBtn = addRow.querySelector('.ab-am-add-btn');
+  const input  = addRow.querySelector('.ab-am-add-input') as HTMLInputElement;
+  const addBtn = addRow.querySelector('.ab-am-add-btn') as HTMLButtonElement;
 
   function addSlot() {
     const label = input.value.trim();
@@ -223,7 +223,7 @@ function _buildCustomCategory(gameId, voiceBtns) {
   }
 
   addBtn.addEventListener('click', addSlot);
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') addSlot(); });
+  input.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter') addSlot(); });
 
   // Collapse toggle
   heading.addEventListener('click', () => {
@@ -271,7 +271,7 @@ function _buildSlotRow(gameId, voiceKey, label, voiceBtns, onDelete = null) {
 
   const btn = createVoiceRecordButton(ctrlCol, { gameId, voiceKey, label });
   voiceBtns.push(btn);
-  row._voiceBtn = btn;
+  (row as any)._voiceBtn = btn;
 
   row.appendChild(labelCol);
   row.appendChild(ctrlCol);

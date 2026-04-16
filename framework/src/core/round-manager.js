@@ -24,7 +24,7 @@ export function createRoundManager(shell, container, {
   buildRoundUI,
   onCorrect,
   onWrong,
-} = {}) {
+}) {
   let answered = false;
 
   /**

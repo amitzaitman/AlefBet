@@ -31,14 +31,23 @@ deploy/           Cloudflare Worker (Nakdan proxy) + infra
 
 - Games load from `../../framework/dist/alefbet.js` (a committed artifact).
 - **After editing `framework/src/`, run `npm run build`** or games won't see the change. `framework/dist/` is committed on purpose so games open without a build step.
-- Tests: `npm test` from the repo root.
 - Dev server: `node start.js` (or double-click `start.bat` on Windows).
+
+## Commands
+
+- `npm run check` — lint + typecheck + tests. CI runs this; make it pass before pushing.
+- `npm run lint` — ESLint over the whole repo (config: `eslint.config.js`).
+- `npm run typecheck` — `tsc --noEmit` over `framework/src/`. `checkJs` is on, so JSDoc types are checked.
+- `npm test` — vitest suites in `framework/src/__tests__/`.
+- `npm run build` — rebuild `framework/dist/`.
 
 ## Conventions
 
-- **JS by default**, TypeScript only where it already exists (primarily `framework/src/editor/` and `index.ts`). Vite's resolver maps `.js` imports to `.ts` files, so importers never change extensions.
+- **JavaScript by default.** The small number of TypeScript files in `framework/src/editor/` + `framework/src/index.ts` exist because the editor uses zod schemas that emit types; don't spread TS elsewhere without reason.
+- **JSDoc types** on framework JS files — `tsc --noEmit` type-checks them via `checkJs: true`. Add `@param`, `@returns`, and `@template` where it helps the type-check.
+- Vite's resolver maps `.js` imports to `.ts` files, so importers always write `./foo.js` regardless of the target's extension.
 - **Named exports only** — no default exports anywhere.
-- **Hebrew JSDoc** on framework modules, explaining purpose + public API.
+- **Hebrew JSDoc prose** on framework modules, explaining purpose + public API. Avoid em-dash (`—`) in JSDoc type/param lines — it breaks the TS JSDoc parser; use `-`.
 - **RTL** everywhere; buttons ≥ 64px for the young end of the age range.
 - **No meteg (U+05BD)** in source — a guard test fails if one sneaks in (see `framework/src/__tests__/no-meteg.test.js`).
 

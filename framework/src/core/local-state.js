@@ -1,9 +1,10 @@
 /**
  * מנהל מצב מקומי — שמירה ב-localStorage עם הודעה לנרשמים
  *
+ * @template T
  * @param {string} storageKey - המפתח לשמירה ב-localStorage
- * @param {*} defaultValue - ערך ברירת המחדל אם אין נתונים שמורים
- * @returns {{ get, set, update, subscribe }}
+ * @param {T} defaultValue - ערך ברירת המחדל אם אין נתונים שמורים
+ * @returns {{ get: () => T, set: (v: T) => void, update: (fn: (v: T) => T) => void, subscribe: (fn: (v: T) => void) => () => void }}
  *
  * @example
  * const state = createLocalState('myApp:tasks', []);
@@ -12,7 +13,7 @@
  * state.update(tasks => tasks.map(t => ({ ...t, done: true })));
  */
 export function createLocalState(storageKey, defaultValue) {
-  /** @type {Array<Function>} רשימת הפונקציות הנרשמות */
+  /** @type {Array<(v: T) => void>} רשימת הפונקציות הנרשמות */
   const subscribers = [];
 
   /**
@@ -44,7 +45,7 @@ export function createLocalState(storageKey, defaultValue) {
 
   /**
    * עדכן את הערך הנוכחי על-פי פונקציית טרנספורמציה
-   * @param {Function} fn - פונקציה שמקבלת את הערך הנוכחי ומחזירה ערך חדש
+   * @param {(v: T) => T} fn - פונקציה שמקבלת את הערך הנוכחי ומחזירה ערך חדש
    */
   function update(fn) {
     set(fn(get()));
@@ -52,8 +53,8 @@ export function createLocalState(storageKey, defaultValue) {
 
   /**
    * הירשם לשינויים במצב
-   * @param {Function} fn - פונקציה שתיקרא עם הערך החדש בכל שינוי
-   * @returns {Function} פונקציית ביטול הרישום
+   * @param {(v: T) => void} fn - פונקציה שתיקרא עם הערך החדש בכל שינוי
+   * @returns {() => void} פונקציית ביטול הרישום
    */
   function subscribe(fn) {
     subscribers.push(fn);

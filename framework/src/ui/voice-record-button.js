@@ -8,14 +8,13 @@ import { createVoiceRecorder, isVoiceRecordingSupported } from '../audio/voice-r
 import { saveVoice, loadVoice, deleteVoice, playVoice }   from '../audio/voice-store.js';
 
 /**
- * @param {HTMLElement} container  — element to append the button group into
- * @param {{
- *   gameId:    string,
- *   voiceKey:  string,   — unique key within the game (e.g. round id, 'instruction')
- *   label?:    string,   — shown as aria-label / tooltip
- *   onSaved?:  (blob: Blob) => void,
- *   onDeleted?: () => void,
- * }} options
+ * @param {HTMLElement} container - element to append the button group into
+ * @param {object} options
+ * @param {string} options.gameId
+ * @param {string} options.voiceKey - unique key within the game (e.g. round id, 'instruction')
+ * @param {string} [options.label] - shown as aria-label / tooltip
+ * @param {(blob: Blob) => void} [options.onSaved]
+ * @param {() => void} [options.onDeleted]
  * @returns {{ refresh(): Promise<void>, destroy(): void }}
  */
 export function createVoiceRecordButton(container, {
@@ -24,7 +23,7 @@ export function createVoiceRecordButton(container, {
   label = 'הקלטת קול',
   onSaved,
   onDeleted,
-} = {}) {
+}) {
   if (!isVoiceRecordingSupported()) {
     // Show disabled indicator instead of crashing
     const note = document.createElement('span');

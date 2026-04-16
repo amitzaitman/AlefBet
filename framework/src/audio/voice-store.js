@@ -13,11 +13,11 @@ function _openDB() {
   if (_dbPromise) return _dbPromise;
   _dbPromise = new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = e => {
-      e.target.result.createObjectStore(STORE_NAME);
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(STORE_NAME);
     };
-    req.onsuccess = e => resolve(e.target.result);
-    req.onerror   = e => { _dbPromise = null; reject(e.target.error); };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror   = () => { _dbPromise = null; reject(req.error); };
   });
   return _dbPromise;
 }

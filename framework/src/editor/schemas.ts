@@ -76,7 +76,7 @@ export const GameMetaSchema = z.object({
 export const GameDataSchema = z.object({
   id:          z.string(),
   version:     z.number().default(1),
-  meta:        GameMetaSchema.default({}),
+  meta:        GameMetaSchema.default({ title: '', type: 'multiple-choice' }),
   rounds:      z.array(z.record(z.string(), z.unknown())).default([]),
   distractors: z.array(z.unknown()).default([]),
 });

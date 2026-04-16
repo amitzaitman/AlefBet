@@ -31,8 +31,8 @@ jobs:
       - name: Build framework
         run: npm run build
 
-      - name: Run tests
-        run: npm test
+      - name: Lint + typecheck + test
+        run: npm run check
 
       - name: Assemble site
         run: |

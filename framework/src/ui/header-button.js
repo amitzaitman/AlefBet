@@ -7,7 +7,7 @@
  * @param {HTMLElement} container — מיכל המשחק
  * @param {string} icon — אייקון (אמוג'י או HTML)
  * @param {string} ariaLabel — תווית נגישות
- * @param {Function} onClick — פעולה בלחיצה
+ * @param {(ev: MouseEvent) => void} onClick - פעולה בלחיצה
  * @returns {HTMLElement|null}
  */
 export function injectHeaderButton(container, icon, ariaLabel, onClick) {

@@ -408,7 +408,7 @@ function Ec(e, t, {
   buildRoundUI: r,
   onCorrect: i,
   onWrong: s
-} = {}) {
+}) {
   let a = !1;
   async function c(m) {
     if (a) return;
@@ -570,10 +570,10 @@ let be = null;
 function De() {
   return be || (be = new Promise((e, t) => {
     const n = indexedDB.open(to, no);
-    n.onupgradeneeded = (o) => {
-      o.target.result.createObjectStore(Q);
-    }, n.onsuccess = (o) => e(o.target.result), n.onerror = (o) => {
-      be = null, t(o.target.error);
+    n.onupgradeneeded = () => {
+      n.result.createObjectStore(Q);
+    }, n.onsuccess = () => e(n.result), n.onerror = () => {
+      be = null, t(n.error);
     };
   }), be);
 }
@@ -751,7 +751,10 @@ function Lc(e, t) {
     </div>
     <span class="progress-bar__label">0 / ${t}</span>
   `, e.appendChild(n);
-  const o = n.querySelector(".progress-bar__fill"), r = n.querySelector(".progress-bar__label");
+  const o = (
+    /** @type {HTMLElement} */
+    n.querySelector(".progress-bar__fill")
+  ), r = n.querySelector(".progress-bar__label");
   return {
     /** עדכן את ההתקדמות */
     update(i) {
@@ -836,13 +839,22 @@ function Pc(e, t) {
       <button id="close-settings-btn" style="padding:0.5rem 1rem; border-radius:0.5rem; background:#ddd; color:#333; border:none; font-size:1.1rem; cursor:pointer; margin-right:0.5rem;">ביטול</button>
     </div>
   `, n.innerHTML = i, n.style.display = "flex";
-  const a = document.getElementById("nikud-rate-slider"), c = document.getElementById("nikud-rate-val");
+  const a = (
+    /** @type {HTMLInputElement} */
+    document.getElementById("nikud-rate-slider")
+  ), c = document.getElementById("nikud-rate-val");
   a.oninput = () => {
     c.textContent = a.value;
   }, document.getElementById("save-settings-btn").onclick = () => {
     const u = parseFloat(a.value);
-    localStorage.setItem("alefbet.nikudRate", u), Wn.setNikudEmphasis({ rate: u });
-    const l = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((m) => m.checked).map((m) => m.value), d = new URL(window.location);
+    localStorage.setItem("alefbet.nikudRate", String(u)), Wn.setNikudEmphasis({ rate: u });
+    const l = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((m) => (
+      /** @type {HTMLInputElement} */
+      m.checked
+    )).map((m) => (
+      /** @type {HTMLInputElement} */
+      m.value
+    )), d = new URL(window.location.href);
     l.length > 0 && l.length < Ze.length ? d.searchParams.set("allowedNikud", l.join(",")) : d.searchParams.delete("allowedNikud"), d.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", d), t && t(e);
   }, document.getElementById("close-settings-btn").onclick = () => {
     n.style.display = "none";
@@ -892,13 +904,13 @@ function jc(e, t) {
     hintAfter: f = 3
   } = t, v = r === "soundboard", _ = document.createElement("div");
   _.className = "ab-zp-wrap";
-  const N = document.createElement("img");
-  N.className = "ab-zp-image", N.src = n, N.alt = "", N.draggable = !1, _.appendChild(N);
+  const x = document.createElement("img");
+  x.className = "ab-zp-image", x.src = n, x.alt = "", x.draggable = !1, _.appendChild(x);
   const $ = document.createElement("div");
   $.className = "ab-zp-layer", _.appendChild($), e.appendChild(_);
-  const T = /* @__PURE__ */ new Set();
+  const N = /* @__PURE__ */ new Set();
   let b = 0, E = !1, g = !1;
-  async function x(S) {
+  async function T(S) {
     if (!(!i || E)) {
       E = !0;
       try {
@@ -914,7 +926,7 @@ function jc(e, t) {
     const S = $.querySelectorAll(".ab-zp-zone");
     S.forEach((w, I) => {
       var F;
-      (F = o[I]) != null && F.correct && !T.has(o[I].id) && w.classList.add("ab-zp-zone--hint");
+      (F = o[I]) != null && F.correct && !N.has(o[I].id) && w.classList.add("ab-zp-zone--hint");
     }), setTimeout(() => {
       S.forEach((w) => w.classList.remove("ab-zp-zone--hint")), g = !1, b = 0;
     }, 1500);
@@ -933,15 +945,15 @@ function jc(e, t) {
       I.className = "ab-zp-zone__label", I.textContent = S.label, w.appendChild(I);
     }
     w.addEventListener("click", () => {
-      if (l && l(S), x(S.id), v) {
+      if (l && l(S), T(S.id), v) {
         w.classList.add("ab-zp-zone--tapped"), setTimeout(() => w.classList.remove("ab-zp-zone--tapped"), 400);
         return;
       }
-      if (!T.has(S.id))
+      if (!N.has(S.id))
         if (S.correct) {
-          T.add(S.id), w.classList.add("ab-zp-zone--correct"), a && a(S);
+          N.add(S.id), w.classList.add("ab-zp-zone--correct"), a && a(S);
           const I = o.filter((F) => F.correct).length;
-          T.size >= I && u && u();
+          N.size >= I && u && u();
         } else
           w.classList.add("ab-zp-zone--wrong"), b++, c && c(S), setTimeout(() => w.classList.remove("ab-zp-zone--wrong"), 600), z();
     }), $.appendChild(w);
@@ -962,7 +974,7 @@ function jc(e, t) {
       });
     },
     reset() {
-      T.clear(), b = 0, g = !1, $.querySelectorAll(".ab-zp-zone").forEach((S) => {
+      N.clear(), b = 0, g = !1, $.querySelectorAll(".ab-zp-zone").forEach((S) => {
         S.classList.remove(
           "ab-zp-zone--correct",
           "ab-zp-zone--wrong",
@@ -997,7 +1009,7 @@ function Uc(e, { size: t = "md" } = {}) {
   const r = document.createElement("div");
   return r.className = "ab-nikud-box__mark", r.textContent = e.symbol, n.appendChild(o), n.appendChild(r), n;
 }
-function Bc(e, t = {}) {
+function Bc(e, t) {
   const {
     title: n = "",
     subtitle: o = "",
@@ -1027,17 +1039,29 @@ function Bc(e, t = {}) {
       ${l}
     </nav>
   `;
-  const d = e.querySelector(".ab-app-subtitle"), m = e.querySelector(".ab-app-content");
+  const d = (
+    /** @type {HTMLElement} */
+    e.querySelector(".ab-app-subtitle")
+  ), m = (
+    /** @type {HTMLElement} */
+    e.querySelector(".ab-app-content")
+  );
   function f(_) {
     v(_), typeof s == "function" && s(_);
   }
   e.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((_) => {
-    _.addEventListener("click", () => f(_.dataset.tab));
+    _.addEventListener("click", () => f(
+      /** @type {HTMLElement} */
+      _.dataset.tab
+    ));
   });
   function v(_) {
-    e.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((N) => {
-      const $ = N.dataset.tab === _;
-      N.classList.toggle("ab-active", $), N.setAttribute("aria-selected", $ ? "true" : "false");
+    e.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((x) => {
+      const $ = (
+        /** @type {HTMLElement} */
+        x
+      ), N = $.dataset.tab === _;
+      $.classList.toggle("ab-active", N), $.setAttribute("aria-selected", N ? "true" : "false");
     });
   }
   return r.length > 0 && v(r[0].id), {
@@ -1065,7 +1089,7 @@ function Wt(e, {
   label: o = "הקלטת קול",
   onSaved: r,
   onDeleted: i
-} = {}) {
+}) {
   if (!Qn()) {
     const w = document.createElement("span");
     return w.className = "ab-voice-unsupported", w.textContent = "🎤 הקלטה לא נתמכת בדפדפן זה", e.appendChild(w), { refresh: async () => {
@@ -1074,9 +1098,9 @@ function Wt(e, {
   const s = eo(), a = document.createElement("div");
   a.className = "ab-voice-btn-wrap", a.setAttribute("aria-label", o), e.appendChild(a);
   let c = "idle", u = null, l = null, d = null, m = null, f = null, v = null, _ = 0;
-  function N() {
+  function x() {
     if (a.innerHTML = "", c === "idle")
-      u = $("🎤", "ab-voice-btn ab-voice-btn--record", "התחל הקלטה", T), a.appendChild(u);
+      u = $("🎤", "ab-voice-btn ab-voice-btn--record", "התחל הקלטה", N), a.appendChild(u);
     else if (c === "recording") {
       f = document.createElement("span"), f.className = "ab-voice-indicator", a.appendChild(f);
       const w = document.createElement("span");
@@ -1085,41 +1109,41 @@ function Wt(e, {
         const I = Math.floor(_ / 60), F = String(_ % 60).padStart(2, "0");
         w.textContent = `${I}:${F}`, _ >= 120 && b();
       }, 1e3), l = $("⏹", "ab-voice-btn ab-voice-btn--stop", "עצור הקלטה", b), a.appendChild(l);
-    } else c === "has-voice" && (d = $("▶", "ab-voice-btn ab-voice-btn--play", "נגן הקלטה", E), a.appendChild(d), u = $("🎤", "ab-voice-btn ab-voice-btn--re-record", "הקלט מחדש", T), a.appendChild(u), m = $("🗑", "ab-voice-btn ab-voice-btn--delete", "מחק הקלטה", g), a.appendChild(m));
+    } else c === "has-voice" && (d = $("▶", "ab-voice-btn ab-voice-btn--play", "נגן הקלטה", E), a.appendChild(d), u = $("🎤", "ab-voice-btn ab-voice-btn--re-record", "הקלט מחדש", N), a.appendChild(u), m = $("🗑", "ab-voice-btn ab-voice-btn--delete", "מחק הקלטה", g), a.appendChild(m));
   }
   function $(w, I, F, W) {
     const q = document.createElement("button");
     return q.className = I, q.type = "button", q.title = F, q.setAttribute("aria-label", F), q.textContent = w, q.addEventListener("click", W), q;
   }
-  async function T() {
+  async function N() {
     try {
-      await s.start(), c = "recording", N();
+      await s.start(), c = "recording", x();
     } catch (w) {
-      console.warn("[voice-record-button] microphone access denied:", w), x("לא ניתן לגשת למיקרופון");
+      console.warn("[voice-record-button] microphone access denied:", w), T("לא ניתן לגשת למיקרופון");
     }
   }
   async function b() {
     clearInterval(v);
     try {
       const w = await s.stop();
-      await oo(t, n, w), c = "has-voice", N(), r == null || r(w);
+      await oo(t, n, w), c = "has-voice", x(), r == null || r(w);
     } catch (w) {
-      console.warn("[voice-record-button] stop error:", w), c = "idle", N();
+      console.warn("[voice-record-button] stop error:", w), c = "idle", x();
     }
   }
   async function E() {
     d == null || d.setAttribute("disabled", "true"), await ve(t, n), d == null || d.removeAttribute("disabled");
   }
   async function g() {
-    confirm("למחוק את ההקלטה?") && (await ro(t, n), c = "idle", N(), i == null || i());
+    confirm("למחוק את ההקלטה?") && (await ro(t, n), c = "idle", x(), i == null || i());
   }
-  function x(w) {
+  function T(w) {
     const I = document.createElement("span");
     I.className = "ab-voice-error", I.textContent = w, a.appendChild(I), setTimeout(() => I.remove(), 3e3);
   }
   async function z() {
     if (s.isActive()) return;
-    c = await rt(t, n).catch(() => null) ? "has-voice" : "idle", N();
+    c = await rt(t, n).catch(() => null) ? "has-voice" : "idle", x();
   }
   function S() {
     clearInterval(v), s.isActive() && s.cancel(), a.remove();
@@ -1216,13 +1240,13 @@ function _o(e, t, { onSelectRound: n, onAddRound: o, onDuplicateRound: r, onMove
   function m() {
     d.forEach(($) => $.destroy()), d = [];
   }
-  function f($, T) {
+  function f($, N) {
     const b = document.createElement("div");
-    b.className = "ab-editor-nav__thumb", $.id === l && b.classList.add("ab-editor-nav__thumb--active"), b.setAttribute("role", "button"), b.setAttribute("tabindex", "0"), b.setAttribute("aria-label", `סיבוב ${T + 1}`), b.dataset.roundId = $.id, $.image && (b.style.backgroundImage = `url(${$.image})`, b.classList.add("ab-editor-nav__thumb--has-img"));
+    b.className = "ab-editor-nav__thumb", $.id === l && b.classList.add("ab-editor-nav__thumb--active"), b.setAttribute("role", "button"), b.setAttribute("tabindex", "0"), b.setAttribute("aria-label", `סיבוב ${N + 1}`), b.dataset.roundId = $.id, $.image && (b.style.backgroundImage = `url(${$.image})`, b.classList.add("ab-editor-nav__thumb--has-img"));
     const E = document.createElement("div");
     E.className = "ab-editor-nav__grip", E.innerHTML = "⠿", E.setAttribute("aria-hidden", "true"), E.title = "גרור לשינוי סדר", b.appendChild(E);
     const g = document.createElement("div");
-    if (g.className = "ab-editor-nav__num", g.textContent = String(T + 1), b.appendChild(g), $.correctEmoji && !$.image) {
+    if (g.className = "ab-editor-nav__num", g.textContent = String(N + 1), b.appendChild(g), $.correctEmoji && !$.image) {
       const z = document.createElement("div");
       z.className = "ab-editor-nav__emoji", z.textContent = $.correctEmoji, b.appendChild(z);
     }
@@ -1230,27 +1254,27 @@ function _o(e, t, { onSelectRound: n, onAddRound: o, onDuplicateRound: r, onMove
       const z = document.createElement("div");
       z.className = "ab-editor-nav__letter", z.textContent = $.target, b.appendChild(z);
     }
-    const x = document.createElement("button");
-    return x.className = "ab-editor-nav__dup", x.innerHTML = "⧉", x.title = "שכפל סיבוב", x.setAttribute("aria-label", "שכפל סיבוב"), x.addEventListener("click", (z) => {
+    const T = document.createElement("button");
+    return T.className = "ab-editor-nav__dup", T.innerHTML = "⧉", T.title = "שכפל סיבוב", T.setAttribute("aria-label", "שכפל סיבוב"), T.addEventListener("click", (z) => {
       z.stopPropagation(), r($.id);
-    }), b.appendChild(x), b.addEventListener("click", () => n($.id)), b.addEventListener("keydown", (z) => {
+    }), b.appendChild(T), b.addEventListener("click", () => n($.id)), b.addEventListener("keydown", (z) => {
       (z.key === "Enter" || z.key === " ") && (z.preventDefault(), n($.id));
     }), d.push(po(E, { roundId: $.id })), d.push(fo(b, ({ data: z }) => {
       z.roundId !== $.id && i(z.roundId, t.getRoundIndex($.id));
     })), b;
   }
   function v() {
-    m(), c.innerHTML = "", t.rounds.forEach(($, T) => c.appendChild(f($, T)));
+    m(), c.innerHTML = "", t.rounds.forEach(($, N) => c.appendChild(f($, N)));
   }
   function _($) {
-    l = $, c.querySelectorAll(".ab-editor-nav__thumb").forEach((T) => {
-      T.classList.toggle("ab-editor-nav__thumb--active", T.dataset.roundId === $);
+    l = $, c.querySelectorAll(".ab-editor-nav__thumb").forEach((N) => {
+      N.classList.toggle("ab-editor-nav__thumb--active", N.dataset.roundId === $);
     });
   }
-  function N() {
+  function x() {
     m(), s.remove();
   }
-  return v(), { refresh: v, setActiveRound: _, destroy: N };
+  return v(), { refresh: v, setActiveRound: _, destroy: x };
 }
 function h(e, t, n) {
   function o(a, c) {
@@ -2450,7 +2474,7 @@ const oi = /* @__PURE__ */ h("$ZodObject", (e, t) => {
     const l = [], d = s.shape;
     for (const m of s.keys) {
       const f = d[m], v = f._zod.optout === "optional", _ = f._zod.run({ value: u[m], issues: [] }, c);
-      _ instanceof Promise ? l.push(_.then((N) => Le(N, a, m, u, v))) : Le(_, a, m, u, v);
+      _ instanceof Promise ? l.push(_.then((x) => Le(x, a, m, u, v))) : Le(_, a, m, u, v);
     }
     return i ? pn(l, u, a, c, o.value, e) : l.length ? Promise.all(l).then(() => a) : a;
   };
@@ -2463,52 +2487,52 @@ const oi = /* @__PURE__ */ h("$ZodObject", (e, t) => {
       return `shape[${g}]._zod.run({ value: input[${g}], issues: [] }, ctx)`;
     };
     f.write("const input = payload.value;");
-    const N = /* @__PURE__ */ Object.create(null);
+    const x = /* @__PURE__ */ Object.create(null);
     let $ = 0;
     for (const E of v.keys)
-      N[E] = `key_${$++}`;
+      x[E] = `key_${$++}`;
     f.write("const newResult = {};");
     for (const E of v.keys) {
-      const g = N[E], x = Et(E), z = m[E], S = ((b = z == null ? void 0 : z._zod) == null ? void 0 : b.optout) === "optional";
+      const g = x[E], T = Et(E), z = m[E], S = ((b = z == null ? void 0 : z._zod) == null ? void 0 : b.optout) === "optional";
       f.write(`const ${g} = ${_(E)};`), S ? f.write(`
         if (${g}.issues.length) {
-          if (${x} in input) {
+          if (${T} in input) {
             payload.issues = payload.issues.concat(${g}.issues.map(iss => ({
               ...iss,
-              path: iss.path ? [${x}, ...iss.path] : [${x}]
+              path: iss.path ? [${T}, ...iss.path] : [${T}]
             })));
           }
         }
         
         if (${g}.value === undefined) {
-          if (${x} in input) {
-            newResult[${x}] = undefined;
+          if (${T} in input) {
+            newResult[${T}] = undefined;
           }
         } else {
-          newResult[${x}] = ${g}.value;
+          newResult[${T}] = ${g}.value;
         }
         
       `) : f.write(`
         if (${g}.issues.length) {
           payload.issues = payload.issues.concat(${g}.issues.map(iss => ({
             ...iss,
-            path: iss.path ? [${x}, ...iss.path] : [${x}]
+            path: iss.path ? [${T}, ...iss.path] : [${T}]
           })));
         }
         
         if (${g}.value === undefined) {
-          if (${x} in input) {
-            newResult[${x}] = undefined;
+          if (${T} in input) {
+            newResult[${T}] = undefined;
           }
         } else {
-          newResult[${x}] = ${g}.value;
+          newResult[${T}] = ${g}.value;
         }
         
       `);
     }
     f.write("payload.value = newResult;"), f.write("return payload;");
-    const T = f.compile();
-    return (E, g) => T(m, E, g);
+    const N = f.compile();
+    return (E, g) => N(m, E, g);
   };
   let i;
   const s = Re, a = !Xt.jitless, u = a && vo.value, l = t.catchall;
@@ -3442,11 +3466,11 @@ function gn(e, t) {
     var _;
     const d = e.target === "draft-2020-12" ? "$defs" : "definitions";
     if (e.external) {
-      const N = (_ = e.external.registry.get(l[0])) == null ? void 0 : _.id, $ = e.external.uri ?? ((b) => b);
-      if (N)
-        return { ref: $(N) };
-      const T = l[1].defId ?? l[1].schema.id ?? `schema${e.counter++}`;
-      return l[1].defId = T, { defId: T, ref: `${$("__shared")}#/${d}/${T}` };
+      const x = (_ = e.external.registry.get(l[0])) == null ? void 0 : _.id, $ = e.external.uri ?? ((b) => b);
+      if (x)
+        return { ref: $(x) };
+      const N = l[1].defId ?? l[1].schema.id ?? `schema${e.counter++}`;
+      return l[1].defId = N, { defId: N, ref: `${$("__shared")}#/${d}/${N}` };
     }
     if (l[1] === n)
       return { ref: "#" };
@@ -3509,21 +3533,21 @@ function vn(e, t) {
     const d = l.def ?? l.schema, m = { ...d }, f = l.ref;
     if (l.ref = null, f) {
       o(f);
-      const _ = e.seen.get(f), N = _.schema;
-      if (N.$ref && (e.target === "draft-07" || e.target === "draft-04" || e.target === "openapi-3.0") ? (d.allOf = d.allOf ?? [], d.allOf.push(N)) : Object.assign(d, N), Object.assign(d, m), u._zod.parent === f)
-        for (const T in d)
-          T === "$ref" || T === "allOf" || T in m || delete d[T];
-      if (N.$ref && _.def)
-        for (const T in d)
-          T === "$ref" || T === "allOf" || T in _.def && JSON.stringify(d[T]) === JSON.stringify(_.def[T]) && delete d[T];
+      const _ = e.seen.get(f), x = _.schema;
+      if (x.$ref && (e.target === "draft-07" || e.target === "draft-04" || e.target === "openapi-3.0") ? (d.allOf = d.allOf ?? [], d.allOf.push(x)) : Object.assign(d, x), Object.assign(d, m), u._zod.parent === f)
+        for (const N in d)
+          N === "$ref" || N === "allOf" || N in m || delete d[N];
+      if (x.$ref && _.def)
+        for (const N in d)
+          N === "$ref" || N === "allOf" || N in _.def && JSON.stringify(d[N]) === JSON.stringify(_.def[N]) && delete d[N];
     }
     const v = u._zod.parent;
     if (v && v !== f) {
       o(v);
       const _ = e.seen.get(v);
       if (_ != null && _.schema.$ref && (d.$ref = _.schema.$ref, _.def))
-        for (const N in d)
-          N === "$ref" || N === "allOf" || N in _.def && JSON.stringify(d[N]) === JSON.stringify(_.def[N]) && delete d[N];
+        for (const x in d)
+          x === "$ref" || x === "allOf" || x in _.def && JSON.stringify(d[x]) === JSON.stringify(_.def[x]) && delete d[x];
     }
     e.override({
       zodSchema: u,
@@ -4203,7 +4227,7 @@ const Ga = Ee({
 }).passthrough(), Hc = Ee({
   id: J(),
   version: re().default(1),
-  meta: tc.default({}),
+  meta: tc.default({ title: "", type: "multiple-choice" }),
   rounds: ke(Za(J(), Oe())).default([]),
   distractors: ke(Oe()).default([])
 }), nc = ft.extend({
@@ -4236,8 +4260,8 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
   function d(b, E) {
     const g = document.createElement("div");
     g.className = "ab-editor-field";
-    const x = document.createElement("label");
-    switch (x.className = "ab-editor-field__label", x.textContent = b.label, g.appendChild(x), b.type) {
+    const T = document.createElement("label");
+    switch (T.className = "ab-editor-field__label", T.textContent = b.label, g.appendChild(T), b.type) {
       case "emoji":
         g.appendChild(f(b, E));
         break;
@@ -4248,7 +4272,7 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
         g.appendChild(_(b, E));
         break;
       case "number":
-        g.appendChild(N(b, E));
+        g.appendChild(x(b, E));
         break;
       default:
         g.appendChild(m(b, E));
@@ -4263,11 +4287,11 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
   function f(b, E) {
     const g = document.createElement("div");
     g.className = "ab-editor-field__emoji-row";
-    const x = document.createElement("div");
-    x.className = "ab-editor-field__emoji-preview", x.textContent = String(E[b.key] ?? "❓"), g.appendChild(x);
+    const T = document.createElement("div");
+    T.className = "ab-editor-field__emoji-preview", T.textContent = String(E[b.key] ?? "❓"), g.appendChild(T);
     const z = document.createElement("input");
     return z.className = "ab-editor-field__input", z.type = "text", z.value = String(E[b.key] ?? ""), z.maxLength = 8, z.placeholder = "🐱", z.style.fontSize = "20px", z.addEventListener("input", () => {
-      x.textContent = z.value || "❓", t(c, b.key, z.value);
+      T.textContent = z.value || "❓", t(c, b.key, z.value);
     }), g.appendChild(z), g;
   }
   function v(b, E) {
@@ -4276,12 +4300,12 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
   }
   function _(b, E) {
     const g = document.createElement("select");
-    return g.className = "ab-editor-field__input", (b.options ?? []).forEach((x) => {
+    return g.className = "ab-editor-field__input", (b.options ?? []).forEach((T) => {
       const z = document.createElement("option");
-      z.value = x, z.textContent = x, E[b.key] === x && (z.selected = !0), g.appendChild(z);
+      z.value = T, z.textContent = T, E[b.key] === T && (z.selected = !0), g.appendChild(z);
     }), g.addEventListener("change", () => t(c, b.key, g.value)), g;
   }
-  function N(b, E) {
+  function x(b, E) {
     const g = document.createElement("input");
     return g.className = "ab-editor-field__input", g.type = "number", g.value = String(E[b.key] ?? ""), b.min !== void 0 && (g.min = String(b.min)), b.max !== void 0 && (g.max = String(b.max)), g.addEventListener("input", () => t(c, b.key, Number(g.value))), g;
   }
@@ -4290,10 +4314,10 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
     E.className = "ab-editor-field ab-editor-field--image";
     const g = document.createElement("label");
     g.className = "ab-editor-field__label", g.textContent = "🖼 תמונה", E.appendChild(g);
-    const x = document.createElement("div");
-    x.className = "ab-editor-field__img-row";
+    const T = document.createElement("div");
+    T.className = "ab-editor-field__img-row";
     const z = document.createElement("div");
-    z.className = "ab-editor-field__img-preview", b.image && (z.style.backgroundImage = `url(${b.image})`), x.appendChild(z);
+    z.className = "ab-editor-field__img-preview", b.image && (z.style.backgroundImage = `url(${b.image})`), T.appendChild(z);
     const S = document.createElement("div");
     S.className = "ab-editor-field__img-btns";
     const w = document.createElement("input");
@@ -4312,12 +4336,12 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
     const F = document.createElement("button");
     return F.className = "ab-editor-btn ab-editor-btn--img-clear", F.textContent = "✕ הסר", F.addEventListener("click", () => {
       z.style.backgroundImage = "", I.textContent = "📤 העלה", t(c, "image", null), F.remove();
-    }), b.image && S.appendChild(F), x.appendChild(S), E.appendChild(x), E;
+    }), b.image && S.appendChild(F), T.appendChild(S), E.appendChild(T), E;
   }
-  function T() {
+  function N() {
     r.remove();
   }
-  return u(), { loadRound: l, clear: u, destroy: T };
+  return u(), { loadRound: l, clear: u, destroy: N };
 }
 let rc = 0;
 function Xe() {
@@ -4623,23 +4647,23 @@ function _c(e, t, { onChange: n, gameId: o }) {
   v.className = "ab-ze-draw-rect", v.hidden = !0, f.appendChild(v);
   const _ = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   _.classList.add("ab-ze-poly-svg"), _.setAttribute("viewBox", "0 0 100 100"), _.setAttribute("preserveAspectRatio", "none"), _.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:12;", f.appendChild(_);
-  const N = document.createElement("div");
-  N.className = "ab-ze-toolbar", f.appendChild(N);
+  const x = document.createElement("div");
+  x.className = "ab-ze-toolbar", f.appendChild(x);
   function $() {
-    N.innerHTML = "";
+    x.innerHTML = "";
     const p = document.createElement("button");
     p.className = `ab-ze-tool-btn${s === "rect" ? " ab-ze-tool-btn--active" : ""}`, p.textContent = "▭ מלבן", p.addEventListener("click", () => {
       g("rect");
-    }), N.appendChild(p);
+    }), x.appendChild(p);
     const y = document.createElement("button");
     y.className = `ab-ze-tool-btn${s === "polygon" ? " ab-ze-tool-btn--active" : ""}`, y.textContent = "✎ חופשי", y.addEventListener("click", () => {
       g("polygon");
-    }), N.appendChild(y);
+    }), x.appendChild(y);
     const C = document.createElement("span");
-    C.className = "ab-ze-toolbar__hint", C.textContent = s === "rect" ? "גררו לציור מלבן" : "לחצו נקודות, לחצו פעמיים לסגירה", N.appendChild(C);
+    C.className = "ab-ze-toolbar__hint", C.textContent = s === "rect" ? "גררו לציור מלבן" : "לחצו נקודות, לחצו פעמיים לסגירה", x.appendChild(C);
   }
   e.style.position = "relative", e.appendChild(f), $();
-  function T(p, y) {
+  function N(p, y) {
     const C = f.getBoundingClientRect();
     return {
       px: Math.max(0, Math.min(100, (p - C.left) / C.width * 100)),
@@ -4681,7 +4705,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
       if (y.addEventListener("pointerdown", (Z) => {
         if (Z.stopPropagation(), m) return;
         i = p.id, b();
-        const { px: D, py: U } = T(Z.clientX, Z.clientY);
+        const { px: D, py: U } = N(Z.clientX, Z.clientY);
         d = { zoneId: p.id, offsetX: D - p.x, offsetY: U - p.y };
       }), f.appendChild(y), p.id === i) {
         const Z = document.createElement("div");
@@ -4720,7 +4744,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
   function g(p) {
     u.length > 0 && (u = [], l = null, E()), s = p, f.classList.toggle("ab-ze-overlay--poly-mode", p === "polygon"), $();
   }
-  function x() {
+  function T() {
     if (!c) return;
     const p = Math.min(c.startX, c.curX), y = Math.min(c.startY, c.curY), C = Math.abs(c.curX - c.startX), M = Math.abs(c.curY - c.startY);
     v.style.left = `${p}%`, v.style.top = `${y}%`, v.style.width = `${C}%`, v.style.height = `${M}%`;
@@ -4746,7 +4770,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
   function S(p) {
     if (p.button !== 0 || p.target.closest(".ab-ze-zone") || p.target.closest(".ab-ze-toolbar") || p.target.closest(".ab-ze-panel")) return;
     if (i = null, s === "polygon") {
-      const { px: M, py: L } = T(p.clientX, p.clientY);
+      const { px: M, py: L } = N(p.clientX, p.clientY);
       if (u.length >= 3) {
         const Z = u[0];
         if (Math.abs(M - Z.x) < 2 && Math.abs(L - Z.y) < 2) {
@@ -4757,20 +4781,20 @@ function _c(e, t, { onChange: n, gameId: o }) {
       u.push({ x: M, y: L }), E(), b();
       return;
     }
-    const { px: y, py: C } = T(p.clientX, p.clientY);
-    c = { startX: y, startY: C, curX: y, curY: C }, v.hidden = !1, x(), b();
+    const { px: y, py: C } = N(p.clientX, p.clientY);
+    c = { startX: y, startY: C, curX: y, curY: C }, v.hidden = !1, T(), b();
   }
   function w(p) {
     s === "polygon" && u.length >= 3 && (p.preventDefault(), z());
   }
   function I(p) {
     if (s === "polygon" && u.length > 0) {
-      const { px: y, py: C } = T(p.clientX, p.clientY);
+      const { px: y, py: C } = N(p.clientX, p.clientY);
       l = { x: y, y: C }, E();
     }
     if (c) {
-      const { px: y, py: C } = T(p.clientX, p.clientY);
-      c.curX = y, c.curY = C, x();
+      const { px: y, py: C } = N(p.clientX, p.clientY);
+      c.curX = y, c.curY = C, T();
       return;
     }
     if (m) {
@@ -4785,7 +4809,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
       p.preventDefault();
       const y = r.find((D) => D.id === d.zoneId);
       if (!y) return;
-      const { px: C, py: M } = T(p.clientX, p.clientY), L = Math.max(0, Math.min(100 - y.width, C - d.offsetX)), Z = Math.max(0, Math.min(100 - y.height, M - d.offsetY));
+      const { px: C, py: M } = N(p.clientX, p.clientY), L = Math.max(0, Math.min(100 - y.width, C - d.offsetX)), Z = Math.max(0, Math.min(100 - y.height, M - d.offsetY));
       if (y.shape === "polygon" && y.points) {
         const D = L - y.x, U = Z - y.y;
         y.points = y.points.map((Y) => ({ x: Y.x + D, y: Y.y + U }));

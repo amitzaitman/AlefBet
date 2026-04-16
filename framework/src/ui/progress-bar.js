@@ -21,7 +21,7 @@ export function createProgressBar(container, total) {
   `;
   container.appendChild(bar);
 
-  const fill = bar.querySelector('.progress-bar__fill');
+  const fill = /** @type {HTMLElement} */ (bar.querySelector('.progress-bar__fill'));
   const label = bar.querySelector('.progress-bar__label');
 
   return {

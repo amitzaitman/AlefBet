@@ -65,19 +65,19 @@ export function showNikudSettingsDialog(container, onSave) {
     modal.innerHTML = content;
     modal.style.display = 'flex';
 
-    const rateSlider = document.getElementById('nikud-rate-slider');
+    const rateSlider = /** @type {HTMLInputElement} */ (document.getElementById('nikud-rate-slider'));
     const rateVal = document.getElementById('nikud-rate-val');
     rateSlider.oninput = () => { rateVal.textContent = rateSlider.value; };
 
     document.getElementById('save-settings-btn').onclick = () => {
         const rate = parseFloat(rateSlider.value);
-        localStorage.setItem('alefbet.nikudRate', rate);
+        localStorage.setItem('alefbet.nikudRate', String(rate));
         tts.setNikudEmphasis({ rate });
         const checked = Array.from(modal.querySelectorAll('.nikud-filter-cb'))
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
+            .filter(cb => /** @type {HTMLInputElement} */ (cb).checked)
+            .map(cb => /** @type {HTMLInputElement} */ (cb).value);
 
-        const url = new URL(window.location);
+        const url = new URL(window.location.href);
         if (checked.length > 0 && checked.length < nikudList.length) {
             url.searchParams.set('allowedNikud', checked.join(','));
         } else {

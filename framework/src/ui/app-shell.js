@@ -27,7 +27,7 @@
  * shell.setSubtitle('3 משימות נותרו');
  * shell.setActiveTab('tasks');
  */
-export function createAppShell(container, config = {}) {
+export function createAppShell(container, config) {
   const {
     title = '',
     subtitle = '',
@@ -87,8 +87,8 @@ export function createAppShell(container, config = {}) {
 
   // ── שמירת הפניות לאלמנטים ─────────────────────────────────────────────────
 
-  const subtitleEl = container.querySelector('.ab-app-subtitle');
-  const contentEl  = container.querySelector('.ab-app-content');
+  const subtitleEl = /** @type {HTMLElement} */ (container.querySelector('.ab-app-subtitle'));
+  const contentEl  = /** @type {HTMLElement} */ (container.querySelector('.ab-app-content'));
 
   // ── טיפול באירועי לחיצה על טאבים ─────────────────────────────────────────
 
@@ -98,7 +98,7 @@ export function createAppShell(container, config = {}) {
   }
 
   container.querySelectorAll('.ab-app-tab, .ab-app-nav-item').forEach(btn => {
-    btn.addEventListener('click', () => _handleTabClick(btn.dataset.tab));
+    btn.addEventListener('click', () => _handleTabClick(/** @type {HTMLElement} */ (btn).dataset.tab));
   });
 
   // ── פונקציות פנימיות ──────────────────────────────────────────────────────
@@ -108,7 +108,8 @@ export function createAppShell(container, config = {}) {
    * @param {string} tabId
    */
   function _setActiveTab(tabId) {
-    container.querySelectorAll('.ab-app-tab, .ab-app-nav-item').forEach(btn => {
+    container.querySelectorAll('.ab-app-tab, .ab-app-nav-item').forEach(el => {
+      const btn = /** @type {HTMLElement} */ (el);
       const isActive = btn.dataset.tab === tabId;
       btn.classList.toggle('ab-active', isActive);
       btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
