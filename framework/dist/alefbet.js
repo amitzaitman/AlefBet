@@ -48,7 +48,7 @@ class In {
     return this._currentRound >= this._totalRounds;
   }
 }
-class wc {
+class kc {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
@@ -200,7 +200,7 @@ async function On(e) {
 function jn(e) {
   return ge.get(e) ?? e ?? "";
 }
-async function kc(e) {
+async function Ec(e) {
   const t = [...new Set(e.filter((n) => n == null ? void 0 : n.trim()))];
   await Promise.all(t.map((n) => On(n)));
 }
@@ -402,7 +402,7 @@ function Xn(e, t, n, o) {
     a.remove(), o();
   }), e.innerHTML = "", e.appendChild(a), Ce(a.querySelector(".completion-screen__content"), "fadeIn");
 }
-function Ec(e, t, {
+function zc(e, t, {
   totalRounds: n,
   progressBar: o = null,
   buildRoundUI: r,
@@ -471,7 +471,7 @@ const Yn = {
   oh: [/[או]/, /^[או]$/, /או/, /הו/],
   oo: [/[או]/, /^[או]$/, /או/, /הו/, /אוּ/]
 };
-function zc() {
+function $c() {
   const e = typeof window < "u" ? window.SpeechRecognition || window.webkitSpeechRecognition : null, t = !!e;
   let n = null;
   return {
@@ -513,7 +513,7 @@ function zc() {
     }
   };
 }
-function $c(e, t) {
+function Sc(e, t) {
   if (!e || !t) return !1;
   const n = Yn[t];
   if (!n) return !1;
@@ -601,7 +601,7 @@ async function ro(e, t) {
     i.objectStore(Q).delete(ot(e, t)), i.oncomplete = o, i.onerror = (s) => r(s.target.error);
   });
 }
-async function Sc(e) {
+async function Nc(e) {
   const t = await De();
   return new Promise((n, o) => {
     const i = t.transaction(Q, "readonly").objectStore(Q).getAllKeys();
@@ -627,7 +627,7 @@ async function ve(e, t) {
     i.onended = () => s(!0), i.onerror = () => s(!1), i.play().catch(() => s(!1));
   }) : !1;
 }
-async function Nc(e, t) {
+async function Cc(e, t) {
   return await rt(e, t).catch(() => null) !== null;
 }
 const xe = [
@@ -659,13 +659,13 @@ const xe = [
   { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
   { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
 ];
-function Cc(e) {
+function xc(e) {
   return xe.find((t) => t.letter === e) || null;
 }
 function io(e = "regular") {
   return e === "regular" ? xe.filter((t) => !t.isFinal) : e === "final" ? xe.filter((t) => t.isFinal) : xe;
 }
-function xc(e, t = "regular") {
+function Tc(e, t = "regular") {
   const n = io(t);
   return [...n].sort(() => Math.random() - 0.5).slice(0, Math.min(e, n.length));
 }
@@ -677,11 +677,11 @@ const Ze = [
   { id: "segol", name: "סָגֹול", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶ", color: "#9B59B6", textColor: "#fff" },
   { id: "holam", name: "חוֹלֵם", nameNikud: "חוֹלָם", symbol: "ֹ", sound: "אֹ", color: "#2ECC71", textColor: "#fff" },
   { id: "kubbutz", name: "קֻובּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אֻ", color: "#F39C12", textColor: "#fff" }
-], Tc = ["א", "ב", "ג", "ד", "מ", "נ", "ל", "ר", "ש", "ת", "פ", "ק"];
-function Zc(e, t) {
+], Zc = ["א", "ב", "ג", "ד", "מ", "נ", "ל", "ר", "ש", "ת", "פ", "ק"];
+function Ic(e, t) {
   return e + t;
 }
-function Ic(e) {
+function Rc(e) {
   let t = [...Ze];
   if (typeof window < "u" && window.location && window.location.search) {
     const o = new URLSearchParams(window.location.search), r = o.get("allowedNikud");
@@ -705,7 +705,7 @@ function Ic(e) {
     n.push(...t);
   return n.sort(() => Math.random() - 0.5).slice(0, e);
 }
-function Rc(e, t, n) {
+function Lc(e, t, n) {
   e.innerHTML = "";
   const o = document.createElement("div");
   o.className = "option-cards-grid";
@@ -743,7 +743,7 @@ function Rc(e, t, n) {
     }
   };
 }
-function Lc(e, t) {
+function Ac(e, t) {
   const n = document.createElement("div");
   n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(t)), n.innerHTML = `
     <div class="progress-bar__track">
@@ -767,7 +767,7 @@ function Lc(e, t) {
     }
   };
 }
-function Ac(e) {
+function Pc(e) {
   const t = document.createElement("div");
   t.className = "feedback-message", t.setAttribute("aria-live", "polite"), t.setAttribute("role", "status"), e.appendChild(t);
   let n = null;
@@ -795,7 +795,7 @@ function Ac(e) {
     }
   };
 }
-function Pc(e, t) {
+function Oc(e, t) {
   let n = document.getElementById("nikud-settings");
   n || (n = document.createElement("div"), n.id = "nikud-settings", Object.assign(n.style, {
     position: "fixed",
@@ -860,7 +860,7 @@ function Pc(e, t) {
     n.style.display = "none";
   };
 }
-function Oc(e) {
+function jc(e) {
   const t = document.createElement("div");
   t.className = "ab-zone", t.style.setProperty("--zone-color", e.color || "#4f67ff"), t.innerHTML = `
     <div class="ab-zone__symbol">${e.symbol || ""}</div>
@@ -888,7 +888,7 @@ function so(e, t, n, o, r) {
     return `${s},${a}`;
   }).join(" ");
 }
-function jc(e, t) {
+function Mc(e, t) {
   const {
     image: n,
     zones: o = [],
@@ -902,14 +902,14 @@ function jc(e, t) {
     showZones: d = !1,
     autoPlayInstruction: m = !0,
     hintAfter: f = 3
-  } = t, v = r === "soundboard", _ = document.createElement("div");
-  _.className = "ab-zp-wrap";
+  } = t, v = r === "soundboard", b = document.createElement("div");
+  b.className = "ab-zp-wrap";
   const x = document.createElement("img");
-  x.className = "ab-zp-image", x.src = n, x.alt = "", x.draggable = !1, _.appendChild(x);
+  x.className = "ab-zp-image", x.src = n, x.alt = "", x.draggable = !1, b.appendChild(x);
   const $ = document.createElement("div");
-  $.className = "ab-zp-layer", _.appendChild($), e.appendChild(_);
+  $.className = "ab-zp-layer", b.appendChild($), e.appendChild(b);
   const N = /* @__PURE__ */ new Set();
-  let b = 0, E = !1, g = !1;
+  let _ = 0, E = !1, g = !1;
   async function T(S) {
     if (!(!i || E)) {
       E = !0;
@@ -921,14 +921,14 @@ function jc(e, t) {
     }
   }
   function z() {
-    if (g || f <= 0 || v || b < f) return;
+    if (g || f <= 0 || v || _ < f) return;
     g = !0;
     const S = $.querySelectorAll(".ab-zp-zone");
     S.forEach((w, I) => {
       var F;
       (F = o[I]) != null && F.correct && !N.has(o[I].id) && w.classList.add("ab-zp-zone--hint");
     }), setTimeout(() => {
-      S.forEach((w) => w.classList.remove("ab-zp-zone--hint")), g = !1, b = 0;
+      S.forEach((w) => w.classList.remove("ab-zp-zone--hint")), g = !1, _ = 0;
     }, 1500);
   }
   return o.forEach((S) => {
@@ -955,7 +955,7 @@ function jc(e, t) {
           const I = o.filter((F) => F.correct).length;
           N.size >= I && u && u();
         } else
-          w.classList.add("ab-zp-zone--wrong"), b++, c && c(S), setTimeout(() => w.classList.remove("ab-zp-zone--wrong"), 600), z();
+          w.classList.add("ab-zp-zone--wrong"), _++, c && c(S), setTimeout(() => w.classList.remove("ab-zp-zone--wrong"), 600), z();
     }), $.appendChild(w);
   }), m && i && s && setTimeout(() => {
     ve(i, s).catch(() => {
@@ -974,7 +974,7 @@ function jc(e, t) {
       });
     },
     reset() {
-      N.clear(), b = 0, g = !1, $.querySelectorAll(".ab-zp-zone").forEach((S) => {
+      N.clear(), _ = 0, g = !1, $.querySelectorAll(".ab-zp-zone").forEach((S) => {
         S.classList.remove(
           "ab-zp-zone--correct",
           "ab-zp-zone--wrong",
@@ -985,23 +985,23 @@ function jc(e, t) {
       });
     },
     destroy() {
-      _.remove();
+      b.remove();
     }
   };
 }
-function Mc(e, t = "טוֹעֵן...") {
+function Dc(e, t = "טוֹעֵן...") {
   e.innerHTML = `<div class="ab-loading">${t}</div>`;
 }
-function Dc(e) {
+function Fc(e) {
   e.innerHTML = "";
 }
-function Fc(e, t, n, o) {
+function Uc(e, t, n, o) {
   const r = e.querySelector(".game-header__spacer");
   if (!r) return null;
   const i = document.createElement("button");
   return i.className = "ab-header-btn", i.setAttribute("aria-label", n), i.textContent = t, i.onclick = o, r.innerHTML = "", r.appendChild(i), i;
 }
-function Uc(e, { size: t = "md" } = {}) {
+function Bc(e, { size: t = "md" } = {}) {
   const n = document.createElement("div");
   n.className = `ab-nikud-box ab-nikud-box--${t} ab-nikud-box--${e.id}`;
   const o = document.createElement("div");
@@ -1009,7 +1009,7 @@ function Uc(e, { size: t = "md" } = {}) {
   const r = document.createElement("div");
   return r.className = "ab-nikud-box__mark", r.textContent = e.symbol, n.appendChild(o), n.appendChild(r), n;
 }
-function Bc(e, t) {
+function Hc(e, t) {
   const {
     title: n = "",
     subtitle: o = "",
@@ -1019,9 +1019,9 @@ function Bc(e, t) {
   } = t;
   e.classList.add("ab-app");
   const a = i ? `<a href="${i}" class="ab-app-back-link" aria-label="דף הבית">🏠</a>` : "", c = o ? `<span class="ab-app-subtitle">${o}</span>` : '<span class="ab-app-subtitle"></span>', u = r.map(
-    (_) => `<button class="ab-app-tab" data-tab="${_.id}" aria-selected="false" role="tab"><span class="ab-app-tab-icon">${_.icon}</span><span class="ab-app-tab-label">${_.label}</span></button>`
+    (b) => `<button class="ab-app-tab" data-tab="${b.id}" aria-selected="false" role="tab"><span class="ab-app-tab-icon">${b.icon}</span><span class="ab-app-tab-label">${b.label}</span></button>`
   ).join(""), l = r.map(
-    (_) => `<button class="ab-app-nav-item" data-tab="${_.id}" aria-selected="false" role="tab"><span class="ab-app-nav-icon">${_.icon}</span><span class="ab-app-nav-label">${_.label}</span></button>`
+    (b) => `<button class="ab-app-nav-item" data-tab="${b.id}" aria-selected="false" role="tab"><span class="ab-app-nav-icon">${b.icon}</span><span class="ab-app-nav-label">${b.label}</span></button>`
   ).join("");
   e.innerHTML = `
     <header class="ab-app-header">
@@ -1046,21 +1046,21 @@ function Bc(e, t) {
     /** @type {HTMLElement} */
     e.querySelector(".ab-app-content")
   );
-  function f(_) {
-    v(_), typeof s == "function" && s(_);
+  function f(b) {
+    v(b), typeof s == "function" && s(b);
   }
-  e.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((_) => {
-    _.addEventListener("click", () => f(
+  e.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((b) => {
+    b.addEventListener("click", () => f(
       /** @type {HTMLElement} */
-      _.dataset.tab
+      b.dataset.tab
     ));
   });
-  function v(_) {
+  function v(b) {
     e.querySelectorAll(".ab-app-tab, .ab-app-nav-item").forEach((x) => {
       const $ = (
         /** @type {HTMLElement} */
         x
-      ), N = $.dataset.tab === _;
+      ), N = $.dataset.tab === b;
       $.classList.toggle("ab-active", N), $.setAttribute("aria-selected", N ? "true" : "false");
     });
   }
@@ -1071,15 +1071,15 @@ function Bc(e, t) {
      * עדכן את כותרת המשנה
      * @param {string} text - הטקסט החדש לכותרת המשנה
      */
-    setSubtitle(_) {
-      d.textContent = _;
+    setSubtitle(b) {
+      d.textContent = b;
     },
     /**
      * הגדר את הטאב הפעיל באופן תכנותי
      * @param {string} tabId - מזהה הטאב להפעלה
      */
-    setActiveTab(_) {
-      v(_);
+    setActiveTab(b) {
+      v(b);
     }
   };
 }
@@ -1097,18 +1097,18 @@ function Wt(e, {
   }
   const s = eo(), a = document.createElement("div");
   a.className = "ab-voice-btn-wrap", a.setAttribute("aria-label", o), e.appendChild(a);
-  let c = "idle", u = null, l = null, d = null, m = null, f = null, v = null, _ = 0;
+  let c = "idle", u = null, l = null, d = null, m = null, f = null, v = null, b = 0;
   function x() {
     if (a.innerHTML = "", c === "idle")
       u = $("🎤", "ab-voice-btn ab-voice-btn--record", "התחל הקלטה", N), a.appendChild(u);
     else if (c === "recording") {
       f = document.createElement("span"), f.className = "ab-voice-indicator", a.appendChild(f);
       const w = document.createElement("span");
-      w.className = "ab-voice-timer", w.textContent = "0:00", a.appendChild(w), _ = 0, v = setInterval(() => {
-        _++;
-        const I = Math.floor(_ / 60), F = String(_ % 60).padStart(2, "0");
-        w.textContent = `${I}:${F}`, _ >= 120 && b();
-      }, 1e3), l = $("⏹", "ab-voice-btn ab-voice-btn--stop", "עצור הקלטה", b), a.appendChild(l);
+      w.className = "ab-voice-timer", w.textContent = "0:00", a.appendChild(w), b = 0, v = setInterval(() => {
+        b++;
+        const I = Math.floor(b / 60), F = String(b % 60).padStart(2, "0");
+        w.textContent = `${I}:${F}`, b >= 120 && _();
+      }, 1e3), l = $("⏹", "ab-voice-btn ab-voice-btn--stop", "עצור הקלטה", _), a.appendChild(l);
     } else c === "has-voice" && (d = $("▶", "ab-voice-btn ab-voice-btn--play", "נגן הקלטה", E), a.appendChild(d), u = $("🎤", "ab-voice-btn ab-voice-btn--re-record", "הקלט מחדש", N), a.appendChild(u), m = $("🗑", "ab-voice-btn ab-voice-btn--delete", "מחק הקלטה", g), a.appendChild(m));
   }
   function $(w, I, F, W) {
@@ -1122,7 +1122,7 @@ function Wt(e, {
       console.warn("[voice-record-button] microphone access denied:", w), T("לא ניתן לגשת למיקרופון");
     }
   }
-  async function b() {
+  async function _() {
     clearInterval(v);
     try {
       const w = await s.stop();
@@ -1241,32 +1241,32 @@ function _o(e, t, { onSelectRound: n, onAddRound: o, onDuplicateRound: r, onMove
     d.forEach(($) => $.destroy()), d = [];
   }
   function f($, N) {
-    const b = document.createElement("div");
-    b.className = "ab-editor-nav__thumb", $.id === l && b.classList.add("ab-editor-nav__thumb--active"), b.setAttribute("role", "button"), b.setAttribute("tabindex", "0"), b.setAttribute("aria-label", `סיבוב ${N + 1}`), b.dataset.roundId = $.id, $.image && (b.style.backgroundImage = `url(${$.image})`, b.classList.add("ab-editor-nav__thumb--has-img"));
+    const _ = document.createElement("div");
+    _.className = "ab-editor-nav__thumb", $.id === l && _.classList.add("ab-editor-nav__thumb--active"), _.setAttribute("role", "button"), _.setAttribute("tabindex", "0"), _.setAttribute("aria-label", `סיבוב ${N + 1}`), _.dataset.roundId = $.id, $.image && (_.style.backgroundImage = `url(${$.image})`, _.classList.add("ab-editor-nav__thumb--has-img"));
     const E = document.createElement("div");
-    E.className = "ab-editor-nav__grip", E.innerHTML = "⠿", E.setAttribute("aria-hidden", "true"), E.title = "גרור לשינוי סדר", b.appendChild(E);
+    E.className = "ab-editor-nav__grip", E.innerHTML = "⠿", E.setAttribute("aria-hidden", "true"), E.title = "גרור לשינוי סדר", _.appendChild(E);
     const g = document.createElement("div");
-    if (g.className = "ab-editor-nav__num", g.textContent = String(N + 1), b.appendChild(g), $.correctEmoji && !$.image) {
+    if (g.className = "ab-editor-nav__num", g.textContent = String(N + 1), _.appendChild(g), $.correctEmoji && !$.image) {
       const z = document.createElement("div");
-      z.className = "ab-editor-nav__emoji", z.textContent = $.correctEmoji, b.appendChild(z);
+      z.className = "ab-editor-nav__emoji", z.textContent = $.correctEmoji, _.appendChild(z);
     }
     if ($.target) {
       const z = document.createElement("div");
-      z.className = "ab-editor-nav__letter", z.textContent = $.target, b.appendChild(z);
+      z.className = "ab-editor-nav__letter", z.textContent = $.target, _.appendChild(z);
     }
     const T = document.createElement("button");
     return T.className = "ab-editor-nav__dup", T.innerHTML = "⧉", T.title = "שכפל סיבוב", T.setAttribute("aria-label", "שכפל סיבוב"), T.addEventListener("click", (z) => {
       z.stopPropagation(), r($.id);
-    }), b.appendChild(T), b.addEventListener("click", () => n($.id)), b.addEventListener("keydown", (z) => {
+    }), _.appendChild(T), _.addEventListener("click", () => n($.id)), _.addEventListener("keydown", (z) => {
       (z.key === "Enter" || z.key === " ") && (z.preventDefault(), n($.id));
-    }), d.push(po(E, { roundId: $.id })), d.push(fo(b, ({ data: z }) => {
+    }), d.push(po(E, { roundId: $.id })), d.push(fo(_, ({ data: z }) => {
       z.roundId !== $.id && i(z.roundId, t.getRoundIndex($.id));
-    })), b;
+    })), _;
   }
   function v() {
     m(), c.innerHTML = "", t.rounds.forEach(($, N) => c.appendChild(f($, N)));
   }
-  function _($) {
+  function b($) {
     l = $, c.querySelectorAll(".ab-editor-nav__thumb").forEach((N) => {
       N.classList.toggle("ab-editor-nav__thumb--active", N.dataset.roundId === $);
     });
@@ -1274,7 +1274,7 @@ function _o(e, t, { onSelectRound: n, onAddRound: o, onDuplicateRound: r, onMove
   function x() {
     m(), s.remove();
   }
-  return v(), { refresh: v, setActiveRound: _, destroy: x };
+  return v(), { refresh: v, setActiveRound: b, destroy: x };
 }
 function h(e, t, n) {
   function o(a, c) {
@@ -2473,16 +2473,16 @@ const oi = /* @__PURE__ */ h("$ZodObject", (e, t) => {
     a.value = {};
     const l = [], d = s.shape;
     for (const m of s.keys) {
-      const f = d[m], v = f._zod.optout === "optional", _ = f._zod.run({ value: u[m], issues: [] }, c);
-      _ instanceof Promise ? l.push(_.then((x) => Le(x, a, m, u, v))) : Le(_, a, m, u, v);
+      const f = d[m], v = f._zod.optout === "optional", b = f._zod.run({ value: u[m], issues: [] }, c);
+      b instanceof Promise ? l.push(b.then((x) => Le(x, a, m, u, v))) : Le(b, a, m, u, v);
     }
     return i ? pn(l, u, a, c, o.value, e) : l.length ? Promise.all(l).then(() => a) : a;
   };
 }), ri = /* @__PURE__ */ h("$ZodObjectJIT", (e, t) => {
   oi.init(e, t);
   const n = e._zod.parse, o = it(() => hn(t)), r = (m) => {
-    var b;
-    const f = new $r(["shape", "payload", "ctx"]), v = o.value, _ = (E) => {
+    var _;
+    const f = new $r(["shape", "payload", "ctx"]), v = o.value, b = (E) => {
       const g = Et(E);
       return `shape[${g}]._zod.run({ value: input[${g}], issues: [] }, ctx)`;
     };
@@ -2493,8 +2493,8 @@ const oi = /* @__PURE__ */ h("$ZodObject", (e, t) => {
       x[E] = `key_${$++}`;
     f.write("const newResult = {};");
     for (const E of v.keys) {
-      const g = x[E], T = Et(E), z = m[E], S = ((b = z == null ? void 0 : z._zod) == null ? void 0 : b.optout) === "optional";
-      f.write(`const ${g} = ${_(E)};`), S ? f.write(`
+      const g = x[E], T = Et(E), z = m[E], S = ((_ = z == null ? void 0 : z._zod) == null ? void 0 : _.optout) === "optional";
+      f.write(`const ${g} = ${b(E)};`), S ? f.write(`
         if (${g}.issues.length) {
           if (${T} in input) {
             payload.issues = payload.issues.concat(${g}.issues.map(iss => ({
@@ -3436,10 +3436,10 @@ function B(e, t, n = { path: [], schemaPath: [] }) {
     if (e._zod.processJSONSchema)
       e._zod.processJSONSchema(t, s.schema, m);
     else {
-      const v = s.schema, _ = t.processors[r.type];
-      if (!_)
+      const v = s.schema, b = t.processors[r.type];
+      if (!b)
         throw new Error(`[toJSONSchema]: Non-representable type encountered: ${r.type}`);
-      _(e, t, v, m);
+      b(e, t, v, m);
     }
     const f = e._zod.parent;
     f && (s.ref || (s.ref = f), B(f, t, m), t.seen.get(f).isParent = !0);
@@ -3463,10 +3463,10 @@ function gn(e, t) {
     }
   }
   const r = (l) => {
-    var _;
+    var b;
     const d = e.target === "draft-2020-12" ? "$defs" : "definitions";
     if (e.external) {
-      const x = (_ = e.external.registry.get(l[0])) == null ? void 0 : _.id, $ = e.external.uri ?? ((b) => b);
+      const x = (b = e.external.registry.get(l[0])) == null ? void 0 : b.id, $ = e.external.uri ?? ((_) => _);
       if (x)
         return { ref: $(x) };
       const N = l[1].defId ?? l[1].schema.id ?? `schema${e.counter++}`;
@@ -3482,8 +3482,8 @@ function gn(e, t) {
     const d = l[1], { ref: m, defId: f } = r(l);
     d.def = { ...d.schema }, f && (d.defId = f);
     const v = d.schema;
-    for (const _ in v)
-      delete v[_];
+    for (const b in v)
+      delete v[b];
     v.$ref = m;
   };
   if (e.cycles === "throw")
@@ -3533,21 +3533,21 @@ function vn(e, t) {
     const d = l.def ?? l.schema, m = { ...d }, f = l.ref;
     if (l.ref = null, f) {
       o(f);
-      const _ = e.seen.get(f), x = _.schema;
+      const b = e.seen.get(f), x = b.schema;
       if (x.$ref && (e.target === "draft-07" || e.target === "draft-04" || e.target === "openapi-3.0") ? (d.allOf = d.allOf ?? [], d.allOf.push(x)) : Object.assign(d, x), Object.assign(d, m), u._zod.parent === f)
         for (const N in d)
           N === "$ref" || N === "allOf" || N in m || delete d[N];
-      if (x.$ref && _.def)
+      if (x.$ref && b.def)
         for (const N in d)
-          N === "$ref" || N === "allOf" || N in _.def && JSON.stringify(d[N]) === JSON.stringify(_.def[N]) && delete d[N];
+          N === "$ref" || N === "allOf" || N in b.def && JSON.stringify(d[N]) === JSON.stringify(b.def[N]) && delete d[N];
     }
     const v = u._zod.parent;
     if (v && v !== f) {
       o(v);
-      const _ = e.seen.get(v);
-      if (_ != null && _.schema.$ref && (d.$ref = _.schema.$ref, _.def))
+      const b = e.seen.get(v);
+      if (b != null && b.schema.$ref && (d.$ref = b.schema.$ref, b.def))
         for (const x in d)
-          x === "$ref" || x === "allOf" || x in _.def && JSON.stringify(d[x]) === JSON.stringify(_.def[x]) && delete d[x];
+          x === "$ref" || x === "allOf" || x in b.def && JSON.stringify(d[x]) === JSON.stringify(b.def[x]) && delete d[x];
     }
     e.override({
       zodSchema: u,
@@ -4224,7 +4224,7 @@ const Ga = Ee({
 }), tc = Ee({
   title: J().default(""),
   type: J().default("multiple-choice")
-}).passthrough(), Hc = Ee({
+}).passthrough(), Jc = Ee({
   id: J(),
   version: re().default(1),
   meta: tc.default({ title: "", type: "multiple-choice" }),
@@ -4250,66 +4250,66 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
   function u() {
     s.innerHTML = '<p class="ab-editor-inspector__empty">בחר סיבוב לעריכה</p>', a.hidden = !0, c = null;
   }
-  function l(b, E = "multiple-choice") {
-    c = b.id, s.innerHTML = "", a.hidden = !1;
+  function l(_, E = "multiple-choice") {
+    c = _.id, s.innerHTML = "", a.hidden = !1;
     const g = o ?? Bt[E] ?? Bt["multiple-choice"];
-    Ya(g).forEach((z) => s.appendChild(d(z, b))), s.appendChild($(b)), a.onclick = () => {
+    Ya(g).forEach((z) => s.appendChild(d(z, _))), s.appendChild($(_)), a.onclick = () => {
       confirm("למחוק את הסיבוב הזה?") && (n(c), u());
     };
   }
-  function d(b, E) {
+  function d(_, E) {
     const g = document.createElement("div");
     g.className = "ab-editor-field";
     const T = document.createElement("label");
-    switch (T.className = "ab-editor-field__label", T.textContent = b.label, g.appendChild(T), b.type) {
+    switch (T.className = "ab-editor-field__label", T.textContent = _.label, g.appendChild(T), _.type) {
       case "emoji":
-        g.appendChild(f(b, E));
+        g.appendChild(f(_, E));
         break;
       case "boolean":
-        g.appendChild(v(b, E));
+        g.appendChild(v(_, E));
         break;
       case "select":
-        g.appendChild(_(b, E));
+        g.appendChild(b(_, E));
         break;
       case "number":
-        g.appendChild(x(b, E));
+        g.appendChild(x(_, E));
         break;
       default:
-        g.appendChild(m(b, E));
+        g.appendChild(m(_, E));
         break;
     }
     return g;
   }
-  function m(b, E) {
+  function m(_, E) {
     const g = document.createElement("input");
-    return g.className = "ab-editor-field__input", g.type = "text", g.value = String(E[b.key] ?? ""), g.dir = "rtl", b.maxLength && (g.maxLength = b.maxLength), g.addEventListener("input", () => t(c, b.key, g.value)), g;
+    return g.className = "ab-editor-field__input", g.type = "text", g.value = String(E[_.key] ?? ""), g.dir = "rtl", _.maxLength && (g.maxLength = _.maxLength), g.addEventListener("input", () => t(c, _.key, g.value)), g;
   }
-  function f(b, E) {
+  function f(_, E) {
     const g = document.createElement("div");
     g.className = "ab-editor-field__emoji-row";
     const T = document.createElement("div");
-    T.className = "ab-editor-field__emoji-preview", T.textContent = String(E[b.key] ?? "❓"), g.appendChild(T);
+    T.className = "ab-editor-field__emoji-preview", T.textContent = String(E[_.key] ?? "❓"), g.appendChild(T);
     const z = document.createElement("input");
-    return z.className = "ab-editor-field__input", z.type = "text", z.value = String(E[b.key] ?? ""), z.maxLength = 8, z.placeholder = "🐱", z.style.fontSize = "20px", z.addEventListener("input", () => {
-      T.textContent = z.value || "❓", t(c, b.key, z.value);
+    return z.className = "ab-editor-field__input", z.type = "text", z.value = String(E[_.key] ?? ""), z.maxLength = 8, z.placeholder = "🐱", z.style.fontSize = "20px", z.addEventListener("input", () => {
+      T.textContent = z.value || "❓", t(c, _.key, z.value);
     }), g.appendChild(z), g;
   }
-  function v(b, E) {
+  function v(_, E) {
     const g = document.createElement("input");
-    return g.type = "checkbox", g.checked = !!E[b.key], g.addEventListener("change", () => t(c, b.key, g.checked)), g;
+    return g.type = "checkbox", g.checked = !!E[_.key], g.addEventListener("change", () => t(c, _.key, g.checked)), g;
   }
-  function _(b, E) {
+  function b(_, E) {
     const g = document.createElement("select");
-    return g.className = "ab-editor-field__input", (b.options ?? []).forEach((T) => {
+    return g.className = "ab-editor-field__input", (_.options ?? []).forEach((T) => {
       const z = document.createElement("option");
-      z.value = T, z.textContent = T, E[b.key] === T && (z.selected = !0), g.appendChild(z);
-    }), g.addEventListener("change", () => t(c, b.key, g.value)), g;
+      z.value = T, z.textContent = T, E[_.key] === T && (z.selected = !0), g.appendChild(z);
+    }), g.addEventListener("change", () => t(c, _.key, g.value)), g;
   }
-  function x(b, E) {
+  function x(_, E) {
     const g = document.createElement("input");
-    return g.className = "ab-editor-field__input", g.type = "number", g.value = String(E[b.key] ?? ""), b.min !== void 0 && (g.min = String(b.min)), b.max !== void 0 && (g.max = String(b.max)), g.addEventListener("input", () => t(c, b.key, Number(g.value))), g;
+    return g.className = "ab-editor-field__input", g.type = "number", g.value = String(E[_.key] ?? ""), _.min !== void 0 && (g.min = String(_.min)), _.max !== void 0 && (g.max = String(_.max)), g.addEventListener("input", () => t(c, _.key, Number(g.value))), g;
   }
-  function $(b) {
+  function $(_) {
     const E = document.createElement("div");
     E.className = "ab-editor-field ab-editor-field--image";
     const g = document.createElement("label");
@@ -4317,7 +4317,7 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
     const T = document.createElement("div");
     T.className = "ab-editor-field__img-row";
     const z = document.createElement("div");
-    z.className = "ab-editor-field__img-preview", b.image && (z.style.backgroundImage = `url(${b.image})`), T.appendChild(z);
+    z.className = "ab-editor-field__img-preview", _.image && (z.style.backgroundImage = `url(${_.image})`), T.appendChild(z);
     const S = document.createElement("div");
     S.className = "ab-editor-field__img-btns";
     const w = document.createElement("input");
@@ -4332,11 +4332,11 @@ function oc(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
       }, q.readAsDataURL(W);
     }), S.appendChild(w);
     const I = document.createElement("button");
-    I.className = "ab-editor-btn ab-editor-btn--img-upload", I.textContent = b.image ? "🔄 החלף" : "📤 העלה", I.addEventListener("click", () => w.click()), S.appendChild(I);
+    I.className = "ab-editor-btn ab-editor-btn--img-upload", I.textContent = _.image ? "🔄 החלף" : "📤 העלה", I.addEventListener("click", () => w.click()), S.appendChild(I);
     const F = document.createElement("button");
     return F.className = "ab-editor-btn ab-editor-btn--img-clear", F.textContent = "✕ הסר", F.addEventListener("click", () => {
       z.style.backgroundImage = "", I.textContent = "📤 העלה", t(c, "image", null), F.remove();
-    }), b.image && S.appendChild(F), T.appendChild(S), E.appendChild(T), E;
+    }), _.image && S.appendChild(F), T.appendChild(S), E.appendChild(T), E;
   }
   function N() {
     r.remove();
@@ -4460,7 +4460,7 @@ function Cn(e) {
 function ic(e) {
   Cn(e.id).set(e.toJSON());
 }
-function Jc(e) {
+function Vc(e) {
   const t = Cn(e).get();
   if (!t) return null;
   try {
@@ -4469,7 +4469,7 @@ function Jc(e) {
     return null;
   }
 }
-function Vc(e) {
+function Wc(e) {
   try {
     localStorage.removeItem(`${Nn}${e}`);
   } catch {
@@ -4645,8 +4645,8 @@ function _c(e, t, { onChange: n, gameId: o }) {
   f.className = "ab-ze-overlay";
   const v = document.createElement("div");
   v.className = "ab-ze-draw-rect", v.hidden = !0, f.appendChild(v);
-  const _ = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  _.classList.add("ab-ze-poly-svg"), _.setAttribute("viewBox", "0 0 100 100"), _.setAttribute("preserveAspectRatio", "none"), _.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:12;", f.appendChild(_);
+  const b = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  b.classList.add("ab-ze-poly-svg"), b.setAttribute("viewBox", "0 0 100 100"), b.setAttribute("preserveAspectRatio", "none"), b.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:12;", f.appendChild(b);
   const x = document.createElement("div");
   x.className = "ab-ze-toolbar", f.appendChild(x);
   function $() {
@@ -4670,7 +4670,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
       py: Math.max(0, Math.min(100, (y - C.top) / C.height * 100))
     };
   }
-  function b() {
+  function _() {
     a.forEach((p) => p.destroy()), a = [], f.querySelectorAll(".ab-ze-zone").forEach((p) => p.remove()), f.querySelectorAll(".ab-ze-panel").forEach((p) => p.remove()), r.forEach((p) => {
       const y = document.createElement("div");
       if (y.className = "ab-ze-zone", p.correct && y.classList.add("ab-ze-zone--correct"), p.id === i && y.classList.add("ab-ze-zone--selected"), y.dataset.zoneId = p.id, y.style.left = `${p.x}%`, y.style.top = `${p.y}%`, y.style.width = `${p.width}%`, y.style.height = `${p.height}%`, p.shape === "polygon" && p.points && p.points.length >= 3) {
@@ -4684,11 +4684,11 @@ function _c(e, t, { onChange: n, gameId: o }) {
       C.className = "ab-ze-zone__badge", C.textContent = p.correct ? "✓" : "", p.label && (C.textContent = p.label), y.appendChild(C);
       const M = document.createElement("button");
       M.className = "ab-ze-zone__toggle", M.textContent = p.correct ? "✓ נכון" : "✗ לא נכון", M.title = "סמן כתשובה נכונה / לא נכונה", M.addEventListener("pointerdown", (Z) => Z.stopPropagation()), M.addEventListener("click", (Z) => {
-        Z.stopPropagation(), p.correct = !p.correct, W(), b();
+        Z.stopPropagation(), p.correct = !p.correct, W(), _();
       }), y.appendChild(M);
       const L = document.createElement("button");
       if (L.className = "ab-ze-zone__delete", L.textContent = "✕", L.title = "מחק אזור", L.addEventListener("pointerdown", (Z) => Z.stopPropagation()), L.addEventListener("click", (Z) => {
-        Z.stopPropagation(), r = r.filter((D) => D.id !== p.id), i === p.id && (i = null), W(), b();
+        Z.stopPropagation(), r = r.filter((D) => D.id !== p.id), i === p.id && (i = null), W(), _();
       }), y.appendChild(L), p.shape !== "polygon" && p.id === i)
         for (const Z of ["nw", "ne", "sw", "se"]) {
           const D = document.createElement("div");
@@ -4704,7 +4704,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
         }
       if (y.addEventListener("pointerdown", (Z) => {
         if (Z.stopPropagation(), m) return;
-        i = p.id, b();
+        i = p.id, _();
         const { px: D, py: U } = N(Z.clientX, Z.clientY);
         d = { zoneId: p.id, offsetX: D - p.x, offsetY: U - p.y };
       }), f.appendChild(y), p.id === i) {
@@ -4732,13 +4732,13 @@ function _c(e, t, { onChange: n, gameId: o }) {
     });
   }
   function E() {
-    if (_.innerHTML = "", u.length === 0) return;
+    if (b.innerHTML = "", u.length === 0) return;
     const p = [...u];
     l && p.push(l);
     const y = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    y.setAttribute("points", p.map((C) => `${C.x},${C.y}`).join(" ")), y.setAttribute("fill", "rgba(251,191,36,0.15)"), y.setAttribute("stroke", "#fbbf24"), y.setAttribute("stroke-width", "0.4"), y.setAttribute("stroke-dasharray", "1,0.5"), _.appendChild(y), u.forEach((C, M) => {
+    y.setAttribute("points", p.map((C) => `${C.x},${C.y}`).join(" ")), y.setAttribute("fill", "rgba(251,191,36,0.15)"), y.setAttribute("stroke", "#fbbf24"), y.setAttribute("stroke-width", "0.4"), y.setAttribute("stroke-dasharray", "1,0.5"), b.appendChild(y), u.forEach((C, M) => {
       const L = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      L.setAttribute("cx", String(C.x)), L.setAttribute("cy", String(C.y)), L.setAttribute("r", "0.8"), L.setAttribute("fill", M === 0 ? "#22c55e" : "#fbbf24"), L.setAttribute("stroke", "#fff"), L.setAttribute("stroke-width", "0.3"), _.appendChild(L);
+      L.setAttribute("cx", String(C.x)), L.setAttribute("cy", String(C.y)), L.setAttribute("r", "0.8"), L.setAttribute("fill", M === 0 ? "#22c55e" : "#fbbf24"), L.setAttribute("stroke", "#fff"), L.setAttribute("stroke-width", "0.3"), b.appendChild(L);
     });
   }
   function g(p) {
@@ -4765,7 +4765,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
       };
       r.push(C), i = C.id, W();
     }
-    u = [], l = null, E(), b();
+    u = [], l = null, E(), _();
   }
   function S(p) {
     if (p.button !== 0 || p.target.closest(".ab-ze-zone") || p.target.closest(".ab-ze-toolbar") || p.target.closest(".ab-ze-panel")) return;
@@ -4778,11 +4778,11 @@ function _c(e, t, { onChange: n, gameId: o }) {
           return;
         }
       }
-      u.push({ x: M, y: L }), E(), b();
+      u.push({ x: M, y: L }), E(), _();
       return;
     }
     const { px: y, py: C } = N(p.clientX, p.clientY);
-    c = { startX: y, startY: C, curX: y, curY: C }, v.hidden = !1, T(), b();
+    c = { startX: y, startY: C, curX: y, curY: C }, v.hidden = !1, T(), _();
   }
   function w(p) {
     s === "polygon" && u.length >= 3 && (p.preventDefault(), z());
@@ -4802,7 +4802,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
       const y = r.find((U) => U.id === m.zoneId);
       if (!y) return;
       const C = m.origZone, M = f.getBoundingClientRect(), L = (p.clientX - m.startX) / M.width * 100, Z = (p.clientY - m.startY) / M.height * 100, D = m.handle;
-      D.includes("e") && (y.width = Math.max(3, C.width + L)), D.includes("w") && (y.x = C.x + L, y.width = Math.max(3, C.width - L)), D.includes("s") && (y.height = Math.max(3, C.height + Z)), D.includes("n") && (y.y = C.y + Z, y.height = Math.max(3, C.height - Z)), b();
+      D.includes("e") && (y.width = Math.max(3, C.width + L)), D.includes("w") && (y.x = C.x + L, y.width = Math.max(3, C.width - L)), D.includes("s") && (y.height = Math.max(3, C.height + Z)), D.includes("n") && (y.y = C.y + Z, y.height = Math.max(3, C.height - Z)), _();
       return;
     }
     if (d) {
@@ -4814,7 +4814,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
         const D = L - y.x, U = Z - y.y;
         y.points = y.points.map((Y) => ({ x: Y.x + D, y: Y.y + U }));
       }
-      y.x = L, y.y = Z, b();
+      y.x = L, y.y = Z, _();
     }
   }
   function F() {
@@ -4832,7 +4832,7 @@ function _c(e, t, { onChange: n, gameId: o }) {
         };
         r.push(L), i = L.id, W();
       }
-      c = null, v.hidden = !0, b();
+      c = null, v.hidden = !0, _();
       return;
     }
     if (m) {
@@ -4853,11 +4853,11 @@ function _c(e, t, { onChange: n, gameId: o }) {
       z();
       return;
     }
-    i && ((p.key === "Delete" || p.key === "Backspace") && (r = r.filter((y) => y.id !== i), i = null, W(), b()), p.key === "Escape" && (i = null, b()));
+    i && ((p.key === "Delete" || p.key === "Backspace") && (r = r.filter((y) => y.id !== i), i = null, W(), _()), p.key === "Escape" && (i = null, _()));
   }
-  return f.addEventListener("pointerdown", S), f.addEventListener("dblclick", w), document.addEventListener("pointermove", I), document.addEventListener("pointerup", F), document.addEventListener("keydown", q), b(), {
+  return f.addEventListener("pointerdown", S), f.addEventListener("dblclick", w), document.addEventListener("pointermove", I), document.addEventListener("pointerup", F), document.addEventListener("keydown", q), _(), {
     setZones(p) {
-      r = structuredClone(p), i = null, b();
+      r = structuredClone(p), i = null, _();
     },
     getZones() {
       return structuredClone(r);
@@ -4969,6 +4969,9 @@ const vc = [
   }
 ];
 function yc(e) {
+  return e.zones.map((t) => ({ ...t, id: gc() }));
+}
+function wc(e) {
   var c;
   (c = document.getElementById("ab-tpl-picker")) == null || c.remove();
   const t = document.createElement("div");
@@ -4985,16 +4988,12 @@ function yc(e) {
   s.className = "ab-tpl-grid", vc.forEach((u) => {
     const l = document.createElement("button");
     l.className = "ab-tpl-card", l.addEventListener("click", () => {
-      const v = u.zones.map((_) => ({
-        ..._,
-        id: gc()
-      }));
-      e(v), a();
+      e(yc(u)), a();
     });
     const d = document.createElement("div");
     d.className = "ab-tpl-card__preview", u.zones.forEach((v) => {
-      const _ = document.createElement("div");
-      _.className = "ab-tpl-card__zone", v.correct && _.classList.add("ab-tpl-card__zone--correct"), _.style.left = `${v.x}%`, _.style.top = `${v.y}%`, _.style.width = `${v.width}%`, _.style.height = `${v.height}%`, d.appendChild(_);
+      const b = document.createElement("div");
+      b.className = "ab-tpl-card__zone", v.correct && b.classList.add("ab-tpl-card__zone--correct"), b.style.left = `${v.x}%`, b.style.top = `${v.y}%`, b.style.width = `${v.width}%`, b.style.height = `${v.height}%`, d.appendChild(b);
     }), l.appendChild(d);
     const m = document.createElement("div");
     m.className = "ab-tpl-card__label", m.innerHTML = `<span class="ab-tpl-card__icon">${u.icon}</span> ${u.nameHe}`, l.appendChild(m);
@@ -5008,7 +5007,7 @@ function yc(e) {
     l.key === "Escape" && (a(), document.removeEventListener("keydown", u));
   });
 }
-class Wc {
+class qc {
   constructor(t, n, o = {}) {
     this._mode = "play", this._overlay = null, this._navigator = null, this._inspector = null, this._toolbar = null, this._selectedId = null, this._undoBtn = null, this._redoBtn = null, this._shortcutHandler = null, this._zoneEditor = null, this._zoneModal = null, this._container = t, this._gameData = n, this._restartGame = o.restartGame, this._roundSchema = o.roundSchema, requestAnimationFrame(() => this._injectToolbar());
   }
@@ -5173,7 +5172,7 @@ class Wc {
     u.className = "ab-ze-footer";
     const l = document.createElement("button");
     l.className = "ab-editor-btn ab-editor-btn--zones", l.textContent = "📐 תבנית", l.addEventListener("click", () => {
-      yc((f) => {
+      wc((f) => {
         var v;
         this._selectedId && (this._gameData.updateRound(this._selectedId, { zones: f }), this._refreshUndoButtons(), (v = this._zoneEditor) == null || v.setZones(f));
       });
@@ -5212,10 +5211,10 @@ export {
   ec as DragMatchRoundSchema,
   Zn as EventBus,
   Me as GameData,
-  Hc as GameDataSchema,
-  Wc as GameEditor,
+  Jc as GameDataSchema,
+  qc as GameEditor,
   tc as GameMetaSchema,
-  wc as GameShell,
+  kc as GameShell,
   In as GameState,
   Qa as MultipleChoiceRoundSchema,
   Ga as PointSchema,
@@ -5223,51 +5222,52 @@ export {
   nc as ZoneTapRoundSchema,
   On as addNikud,
   Ce as animate,
-  Vc as clearGameData,
-  Bc as createAppShell,
+  Wc as clearGameData,
+  Hc as createAppShell,
   po as createDragSource,
   fo as createDropTarget,
-  Ac as createFeedback,
+  Pc as createFeedback,
   Vt as createLocalState,
-  Uc as createNikudBox,
-  Rc as createOptionCards,
-  Lc as createProgressBar,
-  Ec as createRoundManager,
-  zc as createSpeechListener,
+  Bc as createNikudBox,
+  Lc as createOptionCards,
+  Ac as createProgressBar,
+  zc as createRoundManager,
+  $c as createSpeechListener,
   Wt as createVoiceRecordButton,
   eo as createVoiceRecorder,
-  Oc as createZone,
+  jc as createZone,
   _c as createZoneEditor,
-  jc as createZonePlayer,
+  Mc as createZonePlayer,
   ro as deleteVoice,
   sc as exportGameDataAsJSON,
-  Cc as getLetter,
+  yc as generateZonesFromTemplate,
+  xc as getLetter,
   io as getLettersByGroup,
   jn as getNikud,
-  Nc as hasVoice,
+  Cc as hasVoice,
   xe as hebrewLetters,
-  Dc as hideLoadingScreen,
-  Fc as injectHeaderButton,
+  Fc as hideLoadingScreen,
+  Uc as injectHeaderButton,
   Qn as isVoiceRecordingSupported,
-  Zc as letterWithNikud,
-  Sc as listVoiceKeys,
-  Jc as loadGameData,
+  Ic as letterWithNikud,
+  Nc as listVoiceKeys,
+  Vc as loadGameData,
   rt as loadVoice,
-  $c as matchNikudSound,
-  Tc as nikudBaseLetters,
+  Sc as matchNikudSound,
+  Zc as nikudBaseLetters,
   Ze as nikudList,
   ve as playVoice,
-  kc as preloadNikud,
-  xc as randomLetters,
-  Ic as randomNikud,
+  Ec as preloadNikud,
+  Tc as randomLetters,
+  Rc as randomNikud,
   ic as saveGameData,
   oo as saveVoice,
   Ya as schemaToFields,
   lc as showAudioManager,
   Xn as showCompletionScreen,
-  Mc as showLoadingScreen,
-  Pc as showNikudSettingsDialog,
-  yc as showTemplatePicker,
+  Dc as showLoadingScreen,
+  Oc as showNikudSettingsDialog,
+  wc as showTemplatePicker,
   Te as sounds,
   Wn as tts
 };

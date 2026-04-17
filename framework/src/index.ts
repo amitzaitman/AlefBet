@@ -52,7 +52,8 @@ export { saveGameData, loadGameData, clearGameData, exportGameDataAsJSON } from 
 export { showAudioManager } from './editor/audio-manager.js';
 export { createZoneEditor } from './editor/zone-editor.js';
 export type { DrawTool }   from './editor/zone-editor.js';
-export { showTemplatePicker, ACTIVITY_TEMPLATES } from './editor/activity-templates.js';
+export { showTemplatePicker, ACTIVITY_TEMPLATES, generateZonesFromTemplate } from './editor/activity-templates.js';
+export type { ActivityTemplate } from './editor/activity-templates.js';
 
 // ===== Editor: schemas + field utilities (TypeScript consumers) =====
 export {

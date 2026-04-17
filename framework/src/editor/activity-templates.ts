@@ -124,6 +124,17 @@ export const ACTIVITY_TEMPLATES: ActivityTemplate[] = [
   },
 ];
 
+// ── Zone generation ──────────────────────────────────────────────────────────
+
+/**
+ * Turn a template into fully-formed Zone records (with unique ids).
+ * Pure function — separates template data from the picker UI so callers and
+ * tests can use the same code path.
+ */
+export function generateZonesFromTemplate(template: ActivityTemplate): Zone[] {
+  return template.zones.map(z => ({ ...z, id: _zid() } as Zone));
+}
+
 // ── Template picker UI ───────────────────────────────────────────────────────
 
 /**
@@ -166,11 +177,7 @@ export function showTemplatePicker(onSelect: (zones: Zone[]) => void): void {
     const card = document.createElement('button');
     card.className = 'ab-tpl-card';
     card.addEventListener('click', () => {
-      const zones: Zone[] = tpl.zones.map(z => ({
-        ...z,
-        id: _zid(),
-      } as Zone));
-      onSelect(zones);
+      onSelect(generateZonesFromTemplate(tpl));
       close();
     });
 
