@@ -1,27 +1,35 @@
 /**
  * תבנית משחק — AlefBet
  * Claude מייצר קובץ זה לכל משחק חדש
+ *
+ * הצעד הראשון בכל משחק הוא קריאה ל-bootstrapGame — עוטפת לטעינת ניקוד,
+ * הקמת GameShell וחיווט העורך. ראה framework/src/core/bootstrap.js לאופציות.
  */
 import {
-  GameShell,
-  tts,
-  hebrewLetters,
-  getLettersByGroup,
-  randomLetters,
+  bootstrapGame,
   createOptionCards,
   createProgressBar,
   createFeedback,
   showCompletionScreen,
 } from '../../framework/dist/alefbet.js';
 
-export function startGame(container) {
-  const shell = new GameShell(container, {
-    totalRounds: 5,
-    title: 'שֵׁם הַמִּשְׂחָק',
+const STATIC_TEXTS = [
+  'בְּרוּכִים הַבָּאִים',
+];
+
+const ROUNDS = [
+  // { target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' },
+];
+
+export async function startGame(container) {
+  const { shell } = await bootstrapGame(container, {
+    gameId: 'template-game',
+    title: 'שֵׁם הַמִּשְׂחָק',
+    preloadTexts: STATIC_TEXTS,
+    defaultRounds: ROUNDS,
   });
 
-  // הוסף לוגיקת משחק כאן
-  shell.bodyEl.innerHTML = '<p style="text-align:center;padding:2rem">הַמִּשְׂחָק שֶׁלְּךָ יוֹפִיעַ כָּאן</p>';
+  shell.bodyEl.innerHTML = '<p style="text-align:center;padding:2rem">הַמִּשְׂחָק שֶׁלְּךָ יוֹפִיעַ כָּאן</p>';
 
   shell.on('start', () => {
   });

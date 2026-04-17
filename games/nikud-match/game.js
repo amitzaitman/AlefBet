@@ -4,7 +4,7 @@
  * 8 סיבובים
  */
 import {
-  GameShell,
+  bootstrapGame,
   tts,
   nikudList,
   nikudBaseLetters,
@@ -13,18 +13,12 @@ import {
   showCompletionScreen,
   animate,
   sounds,
-  preloadNikud,
-  getNikud,
   randomNikud,
   showNikudSettingsDialog,
   createDragSource,
   createDropTarget,
-  showLoadingScreen,
-  hideLoadingScreen,
   injectHeaderButton,
   createNikudBox,
-  GameEditor,
-  GameData,
 } from '../../framework/dist/alefbet.js';
 
 const STATIC_TEXTS = [
@@ -46,23 +40,22 @@ function pickLetter() {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  showLoadingScreen(container, 'טוֹעֵן נִיקּוּד...');
-
-  await preloadNikud(STATIC_TEXTS);
-  hideLoadingScreen(container);
+  const { shell } = await bootstrapGame(container, {
+    gameId: 'nikud-match',
+    title: 'לִמּוּד נִיקּוּד',
+    preloadTexts: STATIC_TEXTS,
+    loadingMessage: 'טוֹעֵן נִיקּוּד...',
+    totalRounds: 8,
+    editor: {
+      type: 'drag-match',
+      title: 'לימוד ניקוד',
+      restartGame: startGame,
+    },
+  });
 
   const roundNikud = randomNikud(8);
 
-  const shell = new GameShell(container, {
-    totalRounds: 8,
-    title: 'לִמּוּד נִיקּוּד',
-  });
-
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
-
-  // Live editing support (nikud-match rounds are procedurally generated, expose meta only)
-  const gameData = GameData.fromRoundsArray('nikud-match', [], { title: 'לימוד ניקוד', type: 'drag-match' });
-  new GameEditor(container, gameData, { restartGame: c => startGame(c) });
 
   let progressBar = null;
   let roundIndex = 0;

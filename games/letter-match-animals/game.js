@@ -4,20 +4,13 @@
  * 8 סיבובים, אותיות א–ח
  */
 import {
-  GameShell,
-  tts,
+  bootstrapGame,
   getLetter,
   createOptionCards,
   createProgressBar,
   createFeedback,
   showCompletionScreen,
-  preloadNikud,
   getNikud,
-  showLoadingScreen,
-  hideLoadingScreen,
-  GameEditor,
-  GameData,
-  loadGameData,
 } from '../../framework/dist/alefbet.js';
 
 // ── Game data ─────────────────────────────────────────────────────────────
@@ -69,27 +62,18 @@ function buildOptions(round) {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  // Show loading indicator while nikud loads
-  showLoadingScreen(container, 'טוֹעֵן...');
-
-  await preloadNikud(STATIC_TEXTS);
-
-  hideLoadingScreen(container);
-
-  // Load saved rounds (if teacher has edited them) or fall back to defaults
-  const savedData = loadGameData('letter-match-animals');
-  const activeRounds = savedData ? savedData.rounds : ROUNDS;
-
-  const shell = new GameShell(container, {
-    totalRounds: activeRounds.length,
+  const { shell, activeRounds } = await bootstrapGame(container, {
+    gameId: 'letter-match-animals',
     title: getNikud('התאמת אותיות') || 'התאמת אותיות',
+    preloadTexts: STATIC_TEXTS,
+    defaultRounds: ROUNDS,
+    editor: {
+      type: 'multiple-choice',
+      title: 'התאמת אותיות',
+      distractors: DISTRACTORS,
+      restartGame: startGame,
+    },
   });
-
-  // Live editing support
-  const gameData = GameData.fromRoundsArray('letter-match-animals', activeRounds, {
-    title: 'התאמת אותיות', type: 'multiple-choice',
-  }, DISTRACTORS);
-  new GameEditor(container, gameData, { restartGame: c => startGame(c) });
 
   let progressBar = null;
   let feedback = null;

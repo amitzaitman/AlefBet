@@ -10,6 +10,7 @@ export { GameState }         from './core/state.js';
 export { GameShell }         from './core/game-shell.js';
 export { createRoundManager } from './core/round-manager.js';
 export { createLocalState }  from './core/local-state.js';
+export { bootstrapGame }     from './core/bootstrap.js';
 
 // ===== Audio =====
 export { tts }    from './audio/tts.js';

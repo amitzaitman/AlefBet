@@ -4,7 +4,7 @@
  * 8 סיבובים עם ניקוד שונה בכל פעם
  */
 import {
-  GameShell,
+  bootstrapGame,
   tts,
   nikudList,
   letterWithNikud,
@@ -15,12 +15,9 @@ import {
   sounds,
   createSpeechListener,
   matchNikudSound,
-  preloadNikud,
   getNikud,
   randomNikud,
   showNikudSettingsDialog,
-  showLoadingScreen,
-  hideLoadingScreen,
   injectHeaderButton,
 } from '../../framework/dist/alefbet.js';
 
@@ -36,29 +33,29 @@ const STATIC_TEXTS = [
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  showLoadingScreen(container, 'טוֹעֵן נִיקּוּד...');
-
-  await preloadNikud(STATIC_TEXTS);
-
-  // ── Check speech recognition availability ──
   const listener = createSpeechListener();
-  if (!listener.available) {
-    container.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.4rem;color:#e53e3e;direction:rtl;text-align:center;padding:2rem;">
-        ${getNikud('הַמִּשְׂחָק דּוֹרֵשׁ דַּפְדְּפָן Chrome')}
-      </div>
-    `;
-    return;
-  }
 
-  hideLoadingScreen(container);
+  const { shell, aborted } = await bootstrapGame(container, {
+    gameId: 'nikud-speak',
+    title: 'אֱמוֹר אֶת הַנִּיקּוּד',
+    preloadTexts: STATIC_TEXTS,
+    loadingMessage: 'טוֹעֵן נִיקּוּד...',
+    totalRounds: 8,
+    onBeforeHide: () => {
+      if (!listener.available) {
+        container.innerHTML = `
+          <div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.4rem;color:#e53e3e;direction:rtl;text-align:center;padding:2rem;">
+            ${getNikud('הַמִּשְׂחָק דּוֹרֵשׁ דַּפְדְּפָן Chrome')}
+          </div>
+        `;
+        return false;
+      }
+    },
+  });
+
+  if (aborted) return;
 
   const roundNikud = randomNikud(8);
-
-  const shell = new GameShell(container, {
-    totalRounds: 8,
-    title: 'אֱמוֹר אֶת הַנִּיקּוּד',
-  });
 
   // Inject Settings button into header spacer
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
