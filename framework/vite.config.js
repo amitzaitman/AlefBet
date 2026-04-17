@@ -13,8 +13,20 @@ export default defineConfig({
     extensions: ['.ts', '.js', '.json', '.css'],
   },
   test: {
-    environment: 'node',
+    environment: 'jsdom',
     include: ['src/**/*.test.{js,ts}'],
+    setupFiles: ['src/__tests__/setup.js'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      include: ['src/**/*.{js,ts}'],
+      exclude: [
+        'src/**/*.test.*',
+        'src/__tests__/**',
+        'src/editor/**/*.ts',
+        'src/index.ts',
+      ],
+    },
   },
   build: {
     lib: {

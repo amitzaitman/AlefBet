@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { createIDBMock } from './helpers.js';
 
 // voice-store.js has a module-level _dbPromise cache.
 // Reset modules before each test to get a fresh cache, then stub indexedDB.
@@ -7,82 +8,6 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.resetModules();
 });
-
-// ── IndexedDB mock factory ────────────────────────────────────────────────────
-
-/**
- * Returns a minimal in-memory IndexedDB stub.
- * Supports: open, transaction (readwrite/readonly), put, get, delete, getAllKeys.
- * All async operations resolve on the next microtask tick.
- */
-function createIDBMock() {
-  const _data = new Map(); // composite key → value
-
-  function makeReq(resolveFn) {
-    const req = { result: undefined, error: null, onsuccess: null, onerror: null };
-    Promise.resolve().then(() => {
-      try {
-        req.result = resolveFn();
-        req.onsuccess?.({ target: req });
-      } catch (err) {
-        req.error = err;
-        req.onerror?.({ target: req });
-      }
-    });
-    return req;
-  }
-
-  function makeDB() {
-    return {
-      transaction(_storeName, _mode) {
-        const tx = { oncomplete: null, onerror: null };
-
-        tx.objectStore = function () {
-          return {
-            put(value, key) {
-              _data.set(key, value);
-              Promise.resolve().then(() => tx.oncomplete?.());
-              return {}; // IDBRequest (not awaited by caller)
-            },
-            get(key) {
-              return makeReq(() => _data.get(key));
-            },
-            delete(key) {
-              _data.delete(key);
-              Promise.resolve().then(() => tx.oncomplete?.());
-              return {};
-            },
-            getAllKeys() {
-              return makeReq(() => [..._data.keys()]);
-            },
-          };
-        };
-
-        return tx;
-      },
-    };
-  }
-
-  const db = makeDB();
-
-  // Simulate indexedDB.open()
-  function open(_name, _version) {
-    const req = {
-      result: null,
-      error: null,
-      onupgradeneeded: null,
-      onsuccess: null,
-      onerror: null,
-    };
-    Promise.resolve().then(() => {
-      req.result = db;
-      req.onsuccess?.({ target: req });
-    });
-    return req;
-  }
-
-  return { open: vi.fn(open), _data };
-}
 
 // ── saveVoice / loadVoice ─────────────────────────────────────────────────────
 

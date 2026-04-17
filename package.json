@@ -9,6 +9,7 @@
   "scripts": {
     "build": "npm run build --workspace=framework",
     "test": "npm run test --workspace=framework",
+    "test:coverage": "npm run test:coverage --workspace=framework",
     "lint": "eslint .",
     "typecheck": "npm run typecheck --workspace=framework",
     "check": "npm run lint && npm run typecheck && npm test",

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { makeMockMediaRecorder, makeMockStream } from './helpers.js';
 
 // voice-recorder.js uses MediaRecorder and navigator.mediaDevices at call time.
 // Provide mocks via vi.stubGlobal before each test.
@@ -7,60 +8,6 @@ afterEach(() => {
   vi.unstubAllGlobals();
   vi.resetModules();
 });
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-function makeMockStream() {
-  return {
-    getTracks: vi.fn(() => [{ stop: vi.fn() }]),
-  };
-}
-
-/**
- * Build a mock MediaRecorder class.
- *
- * @param {object} opts
- * @param {string[]} [opts.supported]     — mime types to report as supported
- * @param {boolean}  [opts.autoStop]      — if true, calling stop() fires onstop immediately
- */
-function makeMockMediaRecorder({ supported = ['audio/webm'], autoStop = true } = {}) {
-  const instances = [];
-
-  class MockMediaRecorder {
-    constructor(stream, options) {
-      this.stream    = stream;
-      this.options   = options;
-      this.state     = 'inactive';
-      this.mimeType  = options?.mimeType ?? 'audio/webm';
-      this.ondataavailable = null;
-      this.onstop    = null;
-      this.onerror   = null;
-      instances.push(this);
-    }
-
-    start(timeslice) {
-      this.state = 'recording';
-      // Simulate a data chunk arriving
-      Promise.resolve().then(() => {
-        this.ondataavailable?.({ data: { size: 10 } });
-      });
-    }
-
-    stop() {
-      this.state = 'inactive';
-      if (autoStop) {
-        Promise.resolve().then(() => this.onstop?.());
-      }
-    }
-
-    static isTypeSupported(type) {
-      return supported.includes(type);
-    }
-  }
-
-  MockMediaRecorder.instances = instances;
-  return MockMediaRecorder;
-}
 
 // ── isVoiceRecordingSupported ─────────────────────────────────────────────────
 

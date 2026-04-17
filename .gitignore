@@ -4,3 +4,4 @@ node_modules/
 .a5c/
 build_log.txt
 req.txt
+framework/coverage/
