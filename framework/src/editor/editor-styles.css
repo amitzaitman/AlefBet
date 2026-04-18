@@ -26,11 +26,18 @@
   position: relative;
 }
 
-/* ── Editor toolbar (injected into header spacer) ───────────────────────── */
+/* ── Editor toolbar (injected into header spacer) ─────────────────────────
+   ה-spacer בכותרת רחב רק 48-64px, כדי לא להזיז את הכותרת מהמרכז.
+   הסרגל יוצא מהזרימה ועומד על הקצה התחילי של הכותרת. */
 .ab-editor-toolbar {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: clamp(8px, 2dvmin, 16px);
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  z-index: 5;
 }
 
 .ab-editor-btn {

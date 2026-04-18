@@ -1,29 +1,29 @@
 /* ── Nikud Match — Kid-friendly layout ── */
 
-/* Full-height arena: zones on sides, letter in center */
+/* Arena: zones on sides, letter in center. גובה זורם לפי תוכן כדי שלא ייווצרו
+   שטחים ריקים גדולים במצב landscape. */
 .nm-arena {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: center;
   gap: clamp(10px, 2.5dvmin, 20px);
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  min-height: clamp(280px, 55dvh, 460px);
   padding: clamp(10px, 2.5dvmin, 20px);
 }
 
 /* ── Nikud zones — big, tappable, colorful ── */
 .nm-zone {
-  flex: 1;
+  flex: 0 1 clamp(140px, 28dvmin, 240px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(8px, 2dvmin, 16px);
+  gap: clamp(6px, 1.5dvmin, 12px);
   background: var(--zone-color, #4f67ff);
   border-radius: clamp(20px, 5dvmin, 36px);
-  padding: clamp(16px, 4dvmin, 32px);
+  padding: clamp(14px, 3dvmin, 24px);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   -webkit-tap-highlight-color: transparent;
