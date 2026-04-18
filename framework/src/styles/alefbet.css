@@ -517,12 +517,13 @@
   align-items: center;
   justify-content: center;
   /* הניקוד יושב מחוץ לריבוע (למטה לרוב, למעלה ל-cholam).
-     שומרים מקום בזרימה כדי שהסימן לא יחפוף לתווית הבאה אחרי הקופסה. */
-  margin-block-end: clamp(34px, 9dvmin, 56px);
+     שומרים מקום בזרימה כדי שה-SVG לא יחפוף לתווית הבאה אחרי הקופסה.
+     ה-SVG ביחס 2:1 - גובהו חצי מהרוחב שמוגדר ב-.ab-nikud-box__mark. */
+  margin-block-end: clamp(24px, 6dvmin, 38px);
 }
 .ab-nikud-box--holam {
   margin-block-end: 0;
-  margin-block-start: clamp(34px, 9dvmin, 56px);
+  margin-block-start: clamp(24px, 6dvmin, 38px);
 }
 .ab-nikud-box--sm { width: clamp(44px, 11dvmin, 66px); height: clamp(50px, 12dvmin, 74px); }
 .ab-nikud-box--md { width: clamp(58px, 15dvmin, 90px); height: clamp(66px, 17dvmin, 100px); }
@@ -536,16 +537,20 @@
   border-radius: clamp(8px, 2dvmin, 14px);
 }
 
-/* Nikud mark — positioned outside the box.
-   הסימן יושב על תו NBSP בלתי-נראה (ראה createNikudBox) כדי לאפשר רינדור. */
+/* Nikud mark — SVG glyph (see nikud-glyphs.js) positioned outside the box.
+   צבע הסימן נשלט דרך currentColor של אלמנט המעטפת. */
 .ab-nikud-box__mark {
   position: absolute;
-  font-size: clamp(28px, 8dvmin, 48px);
-  font-weight: 900;
-  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
-  line-height: 1;
+  width: clamp(40px, 11dvmin, 64px);
   color: #fff;
   pointer-events: none;
+  line-height: 0;
+}
+.ab-nikud-box__mark svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: currentColor;
 }
 
 /* Below nikud: patach, kamatz, hiriq, segol, tzere, kubbutz */
@@ -561,10 +566,11 @@
   margin-top: 2px;
 }
 
-/* Holam: above-right */
+/* Holam: centered above the box */
 .ab-nikud-box--holam .ab-nikud-box__mark {
   bottom: 100%;
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   margin-bottom: 2px;
 }
 

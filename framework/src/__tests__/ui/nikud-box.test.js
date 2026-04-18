@@ -1,18 +1,20 @@
 /**
  * חוזה createNikudBox
  *
- * הקופסה מציגה ריבוע מקווקו (מסמן את האות) וסימן ניקוד לידו.
- * התו עוגן (NBSP) נדרש כדי שהסימן הצירופי בכלל יראה בדפדפן.
+ * הקופסה מציגה ריבוע מקווקו (מסמן את האות) ולצידה SVG של סימן הניקוד.
+ * עברנו ל-SVG כדי לקבל מראה זהה בכל פלטפורמה ולהפסיק להיתלות בהתנהגות
+ * הסימנים הצירופיים של מנוע הטקסט (היה בעייתי במיוחד ב-iOS Safari).
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createNikudBox } from '../../ui/nikud-box.js';
+import { nikudGlyphSvg, NIKUD_GLYPH_IDS } from '../../ui/nikud-glyphs.js';
 import { nikudList } from '../../data/nikud.js';
 import { mountContainer } from '../helpers.js';
 
 let container;
 beforeEach(() => { container = mountContainer(); });
 
-describe('createNikudBox', () => {
+describe('createNikudBox — wrapper structure', () => {
   it('renders a wrapper with id-specific class', () => {
     const patah = nikudList.find(n => n.id === 'patah');
     container.appendChild(createNikudBox(patah));
@@ -34,16 +36,45 @@ describe('createNikudBox', () => {
     expect(container.querySelector('.ab-nikud-box__box')).toBeTruthy();
     expect(container.querySelector('.ab-nikud-box__mark')).toBeTruthy();
   });
+});
 
-  it('attaches the combining nikud to an invisible NBSP base so it actually renders', () => {
-    // ללא תו בסיס דפדפנים מציגים את הסימן הצירופי כריבוע ריק או כלום.
-    // הבדיקה הזו ננעלה על הפתרון: NBSP (U+00A0) ולאחריו הסימן באותו text node.
+describe('createNikudBox — SVG mark', () => {
+  it('renders an inline svg inside the mark element', () => {
     for (const n of nikudList) {
       const box = createNikudBox(n);
-      const mark = box.querySelector('.ab-nikud-box__mark');
-      expect(mark.textContent.length, `mark text for ${n.id}`).toBe(2);
-      expect(mark.textContent.charCodeAt(0), `anchor char for ${n.id}`).toBe(0x00A0);
-      expect(mark.textContent.charCodeAt(1), `nikud char for ${n.id}`).toBe(n.symbol.charCodeAt(0));
+      const svg = box.querySelector('.ab-nikud-box__mark svg');
+      expect(svg, `svg missing for ${n.id}`).toBeTruthy();
+      expect(svg.getAttribute('viewBox'), `viewBox for ${n.id}`).toBe('0 0 32 16');
+      expect(svg.getAttribute('aria-hidden'), `aria-hidden for ${n.id}`).toBe('true');
+    }
+  });
+
+  it('mark contains no Hebrew nikud characters (rendering is purely SVG)', () => {
+    // ננעלים על האינווריאנט: אסור שייכנס בחזרה תו צירופי של נקוד
+    // לתוך ה-DOM של ה-mark — היה גורם להבדלי רינדור בין דפדפנים.
+    for (const n of nikudList) {
+      const mark = createNikudBox(n).querySelector('.ab-nikud-box__mark');
+      expect(/[\u05B0-\u05C7]/.test(mark.textContent), `${n.id} leaks combining char`).toBe(false);
+    }
+  });
+});
+
+describe('nikudGlyphSvg', () => {
+  it('returns SVG markup for every nikud id in nikudList', () => {
+    for (const n of nikudList) {
+      const svg = nikudGlyphSvg(n.id);
+      expect(svg, `glyph for ${n.id}`).toBeTruthy();
+      expect(svg).toMatch(/^<svg[\s>]/);
+    }
+  });
+
+  it('returns null for unknown ids', () => {
+    expect(nikudGlyphSvg('nonsense')).toBeNull();
+  });
+
+  it('NIKUD_GLYPH_IDS covers the seven canonical nikud', () => {
+    for (const id of ['kamatz', 'patah', 'hiriq', 'tzere', 'segol', 'holam', 'kubbutz']) {
+      expect(NIKUD_GLYPH_IDS, `missing ${id}`).toContain(id);
     }
   });
 });

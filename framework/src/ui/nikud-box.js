@@ -1,12 +1,10 @@
 /**
- * קופסת ניקוד - ריבוע ריק (מסמל אות) עם סימן ניקוד מחוצה לו
- * [נוסף על ידי: nikud-match game]
+ * קופסת ניקוד - ריבוע מקווקו (מסמל אות) עם סימן ניקוד מצויר ב-SVG
+ *
+ * הסימן עצמו מגיע מ-nikud-glyphs.js (SVG ידני) במקום טקסט עברי, כך שהוא נראה
+ * זהה ב-iOS, אנדרואיד ודסקטופ ולא תלוי בהתנהגות הסימנים הצירופיים של הפונט.
  */
-
-// תו עוגן בלתי-נראה (NBSP) שעליו מוצמד סימן הניקוד.
-// בלעדיו דפדפנים מציגים את הסימן הצירופי כריבוע ריק או לא מציגים כלל,
-// במיוחד ב-Safari על iOS שלא משלים DOTTED CIRCLE אוטומטית.
-const NIKUD_ANCHOR = '\u00A0';
+import { nikudGlyphSvg } from './nikud-glyphs.js';
 
 /**
  * צור אלמנט DOM של קופסת ניקוד
@@ -25,9 +23,7 @@ export function createNikudBox(nikud, { size = 'md' } = {}) {
 
   const mark = document.createElement('div');
   mark.className = 'ab-nikud-box__mark';
-  // העוגן והסימן חייבים לשבת באותו text node כדי שהדפדפן יתפוס אותם
-  // כאשכול גרפמי אחד וירנדר את הסימן הצירופי על העוגן.
-  mark.textContent = NIKUD_ANCHOR + nikud.symbol;
+  mark.innerHTML = nikudGlyphSvg(nikud.id) ?? '';
 
   wrapper.appendChild(box);
   wrapper.appendChild(mark);
