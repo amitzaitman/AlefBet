@@ -1,6 +1,6 @@
 /**
- * משחק לימוד ניקוד — גרסה פשוטה לילדים
- * אות עם ניקוד במרכז, שני סמלי ניקוד בצדדים — הקש או גרור לצד הנכון
+ * משחק לימוד ניקוד - גרסה פשוטה לילדים
+ * אות עם ניקוד במרכז, שני סמלי ניקוד בצדדים - הקש על הצד הנכון
  * 8 סיבובים
  */
 import {
@@ -15,16 +15,18 @@ import {
   sounds,
   randomNikud,
   showNikudSettingsDialog,
-  createDragSource,
-  createDropTarget,
   injectHeaderButton,
   createNikudBox,
 } from '../../framework/dist/alefbet.js';
 
+const ROUNDS = 8;
+
+// מסיר את סימני הניקוד ממחרוזת, כדי שהתווית לא תסגיר את התשובה
+const stripNikud = (s) => s.replace(/[\u05B0-\u05C7]/g, '');
+
 const STATIC_TEXTS = [
   'בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד',
   'כָּל הַכָּבוֹד',
-  'נַסֵּה שׁוּב',
   ...nikudList.map(n => n.name),
 ];
 
@@ -45,7 +47,7 @@ export async function startGame(container) {
     title: 'לִמּוּד נִיקּוּד',
     preloadTexts: STATIC_TEXTS,
     loadingMessage: 'טוֹעֵן נִיקּוּד...',
-    totalRounds: 8,
+    totalRounds: ROUNDS,
     editor: {
       type: 'drag-match',
       title: 'לימוד ניקוד',
@@ -53,7 +55,7 @@ export async function startGame(container) {
     },
   });
 
-  const roundNikud = randomNikud(8);
+  const roundNikud = randomNikud(ROUNDS);
 
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
 
@@ -82,29 +84,19 @@ export async function startGame(container) {
     leftZone.appendChild(createNikudBox(leftNikud));
     const leftLabel = document.createElement('div');
     leftLabel.className = 'nm-zone__name';
-    leftLabel.textContent = leftNikud.nameNikud;
+    leftLabel.textContent = stripNikud(leftNikud.name);
     leftZone.appendChild(leftLabel);
     arena.appendChild(leftZone);
 
-    // Center: letter with nikud + hint arrows
+    // Center: letter with target nikud
     const centerArea = document.createElement('div');
     centerArea.className = 'nm-center';
-
-    const hintLeft = document.createElement('div');
-    hintLeft.className = 'nm-hint';
-    hintLeft.textContent = '👈';
 
     const letterEl = document.createElement('div');
     letterEl.className = 'nm-letter';
     letterEl.textContent = letterWithNikud(letter, targetNikud.symbol);
 
-    const hintRight = document.createElement('div');
-    hintRight.className = 'nm-hint';
-    hintRight.textContent = '👉';
-
-    centerArea.appendChild(hintRight);
     centerArea.appendChild(letterEl);
-    centerArea.appendChild(hintLeft);
     arena.appendChild(centerArea);
 
     // Right zone
@@ -114,41 +106,29 @@ export async function startGame(container) {
     rightZone.appendChild(createNikudBox(rightNikud));
     const rightLabel = document.createElement('div');
     rightLabel.className = 'nm-zone__name';
-    rightLabel.textContent = rightNikud.nameNikud;
+    rightLabel.textContent = stripNikud(rightNikud.name);
     rightZone.appendChild(rightLabel);
     arena.appendChild(rightZone);
 
     shell.bodyEl.appendChild(arena);
 
-    // ── Drag support via framework ──
-    const dragSource = createDragSource(letterEl, { letter, targetNikud });
+    // Tap-to-select is the only input — drag affordance removed for clarity.
+    const correctZone = leftNikud.id === targetNikud.id ? leftZone : rightZone;
 
-    createDropTarget(leftZone, ({ data }) => {
-      handleDrop(leftNikud.id === data.targetNikud.id, data.letter, data.targetNikud, letterEl, leftZone);
-    });
-
-    createDropTarget(rightZone, ({ data }) => {
-      handleDrop(rightNikud.id === data.targetNikud.id, data.letter, data.targetNikud, letterEl, rightZone);
-    });
-
-    // Tap-to-select (primary for kids)
     leftZone.addEventListener('click', () => {
-      if (answered) return;
-      handleDrop(leftNikud.id === targetNikud.id, letter, targetNikud, letterEl, leftZone);
+      handleTap(leftNikud.id === targetNikud.id, letter, targetNikud, letterEl, leftZone, correctZone);
     });
 
     rightZone.addEventListener('click', () => {
-      if (answered) return;
-      handleDrop(rightNikud.id === targetNikud.id, letter, targetNikud, letterEl, rightZone);
+      handleTap(rightNikud.id === targetNikud.id, letter, targetNikud, letterEl, rightZone, correctZone);
     });
-
   }
 
-  async function handleDrop(isCorrect, letter, targetNikud, letterEl, zone) {
+  async function handleTap(isCorrect, letter, targetNikud, letterEl, zone, correctZone) {
     if (answered) return;
-    answered = true;
 
     if (isCorrect) {
+      answered = true;
       zone.classList.add('nm-zone--correct');
       letterEl.classList.add('nm-letter--correct');
 
@@ -170,21 +150,26 @@ export async function startGame(container) {
       setTimeout(() => {
         roundIndex++;
         const hasMore = shell.state.nextRound();
-        if (hasMore && roundIndex < 8) {
+        if (hasMore && roundIndex < ROUNDS) {
           buildRoundUI(roundNikud[roundIndex]);
         } else {
-          showCompletionScreen(container, shell.state.score, 8, () => startGame(container));
+          showCompletionScreen(container, shell.state.score, ROUNDS, () => startGame(container));
         }
       }, 1800);
     } else {
-      answered = false;
+      // עידוד חיובי בלבד: פעימה עדינה של האות לאישור הלחיצה,
+      // ולאחריה רמז עדין על האזור הנכון. ללא סימון שלילי או צליל שגוי.
+      animate(letterEl, 'pulse');
+      setTimeout(() => {
+        if (!answered) animate(correctZone, 'pulse');
+      }, 700);
     }
   }
 
   // ── Lifecycle ──
   shell.on('start', () => {
     shell.footerEl.innerHTML = '';
-    progressBar = createProgressBar(shell.footerEl, 8);
+    progressBar = createProgressBar(shell.footerEl, ROUNDS);
     progressBar.update(0);
     roundIndex = 0;
     buildRoundUI(roundNikud[0]);
