@@ -52,14 +52,6 @@
 
 /* Nikud box uses shared ab-nikud-box from framework CSS */
 
-/* Nikud name label */
-.nm-zone__name {
-  font-size: clamp(16px, 4dvmin, 26px);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
-}
-
 /* ── Center: the letter with nikud ── */
 .nm-center {
   display: flex;

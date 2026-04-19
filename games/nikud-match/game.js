@@ -23,9 +23,6 @@ import {
 
 const ROUNDS = 8;
 
-// מסיר את סימני הניקוד ממחרוזת, כדי שהתווית לא תסגיר את התשובה
-const stripNikud = (s) => s.replace(/[\u05B0-\u05C7]/g, '');
-
 const STATIC_TEXTS = [
   'בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד',
   'כָּל הַכָּבוֹד',
@@ -84,10 +81,6 @@ export async function startGame(container) {
     leftZone.className = 'nm-zone nm-zone--left';
     leftZone.style.setProperty('--zone-color', leftNikud.color);
     leftZone.appendChild(createNikudBox(leftNikud));
-    const leftLabel = document.createElement('div');
-    leftLabel.className = 'nm-zone__name';
-    leftLabel.textContent = stripNikud(leftNikud.name);
-    leftZone.appendChild(leftLabel);
     arena.appendChild(leftZone);
 
     // Center: letter with target nikud
@@ -106,10 +99,6 @@ export async function startGame(container) {
     rightZone.className = 'nm-zone nm-zone--right';
     rightZone.style.setProperty('--zone-color', rightNikud.color);
     rightZone.appendChild(createNikudBox(rightNikud));
-    const rightLabel = document.createElement('div');
-    rightLabel.className = 'nm-zone__name';
-    rightLabel.textContent = stripNikud(rightNikud.name);
-    rightZone.appendChild(rightLabel);
     arena.appendChild(rightZone);
 
     shell.bodyEl.appendChild(arena);
