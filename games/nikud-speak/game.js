@@ -13,8 +13,8 @@ import {
   showCompletionScreen,
   animate,
   sounds,
-  createSpeechListener,
-  matchNikudSound,
+  createVowelDetector,
+  matchNikudVowel,
   getNikud,
   randomNikud,
   showNikudSettingsDialog,
@@ -26,14 +26,14 @@ const STATIC_TEXTS = [
   'בְּרוּכִים הַבָּאִים! אֱמוֹר אֶת הַנִּיקּוּד',
   'כָּל הַכָּבוֹד',
   'נַסֵּה שׁוּב! הַקְשֵׁב לַצְּלִיל',
-  'הַמִּשְׂחָק דּוֹרֵשׁ דַּפְדְּפָן Chrome',
+  'הַמִּשְׂחָק דּוֹרֵשׁ גִּישָׁה לַמִּיקְרוֹפוֹן',
   ...nikudList.map(n => n.name),
 ];
 
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  const listener = createSpeechListener();
+  const listener = createVowelDetector();
 
   const { shell, aborted } = await bootstrapGame(container, {
     gameId: 'nikud-speak',
@@ -45,7 +45,7 @@ export async function startGame(container) {
       if (!listener.available) {
         container.innerHTML = `
           <div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.4rem;color:#e53e3e;direction:rtl;text-align:center;padding:2rem;">
-            ${getNikud('הַמִּשְׂחָק דּוֹרֵשׁ דַּפְדְּפָן Chrome')}
+            ${getNikud('הַמִּשְׂחָק דּוֹרֵשׁ גִּישָׁה לַמִּיקְרוֹפוֹן')}
           </div>
         `;
         return false;
@@ -121,11 +121,11 @@ export async function startGame(container) {
     micBtn.disabled = true;
     micBtn.classList.add('mic-btn--recording');
 
-    const result = await listener.listen(4000);
+    const result = await listener.listen(3000);
 
     micBtn.classList.remove('mic-btn--recording');
 
-    const isMatch = matchNikudSound(result.text, nikud.id);
+    const isMatch = matchNikudVowel(result.vowel, nikud.id);
 
     if (isMatch) {
       // Correct!

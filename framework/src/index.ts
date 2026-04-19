@@ -15,7 +15,7 @@ export { bootstrapGame }     from './core/bootstrap.js';
 // ===== Audio =====
 export { tts }    from './audio/tts.js';
 export { sounds } from './audio/sounds.js';
-export { createSpeechListener, matchNikudSound } from './audio/speech-recognition.js';
+export { createVowelDetector, matchNikudVowel, classifyFormants, extractFormantsFromSpectrum, VOWEL_TEMPLATES, NIKUD_VOWEL } from './audio/vowel-detector.js';
 export { createVoiceRecorder, isVoiceRecordingSupported } from './audio/voice-recorder.js';
 export { saveVoice, loadVoice, deleteVoice, listVoiceKeys, playVoice, hasVoice } from './audio/voice-store.js';
 
