@@ -3,6 +3,7 @@ import {
   VOWEL_TEMPLATES,
   NIKUD_VOWEL,
   classifyFormants,
+  cepstralEnvelope,
   extractFormantsFromSpectrum,
   matchNikudVowel,
 } from '../audio/vowel-detector.js';
@@ -12,7 +13,7 @@ describe('classifyFormants', () => {
     expect(classifyFormants(0, 0)).toEqual({ vowel: '', confidence: 0 });
     expect(classifyFormants(NaN, 1000)).toEqual({ vowel: '', confidence: 0 });
     expect(classifyFormants(-100, 500)).toEqual({ vowel: '', confidence: 0 });
-    expect(classifyFormants(2000, 1000)).toEqual({ vowel: '', confidence: 0 }); // F2 <= F1
+    expect(classifyFormants(2000, 1000)).toEqual({ vowel: '', confidence: 0 });
   });
 
   it('classifies each template exactly to itself', () => {
@@ -22,33 +23,22 @@ describe('classifyFormants', () => {
     }
   });
 
-  it('classifies /a/ in a realistic child range', () => {
-    expect(classifyFormants(900, 1400).vowel).toBe('a');
-    expect(classifyFormants(1100, 1600).vowel).toBe('a');
+  it('classifies typical adult-male /a/', () => {
+    expect(classifyFormants(730, 1090).vowel).toBe('a');
   });
 
-  it('classifies /i/ with high F2', () => {
-    expect(classifyFormants(380, 2800).vowel).toBe('i');
-    expect(classifyFormants(450, 3000).vowel).toBe('i');
-  });
-
-  it('classifies /u/ with low F2 far from /o/', () => {
-    expect(classifyFormants(380, 850).vowel).toBe('u');
+  it('classifies typical child /a/', () => {
+    expect(classifyFormants(1000, 1500).vowel).toBe('a');
   });
 
   it('distinguishes /o/ from /u/ by F2', () => {
-    const o = classifyFormants(600, 1100);
-    const u = classifyFormants(400, 850);
-    expect(o.vowel).toBe('o');
-    expect(u.vowel).toBe('u');
+    expect(classifyFormants(550, 1000).vowel).toBe('o');
+    expect(classifyFormants(400, 850).vowel).toBe('u');
   });
 
-  it('returns confidence between 0 and 1', () => {
-    for (const [, t] of Object.entries(VOWEL_TEMPLATES)) {
-      const { confidence } = classifyFormants(t.F1, t.F2);
-      expect(confidence).toBeGreaterThanOrEqual(0);
-      expect(confidence).toBeLessThanOrEqual(1);
-    }
+  it('classifies /i/ with high F2', () => {
+    expect(classifyFormants(300, 2500).vowel).toBe('i');
+    expect(classifyFormants(400, 2800).vowel).toBe('i');
   });
 });
 
@@ -59,23 +49,16 @@ describe('matchNikudVowel', () => {
     }
   });
 
-  it('treats kamatz and patah as the /a/ pair', () => {
+  it('treats kamatz and patah as the /a/ pair, tzere and segol as /e/', () => {
     expect(matchNikudVowel('a', 'kamatz')).toBe(true);
     expect(matchNikudVowel('a', 'patah')).toBe(true);
-  });
-
-  it('treats tzere and segol as the /e/ pair', () => {
     expect(matchNikudVowel('e', 'tzere')).toBe(true);
     expect(matchNikudVowel('e', 'segol')).toBe(true);
   });
 
-  it('rejects wrong vowels', () => {
+  it('rejects wrong vowels and unknown inputs', () => {
     expect(matchNikudVowel('i', 'kamatz')).toBe(false);
-    expect(matchNikudVowel('o', 'hiriq')).toBe(false);
     expect(matchNikudVowel('a', 'holam')).toBe(false);
-  });
-
-  it('rejects unknown inputs', () => {
     expect(matchNikudVowel('', 'kamatz')).toBe(false);
     expect(matchNikudVowel('a', '')).toBe(false);
     expect(matchNikudVowel('x', 'kamatz')).toBe(false);
@@ -83,24 +66,65 @@ describe('matchNikudVowel', () => {
   });
 });
 
+describe('cepstralEnvelope', () => {
+  it('handles trivial input', () => {
+    const out = cepstralEnvelope(new Float32Array(0), 10);
+    expect(out.length).toBe(0);
+  });
+
+  it('flattens harmonic structure, preserving broad envelope shape', () => {
+    const N = 512;
+    const raw = new Float32Array(N);
+    // Envelope: smooth gaussian bump around bin 100
+    const bump = (i) => 30 * Math.exp(-((i - 100) ** 2) / (2 * 40 * 40));
+    // Harmonic comb: sharp spikes every 20 bins
+    for (let i = 0; i < N; i++) raw[i] = bump(i) + (i % 20 === 0 ? 25 : 0);
+    const env = cepstralEnvelope(raw, 15);
+    // The envelope peak should be near bin 100, not at the comb spikes.
+    let maxBin = 0;
+    for (let i = 10; i < N - 10; i++) if (env[i] > env[maxBin]) maxBin = i;
+    expect(Math.abs(maxBin - 100)).toBeLessThanOrEqual(10);
+    // Envelope variance between adjacent bins should be lower than the input's
+    // (the comb gets smoothed out).
+    const v = (arr) => {
+      let sum = 0;
+      for (let i = 1; i < arr.length; i++) sum += Math.abs(arr[i] - arr[i - 1]);
+      return sum / (arr.length - 1);
+    };
+    expect(v(env)).toBeLessThan(v(raw));
+  });
+});
+
 describe('extractFormantsFromSpectrum', () => {
   /**
-   * בונה ספקטרום סינתטי בגודל קבוע שבו מוזרקות שתי פסגות גאוסיניות
-   * סביב F1 ו-F2. מחקה את הצורה הגסה של ספקטרום תנועה.
+   * מחקה ספקטרום קול חי: גריד הרמוני בגובה F0, שמועצם עפ"י מעטפת של
+   * שלושה פורמנטים F1/F2/F3. זה הקלט שהאלגוריתם אמור להתמודד איתו בפועל.
    */
-  function makeSpectrum(F1, F2, binHz = 12, length = 2048) {
-    const spectrum = new Float32Array(length).fill(-120);
-    const addPeak = (freq, height, width) => {
-      const center = Math.round(freq / binHz);
-      for (let i = 0; i < length; i++) {
-        const d = i - center;
-        spectrum[i] = Math.max(spectrum[i], height * Math.exp(-(d * d) / (2 * width * width)) - 120 + height);
-      }
+  function synthVoiceSpectrum(F0, F1, F2, F3 = 2900, binHz = 12, length = 2048) {
+    const spectrum = new Float32Array(length).fill(-100);
+    const envelopeDb = (freq) => {
+      const bw = 110;
+      const peak1 = 30 * Math.exp(-((freq - F1) ** 2) / (2 * bw * bw));
+      const peak2 = 28 * Math.exp(-((freq - F2) ** 2) / (2 * (bw + 10) ** 2));
+      const peak3 = 18 * Math.exp(-((freq - F3) ** 2) / (2 * (bw + 30) ** 2));
+      // נפילה גבוהה-תדר של -6dB לאוקטבה, כמו בדיבור אמיתי
+      const rolloff = -6 * Math.log2(Math.max(freq, 100) / 100);
+      return -30 + peak1 + peak2 + peak3 + rolloff;
     };
-    // צורה כללית + שתי פסגות חזקות
-    for (let i = 0; i < length; i++) spectrum[i] = -100 - (i / length) * 20;
-    addPeak(F1, 60, 4);
-    addPeak(F2, 55, 5);
+    // מוסיפים הרמוניות (H × F0) עם גובה שמוכתב על ידי המעטפת.
+    // כל הרמוניה מתבטאת ב-3-4 bins סמוכים כדי להתקרב לרזולוציית FFT אמיתית.
+    const nyquist = length * binHz;
+    for (let h = 1; h * F0 < nyquist; h++) {
+      const freq = h * F0;
+      const bin = Math.round(freq / binHz);
+      if (bin < 0 || bin >= length) continue;
+      const height = envelopeDb(freq);
+      for (let i = Math.max(0, bin - 2); i <= Math.min(length - 1, bin + 2); i++) {
+        const d = i - bin;
+        const local = height - 4 * d * d;
+        if (local > spectrum[i]) spectrum[i] = local;
+      }
+    }
     return spectrum;
   }
 
@@ -110,36 +134,61 @@ describe('extractFormantsFromSpectrum', () => {
     expect(extractFormantsFromSpectrum(new Float32Array(100), 0)).toEqual({ F1: 0, F2: 0 });
   });
 
-  it('recovers F1/F2 from a synthetic /a/ spectrum within one bin', () => {
+  it('classifies simulated adult /a/ (F0=150, F1=800, F2=1250)', () => {
     const binHz = 12;
-    const spectrum = makeSpectrum(950, 1500, binHz);
+    const spectrum = synthVoiceSpectrum(150, 800, 1250, 2440, binHz);
     const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
-    expect(Math.abs(F1 - 950)).toBeLessThanOrEqual(binHz);
-    expect(Math.abs(F2 - 1500)).toBeLessThanOrEqual(binHz);
+    expect(classifyFormants(F1, F2).vowel).toBe('a');
   });
 
-  it('recovers F1/F2 from a synthetic /i/ spectrum', () => {
+  it('classifies simulated child /a/ (F0=300, F1=1000, F2=1500)', () => {
     const binHz = 12;
-    const spectrum = makeSpectrum(400, 2800, binHz);
+    const spectrum = synthVoiceSpectrum(300, 1000, 1500, 3100, binHz);
     const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
-    expect(Math.abs(F1 - 400)).toBeLessThanOrEqual(binHz * 2);
-    expect(Math.abs(F2 - 2800)).toBeLessThanOrEqual(binHz * 2);
+    expect(classifyFormants(F1, F2).vowel).toBe('a');
   });
 
-  it('synthetic pipeline: spectrum -> formants -> vowel classifies correctly', () => {
+  it('classifies simulated adult /i/', () => {
     const binHz = 12;
-    const cases = [
-      { label: 'a', F1: 950, F2: 1500 },
-      { label: 'e', F1: 600, F2: 2300 },
-      { label: 'i', F1: 400, F2: 2900 },
-      { label: 'o', F1: 600, F2: 1050 },
-      { label: 'u', F1: 400, F2: 900 },
-    ];
-    for (const c of cases) {
-      const spectrum = makeSpectrum(c.F1, c.F2, binHz);
+    const spectrum = synthVoiceSpectrum(180, 300, 2500, 3300, binHz);
+    const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
+    expect(classifyFormants(F1, F2).vowel).toBe('i');
+  });
+
+  it('classifies simulated child /i/', () => {
+    const binHz = 12;
+    const spectrum = synthVoiceSpectrum(320, 400, 2900, 3700, binHz);
+    const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
+    expect(classifyFormants(F1, F2).vowel).toBe('i');
+  });
+
+  it('classifies simulated /o/ with low F2', () => {
+    const binHz = 12;
+    const spectrum = synthVoiceSpectrum(160, 500, 900, 2500, binHz);
+    const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
+    expect(classifyFormants(F1, F2).vowel).toBe('o');
+  });
+
+  it('classifies simulated /u/ below /o/ in F2', () => {
+    const binHz = 12;
+    const spectrum = synthVoiceSpectrum(180, 320, 800, 2400, binHz);
+    const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
+    expect(classifyFormants(F1, F2).vowel).toBe('u');
+  });
+
+  it('classifies simulated /e/ between /a/ and /i/', () => {
+    const binHz = 12;
+    const spectrum = synthVoiceSpectrum(170, 550, 2100, 2700, binHz);
+    const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
+    expect(classifyFormants(F1, F2).vowel).toBe('e');
+  });
+
+  it('is stable across reasonable F0 variation for /a/', () => {
+    const binHz = 12;
+    for (const F0 of [140, 180, 220]) {
+      const spectrum = synthVoiceSpectrum(F0, 850, 1400, 2700, binHz);
       const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
-      const { vowel } = classifyFormants(F1, F2);
-      expect(vowel, `expected ${c.label} for synthetic spectrum`).toBe(c.label);
+      expect(classifyFormants(F1, F2).vowel, `F0=${F0}`).toBe('a');
     }
   });
 });

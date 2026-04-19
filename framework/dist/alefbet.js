@@ -240,7 +240,7 @@ function jc(e) {
     n.push(...t);
   return n.sort(() => Math.random() - 0.5).slice(0, e);
 }
-let ie = [], Ce = !1, Jt = !0, K = 0.9, We = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, qe = !1, _e = null;
+let ie = [], Ce = !1, Jt = !0, K = 0.9, Ve = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, We = !1, _e = null;
 function bt(e, t, n, o = t) {
   console.warn(`[tts] ${e} TTS failed`, { text: t, sentText: o, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
     detail: { provider: e, text: t, sentText: o, reason: n }
@@ -255,9 +255,9 @@ function Un(e) {
 }
 function Hn() {
   var e;
-  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : qe || (e = document.userActivation) != null && e.hasBeenActive ? (qe = !0, Promise.resolve()) : _e || (_e = new Promise((t) => {
+  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : We || (e = document.userActivation) != null && e.hasBeenActive ? (We = !0, Promise.resolve()) : _e || (_e = new Promise((t) => {
     const n = () => {
-      qe = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), t();
+      We = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), t();
     };
     window.addEventListener("pointerdown", n, { once: !0, capture: !0 }), window.addEventListener("keydown", n, { once: !0, capture: !0 }), window.addEventListener("touchstart", n, { once: !0, capture: !0 });
   }).finally(() => {
@@ -270,7 +270,7 @@ function Jn(e, t, n) {
     n((s == null ? void 0 : s.message) || "audio.play() rejected");
   });
 }
-function Vn(e) {
+function qn(e) {
   return new Promise((t, n) => {
     const o = Bn(e).trim() || e;
     let r = !1, i = !1;
@@ -297,16 +297,16 @@ function Vn(e) {
   });
 }
 let Ke = null;
-const Wn = ["carmit", "hila", "female"];
-function qn(e) {
+const Vn = ["carmit", "hila", "female"];
+function Wn(e) {
   const t = (e.name || "").toLowerCase();
-  return Wn.some((n) => t.includes(n));
+  return Vn.some((n) => t.includes(n));
 }
 function Xn() {
   const t = speechSynthesis.getVoices().filter(
     (n) => n.lang === "he-IL" || n.lang === "iw-IL" || n.lang.startsWith("he")
   );
-  return t.length === 0 ? null : t.find(qn) || t[0];
+  return t.length === 0 ? null : t.find(Wn) || t[0];
 }
 function vt() {
   Ke = Xn();
@@ -325,7 +325,7 @@ function Yn(e) {
 async function Gn(e) {
   if (Jt)
     try {
-      await Vn(e);
+      await qn(e);
       return;
     } catch {
       console.info("[tts] Falling back to browser Speech API");
@@ -371,7 +371,7 @@ const Kn = {
    *   rate: מהירות דיבור להדגשה (ברירת מחדל 0.5)
    */
   setNikudEmphasis({ rate: e } = {}) {
-    e != null && (We = Math.max(0.3, Math.min(1.5, e)));
+    e != null && (Ve = Math.max(0.3, Math.min(1.5, e)));
   },
   /**
    * הקרא אות עם ניקוד באיטיות להדגשת התנועה
@@ -380,7 +380,7 @@ const Kn = {
    */
   speakNikud(e, t) {
     const n = e + t, o = K;
-    return K = We, new Promise((r) => {
+    return K = Ve, new Promise((r) => {
       ie.push({ text: n, resolve: r }), Te();
     }).finally(() => {
       K = o;
@@ -395,7 +395,7 @@ const Kn = {
     const t = we.find((o) => o.id === e);
     if (!t || !t.sound) return Promise.resolve();
     const n = K;
-    return K = We, new Promise((o) => {
+    return K = Ve, new Promise((o) => {
       ie.push({ text: t.sound, resolve: o }), Te();
     }).finally(() => {
       K = n;
@@ -485,7 +485,7 @@ function Mc(e, t, {
   }
   return { handleCorrect: c, handleWrong: u, isAnswered: l, reset: d };
 }
-function Vt(e, t) {
+function qt(e, t) {
   const n = [];
   function o() {
     try {
@@ -630,15 +630,15 @@ class ke {
     return new ke({ id: t, meta: o, rounds: n, distractors: r });
   }
 }
-const Wt = "alefbet.editor.";
-function qt(e) {
-  return Vt(`${Wt}${e}`, null);
+const Vt = "alefbet.editor.";
+function Wt(e) {
+  return qt(`${Vt}${e}`, null);
 }
 function ro(e) {
-  qt(e.id).set(e.toJSON());
+  Wt(e.id).set(e.toJSON());
 }
 function io(e) {
-  const t = qt(e).get();
+  const t = Wt(e).get();
   if (!t) return null;
   try {
     return ke.fromJSON(t);
@@ -648,7 +648,7 @@ function io(e) {
 }
 function Dc(e) {
   try {
-    localStorage.removeItem(`${Wt}${e}`);
+    localStorage.removeItem(`${Vt}${e}`);
   } catch {
   }
 }
@@ -1218,7 +1218,7 @@ const ct = (e) => (t, n, o, r) => {
 }, Mo = (e) => (t, n, o) => Be(e)(t, n, o), Do = (e) => async (t, n, o) => {
   const r = o ? Object.assign(o, { direction: "backward" }) : { direction: "backward" };
   return Ue(e)(t, n, r);
-}, Fo = (e) => async (t, n, o) => Ue(e)(t, n, o), Bo = /^[cC][^\s-]{8,}$/, Uo = /^[0-9a-z]+$/, Ho = /^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$/, Jo = /^[0-9a-vA-V]{20}$/, Vo = /^[A-Za-z0-9]{27}$/, Wo = /^[a-zA-Z0-9_-]{21}$/, qo = /^P(?:(\d+W)|(?!.*W)(?=\d|T\d)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+([.,]\d+)?S)?)?)$/, Xo = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/, zt = (e) => e ? new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${e}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`) : /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/, Yo = /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/, Go = "^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$";
+}, Fo = (e) => async (t, n, o) => Ue(e)(t, n, o), Bo = /^[cC][^\s-]{8,}$/, Uo = /^[0-9a-z]+$/, Ho = /^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$/, Jo = /^[0-9a-vA-V]{20}$/, qo = /^[A-Za-z0-9]{27}$/, Vo = /^[a-zA-Z0-9_-]{21}$/, Wo = /^P(?:(\d+W)|(?!.*W)(?=\d|T\d)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+([.,]\d+)?S)?)?)$/, Xo = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/, zt = (e) => e ? new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${e}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`) : /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/, Yo = /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/, Go = "^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$";
 function Ko() {
   return new RegExp(Go, "u");
 }
@@ -1239,7 +1239,7 @@ function ar(e) {
 const cr = (e) => {
   const t = e ? `[\\s\\S]{${(e == null ? void 0 : e.minimum) ?? 0},${(e == null ? void 0 : e.maximum) ?? ""}}` : "[\\s\\S]*";
   return new RegExp(`^${t}$`);
-}, ur = /^-?\d+$/, an = /^-?\d+(?:\.\d+)?$/, lr = /^(?:true|false)$/i, dr = /^[^A-Z]*$/, hr = /^[^a-z]*$/, q = /* @__PURE__ */ h("$ZodCheck", (e, t) => {
+}, ur = /^-?\d+$/, an = /^-?\d+(?:\.\d+)?$/, lr = /^(?:true|false)$/i, dr = /^[^A-Z]*$/, hr = /^[^a-z]*$/, W = /* @__PURE__ */ h("$ZodCheck", (e, t) => {
   var n;
   e._zod ?? (e._zod = {}), e._zod.def = t, (n = e._zod).onattach ?? (n.onattach = []);
 }), cn = {
@@ -1247,7 +1247,7 @@ const cr = (e) => {
   bigint: "bigint",
   object: "date"
 }, un = /* @__PURE__ */ h("$ZodCheckLessThan", (e, t) => {
-  q.init(e, t);
+  W.init(e, t);
   const n = cn[typeof t.value];
   e._zod.onattach.push((o) => {
     const r = o._zod.bag, i = (t.inclusive ? r.maximum : r.exclusiveMaximum) ?? Number.POSITIVE_INFINITY;
@@ -1264,7 +1264,7 @@ const cr = (e) => {
     });
   };
 }), ln = /* @__PURE__ */ h("$ZodCheckGreaterThan", (e, t) => {
-  q.init(e, t);
+  W.init(e, t);
   const n = cn[typeof t.value];
   e._zod.onattach.push((o) => {
     const r = o._zod.bag, i = (t.inclusive ? r.minimum : r.exclusiveMinimum) ?? Number.NEGATIVE_INFINITY;
@@ -1281,7 +1281,7 @@ const cr = (e) => {
     });
   };
 }), fr = /* @__PURE__ */ h("$ZodCheckMultipleOf", (e, t) => {
-  q.init(e, t), e._zod.onattach.push((n) => {
+  W.init(e, t), e._zod.onattach.push((n) => {
     var o;
     (o = n._zod.bag).multipleOf ?? (o.multipleOf = t.value);
   }), e._zod.check = (n) => {
@@ -1298,7 +1298,7 @@ const cr = (e) => {
   };
 }), pr = /* @__PURE__ */ h("$ZodCheckNumberFormat", (e, t) => {
   var s;
-  q.init(e, t), t.format = t.format || "float64";
+  W.init(e, t), t.format = t.format || "float64";
   const n = (s = t.format) == null ? void 0 : s.includes("int"), o = n ? "int" : "number", [r, i] = ko[t.format];
   e._zod.onattach.push((a) => {
     const c = a._zod.bag;
@@ -1360,7 +1360,7 @@ const cr = (e) => {
   };
 }), mr = /* @__PURE__ */ h("$ZodCheckMaxLength", (e, t) => {
   var n;
-  q.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
+  W.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
     const r = o.value;
     return !it(r) && r.length !== void 0;
   }), e._zod.onattach.push((o) => {
@@ -1383,7 +1383,7 @@ const cr = (e) => {
   };
 }), _r = /* @__PURE__ */ h("$ZodCheckMinLength", (e, t) => {
   var n;
-  q.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
+  W.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
     const r = o.value;
     return !it(r) && r.length !== void 0;
   }), e._zod.onattach.push((o) => {
@@ -1406,7 +1406,7 @@ const cr = (e) => {
   };
 }), gr = /* @__PURE__ */ h("$ZodCheckLengthEquals", (e, t) => {
   var n;
-  q.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
+  W.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
     const r = o.value;
     return !it(r) && r.length !== void 0;
   }), e._zod.onattach.push((o) => {
@@ -1429,7 +1429,7 @@ const cr = (e) => {
   };
 }), He = /* @__PURE__ */ h("$ZodCheckStringFormat", (e, t) => {
   var n, o;
-  q.init(e, t), e._zod.onattach.push((r) => {
+  W.init(e, t), e._zod.onattach.push((r) => {
     const i = r._zod.bag;
     i.format = t.format, t.pattern && (i.patterns ?? (i.patterns = /* @__PURE__ */ new Set()), i.patterns.add(t.pattern));
   }), t.pattern ? (n = e._zod).check ?? (n.check = (r) => {
@@ -1461,7 +1461,7 @@ const cr = (e) => {
 }), yr = /* @__PURE__ */ h("$ZodCheckUpperCase", (e, t) => {
   t.pattern ?? (t.pattern = hr), He.init(e, t);
 }), wr = /* @__PURE__ */ h("$ZodCheckIncludes", (e, t) => {
-  q.init(e, t);
+  W.init(e, t);
   const n = Fe(t.includes), o = new RegExp(typeof t.position == "number" ? `^.{${t.position}}${n}` : n);
   t.pattern = o, e._zod.onattach.push((r) => {
     const i = r._zod.bag;
@@ -1478,7 +1478,7 @@ const cr = (e) => {
     });
   };
 }), kr = /* @__PURE__ */ h("$ZodCheckStartsWith", (e, t) => {
-  q.init(e, t);
+  W.init(e, t);
   const n = new RegExp(`^${Fe(t.prefix)}.*`);
   t.pattern ?? (t.pattern = n), e._zod.onattach.push((o) => {
     const r = o._zod.bag;
@@ -1495,7 +1495,7 @@ const cr = (e) => {
     });
   };
 }), Er = /* @__PURE__ */ h("$ZodCheckEndsWith", (e, t) => {
-  q.init(e, t);
+  W.init(e, t);
   const n = new RegExp(`.*${Fe(t.suffix)}$`);
   t.pattern ?? (t.pattern = n), e._zod.onattach.push((o) => {
     const r = o._zod.bag;
@@ -1512,7 +1512,7 @@ const cr = (e) => {
     });
   };
 }), zr = /* @__PURE__ */ h("$ZodCheckOverwrite", (e, t) => {
-  q.init(e, t), e._zod.check = (n) => {
+  W.init(e, t), e._zod.check = (n) => {
     n.value = t.tx(n.value);
   };
 });
@@ -1696,7 +1696,7 @@ const Sr = {
 }), Zr = /* @__PURE__ */ h("$ZodEmoji", (e, t) => {
   t.pattern ?? (t.pattern = Ko()), O.init(e, t);
 }), Ir = /* @__PURE__ */ h("$ZodNanoID", (e, t) => {
-  t.pattern ?? (t.pattern = Wo), O.init(e, t);
+  t.pattern ?? (t.pattern = Vo), O.init(e, t);
 }), Rr = /* @__PURE__ */ h("$ZodCUID", (e, t) => {
   t.pattern ?? (t.pattern = Bo), O.init(e, t);
 }), Ar = /* @__PURE__ */ h("$ZodCUID2", (e, t) => {
@@ -1706,7 +1706,7 @@ const Sr = {
 }), Or = /* @__PURE__ */ h("$ZodXID", (e, t) => {
   t.pattern ?? (t.pattern = Jo), O.init(e, t);
 }), Pr = /* @__PURE__ */ h("$ZodKSUID", (e, t) => {
-  t.pattern ?? (t.pattern = Vo), O.init(e, t);
+  t.pattern ?? (t.pattern = qo), O.init(e, t);
 }), jr = /* @__PURE__ */ h("$ZodISODateTime", (e, t) => {
   t.pattern ?? (t.pattern = ar(t)), O.init(e, t);
 }), Mr = /* @__PURE__ */ h("$ZodISODate", (e, t) => {
@@ -1714,7 +1714,7 @@ const Sr = {
 }), Dr = /* @__PURE__ */ h("$ZodISOTime", (e, t) => {
   t.pattern ?? (t.pattern = sr(t)), O.init(e, t);
 }), Fr = /* @__PURE__ */ h("$ZodISODuration", (e, t) => {
-  t.pattern ?? (t.pattern = qo), O.init(e, t);
+  t.pattern ?? (t.pattern = Wo), O.init(e, t);
 }), Br = /* @__PURE__ */ h("$ZodIPv4", (e, t) => {
   t.pattern ?? (t.pattern = Qo), O.init(e, t), e._zod.bag.format = "ipv4";
 }), Ur = /* @__PURE__ */ h("$ZodIPv6", (e, t) => {
@@ -1770,7 +1770,7 @@ function dn(e) {
     return !1;
   }
 }
-const Vr = /* @__PURE__ */ h("$ZodBase64", (e, t) => {
+const qr = /* @__PURE__ */ h("$ZodBase64", (e, t) => {
   t.pattern ?? (t.pattern = or), O.init(e, t), e._zod.bag.contentEncoding = "base64", e._zod.check = (n) => {
     dn(n.value) || n.issues.push({
       code: "invalid_format",
@@ -1781,15 +1781,15 @@ const Vr = /* @__PURE__ */ h("$ZodBase64", (e, t) => {
     });
   };
 });
-function Wr(e) {
+function Vr(e) {
   if (!on.test(e))
     return !1;
   const t = e.replace(/[-_]/g, (o) => o === "-" ? "+" : "/"), n = t.padEnd(Math.ceil(t.length / 4) * 4, "=");
   return dn(n);
 }
-const qr = /* @__PURE__ */ h("$ZodBase64URL", (e, t) => {
+const Wr = /* @__PURE__ */ h("$ZodBase64URL", (e, t) => {
   t.pattern ?? (t.pattern = on), O.init(e, t), e._zod.bag.contentEncoding = "base64url", e._zod.check = (n) => {
-    Wr(n.value) || n.issues.push({
+    Vr(n.value) || n.issues.push({
       code: "invalid_format",
       format: "base64url",
       input: n.value,
@@ -2353,7 +2353,7 @@ function Zt(e) {
   return e.value = Object.freeze(e.value), e;
 }
 const bi = /* @__PURE__ */ h("$ZodCustom", (e, t) => {
-  q.init(e, t), j.init(e, t), e._zod.parse = (n, o) => n, e._zod.check = (n) => {
+  W.init(e, t), j.init(e, t), e._zod.parse = (n, o) => n, e._zod.check = (n) => {
     const o = n.value, r = t.fn(o);
     if (r instanceof Promise)
       return r.then((i) => It(i, n, o, e));
@@ -2672,7 +2672,7 @@ function Ji(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function Vi(e, t) {
+function qi(e, t) {
   return new e({
     type: "string",
     format: "duration",
@@ -2681,7 +2681,7 @@ function Vi(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function Wi(e, t) {
+function Vi(e, t) {
   return new e({
     type: "number",
     checks: [],
@@ -2689,7 +2689,7 @@ function Wi(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function qi(e, t) {
+function Wi(e, t) {
   return new e({
     type: "number",
     check: "number_format",
@@ -2899,7 +2899,7 @@ function ds(e) {
 }
 // @__NO_SIDE_EFFECTS__
 function hs(e, t) {
-  const n = new q({
+  const n = new W({
     check: "custom",
     ...$(t)
   });
@@ -2951,7 +2951,7 @@ function U(e, t, n = { path: [], schemaPath: [] }) {
     m && (s.ref || (s.ref = m), U(m, t, p), t.seen.get(m).isParent = !0);
   }
   const c = t.metadataRegistry.get(e);
-  return c && Object.assign(s.schema, c), t.io === "input" && V(e) && (delete s.schema.examples, delete s.schema.default), t.io === "input" && s.schema._prefault && ((o = s.schema).default ?? (o.default = s.schema._prefault)), delete s.schema._prefault, t.seen.get(e).schema;
+  return c && Object.assign(s.schema, c), t.io === "input" && q(e) && (delete s.schema.examples, delete s.schema.default), t.io === "input" && s.schema._prefault && ((o = s.schema).default ?? (o.default = s.schema._prefault)), delete s.schema._prefault, t.seen.get(e).schema;
 }
 function vn(e, t) {
   var s, a, c, u;
@@ -3094,7 +3094,7 @@ function yn(e, t) {
     throw new Error("Error converting schema to JSON.");
   }
 }
-function V(e, t) {
+function q(e, t) {
   const n = t ?? { seen: /* @__PURE__ */ new Set() };
   if (n.seen.has(e))
     return !1;
@@ -3103,36 +3103,36 @@ function V(e, t) {
   if (o.type === "transform")
     return !0;
   if (o.type === "array")
-    return V(o.element, n);
+    return q(o.element, n);
   if (o.type === "set")
-    return V(o.valueType, n);
+    return q(o.valueType, n);
   if (o.type === "lazy")
-    return V(o.getter(), n);
+    return q(o.getter(), n);
   if (o.type === "promise" || o.type === "optional" || o.type === "nonoptional" || o.type === "nullable" || o.type === "readonly" || o.type === "default" || o.type === "prefault")
-    return V(o.innerType, n);
+    return q(o.innerType, n);
   if (o.type === "intersection")
-    return V(o.left, n) || V(o.right, n);
+    return q(o.left, n) || q(o.right, n);
   if (o.type === "record" || o.type === "map")
-    return V(o.keyType, n) || V(o.valueType, n);
+    return q(o.keyType, n) || q(o.valueType, n);
   if (o.type === "pipe")
-    return V(o.in, n) || V(o.out, n);
+    return q(o.in, n) || q(o.out, n);
   if (o.type === "object") {
     for (const r in o.shape)
-      if (V(o.shape[r], n))
+      if (q(o.shape[r], n))
         return !0;
     return !1;
   }
   if (o.type === "union") {
     for (const r of o.options)
-      if (V(r, n))
+      if (q(r, n))
         return !0;
     return !1;
   }
   if (o.type === "tuple") {
     for (const r of o.items)
-      if (V(r, n))
+      if (q(r, n))
         return !0;
-    return !!(o.rest && V(o.rest, n));
+    return !!(o.rest && q(o.rest, n));
   }
   return !1;
 }
@@ -3310,7 +3310,7 @@ const Fs = /* @__PURE__ */ h("ZodISODuration", (e, t) => {
   Fr.init(e, t), P.init(e, t);
 });
 function Bs(e) {
-  return /* @__PURE__ */ Vi(Fs, e);
+  return /* @__PURE__ */ qi(Fs, e);
 }
 const Us = (e, t) => {
   tn.init(e, t), e.name = "ZodError", Object.defineProperties(e, {
@@ -3343,7 +3343,7 @@ const Us = (e, t) => {
   });
 }, X = h("ZodError", Us, {
   Parent: Error
-}), Hs = /* @__PURE__ */ ct(X), Js = /* @__PURE__ */ ut(X), Vs = /* @__PURE__ */ Be(X), Ws = /* @__PURE__ */ Ue(X), qs = /* @__PURE__ */ Ao(X), Xs = /* @__PURE__ */ Lo(X), Ys = /* @__PURE__ */ Oo(X), Gs = /* @__PURE__ */ Po(X), Ks = /* @__PURE__ */ jo(X), Qs = /* @__PURE__ */ Mo(X), ea = /* @__PURE__ */ Do(X), ta = /* @__PURE__ */ Fo(X), M = /* @__PURE__ */ h("ZodType", (e, t) => (j.init(e, t), Object.assign(e["~standard"], {
+}), Hs = /* @__PURE__ */ ct(X), Js = /* @__PURE__ */ ut(X), qs = /* @__PURE__ */ Be(X), Vs = /* @__PURE__ */ Ue(X), Ws = /* @__PURE__ */ Ao(X), Xs = /* @__PURE__ */ Lo(X), Ys = /* @__PURE__ */ Oo(X), Gs = /* @__PURE__ */ Po(X), Ks = /* @__PURE__ */ jo(X), Qs = /* @__PURE__ */ Mo(X), ea = /* @__PURE__ */ Do(X), ta = /* @__PURE__ */ Fo(X), M = /* @__PURE__ */ h("ZodType", (e, t) => (j.init(e, t), Object.assign(e["~standard"], {
   jsonSchema: {
     input: je(e, "input"),
     output: je(e, "output")
@@ -3355,7 +3355,7 @@ const Us = (e, t) => {
   ]
 }), {
   parent: !0
-}), e.with = e.check, e.clone = (n, o) => re(e, n, o), e.brand = () => e, e.register = (n, o) => (n.add(e, o), e), e.parse = (n, o) => Hs(e, n, o, { callee: e.parse }), e.safeParse = (n, o) => Vs(e, n, o), e.parseAsync = async (n, o) => Js(e, n, o, { callee: e.parseAsync }), e.safeParseAsync = async (n, o) => Ws(e, n, o), e.spa = e.safeParseAsync, e.encode = (n, o) => qs(e, n, o), e.decode = (n, o) => Xs(e, n, o), e.encodeAsync = async (n, o) => Ys(e, n, o), e.decodeAsync = async (n, o) => Gs(e, n, o), e.safeEncode = (n, o) => Ks(e, n, o), e.safeDecode = (n, o) => Qs(e, n, o), e.safeEncodeAsync = async (n, o) => ea(e, n, o), e.safeDecodeAsync = async (n, o) => ta(e, n, o), e.refine = (n, o) => e.check(Wa(n, o)), e.superRefine = (n) => e.check(qa(n)), e.overwrite = (n) => e.check(/* @__PURE__ */ pe(n)), e.optional = () => Dt(e), e.exactOptional = () => La(e), e.nullable = () => Ft(e), e.nullish = () => Dt(Ft(e)), e.nonoptional = (n) => Da(e, n), e.array = () => ze(e), e.or = (n) => xa([e, n]), e.and = (n) => Ca(e, n), e.transform = (n) => Bt(e, Ra(n)), e.default = (n) => Pa(e, n), e.prefault = (n) => Ma(e, n), e.catch = (n) => Ba(e, n), e.pipe = (n) => Bt(e, n), e.readonly = () => Ja(e), e.describe = (n) => {
+}), e.with = e.check, e.clone = (n, o) => re(e, n, o), e.brand = () => e, e.register = (n, o) => (n.add(e, o), e), e.parse = (n, o) => Hs(e, n, o, { callee: e.parse }), e.safeParse = (n, o) => qs(e, n, o), e.parseAsync = async (n, o) => Js(e, n, o, { callee: e.parseAsync }), e.safeParseAsync = async (n, o) => Vs(e, n, o), e.spa = e.safeParseAsync, e.encode = (n, o) => Ws(e, n, o), e.decode = (n, o) => Xs(e, n, o), e.encodeAsync = async (n, o) => Ys(e, n, o), e.decodeAsync = async (n, o) => Gs(e, n, o), e.safeEncode = (n, o) => Ks(e, n, o), e.safeDecode = (n, o) => Qs(e, n, o), e.safeEncodeAsync = async (n, o) => ea(e, n, o), e.safeDecodeAsync = async (n, o) => ta(e, n, o), e.refine = (n, o) => e.check(Va(n, o)), e.superRefine = (n) => e.check(Wa(n)), e.overwrite = (n) => e.check(/* @__PURE__ */ pe(n)), e.optional = () => Dt(e), e.exactOptional = () => La(e), e.nullable = () => Ft(e), e.nullish = () => Dt(Ft(e)), e.nonoptional = (n) => Da(e, n), e.array = () => ze(e), e.or = (n) => xa([e, n]), e.and = (n) => Ca(e, n), e.transform = (n) => Bt(e, Ra(n)), e.default = (n) => Pa(e, n), e.prefault = (n) => Ma(e, n), e.catch = (n) => Ba(e, n), e.pipe = (n) => Bt(e, n), e.readonly = () => Ja(e), e.describe = (n) => {
   const o = e.clone();
   return ve.add(o, { description: n }), o;
 }, Object.defineProperty(e, "description", {
@@ -3376,7 +3376,7 @@ const Us = (e, t) => {
 }), En = /* @__PURE__ */ h("ZodString", (e, t) => {
   lt.init(e, t), kn.init(e, t), e.email = (n) => e.check(/* @__PURE__ */ ki(na, n)), e.url = (n) => e.check(/* @__PURE__ */ xi(oa, n)), e.jwt = (n) => e.check(/* @__PURE__ */ Bi(ba, n)), e.emoji = (n) => e.check(/* @__PURE__ */ Ni(ra, n)), e.guid = (n) => e.check(/* @__PURE__ */ At(jt, n)), e.uuid = (n) => e.check(/* @__PURE__ */ Ei(Ne, n)), e.uuidv4 = (n) => e.check(/* @__PURE__ */ zi(Ne, n)), e.uuidv6 = (n) => e.check(/* @__PURE__ */ $i(Ne, n)), e.uuidv7 = (n) => e.check(/* @__PURE__ */ Si(Ne, n)), e.nanoid = (n) => e.check(/* @__PURE__ */ Ci(ia, n)), e.guid = (n) => e.check(/* @__PURE__ */ At(jt, n)), e.cuid = (n) => e.check(/* @__PURE__ */ Ti(sa, n)), e.cuid2 = (n) => e.check(/* @__PURE__ */ Zi(aa, n)), e.ulid = (n) => e.check(/* @__PURE__ */ Ii(ca, n)), e.base64 = (n) => e.check(/* @__PURE__ */ Mi(ma, n)), e.base64url = (n) => e.check(/* @__PURE__ */ Di(_a, n)), e.xid = (n) => e.check(/* @__PURE__ */ Ri(ua, n)), e.ksuid = (n) => e.check(/* @__PURE__ */ Ai(la, n)), e.ipv4 = (n) => e.check(/* @__PURE__ */ Li(da, n)), e.ipv6 = (n) => e.check(/* @__PURE__ */ Oi(ha, n)), e.cidrv4 = (n) => e.check(/* @__PURE__ */ Pi(fa, n)), e.cidrv6 = (n) => e.check(/* @__PURE__ */ ji(pa, n)), e.e164 = (n) => e.check(/* @__PURE__ */ Fi(ga, n)), e.datetime = (n) => e.check(Os(n)), e.date = (n) => e.check(js(n)), e.time = (n) => e.check(Ds(n)), e.duration = (n) => e.check(Bs(n));
 });
-function W(e) {
+function V(e) {
   return /* @__PURE__ */ wi(En, e);
 }
 const P = /* @__PURE__ */ h("ZodStringFormat", (e, t) => {
@@ -3412,9 +3412,9 @@ const P = /* @__PURE__ */ h("ZodStringFormat", (e, t) => {
 }), pa = /* @__PURE__ */ h("ZodCIDRv6", (e, t) => {
   Jr.init(e, t), P.init(e, t);
 }), ma = /* @__PURE__ */ h("ZodBase64", (e, t) => {
-  Vr.init(e, t), P.init(e, t);
-}), _a = /* @__PURE__ */ h("ZodBase64URL", (e, t) => {
   qr.init(e, t), P.init(e, t);
+}), _a = /* @__PURE__ */ h("ZodBase64URL", (e, t) => {
+  Wr.init(e, t), P.init(e, t);
 }), ga = /* @__PURE__ */ h("ZodE164", (e, t) => {
   Xr.init(e, t), P.init(e, t);
 }), ba = /* @__PURE__ */ h("ZodJWT", (e, t) => {
@@ -3425,13 +3425,13 @@ const P = /* @__PURE__ */ h("ZodStringFormat", (e, t) => {
   e.minValue = Math.max(n.minimum ?? Number.NEGATIVE_INFINITY, n.exclusiveMinimum ?? Number.NEGATIVE_INFINITY) ?? null, e.maxValue = Math.min(n.maximum ?? Number.POSITIVE_INFINITY, n.exclusiveMaximum ?? Number.POSITIVE_INFINITY) ?? null, e.isInt = (n.format ?? "").includes("int") || Number.isSafeInteger(n.multipleOf ?? 0.5), e.isFinite = !0, e.format = n.format ?? null;
 });
 function se(e) {
-  return /* @__PURE__ */ Wi(dt, e);
+  return /* @__PURE__ */ Vi(dt, e);
 }
 const va = /* @__PURE__ */ h("ZodNumberFormat", (e, t) => {
   Kr.init(e, t), dt.init(e, t);
 });
 function Mt(e) {
-  return /* @__PURE__ */ qi(va, e);
+  return /* @__PURE__ */ Wi(va, e);
 }
 const zn = /* @__PURE__ */ h("ZodBoolean", (e, t) => {
   Qr.init(e, t), M.init(e, t), e._zod.processJSONSchema = (n, o, r) => gs(e, n, o);
@@ -3651,13 +3651,13 @@ function Ja(e) {
     innerType: e
   });
 }
-const Va = /* @__PURE__ */ h("ZodCustom", (e, t) => {
+const qa = /* @__PURE__ */ h("ZodCustom", (e, t) => {
   bi.init(e, t), M.init(e, t), e._zod.processJSONSchema = (n, o, r) => ws(e, n);
 });
-function Wa(e, t = {}) {
-  return /* @__PURE__ */ ls(Va, e, t);
+function Va(e, t = {}) {
+  return /* @__PURE__ */ ls(qa, e, t);
 }
-function qa(e) {
+function Wa(e) {
   return /* @__PURE__ */ ds(e);
 }
 const Xa = /* @__PURE__ */ new Set(["id", "image"]);
@@ -3706,7 +3706,7 @@ const Ga = $e({
   x: se().min(0).max(100),
   y: se().min(0).max(100)
 }), Ka = $e({
-  id: W(),
+  id: V(),
   shape: $n(["rect", "polygon"]).default("rect"),
   x: se().min(0).max(100),
   y: se().min(0).max(100),
@@ -3714,30 +3714,30 @@ const Ga = $e({
   height: se().min(0).max(100),
   points: ze(Ga).optional(),
   correct: ya().default(!1),
-  label: W().optional()
+  label: V().optional()
 }), ft = $e({
-  id: W(),
-  image: W().optional(),
+  id: V(),
+  image: V().optional(),
   zones: ze(Ka).optional()
 }).passthrough(), Qa = ft.extend({
-  target: W().max(2).describe("אות יעד"),
-  correct: W().describe("תשובה נכונה"),
-  correctEmoji: W().describe("אמוג'י")
+  target: V().max(2).describe("אות יעד"),
+  correct: V().describe("תשובה נכונה"),
+  correctEmoji: V().describe("אמוג'י")
 }), ec = ft.extend({
-  target: W().max(2).describe("אות יעד"),
-  correct: W().describe("תשובה נכונה"),
-  correctEmoji: W().describe("אמוג'י")
+  target: V().max(2).describe("אות יעד"),
+  correct: V().describe("תשובה נכונה"),
+  correctEmoji: V().describe("אמוג'י")
 }), tc = $e({
-  title: W().default(""),
-  type: W().default("multiple-choice")
+  title: V().default(""),
+  type: V().default("multiple-choice")
 }).passthrough(), Fc = $e({
-  id: W(),
+  id: V(),
   version: se().default(1),
   meta: tc.default({ title: "", type: "multiple-choice" }),
-  rounds: ze(Za(W(), Me())).default([]),
+  rounds: ze(Za(V(), Me())).default([]),
   distractors: ze(Me()).default([])
 }), nc = ft.extend({
-  instruction: W().optional().describe("הוראה")
+  instruction: V().optional().describe("הוראה")
 }), Ut = {
   "multiple-choice": Qa,
   "drag-match": ec,
@@ -4062,7 +4062,7 @@ function hc(e) {
   return e.trim().replace(/\s+/g, "-").replace(/[^a-z0-9\u05D0-\u05EA_-]/gi, "").toLowerCase() || `custom-${Date.now()}`;
 }
 function fc(e) {
-  return Vt(`alefbet.audio-manager.${e}.custom`, []);
+  return qt(`alefbet.audio-manager.${e}.custom`, []);
 }
 function pc(e, t = null) {
   var u;
@@ -4263,8 +4263,8 @@ function yc(e, t, { onChange: n, gameId: o }) {
         }), F.appendChild(B), I.appendChild(F), o) {
           const Y = document.createElement("div");
           Y.className = "ab-ze-panel__row";
-          const Ve = document.createElement("span");
-          Ve.className = "ab-ze-panel__audio-label", Ve.textContent = "🎤", Y.appendChild(Ve);
+          const qe = document.createElement("span");
+          qe.className = "ab-ze-panel__audio-label", qe.textContent = "🎤", Y.appendChild(qe);
           const Zn = Nn(Y, {
             gameId: o,
             voiceKey: `zone-${f.id}`,
@@ -4768,11 +4768,11 @@ async function Hc(e, t) {
   return { shell: r, activeRounds: o, gameData: i, aborted: !1 };
 }
 const xc = {
-  a: { F1: 950, F2: 1500 },
-  e: { F1: 600, F2: 2300 },
-  i: { F1: 400, F2: 2900 },
-  o: { F1: 600, F2: 1050 },
-  u: { F1: 400, F2: 900 }
+  a: { F1: 850, F2: 1400 },
+  e: { F1: 550, F2: 2100 },
+  i: { F1: 350, F2: 2700 },
+  o: { F1: 550, F2: 1e3 },
+  u: { F1: 350, F2: 850 }
 }, Nc = {
   kamatz: "a",
   patah: "a",
@@ -4798,38 +4798,39 @@ function Jc(e, t) {
   return !e || !t ? !1 : Nc[t] === e;
 }
 function Tc(e, t) {
-  const n = e.length, o = new Float32Array(n);
-  for (let r = 0; r < n; r++) {
-    let i = 0, s = 0;
-    const a = Math.max(0, r - t), c = Math.min(n - 1, r + t);
-    for (let u = a; u <= c; u++)
-      i += e[u], s++;
-    o[r] = i / s;
+  const n = e.length, o = Math.max(1, Math.min(t, n)), r = new Float32Array(o);
+  for (let a = 0; a < o; a++) {
+    let c = 0;
+    const u = Math.PI * a / n;
+    for (let l = 0; l < n; l++)
+      c += e[l] * Math.cos(u * (l + 0.5));
+    r[a] = c;
   }
-  return o;
+  const i = new Float32Array(n), s = 2 / n;
+  for (let a = 0; a < n; a++) {
+    let c = r[0] * 0.5;
+    for (let u = 1; u < o; u++)
+      c += r[u] * Math.cos(Math.PI * u * (a + 0.5) / n);
+    i[a] = s * c;
+  }
+  return i;
 }
 function Zc(e, t) {
   if (!e || e.length === 0 || !Number.isFinite(t) || t <= 0)
     return { F1: 0, F2: 0 };
-  const n = Tc(e, 3), o = Math.max(2, Math.floor(200 / t)), r = Math.min(n.length - 3, Math.floor(3500 / t)), i = [];
-  for (let l = o; l <= r; l++) {
-    const d = n[l];
-    d > n[l - 1] && d > n[l - 2] && d > n[l + 1] && d > n[l + 2] && i.push({ bin: l, mag: d });
+  const n = Tc(e, 80), o = Math.min(n.length - 3, Math.floor(3500 / t)), r = [];
+  for (let u = 3; u <= o; u++) {
+    const l = n[u];
+    l > n[u - 1] && l > n[u - 2] && l > n[u + 1] && l > n[u + 2] && r.push({ freq: u * t, mag: l });
   }
+  if (r.length === 0) return { F1: 0, F2: 0 };
+  const i = r.filter((u) => u.freq >= 200 && u.freq <= 1100);
   if (i.length === 0) return { F1: 0, F2: 0 };
-  i.sort((l, d) => d.mag - l.mag);
-  const s = i.slice(0, 4).sort((l, d) => l.bin - d.bin);
-  if (s.length < 2) return { F1: s[0].bin * t, F2: 0 };
-  const a = s[0].bin * t, c = 200 / t;
-  let u = s[1];
-  for (const l of s.slice(1))
-    if (l.bin - s[0].bin >= c) {
-      u = l;
-      break;
-    }
-  return { F1: a, F2: u.bin * t };
+  i.sort((u, l) => l.mag - u.mag);
+  const s = i[0].freq, a = Math.max(s + 250, 700), c = r.filter((u) => u.freq >= a && u.freq <= 3500);
+  return c.length === 0 ? { F1: s, F2: 0 } : (c.sort((u, l) => l.mag - u.mag), { F1: s, F2: c[0].freq });
 }
-function Vc() {
+function qc() {
   var u;
   const e = typeof window < "u", t = e && !!((u = navigator == null ? void 0 : navigator.mediaDevices) != null && u.getUserMedia), n = e ? window.AudioContext || window.webkitAudioContext : null, o = t && !!n;
   let r = null, i = null, s = !1;
@@ -4928,13 +4929,13 @@ const Ie = [
   { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
   { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
 ];
-function Wc(e) {
+function Vc(e) {
   return Ie.find((t) => t.letter === e) || null;
 }
 function Ic(e = "regular") {
   return e === "regular" ? Ie.filter((t) => !t.isFinal) : e === "final" ? Ie.filter((t) => t.isFinal) : Ie;
 }
-function qc(e, t = "regular") {
+function Wc(e, t = "regular") {
   const n = Ic(t);
   return [...n].sort(() => Math.random() - 0.5).slice(0, Math.min(e, n.length));
 }
@@ -5359,14 +5360,14 @@ export {
   po as createDragSource,
   mo as createDropTarget,
   Gc as createFeedback,
-  Vt as createLocalState,
+  qt as createLocalState,
   ou as createNikudBox,
   Xc as createOptionCards,
   Yc as createProgressBar,
   Mc as createRoundManager,
   Nn as createVoiceRecordButton,
   sc as createVoiceRecorder,
-  Vc as createVowelDetector,
+  qc as createVowelDetector,
   Qc as createZone,
   yc as createZoneEditor,
   eu as createZonePlayer,
@@ -5374,7 +5375,7 @@ export {
   so as exportGameDataAsJSON,
   Zc as extractFormantsFromSpectrum,
   zc as generateZonesFromTemplate,
-  Wc as getLetter,
+  Vc as getLetter,
   Ic as getLettersByGroup,
   Dn as getNikud,
   Uc as hasVoice,
@@ -5392,7 +5393,7 @@ export {
   we as nikudList,
   ye as playVoice,
   Fn as preloadNikud,
-  qc as randomLetters,
+  Wc as randomLetters,
   jc as randomNikud,
   ro as saveGameData,
   uc as saveVoice,

@@ -6,24 +6,32 @@
  * (F1 - גובה הלשון, F2 - קדמיות/אחוריות). מחלצים אותם מהספקטרום,
  * משווים במישור לוג-תדרי לתבניות ידועות, ומחזירים את התנועה הקרובה ביותר.
  *
+ * חילוץ הפורמנטים משתמש ב-Cepstral Liftering: DCT של הספקטרום בלוג,
+ * חיתוך המקדמים הגבוהים (שמייצגים את הגריד ההרמוני של הטון F0),
+ * ו-IDCT שמחזירה מעטפת חלקה שהפסגות שלה הן פורמנטים אמיתיים -
+ * לא ההרמוניות של הקול. זו הגישה הסטנדרטית; חיפוש פסגות ישיר על
+ * ה-FFT היה מחזיר כפולות של F0 במקום פורמנטים, ולכן נכשל על קול חי.
+ *
  * API ציבורי:
  *   createVowelDetector() - יוצר listener שמקליט לכמה שניות ומחזיר תנועה.
  *   matchNikudVowel(vowel, nikudId) - בודק אם התנועה תואמת לניקוד.
  *   classifyFormants(F1, F2) - סיווג טהור (ללא אודיו) - חשוף לשם בדיקות.
- *   extractFormantsFromSpectrum(spectrum, binHz) - חילוץ פסגות מספקטרום - גם לטסטים.
+ *   extractFormantsFromSpectrum(spectrum, binHz) - חילוץ פסגות מספקטרום.
+ *   cepstralEnvelope(logSpectrum, cutoff) - מעטפת ספקטרלית בלבד, לבדיקות.
  */
 
 /**
- * תבניות פורמנטים לתנועות עבריות. הערכים הם ממוצעים גסים עבור ילדים בגיל 3-8,
- * שבהם מסלול הקול קצר והפורמנטים גבוהים ב-20-30% מהמבוגרים.
+ * תבניות פורמנטים לתנועות עבריות. מחושבות כממוצע בין ערכי מבוגר לילד
+ * (F1/F2 של ילד גבוהים ב-20-30% מאלו של מבוגר) כדי לעבוד על טווח רחב.
+ * הסיווג עובד במרחק לוג-תדרי ולכן גמיש מול הפרשי פיץ' מתונים.
  * @type {Record<'a'|'e'|'i'|'o'|'u', {F1: number, F2: number}>}
  */
 export const VOWEL_TEMPLATES = {
-  a: { F1: 950, F2: 1500 },
-  e: { F1: 600, F2: 2300 },
-  i: { F1: 400, F2: 2900 },
-  o: { F1: 600, F2: 1050 },
-  u: { F1: 400, F2: 900 },
+  a: { F1: 850, F2: 1400 },
+  e: { F1: 550, F2: 2100 },
+  i: { F1: 350, F2: 2700 },
+  o: { F1: 550, F2: 1000 },
+  u: { F1: 350, F2: 850 },
 };
 
 /**
@@ -46,7 +54,6 @@ export const NIKUD_VOWEL = {
  * @param {number} F1 - הפורמנט הראשון ב-Hz
  * @param {number} F2 - הפורמנט השני ב-Hz
  * @returns {{vowel: string, confidence: number}}
- *   vowel ריק אם הקלט לא תקין. confidence הוא 1 - (dBest / dSecond), בין 0 ל-1.
  */
 export function classifyFormants(F1, F2) {
   if (!Number.isFinite(F1) || !Number.isFinite(F2) || F1 <= 0 || F2 <= 0 || F2 <= F1) {
@@ -79,61 +86,77 @@ export function matchNikudVowel(vowel, nikudId) {
 }
 
 /**
- * ממוצע נע על ספקטרום כדי להחליק רעש לפני חיפוש פסגות.
- * @param {ArrayLike<number>} spectrum
- * @param {number} window - חצי-חלון משני הצדדים (סה"כ 2*window+1 נקודות)
+ * מעטפת ספקטרלית על ידי DCT + liftering + IDCT. החיתוך במקדם cutoff מסנן
+ * את הגריד ההרמוני (רעש מהיר בתדרים גבוהים של ה-cepstrum) ומשאיר את
+ * המעטפת ההדרגתית שמייצגת את מסלול הקול.
+ *
+ * @param {ArrayLike<number>} logSpectrum - ספקטרום בלוג (dB יעבוד)
+ * @param {number} cutoff - כמה מקדמי cepstrum לשמור (15-40 טיפוסי)
  * @returns {Float32Array}
  */
-function smoothSpectrum(spectrum, window) {
-  const n = spectrum.length;
-  const out = new Float32Array(n);
-  for (let i = 0; i < n; i++) {
+export function cepstralEnvelope(logSpectrum, cutoff) {
+  const N = logSpectrum.length;
+  const L = Math.max(1, Math.min(cutoff, N));
+  const cepstrum = new Float32Array(L);
+  // DCT-II, מחושב רק עבור L המקדמים הראשונים שאותם נשמור.
+  for (let k = 0; k < L; k++) {
     let sum = 0;
-    let count = 0;
-    const from = Math.max(0, i - window);
-    const to = Math.min(n - 1, i + window);
-    for (let j = from; j <= to; j++) { sum += spectrum[j]; count++; }
-    out[i] = sum / count;
+    const factor = Math.PI * k / N;
+    for (let n = 0; n < N; n++) {
+      sum += logSpectrum[n] * Math.cos(factor * (n + 0.5));
+    }
+    cepstrum[k] = sum;
+  }
+  // IDCT מוגבל ל-L המקדמים בלבד - זה שקול לאיפוס כל המקדמים מעל L
+  // לפני ההיפוך, כלומר ל-low-pass lifter.
+  const out = new Float32Array(N);
+  const scale = 2 / N;
+  for (let n = 0; n < N; n++) {
+    let sum = cepstrum[0] * 0.5;
+    for (let k = 1; k < L; k++) {
+      sum += cepstrum[k] * Math.cos(Math.PI * k * (n + 0.5) / N);
+    }
+    out[n] = scale * sum;
   }
   return out;
 }
 
 /**
- * מחלץ את שני הפורמנטים המובילים מספקטרום תדר.
- * אסטרטגיה: החלקה קלה, חיפוש מקסימה מקומיים ברצועה 200-3500Hz,
- * בחירת ארבע הפסגות החזקות ביותר, ואז שתי התדירויות הנמוכות מביניהן
- * כ-F1 ו-F2. דרישה: F2 - F1 >= 200Hz כדי לא לקחת פסגה כפולה.
+ * מחלץ את שני הפורמנטים המובילים מספקטרום תדר דרך מעטפת cepstral.
+ * הבחירה לפי חוזק הפסגה בטווחי תדר פונטיים סטנדרטיים:
+ * F1 ב-200-1100Hz (טווח רחב לכלול ילדים עם /a/ גבוה),
+ * F2 ב-max(F1+250, 700) עד 3500Hz. בחירה לפי חוזק כדי לא להיתפס
+ * לגבשושיות משניות כגון הדלף בתדרים נמוכים.
  *
- * @param {ArrayLike<number>} spectrum - ערכי ספקטרום ב-dB (או יחידה עקבית אחרת)
+ * @param {ArrayLike<number>} spectrum - ערכי ספקטרום בלוג (ב-dB או דומה)
  * @param {number} binHz - כמה הרץ מיצג כל bin
- * @returns {{F1: number, F2: number}} - מחזיר אפס אם לא נמצאו פסגות מספקות
+ * @returns {{F1: number, F2: number}}
  */
 export function extractFormantsFromSpectrum(spectrum, binHz) {
   if (!spectrum || spectrum.length === 0 || !Number.isFinite(binHz) || binHz <= 0) {
     return { F1: 0, F2: 0 };
   }
-  const smooth = smoothSpectrum(spectrum, 3);
-  const minBin = Math.max(2, Math.floor(200 / binHz));
-  const maxBin = Math.min(smooth.length - 3, Math.floor(3500 / binHz));
+  const envelope = cepstralEnvelope(spectrum, 80);
+  const maxSearchBin = Math.min(envelope.length - 3, Math.floor(3500 / binHz));
   const peaks = [];
-  for (let i = minBin; i <= maxBin; i++) {
-    const v = smooth[i];
-    if (v > smooth[i - 1] && v > smooth[i - 2] && v > smooth[i + 1] && v > smooth[i + 2]) {
-      peaks.push({ bin: i, mag: v });
+  for (let i = 3; i <= maxSearchBin; i++) {
+    const v = envelope[i];
+    if (v > envelope[i - 1] && v > envelope[i - 2] && v > envelope[i + 1] && v > envelope[i + 2]) {
+      peaks.push({ freq: i * binHz, mag: v });
     }
   }
   if (peaks.length === 0) return { F1: 0, F2: 0 };
-  peaks.sort((a, b) => b.mag - a.mag);
-  const candidates = peaks.slice(0, 4).sort((a, b) => a.bin - b.bin);
-  if (candidates.length < 2) return { F1: candidates[0].bin * binHz, F2: 0 };
 
-  const F1 = candidates[0].bin * binHz;
-  const minGap = 200 / binHz;
-  let f2Candidate = candidates[1];
-  for (const c of candidates.slice(1)) {
-    if (c.bin - candidates[0].bin >= minGap) { f2Candidate = c; break; }
-  }
-  return { F1, F2: f2Candidate.bin * binHz };
+  const f1Candidates = peaks.filter(p => p.freq >= 200 && p.freq <= 1100);
+  if (f1Candidates.length === 0) return { F1: 0, F2: 0 };
+  f1Candidates.sort((a, b) => b.mag - a.mag);
+  const F1 = f1Candidates[0].freq;
+
+  const f2Low = Math.max(F1 + 250, 700);
+  const f2Candidates = peaks.filter(p => p.freq >= f2Low && p.freq <= 3500);
+  if (f2Candidates.length === 0) return { F1, F2: 0 };
+  f2Candidates.sort((a, b) => b.mag - a.mag);
+  return { F1, F2: f2Candidates[0].freq };
 }
 
 /**
