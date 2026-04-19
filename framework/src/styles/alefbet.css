@@ -566,11 +566,10 @@
   margin-top: 2px;
 }
 
-/* Holam: centered above the box */
+/* Holam: anchored to the upper-left corner above the box */
 .ab-nikud-box--holam .ab-nikud-box__mark {
   bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   margin-bottom: 2px;
 }
 

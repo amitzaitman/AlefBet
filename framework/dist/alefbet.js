@@ -5151,10 +5151,10 @@ const Cc = "0 0 32 16", Tn = {
   tzere: '<circle cx="9" cy="8" r="2.8"/><circle cx="23" cy="8" r="2.8"/>',
   // משולש הפוך — שתיים למעלה, אחת למטה במרכז
   segol: '<circle cx="8" cy="4" r="2.6"/><circle cx="24" cy="4" r="2.6"/><circle cx="16" cy="12" r="2.6"/>',
-  // נקודה אחת (ממוקמת מעל הקופסה דרך .ab-nikud-box--holam)
-  holam: '<circle cx="16" cy="8" r="3.4"/>',
-  // שלוש נקודות אלכסון — מימין-למטה לשמאל-למעלה
-  kubbutz: '<circle cx="6" cy="13" r="2.5"/><circle cx="16" cy="8"  r="2.5"/><circle cx="26" cy="3"  r="2.5"/>'
+  // נקודה אחת - ממוקמת מעל הקופסה בפינה השמאלית דרך .ab-nikud-box--holam
+  holam: '<circle cx="7" cy="11" r="3.4"/>',
+  // שלוש נקודות אלכסון - משמאל-למעלה לימין-למטה
+  kubbutz: '<circle cx="6"  cy="3"  r="2.5"/><circle cx="16" cy="8"  r="2.5"/><circle cx="26" cy="13" r="2.5"/>'
 };
 function Tc(e) {
   const t = Tn[e];
