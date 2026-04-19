@@ -89,13 +89,7 @@
   animation-delay: 0.15s;
   z-index: 10;
   position: relative;
-  cursor: grab;
-  touch-action: none; /* מנטרל ברירת-מחדל של גלילה כדי ש-PointerEvents ינהלו את הגרירה */
-}
-
-.nm-letter.drag-source--dragging {
-  opacity: 0.35;
-  cursor: grabbing;
+  /* cursor/touch-action/opacity בזמן גרירה מגיעים מברירות המחדל של .drag-source ב-framework */
 }
 
 .nm-letter--correct {

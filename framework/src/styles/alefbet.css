@@ -401,14 +401,15 @@
 }
 
 /* ── Drop Target ─────────────────────────────────────────────────────────── */
+/* ברירות מחדל חסרות !important כדי שמשחקים יוכלו לעקוף לפי ספציפיות. */
 .drop-target--active {
-  border-color: var(--ab-primary) !important;
-  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.35) !important;
+  border-color: var(--ab-primary);
+  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.35);
 }
 
 .drop-target--hover {
-  border-color: var(--ab-primary) !important;
-  background: #fff0e8 !important;
+  border-color: var(--ab-primary);
+  background: #fff0e8;
   transform: scale(1.05);
 }
 
