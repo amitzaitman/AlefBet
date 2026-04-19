@@ -4,6 +4,7 @@
  * עם נפילה ל-Web Speech API כגיבוי
  */
 import { getNikud } from '../utils/nakdan.js';
+import { nikudList } from '../data/nikud.js';
 
 let _queue = [];
 let _speaking = false;
@@ -118,14 +119,23 @@ function _googleSpeak(text) {
 
 let _hebrewVoice = null;
 
+// קולות עבריים נשיים ידועים ברחבי מערכות הפעלה נפוצות (macOS Carmit,
+// Windows Hila, Google he-IL). ננסה להתאים תחילה קול נשי כדי להדמות
+// מורה/מבוגרת שמדברת אל הילד.
+const FEMALE_HEBREW_VOICES = ['carmit', 'hila', 'female'];
+
+function _isFemaleHebrew(voice) {
+  const name = (voice.name || '').toLowerCase();
+  return FEMALE_HEBREW_VOICES.some(f => name.includes(f));
+}
+
 function _findHebrewVoice() {
   const voices = speechSynthesis.getVoices();
-  return (
-    voices.find(v => v.lang === 'he-IL') ||
-    voices.find(v => v.lang === 'iw-IL') ||
-    voices.find(v => v.lang.startsWith('he')) ||
-    null
+  const hebrew = voices.filter(v =>
+    v.lang === 'he-IL' || v.lang === 'iw-IL' || v.lang.startsWith('he')
   );
+  if (hebrew.length === 0) return null;
+  return hebrew.find(_isFemaleHebrew) || hebrew[0];
 }
 
 function _initVoice() {
@@ -234,6 +244,24 @@ export const tts = {
     _rate = _nikudRate;
     return new Promise(resolve => {
       _queue.push({ text, resolve });
+      _processQueue();
+    }).finally(() => {
+      _rate = savedRate;
+    });
+  },
+
+  /**
+   * הקרא את צליל התנועה של הניקוד ("אָה", "אוֹ" וכו'),
+   * כדי להדגים לילד מה להגות.
+   * @param {string} nikudId - מזהה ניקוד מתוך nikudList (למשל 'kamatz').
+   */
+  speakVowel(nikudId) {
+    const entry = nikudList.find(n => n.id === nikudId);
+    if (!entry || !entry.sound) return Promise.resolve();
+    const savedRate = _rate;
+    _rate = _nikudRate;
+    return new Promise(resolve => {
+      _queue.push({ text: entry.sound, resolve });
       _processQueue();
     }).finally(() => {
       _rate = savedRate;

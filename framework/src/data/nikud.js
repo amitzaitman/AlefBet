@@ -6,13 +6,13 @@
 
 /** רשימת סימני הניקוד העיקריים */
 export const nikudList = [
-  { id: 'kamatz', name: 'קָמָץ', nameNikud: 'קָמָץ', symbol: '\u05B8', sound: 'אָ', color: '#FF6B6B', textColor: '#fff' },
-  { id: 'patah', name: 'פֶּתַח', nameNikud: 'פָּתַח', symbol: '\u05B7', sound: 'אָ', color: '#FF8C42', textColor: '#fff' },
+  { id: 'kamatz', name: 'קָמָץ', nameNikud: 'קָמָץ', symbol: '\u05B8', sound: 'אָה', color: '#FF6B6B', textColor: '#fff' },
+  { id: 'patah', name: 'פֶּתַח', nameNikud: 'פָּתַח', symbol: '\u05B7', sound: 'אָה', color: '#FF8C42', textColor: '#fff' },
   { id: 'hiriq', name: 'חִירִיק', nameNikud: 'חִירִיק', symbol: '\u05B4', sound: 'אִי', color: '#4ECDC4', textColor: '#fff' },
-  { id: 'tzere', name: 'צָרָה', nameNikud: 'צֵרֶה', symbol: '\u05B5', sound: 'אֶ', color: '#45B7D1', textColor: '#fff' },
-  { id: 'segol', name: 'סָגֹול', nameNikud: 'סְגוֹל', symbol: '\u05B6', sound: 'אֶ', color: '#9B59B6', textColor: '#fff' },
-  { id: 'holam', name: 'חוֹלֵם', nameNikud: 'חוֹלָם', symbol: '\u05B9', sound: 'אֹ', color: '#2ECC71', textColor: '#fff' },
-  { id: 'kubbutz', name: 'קֻובּוּץ', nameNikud: 'קֻבּוּץ', symbol: '\u05BB', sound: 'אֻ', color: '#F39C12', textColor: '#fff' },
+  { id: 'tzere', name: 'צָרָה', nameNikud: 'צֵרֶה', symbol: '\u05B5', sound: 'אֶה', color: '#45B7D1', textColor: '#fff' },
+  { id: 'segol', name: 'סָגֹול', nameNikud: 'סְגוֹל', symbol: '\u05B6', sound: 'אֶה', color: '#9B59B6', textColor: '#fff' },
+  { id: 'holam', name: 'חוֹלֵם', nameNikud: 'חוֹלָם', symbol: '\u05B9', sound: 'אוֹ', color: '#2ECC71', textColor: '#fff' },
+  { id: 'kubbutz', name: 'קֻובּוּץ', nameNikud: 'קֻבּוּץ', symbol: '\u05BB', sound: 'אוּ', color: '#F39C12', textColor: '#fff' },
 ];
 
 /** אותיות בסיס לשימוש עם ניקוד (ללא אותיות סופיות) */

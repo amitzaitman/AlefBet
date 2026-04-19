@@ -91,7 +91,7 @@ export async function startGame(container) {
     demoBtn.setAttribute('aria-label', 'הַשְׁמַע צְלִיל');
     demoBtn.innerHTML = '<span class="demo-btn__icon">🔊</span><span class="demo-btn__text">הַקְשֵׁב</span>';
     demoBtn.onclick = () => {
-      tts.speakNikud('א', nikud.symbol);
+      tts.speakVowel(nikud.id);
     };
     panel.appendChild(demoBtn);
 
