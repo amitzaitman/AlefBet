@@ -1,6 +1,6 @@
 /**
  * משחק לימוד ניקוד - גרסה פשוטה לילדים
- * אות עם ניקוד במרכז, שני סמלי ניקוד בצדדים - הקש על הצד הנכון
+ * אות עם ניקוד במרכז, שני סמלי ניקוד בצדדים - גוררים את האות לצד הנכון
  * 8 סיבובים
  */
 import {
@@ -17,6 +17,8 @@ import {
   showNikudSettingsDialog,
   injectHeaderButton,
   createNikudBox,
+  createDragSource,
+  createDropTarget,
 } from '../../framework/dist/alefbet.js';
 
 const ROUNDS = 8;
@@ -112,19 +114,27 @@ export async function startGame(container) {
 
     shell.bodyEl.appendChild(arena);
 
-    // Tap-to-select is the only input — drag affordance removed for clarity.
+    // גרירה היא אופן האינטראקציה העיקרי: הילד גורר את האות לאזור הניקוד הנכון.
     const correctZone = leftNikud.id === targetNikud.id ? leftZone : rightZone;
 
-    leftZone.addEventListener('click', () => {
-      handleTap(leftNikud.id === targetNikud.id, letter, targetNikud, letterEl, leftZone, correctZone);
+    createDragSource(letterEl, { letter, targetNikud });
+
+    createDropTarget(leftZone, ({ data }) => {
+      handleAnswer(
+        leftNikud.id === data.targetNikud.id,
+        data.letter, data.targetNikud, letterEl, leftZone, correctZone,
+      );
     });
 
-    rightZone.addEventListener('click', () => {
-      handleTap(rightNikud.id === targetNikud.id, letter, targetNikud, letterEl, rightZone, correctZone);
+    createDropTarget(rightZone, ({ data }) => {
+      handleAnswer(
+        rightNikud.id === data.targetNikud.id,
+        data.letter, data.targetNikud, letterEl, rightZone, correctZone,
+      );
     });
   }
 
-  async function handleTap(isCorrect, letter, targetNikud, letterEl, zone, correctZone) {
+  async function handleAnswer(isCorrect, letter, targetNikud, letterEl, zone, correctZone) {
     if (answered) return;
 
     if (isCorrect) {
