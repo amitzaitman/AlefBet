@@ -1,26 +1,67 @@
 /* ==========================================================================
-   AlefBet Framework — Base Styles
-   Dynamic layout using clamp() + dvmin/dvh/dvw — no orientation breakpoints
-   Accessibility redesign: larger targets, bolder colors, stronger focus rings
+   AlefBet Framework — Storybook Papercraft
+   ספריית עיצוב בהשראת ספרי-ילדים: נייר חם, דיו עמוק, רקע גרגירי וטייפ צבעוני.
+   שמות המחלקות והחתימה של ה-JS לא משתנים; רק החזות החליפה את עורהּ.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Rubik:wght@400;500;700;900&display=swap');
 
 /* ── CSS Custom Properties ───────────────────────────────────────────────── */
 :root {
-  --ab-primary: #FF6B35;
-  --ab-primary-dark: #E5501A;
-  --ab-secondary: #7B61FF;
-  --ab-success: #00C896;
-  --ab-error: #FF4757;
-  --ab-warning: #FFB400;
-  --ab-hint: #A855F7;
-  --ab-bg: #FFF8F0;
-  --ab-surface: #FFFFFF;
-  --ab-text: #1C1B1F;
-  --ab-text-muted: #6B7280;
-  --ab-border: #E2D4C8;
-  --ab-shadow: rgba(0, 0, 0, 0.12);
+  /* Ink palette — deep warm browns instead of cool grays */
+  --ab-ink:        #1B140C;
+  --ab-ink-soft:   #4A3A2A;
+  --ab-ink-muted:  #8C7A65;
+
+  /* Paper layers — warm cream stack */
+  --ab-paper:      #FFFAEC;   /* card face */
+  --ab-paper-2:    #F5EBD1;   /* nested paper */
+  --ab-paper-3:    #EAD9B5;   /* deep paper / progress track */
+  --ab-bg:         #FBF5E3;   /* page */
+  --ab-surface:    #FFFAEC;   /* alias kept for legacy refs */
+  --ab-text:       #1B140C;
+  --ab-text-muted: #7A6A55;
+  --ab-border:     #D9C8A6;   /* paper edge */
+
+  /* Accent palette — pulled from an illustrated alef-bet book */
+  --ab-tomato:     #C9442C;
+  --ab-tomato-dk:  #A4321E;
+  --ab-ochre:      #D99221;
+  --ab-ochre-soft: #E8B864;
+  --ab-teal:       #2A7B71;
+  --ab-teal-soft:  #6BB3A8;
+  --ab-plum:       #783952;
+  --ab-sage:       #6E8B4E;
+
+  /* Semantic mapping (legacy var names preserved for any JS that reads them) */
+  --ab-primary:      var(--ab-tomato);
+  --ab-primary-dark: var(--ab-tomato-dk);
+  --ab-secondary:    var(--ab-plum);
+  --ab-success:      var(--ab-teal);
+  --ab-error:        var(--ab-tomato);
+  --ab-warning:      var(--ab-ochre);
+  --ab-hint:         var(--ab-plum);
+
+  /* Shadows — warm, not gray; layered for paper-on-paper depth */
+  --ab-shadow:        rgba(60, 40, 18, 0.16);
+  --ab-shadow-soft:   rgba(60, 40, 18, 0.10);
+  --ab-shadow-deep:   rgba(60, 40, 18, 0.26);
+  --ab-paper-shadow:
+    0 1px 0 rgba(255, 250, 235, 0.9) inset,
+    0 -1px 0 rgba(110, 80, 40, 0.06) inset,
+    0 2px 0 var(--ab-border),
+    0 6px 14px var(--ab-shadow-soft),
+    0 14px 28px var(--ab-shadow);
+  --ab-paper-shadow-lifted:
+    0 1px 0 rgba(255, 250, 235, 0.9) inset,
+    0 -1px 0 rgba(110, 80, 40, 0.06) inset,
+    0 3px 0 var(--ab-border),
+    0 12px 22px var(--ab-shadow),
+    0 22px 40px var(--ab-shadow-soft);
+
+  /* Tape (decorative corner strip on cards) */
+  --ab-tape:        rgba(217, 146, 33, 0.55);
+  --ab-tape-edge:   rgba(217, 146, 33, 0.18);
 
   --ab-space-xs: 6px;
   --ab-space-sm: 12px;
@@ -29,16 +70,21 @@
   --ab-space-xl: 48px;
   --ab-space-2xl: 64px;
 
-  --ab-radius-sm: 12px;
-  --ab-radius-md: 20px;
-  --ab-radius-lg: 28px;
+  --ab-radius-sm: 10px;
+  --ab-radius-md: 18px;
+  --ab-radius-lg: 26px;
   --ab-radius-full: 9999px;
 
-  /* Font scale — increase for younger children */
+  /* Type system */
   --font-scale: 1;
+  --ab-font-display: 'Frank Ruhl Libre', 'David', 'Times New Roman', 'Arial Hebrew', serif;
+  --ab-font-body:    'Rubik', 'Heebo', 'Arial Hebrew', system-ui, sans-serif;
+  --ab-font:         var(--ab-font-body); /* legacy alias */
 
-  --ab-font: 'Heebo', 'Arial Hebrew', 'David', Arial, sans-serif;
-  --ab-transition: 0.2s ease;
+  --ab-transition: 0.22s cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Hand-rolled paper grain (inline SVG, no network round-trip) */
+  --ab-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.30  0 0 0 0 0.15  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.32'/></svg>");
 }
 
 /* ── RTL Foundation ──────────────────────────────────────────────────────── */
@@ -51,15 +97,35 @@
 
 /* ── Game Container ──────────────────────────────────────────────────────── */
 .alefbet-game {
-  font-family: var(--ab-font);
+  position: relative;
+  font-family: var(--ab-font-body);
   font-size: clamp(16px, 4dvmin, 22px);
   color: var(--ab-text);
-  background: var(--ab-bg);
+  background-color: var(--ab-bg);
+  background-image:
+    radial-gradient(ellipse 90% 60% at 18% 0%, rgba(217, 146, 33, 0.10), transparent 60%),
+    radial-gradient(ellipse 80% 60% at 100% 100%, rgba(120, 57, 82, 0.08), transparent 65%),
+    var(--ab-grain);
+  background-attachment: fixed, fixed, fixed;
+  background-size: auto, auto, 220px 220px;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   padding: clamp(12px, 3dvh, 24px) clamp(12px, 3dvw, 24px);
+  overflow-x: hidden;
 }
+
+/* Subtle vignette so paper feels lit, not flat */
+.alefbet-game::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(70, 40, 12, 0.10) 100%);
+  z-index: 0;
+}
+
+.alefbet-game > * { position: relative; z-index: 1; }
 
 /* ── Game Header ─────────────────────────────────────────────────────────── */
 .game-header {
@@ -67,20 +133,39 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: clamp(8px, 2dvh, 16px) 0;
+  padding: clamp(10px, 2.4dvh, 18px) 0 clamp(14px, 3dvh, 24px);
   flex-shrink: 0;
 }
 
 .game-title {
-  font-size: clamp(22px, 5.5dvmin, 40px);
+  font-family: var(--ab-font-display);
   font-weight: 900;
-  color: var(--ab-primary);
+  font-size: clamp(26px, 6.4dvmin, 46px);
+  letter-spacing: -0.01em;
+  color: var(--ab-ink);
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.05;
   text-align: center;
+  position: relative;
+  padding: 0 clamp(6px, 1.5dvmin, 14px);
 }
 
-/* Back-to-library button */
+/* Crayon-style underline behind the title */
+.game-title::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -6px;
+  height: 8px;
+  background: var(--ab-ochre-soft);
+  border-radius: 99px;
+  transform: rotate(-1deg);
+  z-index: -1;
+  opacity: 0.65;
+}
+
+/* Back-to-library button — paper chip */
 .game-back-btn {
   position: absolute;
   inset-inline-end: 0;
@@ -91,29 +176,38 @@
   height: clamp(48px, 10dvmin, 64px);
   border-radius: var(--ab-radius-sm);
   text-decoration: none;
-  font-size: clamp(24px, 6dvmin, 36px);
+  font-size: clamp(22px, 5.4dvmin, 32px);
   line-height: 1;
-  background: transparent;
-  transition: background var(--ab-transition), transform var(--ab-transition);
+  color: var(--ab-ink);
+  background: var(--ab-paper);
+  border: 2px solid var(--ab-border);
+  box-shadow:
+    0 2px 0 var(--ab-border),
+    0 4px 10px var(--ab-shadow-soft);
+  transition: transform var(--ab-transition), box-shadow var(--ab-transition), background var(--ab-transition);
 }
 
 .game-back-btn:hover {
-  background: rgba(255, 107, 53, 0.12);
-  transform: scale(1.1);
+  background: var(--ab-paper-2);
+  transform: translateY(-2px) rotate(-2deg);
+  box-shadow:
+    0 4px 0 var(--ab-border),
+    0 10px 18px var(--ab-shadow);
 }
+
+.game-back-btn:active { transform: translateY(0) scale(0.96); }
 
 .game-back-btn:focus-visible {
-  outline: 4px solid var(--ab-primary);
-  outline-offset: 3px;
+  outline: 3px dashed var(--ab-tomato);
+  outline-offset: 4px;
 }
 
-/* Spacer to keep title centered when back button is present */
 .game-header__spacer {
   width: clamp(48px, 10dvmin, 64px);
   flex-shrink: 0;
 }
 
-/* ── Game Body — naturally wraps portrait↔landscape ──────────────────────── */
+/* ── Game Body ───────────────────────────────────────────────────────────── */
 .game-body {
   flex: 1;
   display: flex;
@@ -128,11 +222,12 @@
 
 .game-footer {
   flex-shrink: 0;
-  padding: clamp(8px, 2dvh, 16px) 0;
+  padding: clamp(10px, 2.2dvh, 18px) 0 clamp(6px, 1.4dvh, 12px);
 }
 
-/* ── Button Base ─────────────────────────────────────────────────────────── */
+/* ── Button Base — Paper Stamp ───────────────────────────────────────────── */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -140,177 +235,261 @@
   min-height: clamp(64px, 13dvmin, 80px);
   min-width: clamp(64px, 13dvmin, 80px);
   padding: clamp(12px, 3dvh, 20px) clamp(24px, 5dvw, 40px);
-  border: none;
+  border: 2.5px solid var(--ab-ink);
   border-radius: var(--ab-radius-md);
-  font-family: var(--ab-font);
+  font-family: var(--ab-font-display);
   font-size: clamp(18px, 4dvmin, 24px);
   font-weight: 900;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: transform var(--ab-transition), box-shadow var(--ab-transition);
+  background: var(--ab-paper);
+  color: var(--ab-ink);
+  transition: transform var(--ab-transition), box-shadow var(--ab-transition), background var(--ab-transition);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  box-shadow: 4px 4px 0 var(--ab-ink);
 }
 
-.btn:active {
-  transform: scale(0.95);
-}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ab-ink); }
+.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ab-ink); }
 
 .btn:focus-visible {
-  outline: 4px solid var(--ab-primary);
-  outline-offset: 3px;
+  outline: 3px dashed var(--ab-ochre);
+  outline-offset: 4px;
 }
 
 .btn--primary {
-  background: var(--ab-primary);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.40);
+  background: var(--ab-tomato);
+  color: var(--ab-paper);
+  box-shadow: 4px 4px 0 var(--ab-ink);
 }
-
 .btn--primary:hover {
-  background: var(--ab-primary-dark);
-  box-shadow: 0 8px 20px rgba(255, 107, 53, 0.50);
-  transform: translateY(-2px);
+  background: var(--ab-tomato-dk);
+  box-shadow: 6px 6px 0 var(--ab-ink);
 }
 
 .btn--secondary {
-  background: var(--ab-surface);
-  color: var(--ab-primary);
-  border: 3px solid var(--ab-primary);
+  background: var(--ab-paper);
+  color: var(--ab-ink);
+  border-color: var(--ab-ink);
 }
 
-/* ── Option Cards ────────────────────────────────────────────────────────── */
+/* ── Option Cards — Paper Cut-outs with Tape ─────────────────────────────── */
 .option-cards-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: clamp(10px, 2.5dvmin, 24px);
+  gap: clamp(14px, 3dvmin, 28px);
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
+  padding: clamp(6px, 1.5dvmin, 12px);
 }
 
 .option-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: clamp(8px, 1.5dvh, 14px);
-  min-height: clamp(90px, 18dvmin, 150px);
-  padding: clamp(10px, 2.5dvh, 24px);
-  background: var(--ab-surface);
-  border: 4px solid var(--ab-border);
+  min-height: clamp(96px, 19dvmin, 160px);
+  padding: clamp(14px, 3dvh, 26px) clamp(10px, 2.5dvh, 20px);
+  background: var(--ab-paper);
+  border: none;
   border-radius: var(--ab-radius-lg);
   cursor: pointer;
-  transition: border-color var(--ab-transition), transform var(--ab-transition), box-shadow var(--ab-transition);
-  font-family: var(--ab-font);
+  font-family: var(--ab-font-body);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  box-shadow: 0 4px 12px var(--ab-shadow);
+  box-shadow: var(--ab-paper-shadow);
+  transition: transform var(--ab-transition), box-shadow var(--ab-transition), background var(--ab-transition);
+  overflow: visible;
 }
+
+/* Subtle hand-cut inner ring + paper tooth */
+.option-card::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: calc(var(--ab-radius-lg) - 4px);
+  border: 1.5px dashed rgba(74, 58, 42, 0.18);
+  pointer-events: none;
+}
+
+/* Decorative tape strip — top-left corner, slight rotation */
+.option-card::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  inset-inline-start: 14%;
+  width: clamp(46px, 10dvmin, 72px);
+  height: clamp(16px, 3dvmin, 22px);
+  background:
+    linear-gradient(180deg, rgba(255, 250, 235, 0.55) 0%, transparent 30%, transparent 70%, rgba(60, 40, 18, 0.10) 100%),
+    var(--ab-tape);
+  border-inline: 1px dashed var(--ab-tape-edge);
+  transform: rotate(-6deg);
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(60, 40, 18, 0.10);
+}
+
+/* Alternate tape rotation for grid-position even cards */
+.option-card:nth-child(2n)::before { transform: rotate(5deg); inset-inline-start: auto; inset-inline-end: 14%; }
+.option-card:nth-child(3n)::before { transform: rotate(-3deg); inset-inline-start: 50%; margin-inline-start: -36px; }
 
 .option-card:hover:not(:disabled) {
-  border-color: var(--ab-primary);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 24px var(--ab-shadow);
+  transform: translateY(-4px) rotate(-0.6deg);
+  box-shadow: var(--ab-paper-shadow-lifted);
+  background: #FFFCEF;
 }
 
-.option-card:active:not(:disabled) {
-  transform: scale(0.96);
-}
+.option-card:active:not(:disabled) { transform: translateY(-1px) scale(0.985); }
 
-.option-card:disabled {
-  cursor: default;
-  opacity: 0.75;
-}
+.option-card:disabled { cursor: default; opacity: 0.78; }
 
-.option-card:focus-visible {
-  outline: 4px solid var(--ab-primary);
-  outline-offset: 3px;
-}
+.option-card:focus-visible { outline: 3px dashed var(--ab-tomato); outline-offset: 4px; }
 
 .option-card--correct {
-  border-color: var(--ab-success) !important;
-  background: #e6faf4 !important;
+  background: #EAF6F0 !important;
+  box-shadow:
+    0 0 0 3px var(--ab-teal),
+    0 0 0 7px rgba(42, 123, 113, 0.18),
+    var(--ab-paper-shadow-lifted) !important;
+  animation: ab-stamp 0.5s ease-out;
 }
+.option-card--correct::before { background: var(--ab-teal-soft); }
 
 .option-card--wrong {
-  border-color: var(--ab-warning) !important;
-  background: #fff8e6 !important;
+  background: #FBEAD7 !important;
+  box-shadow:
+    0 0 0 3px var(--ab-ochre),
+    0 0 0 7px rgba(217, 146, 33, 0.16),
+    var(--ab-paper-shadow) !important;
+  animation: ab-wobble 0.45s ease-in-out;
 }
 
 .option-card--hint {
-  border-color: var(--ab-hint) !important;
-  background: #f7edfe !important;
+  background: #F0E4EB !important;
+  box-shadow:
+    0 0 0 3px var(--ab-plum),
+    0 0 0 7px rgba(120, 57, 82, 0.14),
+    var(--ab-paper-shadow) !important;
 }
 
 .option-card__emoji {
-  font-size: clamp(32px, 10dvmin, 56px);
+  font-size: clamp(34px, 11dvmin, 60px);
   line-height: 1;
+  filter: drop-shadow(0 2px 1px rgba(60, 40, 18, 0.18));
 }
 
 .option-card__text {
-  font-size: clamp(16px, 4dvmin, 24px);
+  font-family: var(--ab-font-display);
+  font-size: clamp(20px, 4.6dvmin, 28px);
   font-weight: 900;
-  color: var(--ab-text);
+  color: var(--ab-ink);
+  letter-spacing: -0.005em;
 }
 
-/* ── Progress Bar ────────────────────────────────────────────────────────── */
+/* ── Progress Bar — Stitched Ribbon ──────────────────────────────────────── */
 .progress-bar {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 2.5dvmin, 20px);
+  gap: clamp(12px, 2.6dvmin, 22px);
   width: 100%;
   max-width: 100%;
+  padding: 4px 6px;
 }
 
 .progress-bar__track {
   flex: 1;
-  height: clamp(12px, 2dvmin, 18px);
-  background: var(--ab-border);
+  height: clamp(14px, 2.4dvmin, 22px);
+  background: var(--ab-paper-3);
   border-radius: var(--ab-radius-full);
   overflow: hidden;
+  border: 2px solid var(--ab-ink-soft);
+  box-shadow: inset 0 2px 3px rgba(60, 40, 18, 0.18);
+  position: relative;
+}
+
+/* Stitched look — repeating dashes along the track */
+.progress-bar__track::after {
+  content: "";
+  position: absolute;
+  inset: 4px 6px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(60, 40, 18, 0.18) 0 6px,
+    transparent 6px 12px
+  );
+  border-radius: 99px;
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .progress-bar__fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--ab-primary), var(--ab-warning));
+  background:
+    linear-gradient(180deg, rgba(255, 250, 235, 0.35) 0%, transparent 60%),
+    linear-gradient(90deg, var(--ab-tomato) 0%, var(--ab-ochre) 100%);
   border-radius: var(--ab-radius-full);
-  transition: width 0.4s ease;
+  transition: width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(60, 40, 18, 0.18) inset;
 }
 
 .progress-bar__label {
-  font-size: clamp(13px, 3dvmin, 18px);
+  font-family: var(--ab-font-display);
+  font-size: clamp(15px, 3.3dvmin, 20px);
   font-weight: 700;
-  color: var(--ab-text-muted);
+  color: var(--ab-ink-soft);
   white-space: nowrap;
-  min-width: 48px;
+  min-width: 56px;
   text-align: center;
   /* בלי זה ה-bidi מהפך את "0 / 8" ל-"8 / 0" כשהדף ב-RTL. */
   direction: ltr;
   unicode-bidi: isolate;
+  letter-spacing: 0.04em;
 }
 
-/* ── Feedback Message ────────────────────────────────────────────────────── */
+/* ── Feedback Message — Teacher's Ink Note ───────────────────────────────── */
 .feedback-message {
-  min-height: clamp(40px, 8dvmin, 60px);
-  font-size: clamp(24px, 6dvmin, 40px);
+  min-height: clamp(44px, 8dvmin, 64px);
+  font-family: var(--ab-font-display);
+  font-size: clamp(26px, 6.4dvmin, 44px);
   font-weight: 900;
   text-align: center;
-  padding: clamp(6px, 1.5dvh, 12px) clamp(12px, 3dvw, 24px);
+  padding: clamp(8px, 1.6dvh, 14px) clamp(14px, 3dvw, 28px);
   border-radius: var(--ab-radius-md);
+  letter-spacing: -0.005em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  transition: transform 0.25s ease;
 }
 
+.feedback-message:empty { padding: 0; }
+
 .feedback-message--correct {
-  color: var(--ab-success);
+  color: var(--ab-teal);
+  transform: rotate(-2deg);
+  text-shadow:
+    1px 1px 0 rgba(42, 123, 113, 0.18),
+    0 2px 0 rgba(60, 40, 18, 0.06);
 }
 
 .feedback-message--wrong {
-  color: var(--ab-warning);
+  color: var(--ab-tomato);
+  transform: rotate(1.5deg);
+  text-shadow: 0 1px 0 rgba(60, 40, 18, 0.10);
 }
 
 .feedback-message--hint {
-  color: var(--ab-hint);
+  color: var(--ab-plum);
+  transform: rotate(-1deg);
 }
 
-/* ── Completion Screen ───────────────────────────────────────────────────── */
+/* ── Completion Screen — Paper Certificate ───────────────────────────────── */
 .completion-screen {
   display: flex;
   align-items: center;
@@ -320,64 +499,138 @@
 }
 
 .completion-screen__content {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(12px, 3dvmin, 28px);
+  gap: clamp(14px, 3dvmin, 30px);
   text-align: center;
-  background: var(--ab-surface);
+  background: var(--ab-paper);
   border-radius: var(--ab-radius-lg);
-  padding: clamp(24px, 5dvh, 56px) clamp(24px, 5dvw, 48px);
-  box-shadow: 0 10px 40px var(--ab-shadow);
-  max-width: 400px;
+  padding: clamp(28px, 5.4dvh, 60px) clamp(28px, 5dvw, 52px);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 235, 0.9) inset,
+    0 3px 0 var(--ab-border),
+    0 18px 36px var(--ab-shadow),
+    0 28px 60px var(--ab-shadow-soft);
+  max-width: 440px;
   width: 100%;
+  /* Decorative inner border */
+  outline: 1px dashed rgba(74, 58, 42, 0.30);
+  outline-offset: -14px;
 }
 
+/* Corner tape on certificate (top-right + bottom-left for whimsy) */
+.completion-screen__content::before,
+.completion-screen__content::after {
+  content: "";
+  position: absolute;
+  width: 78px;
+  height: 22px;
+  background: var(--ab-tape);
+  border-inline: 1px dashed var(--ab-tape-edge);
+  pointer-events: none;
+}
+.completion-screen__content::before { top: -10px; right: 12%; transform: rotate(6deg); }
+.completion-screen__content::after  { bottom: -10px; left: 12%; transform: rotate(-7deg); }
+
 .completion-screen__stars {
-  font-size: clamp(40px, 12dvmin, 68px);
-  letter-spacing: 6px;
+  font-size: clamp(44px, 13dvmin, 76px);
+  letter-spacing: 10px;
   line-height: 1;
+  filter: drop-shadow(0 4px 2px rgba(60, 40, 18, 0.22));
+  animation: ab-star-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .completion-screen__title {
-  font-size: clamp(22px, 6dvmin, 40px);
+  font-family: var(--ab-font-display);
+  font-size: clamp(28px, 7dvmin, 46px);
   font-weight: 900;
-  color: var(--ab-primary);
+  color: var(--ab-tomato);
   margin: 0;
+  letter-spacing: -0.01em;
+  position: relative;
+}
+.completion-screen__title::after {
+  content: "";
+  position: absolute;
+  left: 12%; right: 12%; bottom: -4px;
+  height: 6px;
+  background: var(--ab-ochre-soft);
+  border-radius: 99px;
+  transform: rotate(-1deg);
+  opacity: 0.7;
+  z-index: -1;
 }
 
 .completion-screen__score {
-  font-size: clamp(16px, 4dvmin, 24px);
-  color: var(--ab-text-muted);
+  font-family: var(--ab-font-body);
+  font-size: clamp(17px, 4dvmin, 24px);
+  color: var(--ab-ink-soft);
   margin: 0;
+  font-weight: 500;
 }
 
-/* ── Letter Display ──────────────────────────────────────────────────────── */
-/* dvmin = min(dvh, dvw) — scales proportionally in any orientation */
+/* ── Letter Display — Big Ink Letter on Paper ───────────────────────────── */
 .letter-display {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: clamp(110px, 28dvmin, 180px);
-  height: clamp(110px, 28dvmin, 180px);
-  background: var(--ab-surface);
-  border: 5px solid var(--ab-primary);
+  width: clamp(120px, 30dvmin, 200px);
+  height: clamp(120px, 30dvmin, 200px);
+  background: var(--ab-paper);
+  border: 3px solid var(--ab-ink);
   border-radius: var(--ab-radius-lg);
-  font-size: clamp(52px, 18dvmin, 90px);
+  font-family: var(--ab-font-display);
+  font-size: clamp(64px, 22dvmin, 108px);
   font-weight: 900;
-  color: var(--ab-primary);
-  box-shadow: 0 6px 24px rgba(255, 107, 53, 0.25);
+  color: var(--ab-ink);
   user-select: none;
+  box-shadow:
+    8px 8px 0 var(--ab-ink),
+    0 18px 32px var(--ab-shadow);
+  text-shadow: 0 1px 0 rgba(60, 40, 18, 0.10);
+}
+
+/* Tape strip on the letter card */
+.letter-display::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 60%;
+  height: 18px;
+  background: var(--ab-tape);
+  border-inline: 1px dashed var(--ab-tape-edge);
+  pointer-events: none;
+}
+
+/* Subtle inner ruled paper feel */
+.letter-display::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: calc(var(--ab-radius-lg) - 6px);
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0 22px,
+    rgba(74, 58, 42, 0.07) 22px 23px
+  );
+  pointer-events: none;
 }
 
 /* ── Instruction Text ────────────────────────────────────────────────────── */
 .game-instruction {
-  font-size: clamp(15px, 3.5dvmin, 22px);
-  font-weight: 700;
-  color: var(--ab-text-muted);
+  font-family: var(--ab-font-body);
+  font-size: clamp(16px, 3.6dvmin, 22px);
+  font-weight: 500;
+  color: var(--ab-ink-soft);
   text-align: center;
   margin: 0;
+  letter-spacing: 0.01em;
 }
 
 /* ── Drag Source ─────────────────────────────────────────────────────────── */
@@ -387,36 +640,33 @@
   transition: transform var(--ab-transition), opacity var(--ab-transition);
 }
 
-.drag-source:active {
-  cursor: grabbing;
-}
+.drag-source:active { cursor: grabbing; }
 
-.drag-source--dragging {
-  opacity: 0.4;
-}
+.drag-source--dragging { opacity: 0.45; }
 
 .drag-source--selected {
-  box-shadow: 0 0 0 5px var(--ab-primary);
-  transform: scale(1.06);
+  box-shadow:
+    0 0 0 4px var(--ab-tomato),
+    0 0 0 8px rgba(201, 68, 44, 0.20),
+    var(--ab-paper-shadow-lifted);
+  transform: scale(1.05) rotate(-1deg);
 }
 
 /* ── Drop Target ─────────────────────────────────────────────────────────── */
 /* ברירות מחדל חסרות !important כדי שמשחקים יוכלו לעקוף לפי ספציפיות. */
 .drop-target--active {
-  border-color: var(--ab-primary);
-  box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.35);
+  outline: 3px dashed var(--ab-tomato);
+  outline-offset: 4px;
 }
 
 .drop-target--hover {
-  border-color: var(--ab-primary);
-  background: #fff0e8;
-  transform: scale(1.05);
+  transform: scale(1.04) rotate(-0.5deg);
 }
 
 /* ── Nikud Letter Card (focus rule) ──────────────────────────────────────── */
 .nikud-letter-card:focus-visible {
-  outline: 4px solid var(--ab-primary);
-  outline-offset: 3px;
+  outline: 3px dashed var(--ab-tomato);
+  outline-offset: 4px;
 }
 
 /* ── Loading Screen ─────────────────────────────────────────────────────── */
@@ -425,15 +675,27 @@
   align-items: center;
   justify-content: center;
   min-height: 100dvh;
-  font-family: var(--ab-font, 'Heebo', Arial, sans-serif);
-  font-size: 1.2rem;
-  color: #4f67ff;
+  font-family: var(--ab-font-body);
+  font-size: clamp(18px, 3.5dvmin, 22px);
+  color: var(--ab-ink-soft);
+  background: var(--ab-bg);
   direction: rtl;
+  letter-spacing: 0.02em;
 }
 
-/* ── Header Button ──────────────────────────────────────────────────────── */
-.ab-header-btn { background:none; border:none; font-size:1.5rem; cursor:pointer; padding:4px; border-radius:8px; transition: background 0.15s; }
-.ab-header-btn:hover { background: rgba(0,0,0,0.06); }
+/* ── Header Button (small icon) ─────────────────────────────────────────── */
+.ab-header-btn {
+  background: var(--ab-paper);
+  border: 2px solid var(--ab-border);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--ab-radius-sm);
+  color: var(--ab-ink);
+  transition: background var(--ab-transition), transform var(--ab-transition);
+  box-shadow: 0 2px 0 var(--ab-border);
+}
+.ab-header-btn:hover { background: var(--ab-paper-2); transform: translateY(-1px); }
 
 /* ── Utility Classes ─────────────────────────────────────────────────────── */
 .visually-hidden {
@@ -448,13 +710,8 @@
   border: 0;
 }
 
-.text-center {
-  text-align: center;
-}
-
-.text-start {
-  text-align: start;
-}
+.text-center { text-align: center; }
+.text-start  { text-align: start; }
 
 /* ── Reduced Motion ──────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
@@ -464,54 +721,157 @@
     animation: none !important;
   }
 
-  .progress-bar__fill {
-    transition: none !important;
-  }
+  .progress-bar__fill { transition: none !important; }
 
   .btn,
   .option-card,
   .drag-source,
   .drop-target--hover,
-  .game-back-btn {
+  .game-back-btn,
+  .feedback-message--correct,
+  .feedback-message--wrong,
+  .feedback-message--hint {
     transform: none !important;
   }
 }
 
-/* ── Shared Entry Animations ── */
-@keyframes ab-appear { from { opacity:0; transform:scale(0.75) translateY(-10px); } to { opacity:1; transform:scale(1) translateY(0); } }
-@keyframes ab-pop { from { opacity:0; transform:scale(0.6); } to { opacity:1; transform:scale(1); } }
-@keyframes ab-zone-in { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
-@keyframes ab-hint-pulse { 0%,100% { opacity:0.4; } 50% { opacity:1; } }
+/* ── Shared Entry Animations ─────────────────────────────────────────────── */
+@keyframes ab-appear {
+  0%   { opacity: 0; transform: translateY(-14px) scale(0.85) rotate(-2deg); }
+  60%  { opacity: 1; transform: translateY(2px) scale(1.02) rotate(0.6deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
 
-.anim-appear { animation: ab-appear 0.4s ease-out both; }
-.anim-pop { animation: ab-pop 0.35s ease-out both; }
-.anim-zone-in { animation: ab-zone-in 0.4s ease-out both; }
-.anim-hint-pulse { animation: ab-hint-pulse 1.5s ease-in-out infinite; }
+@keyframes ab-pop {
+  0%   { opacity: 0; transform: scale(0.55) rotate(-3deg); }
+  70%  { opacity: 1; transform: scale(1.08) rotate(1.5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
 
-/* ── Interactive Zones ── */
+@keyframes ab-zone-in {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.85); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes ab-hint-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.04); }
+}
+
+@keyframes ab-stamp {
+  0%   { transform: scale(1)   rotate(0); }
+  35%  { transform: scale(1.12) rotate(-2deg); }
+  70%  { transform: scale(0.97) rotate(1deg); }
+  100% { transform: scale(1)   rotate(0); }
+}
+
+@keyframes ab-wobble {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px) rotate(-1deg); }
+  40%      { transform: translateX(6px)  rotate(1deg); }
+  60%      { transform: translateX(-4px) rotate(-0.6deg); }
+  80%      { transform: translateX(4px)  rotate(0.6deg); }
+}
+
+@keyframes ab-star-pop {
+  0%   { opacity: 0; transform: scale(0.4) rotate(-12deg); }
+  60%  { opacity: 1; transform: scale(1.18) rotate(4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+.anim-appear     { animation: ab-appear 0.48s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.anim-pop        { animation: ab-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.anim-zone-in    { animation: ab-zone-in 0.44s ease-out both; }
+.anim-hint-pulse { animation: ab-hint-pulse 1.4s ease-in-out infinite; }
+
+/* ── Interactive Zones — Colored Paper Swatches ─────────────────────────── */
 .ab-zone {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: clamp(8px, 2dvmin, 16px);
-  background: var(--zone-color, #4f67ff);
+  background: var(--zone-color, var(--ab-teal));
   border-radius: clamp(20px, 5dvmin, 36px);
   padding: clamp(16px, 4dvmin, 32px);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform var(--ab-transition), box-shadow var(--ab-transition);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    0 6px 0 rgba(60, 40, 18, 0.18),
+    0 12px 24px var(--ab-shadow);
+  overflow: hidden;
 }
-.ab-zone:active { transform: scale(0.96); }
-.ab-zone--hover { transform: scale(1.06); box-shadow: 0 10px 32px rgba(0,0,0,0.25); }
-.ab-zone--correct { box-shadow: 0 0 0 8px #00C896, 0 10px 32px rgba(0,200,150,0.4) !important; transform: scale(1.04); }
-.ab-zone__symbol { font-size: clamp(56px, 18dvmin, 100px); font-weight: 900; color: #fff; line-height: 1; font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; }
-.ab-zone__label { font-size: clamp(16px, 4dvmin, 26px); font-weight: 700; color: rgba(255,255,255,0.95); font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; }
 
-/* ── Nikud Box — dashed box (letter placeholder) with nikud mark outside ── */
+/* Hand-cut inner outline */
+.ab-zone::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: inherit;
+  border: 1.5px dashed rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+}
+
+/* Subtle grain on the colored paper */
+.ab-zone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ab-grain);
+  background-size: 220px 220px;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.ab-zone:active { transform: translateY(2px) scale(0.97); }
+.ab-zone--hover {
+  transform: translateY(-4px) scale(1.03) rotate(-0.6deg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
+    0 10px 0 rgba(60, 40, 18, 0.20),
+    0 22px 36px var(--ab-shadow-deep);
+}
+.ab-zone--correct {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
+    0 0 0 4px var(--ab-teal),
+    0 0 0 8px rgba(42, 123, 113, 0.25),
+    0 12px 24px var(--ab-shadow-deep) !important;
+  transform: translateY(-2px) scale(1.04);
+  animation: ab-stamp 0.5s ease-out;
+}
+.ab-zone__symbol {
+  font-family: var(--ab-font-display);
+  font-size: clamp(58px, 19dvmin, 108px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.20);
+  position: relative;
+  z-index: 1;
+}
+.ab-zone__label {
+  font-family: var(--ab-font-display);
+  font-size: clamp(17px, 4.2dvmin, 28px);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.96);
+  letter-spacing: 0.01em;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Nikud Box ──────────────────────────────────────────────────────────── */
+/* קופסת מקום-של-אות (מקווקווית) עם סימן הניקוד מחוץ לקופסה. */
 .ab-nikud-box {
   position: relative;
   display: flex;
@@ -530,22 +890,20 @@
 .ab-nikud-box--md { width: clamp(58px, 15dvmin, 90px); height: clamp(66px, 17dvmin, 100px); }
 .ab-nikud-box--lg { width: clamp(76px, 20dvmin, 116px); height: clamp(86px, 22dvmin, 128px); }
 
-/* Dashed box — the letter placeholder */
 .ab-nikud-box__box {
   width: 100%;
   height: 100%;
-  border: 4px dashed rgba(255, 255, 255, 0.6);
+  border: 3.5px dashed rgba(255, 255, 255, 0.78);
   border-radius: clamp(8px, 2dvmin, 14px);
 }
 
-/* Nikud mark — SVG glyph (see nikud-glyphs.js) positioned outside the box.
-   צבע הסימן נשלט דרך currentColor של אלמנט המעטפת. */
 .ab-nikud-box__mark {
   position: absolute;
   width: clamp(40px, 11dvmin, 64px);
   color: #fff;
   pointer-events: none;
   line-height: 0;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.18));
 }
 .ab-nikud-box__mark svg {
   display: block;
@@ -554,7 +912,7 @@
   fill: currentColor;
 }
 
-/* Below nikud: patach, kamatz, hiriq, segol, tzere, kubbutz */
+/* Below nikud */
 .ab-nikud-box--patah .ab-nikud-box__mark,
 .ab-nikud-box--kamatz .ab-nikud-box__mark,
 .ab-nikud-box--hiriq .ab-nikud-box__mark,
@@ -567,7 +925,7 @@
   margin-top: 2px;
 }
 
-/* Holam: anchored to the upper-left corner above the box */
+/* Holam: anchored above */
 .ab-nikud-box--holam .ab-nikud-box__mark {
   bottom: 100%;
   left: 0;
@@ -576,14 +934,15 @@
 
 /* ==========================================================================
    AppShell — מעטפת אפליקציה רב-טאבים (לא משחקים)
+   נשמרת בעקרון, רק נצבעת מחדש כדי להתאים לפלטה.
    ========================================================================== */
-
-/* ── מיכל ראשי ────────────────────────────────────────────────────────────── */
 .ab-app {
-  font-family: var(--ab-font);
+  font-family: var(--ab-font-body);
   font-size: clamp(15px, 3.5dvmin, 18px);
   color: var(--ab-text);
-  background: var(--ab-bg);
+  background-color: var(--ab-bg);
+  background-image: var(--ab-grain);
+  background-size: 220px 220px;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -592,11 +951,8 @@
   box-sizing: border-box;
 }
 
-.ab-app * {
-  box-sizing: border-box;
-}
+.ab-app * { box-sizing: border-box; }
 
-/* ── כותרת דביקה ─────────────────────────────────────────────────────────── */
 .ab-app-header {
   position: sticky;
   top: 0;
@@ -604,11 +960,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--ab-surface);
-  border-bottom: 1px solid var(--ab-border);
+  background: var(--ab-paper);
+  border-bottom: 2px solid var(--ab-border);
   padding: var(--ab-space-sm) var(--ab-space-md);
   flex-shrink: 0;
-  box-shadow: 0 1px 4px var(--ab-shadow);
+  box-shadow: 0 2px 0 var(--ab-border), 0 4px 12px var(--ab-shadow-soft);
 }
 
 .ab-app-header-text {
@@ -618,16 +974,16 @@
   min-width: 0;
 }
 
-/* ── כותרת ראשית ─────────────────────────────────────────────────────────── */
 .ab-app-title {
-  font-size: clamp(18px, 4.5dvmin, 26px);
+  font-family: var(--ab-font-display);
+  font-size: clamp(20px, 4.6dvmin, 28px);
   font-weight: 900;
-  color: var(--ab-text);
+  color: var(--ab-ink);
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
 }
 
-/* ── כותרת משנה ──────────────────────────────────────────────────────────── */
 .ab-app-subtitle {
   font-size: clamp(12px, 2.5dvmin, 14px);
   color: var(--ab-text-muted);
@@ -638,7 +994,6 @@
   text-overflow: ellipsis;
 }
 
-/* ── כפתור חזרה לדף הבית ─────────────────────────────────────────────────── */
 .ab-app-back-link {
   display: flex;
   align-items: center;
@@ -649,47 +1004,40 @@
   font-size: clamp(22px, 5dvmin, 30px);
   border-radius: var(--ab-radius-sm);
   text-decoration: none;
-  color: var(--ab-text);
-  background: transparent;
+  color: var(--ab-ink);
+  background: var(--ab-paper-2);
+  border: 2px solid var(--ab-border);
   transition: background var(--ab-transition), transform var(--ab-transition);
   margin-inline-start: var(--ab-space-sm);
 }
 
 .ab-app-back-link:hover {
-  background: rgba(255, 107, 53, 0.12);
-  transform: scale(1.1);
+  background: var(--ab-paper-3);
+  transform: translateY(-1px) rotate(-2deg);
 }
 
 .ab-app-back-link:focus-visible {
-  outline: 4px solid var(--ab-primary);
+  outline: 3px dashed var(--ab-tomato);
   outline-offset: 3px;
 }
 
-/* ── שורת טאבים — שולחן עבודה בלבד ─────────────────────────────────────── */
 .ab-app-tabs {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  background: var(--ab-surface);
-  border-bottom: 1px solid var(--ab-border);
+  background: var(--ab-paper);
+  border-bottom: 2px solid var(--ab-border);
   padding: 0 var(--ab-space-md);
   flex-shrink: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
+.ab-app-tabs::-webkit-scrollbar { display: none; }
 
-.ab-app-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-/* מסתר שורת טאבים במובייל */
 @media (max-width: 639px) {
-  .ab-app-tabs {
-    display: none;
-  }
+  .ab-app-tabs { display: none; }
 }
 
-/* ── טאב בודד ────────────────────────────────────────────────────────────── */
 .ab-app-tab {
   display: flex;
   align-items: center;
@@ -698,8 +1046,8 @@
   border: none;
   border-bottom: 3px solid transparent;
   background: transparent;
-  color: var(--ab-text-muted);
-  font-family: var(--ab-font);
+  color: var(--ab-ink-muted);
+  font-family: var(--ab-font-body);
   font-size: clamp(14px, 3dvmin, 16px);
   font-weight: 500;
   cursor: pointer;
@@ -708,42 +1056,32 @@
   direction: rtl;
 }
 
-.ab-app-tab:hover {
-  color: var(--ab-text);
-}
+.ab-app-tab:hover { color: var(--ab-ink); }
 
 .ab-app-tab.ab-active {
-  color: var(--ab-primary);
-  border-bottom-color: var(--ab-primary);
+  color: var(--ab-tomato);
+  border-bottom-color: var(--ab-tomato);
   font-weight: 700;
 }
 
 .ab-app-tab:focus-visible {
-  outline: 3px solid var(--ab-primary);
+  outline: 3px dashed var(--ab-tomato);
   outline-offset: -3px;
 }
 
-.ab-app-tab-icon {
-  font-size: 1.1em;
-}
+.ab-app-tab-icon { font-size: 1.1em; }
 
-/* ── אזור תוכן ראשי ──────────────────────────────────────────────────────── */
 .ab-app-content {
   flex: 1;
   overflow-y: auto;
   padding: var(--ab-space-md);
-  /* מרווח תחתון כדי שהניווט התחתון לא יכסה תוכן במובייל */
   padding-bottom: calc(72px + env(safe-area-inset-bottom, 0));
 }
 
-/* בשולחן עבודה אין ניווט תחתון — אין צורך במרווח נוסף */
 @media (min-width: 640px) {
-  .ab-app-content {
-    padding-bottom: var(--ab-space-md);
-  }
+  .ab-app-content { padding-bottom: var(--ab-space-md); }
 }
 
-/* ── ניווט תחתון — מובייל בלבד ──────────────────────────────────────────── */
 .ab-app-bottom-nav {
   position: fixed;
   bottom: 0;
@@ -753,20 +1091,16 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  background: var(--ab-surface);
-  border-top: 1px solid var(--ab-border);
+  background: var(--ab-paper);
+  border-top: 2px solid var(--ab-border);
   padding-bottom: env(safe-area-inset-bottom, 0);
-  box-shadow: 0 -2px 8px var(--ab-shadow);
+  box-shadow: 0 -3px 0 var(--ab-border), 0 -6px 14px var(--ab-shadow-soft);
 }
 
-/* מסתר ניווט תחתון בשולחן עבודה */
 @media (min-width: 640px) {
-  .ab-app-bottom-nav {
-    display: none;
-  }
+  .ab-app-bottom-nav { display: none; }
 }
 
-/* ── פריט ניווט תחתון ────────────────────────────────────────────────────── */
 .ab-app-nav-item {
   flex: 1;
   display: flex;
@@ -778,8 +1112,8 @@
   border: none;
   border-top: 3px solid transparent;
   background: transparent;
-  color: var(--ab-text-muted);
-  font-family: var(--ab-font);
+  color: var(--ab-ink-muted);
+  font-family: var(--ab-font-body);
   font-size: 10px;
   font-weight: 500;
   cursor: pointer;
@@ -788,34 +1122,23 @@
   min-height: 56px;
 }
 
-.ab-app-nav-item:hover {
-  color: var(--ab-text);
-}
+.ab-app-nav-item:hover { color: var(--ab-ink); }
 
 .ab-app-nav-item.ab-active {
-  color: var(--ab-primary);
-  border-top-color: var(--ab-primary);
+  color: var(--ab-tomato);
+  border-top-color: var(--ab-tomato);
   font-weight: 700;
 }
 
 .ab-app-nav-item:focus-visible {
-  outline: 3px solid var(--ab-primary);
+  outline: 3px dashed var(--ab-tomato);
   outline-offset: -3px;
 }
 
-.ab-app-nav-icon {
-  font-size: 22px;
-  line-height: 1;
-}
-
-.ab-app-nav-label {
-  font-size: 10px;
-  line-height: 1.2;
-}
+.ab-app-nav-icon { font-size: 22px; line-height: 1; }
+.ab-app-nav-label { font-size: 10px; line-height: 1.2; }
 
 /* ── Audio Status Banner ─────────────────────────────────────────────────── */
-/* פס סטטוס קול עליון: מודיע לילד שצריך להקיש כדי לאפשר קול,
-   או שאין תמיכה בקול. RTL, גובה ~64px, לא חוסם את אזור המשחק. */
 .alefbet-audio-banner {
   position: fixed;
   top: 0;
@@ -829,35 +1152,30 @@
   min-height: 64px;
   padding: 16px 20px;
   direction: rtl;
-  font-family: var(--ab-font);
+  font-family: var(--ab-font-display);
   font-size: clamp(18px, 3.2dvmin, 22px);
   font-weight: 700;
-  color: #fff;
-  background: rgba(28, 27, 31, 0.92);
-  box-shadow: 0 2px 8px var(--ab-shadow);
+  color: var(--ab-paper);
+  background: var(--ab-ink);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.18), 0 6px 18px var(--ab-shadow);
   pointer-events: auto;
   opacity: 0;
   transform: translateY(-100%);
   transition: opacity var(--ab-transition), transform var(--ab-transition);
 }
 
-.alefbet-audio-banner.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+.alefbet-audio-banner.is-visible { opacity: 1; transform: translateY(0); }
 
 .alefbet-audio-banner.is-await {
-  background: var(--ab-primary);
+  background: var(--ab-tomato);
   cursor: pointer;
 }
 
-.alefbet-audio-banner.is-unsupported {
-  background: var(--ab-text);
-}
+.alefbet-audio-banner.is-unsupported { background: var(--ab-ink); }
 
 .alefbet-audio-banner.is-failed {
-  background: var(--ab-warning);
-  color: var(--ab-text);
+  background: var(--ab-ochre);
+  color: var(--ab-ink);
 }
 
 .alefbet-audio-banner__msg {

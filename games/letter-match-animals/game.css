@@ -1,36 +1,28 @@
-/* ── Letter Match Animals — Game-specific styles ── */
+/* ── Letter Match Animals — Game-specific styles ──────────────────────────
+   הצביעה הפעם משאירה את ה-glow-ים החזותיים למחלקות המסגרת (option-card--correct
+   ו--wrong) שכבר מציירות חותם ירוק/חמרי על נייר. כאן נשארים רק חוקי הפריסה
+   הספציפיים של פאנל-האות מול פאנל-הכרטיסים. */
 
-/* Two-panel layout — flex children inside .game-body */
 .round-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(10px, 2.5dvmin, 20px);
+  gap: clamp(12px, 2.8dvmin, 22px);
 }
 
-/* Letter panel: fixed size, doesn't grow */
+/* Letter panel: fixed size, doesn't grow — slight tilt for storybook feel */
 .round-panel--letter {
   flex: 0 0 auto;
+  transform: rotate(-1.5deg);
 }
 
-/* Options panel: expands to fill remaining space,
-   wraps below letter in portrait, sits beside in landscape */
+/* Options panel: expands to fill remaining space, wraps below the letter
+   in portrait and sits beside it in landscape. */
 .round-panel--options {
   flex: 1 0 min(280px, 85dvw);
-  max-width: 480px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(10px, 2.5dvmin, 20px);
-}
-
-/* Letter entrance animation — uses framework .anim-appear class added in JS */
-
-/* Correct card glow */
-.option-card--correct {
-  box-shadow: 0 0 0 6px #00C896, 0 4px 20px rgba(0,200,150,0.4) !important;
-}
-
-.option-card--wrong {
-  box-shadow: 0 0 0 6px #FFB400, 0 4px 20px rgba(255,180,0,0.3) !important;
+  gap: clamp(12px, 2.8dvmin, 22px);
 }
