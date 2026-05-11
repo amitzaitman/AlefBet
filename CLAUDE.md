@@ -23,7 +23,6 @@ framework/src/
   __tests__/ vitest suites
 
 games/<name>/     index.html + game.js + game.css  (single-screen games)
-apps/<name>/      larger multi-page apps (e.g. passover-cleaning)
 deploy/           Cloudflare Worker (Nakdan proxy) + infra
 ```
 
@@ -58,4 +57,4 @@ deploy/           Cloudflare Worker (Nakdan proxy) + infra
 
 ## Deploy
 
-Pushing to `main` triggers `.github/workflows/deploy.yml`, which serves `index.html`, `games/`, `apps/`, and `framework/dist/` from GitHub Pages.
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which serves `index.html`, `games/`, and `framework/dist/` from GitHub Pages.

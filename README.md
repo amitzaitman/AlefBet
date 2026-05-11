@@ -115,9 +115,6 @@ AlefBet/
 │       ├── alefbet.umd.cjs
 │       └── alefbet.css
 │
-├── apps/                       ← Larger multi-page apps
-│   └── passover-cleaning/
-│
 └── games/                      ← Each game is an independent folder
     ├── _template/              ← Copy this to start a new game
     ├── letter-match-animals/   🦁 Letter → Animal matching

@@ -1,8 +1,8 @@
 /**
  * חוזה createLocalState
  *
- * עטיפה סביב localStorage שמשדרת לנרשמים בכל שינוי. משמש ב-apps גדולים
- * כמקור אמת עמיד לאיפוס.
+ * עטיפה סביב localStorage שמשדרת לנרשמים בכל שינוי. משמש במשחקים
+ * בעלי מצב מתמשך כמקור אמת עמיד לאיפוס.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createLocalState } from '../../core/local-state.js';

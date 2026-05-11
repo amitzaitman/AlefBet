@@ -8,7 +8,7 @@ import { join, extname } from 'path';
  */
 
 const PROJECT_ROOT = join(import.meta.dirname, '..', '..', '..');
-const SCAN_DIRS = ['framework/src', 'games', 'apps'];
+const SCAN_DIRS = ['framework/src', 'games'];
 const SCAN_FILES = ['index.html'];
 const SCAN_EXTENSIONS = new Set(['.js', '.html', '.css', '.json']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.a5c', '.git', '.claude']);

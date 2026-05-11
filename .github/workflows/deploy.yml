@@ -41,7 +41,6 @@ jobs:
           cp index.html _site/
           cp -r framework/dist _site/framework/dist
           cp -r games _site/games
-          cp -r apps _site/apps
 
       - uses: actions/upload-pages-artifact@v3
         with:
