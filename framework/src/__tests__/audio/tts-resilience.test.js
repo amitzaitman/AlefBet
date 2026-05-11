@@ -96,9 +96,9 @@ function makeSynthStub(opts = {}) {
 function installAudioStub(configure) {
   /** @type {any[]} */
   const instances = [];
-  function FakeAudio() {
+  function FakeAudio(url) {
     const a = {
-      src: '',
+      src: typeof url === 'string' ? url : '',
       playbackRate: 1,
       onended: null,
       onerror: null,
@@ -326,6 +326,126 @@ describe('tts resilience', () => {
     const sequence = stateEvents().map(e => e.detail?.state);
     // המעבר חייב לכלול מעבר ל-ready לפחות פעם אחת.
     expect(sequence).toContain('ready');
+  });
+
+  it('speakNikud → plays syllable at natural rate then vowel sound at slow rate', async () => {
+    // הבעיה ההיסטורית: הברה אחת בקצב 0.5 מתחה גם את העיצור (-> "מממממההה").
+    // המימוש החדש משמיע את ההברה בקצב הרגיל ואז את צליל התנועה לבד בקצב
+    // האיטי כדי שתישמע "מההההה".
+    /** @type {any[]} */
+    const audios = installAudioStub((a) => {
+      a.play = vi.fn(() => {
+        queueMicrotask(() => { if (typeof a.onended === 'function') a.onended(); });
+        return Promise.resolve();
+      });
+    });
+    const synth = makeSynthStub({ voices: [{ name: 'Carmit', lang: 'he-IL' }] });
+    globalThis.speechSynthesis = synth;
+
+    const tts = await loadTts();
+    tts.useGoogle(true);
+    tts.setNikudEmphasis({ rate: 0.5 });
+
+    await tts.speakNikud('מ', 'ָ');
+
+    // שני audio instances - הברה ואחריה תנועה.
+    expect(audios.length).toBe(2);
+
+    // השלב הראשון - ההברה - בקצב הברירת מחדל (לא הקצב האיטי).
+    expect(audios[0].src).toContain(encodeURIComponent('מָ'));
+    expect(audios[0].playbackRate).toBeGreaterThan(0.5);
+
+    // השלב השני - צליל התנועה - בקצב האיטי שהוגדר.
+    expect(audios[1].src).toContain(encodeURIComponent('אָה'));
+    expect(audios[1].playbackRate).toBe(0.5);
+  });
+
+  it('speakNikud → sends nikud to Google (so it speaks the syllable, not the letter name)', async () => {
+    // הרגרסיה ההיסטורית: _stripNikud היה מסיר את "ַ" וGoogle קיבל "מ" בלבד,
+    // מה שגרם לו לחזור לשם האות ("mem") ולהישמע "ממממ" בקצב איטי. הסעיף הזה
+    // מבטיח שהניקוד מגיע ל-Google כך שהוא מבטא הברה אמיתית.
+    const audios = installAudioStub((a) => {
+      a.play = vi.fn(() => {
+        queueMicrotask(() => { if (typeof a.onended === 'function') a.onended(); });
+        return Promise.resolve();
+      });
+    });
+    const synth = makeSynthStub({ voices: [{ name: 'Carmit', lang: 'he-IL' }] });
+    globalThis.speechSynthesis = synth;
+
+    const tts = await loadTts();
+    tts.useGoogle(true);
+
+    await tts.speakNikud('מ', 'ָ');
+
+    // ה-URL של ההברה חייב להכיל את הניקוד (קמץ), לא רק את האות.
+    expect(audios[0].src).toContain(encodeURIComponent('מָ'));
+    // ולא רק את "מ" - אחרת זו אותה רגרסיה.
+    expect(audios[0].src).not.toBe(`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent('מ')}&tl=he&client=tw-ob`);
+  });
+
+  it('regular tts.speak() still strips nikud (default protective behaviour)', async () => {
+    const audios = installAudioStub((a) => {
+      a.play = vi.fn(() => {
+        queueMicrotask(() => { if (typeof a.onended === 'function') a.onended(); });
+        return Promise.resolve();
+      });
+    });
+    const synth = makeSynthStub({ voices: [{ name: 'Carmit', lang: 'he-IL' }] });
+    globalThis.speechSynthesis = synth;
+
+    const tts = await loadTts();
+    tts.useGoogle(true);
+
+    await tts.speak('שָׁלוֹם');
+
+    // ברירת המחדל של speak נשארת: הסרת ניקוד לפני שליחה ל-Google.
+    expect(audios[0].src).toContain(encodeURIComponent('שלום'));
+    expect(audios[0].src).not.toContain(encodeURIComponent('שָׁ'));
+  });
+
+  it('speakNikud → unknown nikud falls back to single syllable utterance', async () => {
+    const audios = installAudioStub((a) => {
+      a.play = vi.fn(() => {
+        queueMicrotask(() => { if (typeof a.onended === 'function') a.onended(); });
+        return Promise.resolve();
+      });
+    });
+    const synth = makeSynthStub({ voices: [{ name: 'Carmit', lang: 'he-IL' }] });
+    globalThis.speechSynthesis = synth;
+
+    const tts = await loadTts();
+    tts.useGoogle(true);
+
+    // 'ַ' (פתח) לא קיים ב-mock שמכיל רק kamatz/holam - נצפה לשלב יחיד.
+    await tts.speakNikud('מ', 'ַ');
+
+    expect(audios.length).toBe(1);
+    expect(audios[0].src).toContain(encodeURIComponent('מַ'));
+  });
+
+  it('per-item rate override does not leak to the global rate', async () => {
+    const audios = installAudioStub((a) => {
+      a.play = vi.fn(() => {
+        queueMicrotask(() => { if (typeof a.onended === 'function') a.onended(); });
+        return Promise.resolve();
+      });
+    });
+    const synth = makeSynthStub({ voices: [{ name: 'Carmit', lang: 'he-IL' }] });
+    globalThis.speechSynthesis = synth;
+
+    const tts = await loadTts();
+    tts.useGoogle(true);
+    tts.setRate(0.9);
+    tts.setNikudEmphasis({ rate: 0.5 });
+
+    await tts.speakNikud('מ', 'ָ');
+    // אחרי speakNikud, speak רגיל אמור להמשיך בקצב הגלובלי 0.9.
+    await tts.speak('שלום');
+
+    const lastAudio = audios[audios.length - 1];
+    expect(lastAudio.src).toContain(encodeURIComponent('שלום'));
+    expect(lastAudio.playbackRate).toBe(0.9);
   });
 
   it('cancel() leaves state machine consistent and drains queued speaks', async () => {

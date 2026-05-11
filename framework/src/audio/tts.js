@@ -15,7 +15,13 @@ import { nikudList } from '../data/nikud.js';
 /** טיים-אאוט להמתנה לטעינת קולות עבריים מהדפדפן (במילישניות). */
 const VOICE_LOAD_TIMEOUT_MS = 2000;
 
-/** @type {{ text: string, resolve: () => void }[]} */
+/**
+ * תור הדיבור. כל פריט יכול לכלול:
+ * - `rate`: קצב ספציפי לפריט (משמש את `speakNikud`/`speakVowel`).
+ * - `keepNikud`: לא להסיר ניקוד לפני שליחה ל-Google. דרוש להגיית הברה
+ *   בודדת (`מַ`) כי בלי הניקוד Google חוזר לשם האות ("mem") במקום לצליל.
+ * @type {{ text: string, resolve: () => void, rate?: number, keepNikud?: boolean }[]}
+ */
 let _queue = [];
 let _speaking = false;
 let _useGoogleTTS = true;
@@ -190,14 +196,17 @@ function _playGoogleAudio(text, resolve, fail) {
  * מנסה להשמיע ב-Google. דוחה אם אין Audio זמין או אם ההפעלה נכשלה
  * (אחרי טיפול ב-NotAllowedError ו-retry פעם אחת על אינטראקציה).
  * @param {string} text
+ * @param {{ keepNikud?: boolean }} [opts]
  */
-function _googleSpeak(text) {
+function _googleSpeak(text, opts = {}) {
   return new Promise((resolve, reject) => {
     if (typeof Audio === 'undefined') {
       reject(new Error('Audio constructor unavailable'));
       return;
     }
-    const textForGoogle = _stripNikud(text).trim() || text;
+    // הסרת ניקוד היא הגנה ברירת מחדל לטקסטים ארוכים. עבור הברה בודדת בניקוד
+    // (speakNikud) חייבים לשמור את הניקוד כי בלעדיו Google חוזר לשם האות.
+    const textForGoogle = opts.keepNikud ? text : (_stripNikud(text).trim() || text);
     let settled = false;
     let retriedAfterInteraction = false;
 
@@ -370,13 +379,14 @@ async function _browserSpeak(text) {
  * מנסה Google ואז דפדפן. מחזיר { ok: true } בהצלחה, או { ok: false, reason }
  * אם שני הספקים נכשלו. תמיד נפתר (לא דוחה).
  * @param {string} text
+ * @param {{ keepNikud?: boolean }} [opts]
  * @returns {Promise<{ ok: boolean, reason?: string }>}
  */
-async function _speakWithFallback(text) {
+async function _speakWithFallback(text, opts = {}) {
   let lastReason = '';
   if (_useGoogleTTS && typeof Audio !== 'undefined') {
     try {
-      await _googleSpeak(text);
+      await _googleSpeak(text, opts);
       return { ok: true };
     } catch (err) {
       lastReason = err?.message || 'google-failed';
@@ -402,7 +412,15 @@ function _processQueue() {
   _speaking = true;
   _activeItem = item;
 
-  _speakWithFallback(item.text).then((result) => {
+  // קצב לכל פריט: שומרים את הגלובלי, דורסים בזמן ההשמעה, ומחזירים אחרי שהפריט
+  // סיים - כך ש-speakNikud יכול לתור הברה בקצב טבעי ואחריה תנועה איטית
+  // בלי לגרור את הגלובלי לכל המתקשרים האחרים.
+  const previousRate = _rate;
+  const hasRateOverride = typeof item.rate === 'number';
+  if (hasRateOverride) _rate = item.rate;
+
+  _speakWithFallback(item.text, { keepNikud: item.keepNikud === true }).then((result) => {
+    if (hasRateOverride) _rate = previousRate;
     _speaking = false;
     const wasActive = _activeItem === item;
     _activeItem = null;
@@ -428,6 +446,7 @@ function _processQueue() {
     _processQueue();
   }).catch((err) => {
     // הגנה: _speakWithFallback אמור לא לדחות אבל למקרה.
+    if (hasRateOverride) _rate = previousRate;
     _speaking = false;
     _activeItem = null;
     _setState('failed', err?.message || 'unknown');
@@ -601,19 +620,33 @@ export const tts = {
   },
 
   /**
-   * הקרא אות עם ניקוד באיטיות להדגשת התנועה.
+   * הקרא אות עם ניקוד בשני שלבים: קודם את ההברה בקצב טבעי כדי שהעיצור יהיה קצר,
+   * ואז את צליל התנועה לבד בקצב האיטי שמיועד לניקוד - כך הילד שומע
+   * "מ-אההההה" במקום "ממממ-אה" שמתקבל מהאטה אחידה של ההברה כולה.
    * @param {string} letter - האות (למשל 'ב').
    * @param {string} nikudSymbol - סמל הניקוד (למשל U+05B7).
    */
   speakNikud(letter, nikudSymbol) {
-    const text = letter + nikudSymbol;
-    const savedRate = _rate;
-    _rate = _nikudRate;
+    const syllable = letter + nikudSymbol;
+    const entry = nikudList.find(n => n.symbol === nikudSymbol);
     return new Promise(resolve => {
-      _queue.push({ text, resolve: () => resolve(undefined) });
+      if (entry && entry.sound) {
+        // שלב 1: ההברה השלמה בקצב הרגיל; keepNikud=true כדי ש-Google יקבל
+        // את הניקוד ויהגה הברה ולא שם אות. ה-resolve שלה noop כי המתקשר
+        // מחכה רק לסיום השלב השני.
+        _queue.push({ text: syllable, keepNikud: true, resolve: () => {} });
+        // שלב 2: צליל התנועה בקצב האיטי - מאריך את התנועה.
+        _queue.push({
+          text: entry.sound,
+          rate: _nikudRate,
+          keepNikud: true,
+          resolve: () => resolve(undefined),
+        });
+      } else {
+        // אין נתון תנועה - הברה אחת בקצב טבעי.
+        _queue.push({ text: syllable, keepNikud: true, resolve: () => resolve(undefined) });
+      }
       _processQueue();
-    }).finally(() => {
-      _rate = savedRate;
     });
   },
 
@@ -625,13 +658,14 @@ export const tts = {
   speakVowel(nikudId) {
     const entry = nikudList.find(n => n.id === nikudId);
     if (!entry || !entry.sound) return Promise.resolve();
-    const savedRate = _rate;
-    _rate = _nikudRate;
     return new Promise(resolve => {
-      _queue.push({ text: entry.sound, resolve: () => resolve(undefined) });
+      _queue.push({
+        text: entry.sound,
+        rate: _nikudRate,
+        keepNikud: true,
+        resolve: () => resolve(undefined),
+      });
       _processQueue();
-    }).finally(() => {
-      _rate = savedRate;
     });
   },
 };
