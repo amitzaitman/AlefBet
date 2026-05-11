@@ -11,6 +11,8 @@ import {
   createFeedback,
   showCompletionScreen,
   getNikud,
+  tts,
+  mountAudioStatusBanner,
 } from '../../framework/dist/alefbet.js';
 
 // ── Game data ─────────────────────────────────────────────────────────────
@@ -79,6 +81,20 @@ export async function startGame(container) {
   let feedback = null;
   let cards = null;
   let currentRoundIndex = 0;
+  let firstInteractionHandled = false;
+
+  // Mounted on container so the banner sits above the game shell;
+  // teardown fires on shell 'end' so a restart re-mounts cleanly.
+  const audioBanner = mountAudioStatusBanner(container);
+  shell.on('end', () => audioBanner.destroy());
+
+  function handleFirstInteraction() {
+    if (firstInteractionHandled) return;
+    firstInteractionHandled = true;
+    // Pre-warm audio from a real user gesture so the first speak() inside a round
+    // doesn't trip autoplay restrictions and surface the awaiting-interaction banner.
+    tts.unlock();
+  }
 
   function buildRoundUI(roundData) {
     shell.bodyEl.innerHTML = '';
@@ -120,6 +136,7 @@ export async function startGame(container) {
   }
 
   function onSelect(option, roundData, rightPanelEl) {
+    handleFirstInteraction();
     cards.disable();
     const letterName = getLetter(roundData.target)?.nameNikud || roundData.target;
 

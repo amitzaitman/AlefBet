@@ -37,6 +37,7 @@ export { createNikudBox }          from './ui/nikud-box.js';
 export { nikudGlyphSvg, NIKUD_GLYPH_IDS } from './ui/nikud-glyphs.js';
 export { createAppShell }          from './ui/app-shell.js';
 export { createVoiceRecordButton } from './ui/voice-record-button.js';
+export { mountAudioStatusBanner } from './ui/audio-status-banner.js';
 
 // ===== Render =====
 export { animate } from './render/animations.js';

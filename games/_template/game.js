@@ -11,6 +11,8 @@ import {
   createProgressBar,
   createFeedback,
   showCompletionScreen,
+  tts,
+  mountAudioStatusBanner,
 } from '../../framework/dist/alefbet.js';
 
 const STATIC_TEXTS = [
@@ -29,7 +31,22 @@ export async function startGame(container) {
     defaultRounds: ROUNDS,
   });
 
+  // הבאנר מציג למשתמש מצבי שמע (חסום, ממתין למחווה, שגיאה).
+  // ממוקם על ה-container כדי שיופיע מעל מעטפת המשחק; נסגר ב-'end' כדי שאתחול-מחדש יקים אותו נקי.
+  const audioBanner = mountAudioStatusBanner(container);
+  shell.on('end', () => audioBanner.destroy());
+
+  let firstInteractionHandled = false;
+  function handleFirstInteraction() {
+    if (firstInteractionHandled) return;
+    firstInteractionHandled = true;
+    // חימום מוקדם של ה-TTS ממחווה אמיתית של המשתמש — מונע חסימת autoplay בקריאה הראשונה ל-speak().
+    tts.unlock();
+  }
+
   shell.bodyEl.innerHTML = '<p style="text-align:center;padding:2rem">הַמִּשְׂחָק שֶׁלְּךָ יוֹפִיעַ כָּאן</p>';
+  // קוראים ל-handleFirstInteraction בכל אינטראקציה ראשונה של המשתמש (למשל onClick של כרטיס).
+  shell.bodyEl.addEventListener('pointerdown', handleFirstInteraction, { once: true });
 
   shell.on('start', () => {
   });

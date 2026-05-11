@@ -19,6 +19,7 @@ import {
   randomNikud,
   showNikudSettingsDialog,
   injectHeaderButton,
+  mountAudioStatusBanner,
 } from '../../framework/dist/alefbet.js';
 
 // ── Texts to preload ──────────────────────────────────────────────────────
@@ -60,11 +61,49 @@ export async function startGame(container) {
   // Inject Settings button into header spacer
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
 
+  // Audio status banner — independent of the voice-recorder gate at line 45.
+  // Mounted on container so it sits above the shell; torn down on shell 'end'
+  // so a restart re-mounts cleanly.
+  const audioBanner = mountAudioStatusBanner(container);
+
   let progressBar = null;
   let feedback = null;
   let roundIndex = 0;
   let failCount = 0;
   let listening = false;
+  let firstInteractionHandled = false;
+  let ttsUnsupported = tts.audioState === 'unsupported';
+  /** @type {HTMLButtonElement | null} */
+  let currentDemoBtn = null;
+
+  function applyDemoBtnState(btn) {
+    if (!btn) return;
+    if (ttsUnsupported) {
+      btn.disabled = true;
+      btn.setAttribute('aria-disabled', 'true');
+    } else {
+      btn.disabled = false;
+      btn.removeAttribute('aria-disabled');
+    }
+  }
+
+  const unsubTtsState = tts.onStateChange(({ state }) => {
+    ttsUnsupported = state === 'unsupported';
+    applyDemoBtnState(currentDemoBtn);
+  });
+
+  function handleFirstInteraction() {
+    if (firstInteractionHandled) return;
+    firstInteractionHandled = true;
+    // Pre-warm both audio paths from a real user gesture so the first speak()
+    // doesn't trip autoplay restrictions and surface the awaiting-interaction banner.
+    tts.unlock();
+  }
+
+  shell.on('end', () => {
+    audioBanner.destroy();
+    unsubTtsState();
+  });
 
   function buildRoundUI(nikud) {
     failCount = 0;
@@ -91,8 +130,11 @@ export async function startGame(container) {
     demoBtn.setAttribute('aria-label', 'הַשְׁמַע צְלִיל');
     demoBtn.innerHTML = '<span class="demo-btn__icon">🔊</span><span class="demo-btn__text">הַקְשֵׁב</span>';
     demoBtn.onclick = () => {
+      handleFirstInteraction();
       tts.speakVowel(nikud.id);
     };
+    currentDemoBtn = demoBtn;
+    applyDemoBtnState(demoBtn);
     panel.appendChild(demoBtn);
 
     // ── Mic button ──
@@ -100,7 +142,10 @@ export async function startGame(container) {
     micBtn.className = 'mic-btn';
     micBtn.setAttribute('aria-label', 'הַקְלֵט');
     micBtn.innerHTML = '<span class="mic-btn__icon">🎤</span><span class="mic-btn__text">לְחַץ וּדְבַּר</span>';
-    micBtn.onclick = () => onMicPress(nikud, micBtn);
+    micBtn.onclick = () => {
+      handleFirstInteraction();
+      onMicPress(nikud, micBtn);
+    };
     panel.appendChild(micBtn);
 
     // ── Feedback area ──

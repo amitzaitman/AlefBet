@@ -13,10 +13,12 @@
     "lint": "eslint .",
     "typecheck": "npm run typecheck --workspace=framework",
     "check": "npm run lint && npm run typecheck && npm test",
-    "dev:framework": "npm run dev --workspace=framework"
+    "dev:framework": "npm run dev --workspace=framework",
+    "e2e": "playwright test"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.59.1",
     "eslint": "^10.2.0",
     "globals": "^17.5.0",
     "typescript-eslint": "^8.58.2"

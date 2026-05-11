@@ -2,7 +2,7 @@
  * חוזה createLocalState
  *
  * עטיפה סביב localStorage שמשדרת לנרשמים בכל שינוי. משמש ב-apps גדולים
- * (למשל passover-cleaning) כמקור אמת עמיד לאיפוס.
+ * כמקור אמת עמיד לאיפוס.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createLocalState } from '../../core/local-state.js';

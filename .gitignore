@@ -5,3 +5,6 @@ node_modules/
 build_log.txt
 req.txt
 framework/coverage/
+.playwright-libs/
+test-results/
+playwright-report/

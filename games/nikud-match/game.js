@@ -19,6 +19,7 @@ import {
   createNikudBox,
   createDragSource,
   createDropTarget,
+  mountAudioStatusBanner,
 } from '../../framework/dist/alefbet.js';
 
 const ROUNDS = 8;
@@ -57,6 +58,19 @@ export async function startGame(container) {
   const roundNikud = randomNikud(ROUNDS);
 
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
+
+  // הבאנר מציג הודעות "הקש להפעלת קול"/"הקול אינו זמין" מבלי לחסום את המשחק.
+  // ממוקם בתוך המיכל של המשחק כדי שיפורק אוטומטית כשהמשחק מתחיל מחדש.
+  const audioBanner = mountAudioStatusBanner(container);
+
+  // נשחרר את ה-audio context בלחיצה הראשונה כדי לא להיכנס למצב awaiting-interaction באמצע הסיבוב.
+  let audioUnlocked = false;
+  const unlockAudioOnce = () => {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    try { tts.unlock?.(); } catch { /* noop */ }
+  };
+  container.addEventListener('pointerdown', unlockAudioOnce, { once: true, capture: true });
 
   let progressBar = null;
   let roundIndex = 0;
@@ -152,6 +166,8 @@ export async function startGame(container) {
         if (hasMore && roundIndex < ROUNDS) {
           buildRoundUI(roundNikud[roundIndex]);
         } else {
+          // מסך הסיום מחליף את ה-DOM; פירוק הבאנר משחרר מאזיני window שלא יידרשו עוד.
+          audioBanner?.destroy?.();
           showCompletionScreen(container, shell.state.score, ROUNDS, () => startGame(container));
         }
       }, 1800);

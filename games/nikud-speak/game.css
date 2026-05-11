@@ -71,6 +71,20 @@
   transform: scale(0.97);
 }
 
+.demo-btn:disabled,
+.demo-btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f0f4ff;
+  transform: none;
+}
+
+.demo-btn:disabled:hover,
+.demo-btn[aria-disabled="true"]:hover {
+  background: #f0f4ff;
+  transform: none;
+}
+
 .demo-btn__icon {
   font-size: 1.4em;
 }
