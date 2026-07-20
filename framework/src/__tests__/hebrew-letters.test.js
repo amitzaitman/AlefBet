@@ -36,9 +36,18 @@ describe('hebrewLetters data integrity', () => {
   });
 
   it('all final forms are marked correctly', () => {
-    const finalChars = ['ךְ', 'םִ', 'ן', 'ף', 'ץ'];
+    const finalChars = ['ך', 'ם', 'ן', 'ף', 'ץ'];
     for (const ch of finalChars) {
       expect(getLetter(ch)?.isFinal, `${ch} should be isFinal`).toBe(true);
+    }
+  });
+
+  it('letter field is a single bare character - no embedded nikud', () => {
+    // רגרסיה: ם נשמרה בעבר עם חיריק תקוע ו-ך עם שווא, ולכן getLetter('ם')
+    // נכשל וכל התאמה לפי תו נשברה בשקט.
+    for (const l of hebrewLetters) {
+      expect(l.letter.length, `letter "${l.name}" must be one char`).toBe(1);
+      expect(/^[א-ת]$/.test(l.letter), `letter "${l.name}" must be a bare Hebrew letter`).toBe(true);
     }
   });
 });

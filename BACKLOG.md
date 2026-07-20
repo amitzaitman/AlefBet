@@ -11,6 +11,12 @@
 - [x] ציור אזורים חופשי (Freeform Zone Drawing) — כלי פוליגון + מלבן, SVG rendering, גרירת צורות חופשיות
 - [x] מערכת רמזים אוטומטית (Auto-Hint System) — אחרי 3 שגיאות, מצמוץ אוטומטי של אזורים נכונים (hintAfter=3)
 - [x] תבניות פעילויות (Activity Templates) — 8 תבניות מוכנות (2×2, 3×3, שורה, עמודים, זרקור, ריק)
+- [x] שמע עברי ללא רשת (Offline Hebrew Audio) — שרשרת הקלטת-מורה → TTS → סינתזת פורמנטים (`audio/hebrew-audio.js`, `audio/phoneme-synth.js`)
+- [x] אולפן הצלילים (Sound Studio) — עמוד מורה להקלטת אותיות/ניקוד/הברות לבנק צלילים ב-IndexedDB (`games/sound-studio/`)
+- [x] משחק קריאת הברות (Syllable Read) — שמיעת הברה ובחירת אות+ניקוד, עם רמזים מדורגים (`games/syllable-read/`, `core/hints.js`)
+- [x] הסרת Google Translate מזמן ריצה — TTS מקומי בלבד עם watchdog; "קימפול" חד-פעמי של בנק הצלילים דרך ה-worker (`audio/sound-bank-compiler.js`)
+- [x] נקדן עמיד — דילוג על טקסט מנוקד, timeout, מטמון מתמיד ב-localStorage
+- [x] גופנים מקומיים (Rubik, Frank Ruhl Libre) — אפס תלות ב-Google Fonts
 
 ---
 

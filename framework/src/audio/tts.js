@@ -1,11 +1,13 @@
 /**
- * מנוע קריאת טקסט עברי עמיד.
+ * מנוע קריאת טקסט עברי מקומי (Web Speech API בלבד).
  *
- * המנוע משתמש ב-Google Translate TTS לאיכות גבוהה יותר עם נפילה
- * ל-Web Speech API כגיבוי. קיימת מכונת מצבים שמדווחת על אירועים
- * (`alefbet:tts-state` ו-`alefbet:tts-error`) ב-window כדי שמשחקים
- * יוכלו להציג באנר תמיכה לילד ולא להישאר תקועים.
+ * אין כאן אף ספק רשת: קול המערכת (speechSynthesis) הוא הספק היחיד.
+ * הקלטות מורה וסינתזת פונמות אופליין נמצאות מעליו בשרשרת של
+ * hebrew-audio.js, ומילוי חד-פעמי של בנק הצלילים דרך הרשת נעשה
+ * ב-sound-bank-compiler.js - כך שבזמן משחק לא יוצאת אף בקשת רשת.
  *
+ * מכונת מצבים מדווחת אירועים (`alefbet:tts-state` ו-`alefbet:tts-error`)
+ * ב-window כדי שמשחקים יציגו באנר ברור ולא ייכשלו בשקט.
  * מצבים: idle | ready | awaiting-interaction | unsupported | failed.
  * הבטחות תמיד נפתרות (גם בכשל) כדי שמשחק לא יתקע על המתנה לקול.
  */
@@ -18,13 +20,10 @@ const VOICE_LOAD_TIMEOUT_MS = 2000;
 /**
  * תור הדיבור. כל פריט יכול לכלול:
  * - `rate`: קצב ספציפי לפריט (משמש את `speakNikud`/`speakVowel`).
- * - `keepNikud`: לא להסיר ניקוד לפני שליחה ל-Google. דרוש להגיית הברה
- *   בודדת (`מַ`) כי בלי הניקוד Google חוזר לשם האות ("mem") במקום לצליל.
- * @type {{ text: string, resolve: () => void, rate?: number, keepNikud?: boolean }[]}
+ * @type {{ text: string, resolve: () => void, rate?: number }[]}
  */
 let _queue = [];
 let _speaking = false;
-let _useGoogleTTS = true;
 let _rate = 0.9;
 let _nikudRate = (typeof localStorage !== 'undefined' && parseFloat(localStorage.getItem('alefbet.nikudRate'))) || 0.5;
 let _interactionReady = false;
@@ -33,8 +32,6 @@ let _interactionPromise = null;
 
 /** @type {{ resolve: () => void } | null} פריט שכרגע "במעוף" - נשמר כדי ש-cancel יוכל לפתור אותו. */
 let _activeItem = null;
-/** @type {any} אובייקט Audio של גוגל שכרגע מתנגן (אם יש). */
-let _activeAudio = null;
 /** @type {SpeechSynthesisUtterance | null} ה-utterance של הדפדפן שכרגע מנוגן. */
 let _activeUtterance = null;
 
@@ -49,32 +46,23 @@ let _awaitingInteractionEmitted = false;
 let _state = 'idle';
 
 /**
- * מחזיר true אם יש לפחות יכולת קול אחת זמינה (Web Speech או Audio).
+ * מחזיר true אם יכולת הקול המקומית קיימת (Web Speech API).
  */
 function _probeCapability() {
-  const hasSynth = typeof speechSynthesis !== 'undefined';
-  const hasAudio = typeof Audio !== 'undefined';
-  return hasSynth || hasAudio;
-}
-
-/**
- * מחזיר true אם יש לפחות ספק קול שאפשר להשתמש בו עכשיו -
- * synth זמין, או Google מופעל ו-Audio זמין.
- */
-function _hasUsableProvider() {
-  const hasSynth = typeof speechSynthesis !== 'undefined';
-  const hasAudio = typeof Audio !== 'undefined';
-  return hasSynth || (_useGoogleTTS && hasAudio);
+  return typeof speechSynthesis !== 'undefined';
 }
 
 /**
  * שולח אירוע `alefbet:tts-state` ב-window ומעדכן את המצב הפנימי.
- * אינו שולח אם המצב לא השתנה (de-dup).
+ * אינו שולח אם המצב לא השתנה (de-dup), אלא אם force=true - נדרש כדי
+ * שכל ניסיון דיבור כושל יידווח לבאנר גם כשהמצב כבר 'unsupported'/'failed'
+ * (אחרת הכשל היה שקט: האירוע הראשון נורה בטעינת המודול, לפני שיש מאזין).
  * @param {'idle' | 'ready' | 'awaiting-interaction' | 'unsupported' | 'failed'} next
  * @param {string} [reason]
+ * @param {boolean} [force]
  */
-function _setState(next, reason) {
-  if (_state === next) return;
+function _setState(next, reason, force = false) {
+  if (_state === next && !force) return;
   const previousState = _state;
   _state = next;
   if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
@@ -86,13 +74,12 @@ function _setState(next, reason) {
 }
 
 /**
- * אתחול ראשוני של מכונת המצבים. אם אין אף יכולת קול - נכנסים ל-unsupported
+ * אתחול ראשוני של מכונת המצבים. אם אין יכולת קול - נכנסים ל-unsupported
  * ופולטים אירוע. אחרת המצב נשאר idle (ללא אירוע).
  */
 function _bootstrapState() {
-  const capable = _probeCapability();
-  if (!capable) {
-    _setState('unsupported', 'no-audio-capability');
+  if (!_probeCapability()) {
+    _setState('unsupported', 'no-speech-synthesis');
   } else {
     _state = 'idle';
   }
@@ -104,35 +91,29 @@ _bootstrapState();
 
 /**
  * שולח אירוע `alefbet:tts-error` עם פרטי הכשל.
- * @param {'google' | 'browser'} provider
  * @param {string} text
  * @param {string} reason
- * @param {string} [sentText]
  */
-function _reportTTSFailure(provider, text, reason, sentText = text) {
+function _reportTTSFailure(text, reason) {
   _lastError = String(reason || 'unknown');
-  console.warn(`[tts] ${provider} TTS failed`, { text, sentText, reason });
+  console.warn('[tts] browser TTS failed', { text, reason });
   if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
     window.dispatchEvent(new CustomEvent('alefbet:tts-error', {
-      detail: { provider, text, sentText, reason },
+      detail: { provider: 'browser', text, sentText: text, reason },
     }));
   }
 }
 
-// ── עזרי טקסט וזיהוי autoplay ─────────────────────────────────────────────
-
-function _stripNikud(text) {
-  return (text || '').replace(/[֑-ׇ]/g, '');
-}
+// ── זיהוי חסימת autoplay והמתנה לאינטראקציה ──────────────────────────────
 
 function _isInteractionBlockedReason(reason) {
   const msg = String(reason || '').toLowerCase();
-  return msg.includes("didn't interact") || msg.includes('notallowed') || msg.includes('user gesture');
+  return msg.includes('not-allowed') || msg.includes('notallowed') || msg.includes("didn't interact") || msg.includes('user gesture');
 }
 
 /**
  * מחזיר Promise שנפתר על האינטראקציה הראשונה של המשתמש (pointer/touch/key).
- * אם המשתמש כבר התעניין - הפתרון מיידי.
+ * אם המשתמש כבר קיים אינטראקציה - הפתרון מיידי.
  */
 function _waitForFirstInteraction() {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -162,97 +143,7 @@ function _waitForFirstInteraction() {
   return _interactionPromise;
 }
 
-// ── Google Translate TTS ──────────────────────────────────────────────────
-
-/**
- * מנגן את ה-Audio של גוגל. שומר רפרנס פעיל ב-_activeAudio.
- * @param {string} text
- * @param {() => void} resolve
- * @param {(reason: string) => void} fail
- */
-function _playGoogleAudio(text, resolve, fail) {
-  const encoded = encodeURIComponent(text);
-  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=he&client=tw-ob`;
-  const audio = new Audio(url);
-  _activeAudio = audio;
-  audio.playbackRate = _rate;
-  audio.onended = () => {
-    if (_activeAudio === audio) _activeAudio = null;
-    resolve();
-  };
-  audio.onerror = () => {
-    if (_activeAudio === audio) _activeAudio = null;
-    fail('audio.onerror');
-  };
-  const playResult = audio.play();
-  if (playResult && typeof playResult.catch === 'function') {
-    playResult.catch((err) => {
-      fail(err?.message || err?.name || 'audio.play() rejected');
-    });
-  }
-}
-
-/**
- * מנסה להשמיע ב-Google. דוחה אם אין Audio זמין או אם ההפעלה נכשלה
- * (אחרי טיפול ב-NotAllowedError ו-retry פעם אחת על אינטראקציה).
- * @param {string} text
- * @param {{ keepNikud?: boolean }} [opts]
- */
-function _googleSpeak(text, opts = {}) {
-  return new Promise((resolve, reject) => {
-    if (typeof Audio === 'undefined') {
-      reject(new Error('Audio constructor unavailable'));
-      return;
-    }
-    // הסרת ניקוד היא הגנה ברירת מחדל לטקסטים ארוכים. עבור הברה בודדת בניקוד
-    // (speakNikud) חייבים לשמור את הניקוד כי בלעדיו Google חוזר לשם האות.
-    const textForGoogle = opts.keepNikud ? text : (_stripNikud(text).trim() || text);
-    let settled = false;
-    let retriedAfterInteraction = false;
-
-    const resolveOnce = () => {
-      if (settled) return;
-      settled = true;
-      resolve();
-    };
-
-    const rejectOnce = (reason) => {
-      if (settled) return;
-      settled = true;
-      reject(reason instanceof Error ? reason : new Error(String(reason)));
-    };
-
-    const startPlay = () => {
-      try {
-        _playGoogleAudio(textForGoogle, resolveOnce, (reason) => {
-          if (!retriedAfterInteraction && _isInteractionBlockedReason(reason)) {
-            retriedAfterInteraction = true;
-            // Emit awaiting-interaction exactly once per blocked attempt — the test asserts a SINGLE event.
-            if (!_awaitingInteractionEmitted) {
-              _awaitingInteractionEmitted = true;
-              _setState('awaiting-interaction', 'autoplay-blocked');
-            }
-            _waitForFirstInteraction().then(() => {
-              _awaitingInteractionEmitted = false;
-              if (!settled) startPlay();
-            });
-            return;
-          }
-          _reportTTSFailure('google', text, reason, textForGoogle);
-          rejectOnce(reason);
-        });
-      } catch (err) {
-        const reason = err?.message || 'Audio() construction failed';
-        _reportTTSFailure('google', text, reason, textForGoogle);
-        rejectOnce(reason);
-      }
-    };
-
-    startPlay();
-  });
-}
-
-// ── Browser Web Speech API (fallback) ─────────────────────────────────────
+// ── Web Speech API ────────────────────────────────────────────────────────
 
 /** @type {SpeechSynthesisVoice | null} */
 let _hebrewVoice = null;
@@ -278,7 +169,12 @@ function _findHebrewVoice() {
     v.lang === 'he-IL' || v.lang === 'iw-IL' || (v.lang || '').startsWith('he')
   );
   if (hebrew.length === 0) return null;
-  return hebrew.find(_isFemaleHebrew) || hebrew[0];
+  // כשאין רשת - קול רשת (localService=false, כמו Google he-IL ב-Chrome)
+  // ייכשל או ייתקע; מעדיפים קול שמותקן במכשיר.
+  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  const pool = offline ? (hebrew.filter(v => v.localService !== false) || hebrew) : hebrew;
+  const usable = pool.length > 0 ? pool : hebrew;
+  return usable.find(_isFemaleHebrew) || usable[0];
 }
 
 /**
@@ -322,7 +218,7 @@ function _ensureVoicesReady() {
     const timer = setTimeout(() => {
       if (!_voiceTimeoutWarned) {
         _voiceTimeoutWarned = true;
-        _reportTTSFailure('browser', '', 'voice-load-timeout');
+        _reportTTSFailure('', 'voice-load-timeout');
       }
       finish();
     }, VOICE_LOAD_TIMEOUT_MS);
@@ -334,77 +230,102 @@ function _ensureVoicesReady() {
 }
 
 /**
- * מנגן ב-Web Speech API. דוחה אם אין speechSynthesis, או אם ה-utterance
- * נכשל (onerror) - כדי שהשרשרת תוכל לטפל בזה.
+ * גבול זמן קשיח ל-utterance: קול רשת של הדפדפן (למשל Google he-IL
+ * ב-Chrome) עלול אופליין לא לירות לא onend ולא onerror - בלי watchdog
+ * ההבטחה הייתה נתקעת לנצח והמשחק איתה.
  * @param {string} text
+ * @returns {number} מילישניות
  */
-async function _browserSpeak(text) {
-  if (typeof speechSynthesis === 'undefined') {
-    throw new Error('speechSynthesis unavailable');
-  }
-  await _ensureVoicesReady();
+function _utteranceWatchdogMs(text) {
+  return 5000 + (text?.length ?? 0) * 200;
+}
+
+/**
+ * מנגן utterance יחיד ב-Web Speech API. דוחה על כשל או על watchdog.
+ * @param {string} text
+ * @returns {Promise<void>}
+ */
+function _speakUtterance(text) {
   return new Promise((resolve, reject) => {
+    if (typeof SpeechSynthesisUtterance === 'undefined') {
+      reject(new Error('SpeechSynthesisUtterance unavailable'));
+      return;
+    }
     try {
-      if (typeof SpeechSynthesisUtterance === 'undefined') {
-        reject(new Error('SpeechSynthesisUtterance unavailable'));
-        return;
-      }
       const utt = new SpeechSynthesisUtterance(text);
       utt.lang = 'he-IL';
       utt.rate = _rate;
       if (_hebrewVoice) utt.voice = _hebrewVoice;
       _activeUtterance = utt;
+      let settled = false;
+      const watchdog = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        if (_activeUtterance === utt) _activeUtterance = null;
+        try { speechSynthesis.cancel(); } catch { /* noop */ }
+        reject(new Error('utterance-timeout'));
+      }, _utteranceWatchdogMs(text));
       utt.onend = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(watchdog);
         if (_activeUtterance === utt) _activeUtterance = null;
         resolve();
       };
       utt.onerror = (ev) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(watchdog);
         if (_activeUtterance === utt) _activeUtterance = null;
-        const reason = (ev && ev.error) || 'speech-error';
-        _reportTTSFailure('browser', text, String(reason));
-        reject(new Error(String(reason)));
+        reject(new Error(String((ev && ev.error) || 'speech-error')));
       };
       speechSynthesis.speak(utt);
     } catch (err) {
-      const reason = err?.message || 'browser-speak-threw';
-      _reportTTSFailure('browser', text, reason);
-      reject(err instanceof Error ? err : new Error(reason));
+      reject(err instanceof Error ? err : new Error(String(err)));
     }
   });
 }
 
-// ── Queue ─────────────────────────────────────────────────────────────────
-
 /**
- * מנסה Google ואז דפדפן. מחזיר { ok: true } בהצלחה, או { ok: false, reason }
- * אם שני הספקים נכשלו. תמיד נפתר (לא דוחה).
+ * מנגן ב-Web Speech API עם טיפול בחסימת autoplay: אם ההשמעה נחסמה כי
+ * המשתמש עוד לא נגע בדף - עוברים ל-awaiting-interaction, ממתינים למגע
+ * הראשון ומנסים שוב פעם אחת.
  * @param {string} text
- * @param {{ keepNikud?: boolean }} [opts]
- * @returns {Promise<{ ok: boolean, reason?: string }>}
+ * @returns {Promise<{ ok: boolean, reason?: string }>} תמיד נפתר.
  */
-async function _speakWithFallback(text, opts = {}) {
-  let lastReason = '';
-  if (_useGoogleTTS && typeof Audio !== 'undefined') {
-    try {
-      await _googleSpeak(text, opts);
-      return { ok: true };
-    } catch (err) {
-      lastReason = err?.message || 'google-failed';
-      console.info('[tts] Falling back to browser Speech API');
-    }
+async function _browserSpeak(text) {
+  if (typeof speechSynthesis === 'undefined') {
+    return { ok: false, reason: 'speechSynthesis unavailable' };
   }
-  if (typeof speechSynthesis !== 'undefined') {
-    try {
-      await _browserSpeak(text);
-      return { ok: true };
-    } catch (err) {
-      lastReason = err?.message || 'browser-failed';
+  await _ensureVoicesReady();
+  try {
+    await _speakUtterance(text);
+    _awaitingInteractionEmitted = false;
+    return { ok: true };
+  } catch (err) {
+    const reason = err?.message || 'speech-error';
+    if (_isInteractionBlockedReason(reason)) {
+      if (!_awaitingInteractionEmitted) {
+        _awaitingInteractionEmitted = true;
+        _setState('awaiting-interaction', 'autoplay-blocked');
+      }
+      await _waitForFirstInteraction();
+      _awaitingInteractionEmitted = false;
+      try {
+        await _speakUtterance(text);
+        return { ok: true };
+      } catch (retryErr) {
+        const retryReason = retryErr?.message || 'speech-error';
+        _reportTTSFailure(text, retryReason);
+        return { ok: false, reason: retryReason };
+      }
     }
-  } else if (!lastReason) {
-    lastReason = 'no-provider';
+    _reportTTSFailure(text, reason);
+    return { ok: false, reason };
   }
-  return { ok: false, reason: lastReason };
 }
+
+// ── Queue ─────────────────────────────────────────────────────────────────
 
 function _processQueue() {
   if (_speaking || _queue.length === 0) return;
@@ -419,7 +340,7 @@ function _processQueue() {
   const hasRateOverride = typeof item.rate === 'number';
   if (hasRateOverride) _rate = item.rate;
 
-  _speakWithFallback(item.text, { keepNikud: item.keepNikud === true }).then((result) => {
+  _browserSpeak(item.text).then((result) => {
     if (hasRateOverride) _rate = previousRate;
     _speaking = false;
     const wasActive = _activeItem === item;
@@ -430,22 +351,22 @@ function _processQueue() {
       return;
     }
     if (result.ok) {
-      // ב-unsupported כבר אין צורך לעבור - אבל המסלולים האמיתיים יחזירו ready.
       if (_state !== 'unsupported') {
         _setState('ready');
       }
     } else {
-      // שני הספקים נכשלו (או שאין ספק זמין כלל).
-      if (!_hasUsableProvider()) {
-        _setState('unsupported', result.reason || 'no-provider');
+      // force=true: מדווחים על כל כשל השמעה, גם אם המצב לא השתנה -
+      // כך משחק שנטען אחרי אירוע ה-unsupported הראשוני עדיין מציג באנר.
+      if (!_probeCapability()) {
+        _setState('unsupported', result.reason || 'no-provider', true);
       } else {
-        _setState('failed', result.reason);
+        _setState('failed', result.reason, true);
       }
     }
     item.resolve();
     _processQueue();
   }).catch((err) => {
-    // הגנה: _speakWithFallback אמור לא לדחות אבל למקרה.
+    // הגנה: _browserSpeak אמור לא לדחות אבל למקרה.
     if (hasRateOverride) _rate = previousRate;
     _speaking = false;
     _activeItem = null;
@@ -456,8 +377,7 @@ function _processQueue() {
 }
 
 /**
- * אובייקט ה-TTS הציבורי. כל המתודות שומרות תאימות אחורה ומוסיפות
- * `audioState`, `onStateChange`, `probe`.
+ * אובייקט ה-TTS הציבורי - ספק מקומי בלבד. אין קריאות רשת.
  */
 export const tts = {
   /**
@@ -478,7 +398,6 @@ export const tts = {
    * - כל ה-promises שבתור נפתרים (לא נדחים).
    * - אם יש פריט "in-flight" - גם הוא נפתר.
    * - אם הדפדפן תומך - speechSynthesis.cancel() יקרא פעם אחת.
-   * - אם יש Audio של גוגל מנגן - הוא יושתק (pause + src='').
    * - המצב חוזר ל-idle.
    */
   cancel() {
@@ -491,11 +410,6 @@ export const tts = {
     _queue = [];
     _speaking = false;
 
-    if (_activeAudio) {
-      try { _activeAudio.pause?.(); } catch { /* noop */ }
-      try { _activeAudio.src = ''; } catch { /* noop */ }
-      _activeAudio = null;
-    }
     if (_activeUtterance) {
       _activeUtterance = null;
     }
@@ -506,7 +420,7 @@ export const tts = {
   },
 
   /**
-   * האם יש בכלל יכולת קול במכשיר. true אם יש speechSynthesis או Audio.
+   * האם יש יכולת קול מקומית במכשיר.
    */
   get available() {
     return _state !== 'unsupported' && _probeCapability();
@@ -522,34 +436,26 @@ export const tts = {
     return _state;
   },
 
-  /** השגיאה האחרונה שדווחה (provider/reason) או null אם לא הייתה. */
+  /** השגיאה האחרונה שדווחה או null אם לא הייתה. */
   get lastError() {
     return _lastError;
   },
 
   /**
-   * משחרר ידנית את ה-audio context אחרי gesture ידוע (כפתור התחל וכו').
+   * משחרר ידנית את מנוע הקול אחרי gesture ידוע (כפתור התחל וכו').
    * משחקים יקראו לזה במקום להמתין ל-autoplay block.
    * @returns {Promise<void>}
    */
   unlock() {
     _interactionReady = true;
     _awaitingInteractionEmitted = false;
-    // Pre-warm both audio paths so the first real speak doesn't hit autoplay restrictions.
+    // Pre-warm the speech engine so the first real speak doesn't hit autoplay restrictions.
     if (typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined') {
       try {
         const warmup = new SpeechSynthesisUtterance('');
         warmup.volume = 0;
         speechSynthesis.speak(warmup);
         speechSynthesis.cancel();
-      } catch { /* noop */ }
-    }
-    if (typeof Audio !== 'undefined') {
-      try {
-        const a = new Audio();
-        a.muted = true;
-        const p = a.play?.();
-        if (p && typeof p.catch === 'function') p.catch(() => {});
       } catch { /* noop */ }
     }
     if (_state === 'awaiting-interaction') {
@@ -586,9 +492,8 @@ export const tts = {
    * סריקת יכולת מחודשת. מחזירה את הערך של `tts.available`. שימושית לבדיקות.
    */
   probe() {
-    const capable = _probeCapability();
-    if (!capable) {
-      _setState('unsupported', 'no-audio-capability');
+    if (!_probeCapability()) {
+      _setState('unsupported', 'no-speech-synthesis');
     } else if (_state === 'unsupported') {
       _setState('idle', 'recovered');
     }
@@ -601,14 +506,6 @@ export const tts = {
    */
   setRate(rate) {
     _rate = Math.max(0.5, Math.min(2.0, rate));
-  },
-
-  /**
-   * השתמש ב-Google Translate TTS (ברירת מחדל) או רק בדפדפן.
-   * @param {boolean} [enabled]
-   */
-  useGoogle(enabled = true) {
-    _useGoogleTTS = enabled;
   },
 
   /**
@@ -631,20 +528,18 @@ export const tts = {
     const entry = nikudList.find(n => n.symbol === nikudSymbol);
     return new Promise(resolve => {
       if (entry && entry.sound) {
-        // שלב 1: ההברה השלמה בקצב הרגיל; keepNikud=true כדי ש-Google יקבל
-        // את הניקוד ויהגה הברה ולא שם אות. ה-resolve שלה noop כי המתקשר
+        // שלב 1: ההברה השלמה בקצב הרגיל. ה-resolve שלה noop כי המתקשר
         // מחכה רק לסיום השלב השני.
-        _queue.push({ text: syllable, keepNikud: true, resolve: () => {} });
+        _queue.push({ text: syllable, resolve: () => {} });
         // שלב 2: צליל התנועה בקצב האיטי - מאריך את התנועה.
         _queue.push({
           text: entry.sound,
           rate: _nikudRate,
-          keepNikud: true,
           resolve: () => resolve(undefined),
         });
       } else {
         // אין נתון תנועה - הברה אחת בקצב טבעי.
-        _queue.push({ text: syllable, keepNikud: true, resolve: () => resolve(undefined) });
+        _queue.push({ text: syllable, resolve: () => resolve(undefined) });
       }
       _processQueue();
     });
@@ -662,7 +557,6 @@ export const tts = {
       _queue.push({
         text: entry.sound,
         rate: _nikudRate,
-        keepNikud: true,
         resolve: () => resolve(undefined),
       });
       _processQueue();

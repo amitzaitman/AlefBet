@@ -12,7 +12,60 @@
 const NAKDAN_URL = 'https://nakdan-u1-0.loadbalancer.dicta.org.il/api';
 let _nakdanDisabledNoticeShown = false;
 
+/** טיים-אאוט לבקשת ניקוד (במילישניות) - בלי זה מסך הטעינה נתקע אופליין. */
+const FETCH_TIMEOUT_MS = 4000;
+
+/** מפתח המטמון המתמיד ב-localStorage - "קימפול" חד-פעמי של ניקוד. */
+const PERSIST_KEY = 'alefbet.nikudCache.v1';
+
+/** תקרת רשומות במטמון המתמיד, למניעת תפיחת localStorage. */
+const PERSIST_MAX_ENTRIES = 300;
+
 const _cache = new Map();
+
+// טען את המטמון המתמיד פעם אחת בעליית המודול: ניקוד שהושג פעם ברשת
+// זמין מעכשיו גם אופליין לגמרי.
+(function _loadPersistedCache() {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const raw = localStorage.getItem(PERSIST_KEY);
+    if (!raw) return;
+    const entries = JSON.parse(raw);
+    if (Array.isArray(entries)) {
+      for (const [key, value] of entries) {
+        if (typeof key === 'string' && typeof value === 'string') _cache.set(key, value);
+      }
+    }
+  } catch { /* מטמון פגום - מתעלמים וממשיכים ריק */ }
+})();
+
+/** שמור את המטמון המתמיד (רק תוצאות אמיתיות, עד התקרה). */
+function _persistCache() {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    const entries = [..._cache.entries()]
+      .filter(([key, value]) => value !== key) // אל תשמור fallbackים של "אותו טקסט"
+      .slice(-PERSIST_MAX_ENTRIES);
+    localStorage.setItem(PERSIST_KEY, JSON.stringify(entries));
+  } catch { /* localStorage מלא/חסום - המטמון בזיכרון עדיין עובד */ }
+}
+
+/**
+ * האם הטקסט כבר מנוקד מספיק כדי לוותר על הרשת: אם לרוב המילים העבריות
+ * יש כבר סימן ניקוד אחד לפחות - אין מה לבקש מדיקטה. כך משחקים שכל
+ * הטקסטים שלהם מנוקדים מראש לא יוצרים אף בקשת רשת.
+ * @param {string} text
+ * @returns {boolean}
+ */
+export function isVowelized(text) {
+  if (!text) return false;
+  const words = text.split(/\s+/).filter(w => /[א-ת]/.test(w));
+  if (words.length === 0) return true; // אין עברית - אין מה לנקד
+  // סימני ניקוד: U+05B0-U+05BC, שין/שין שמאלית (U+05C1/2), קמץ קטן (U+05C7).
+  // מתג (U+05BD) מוחרג בכוונה - הוא אסור במקורות הפרויקט.
+  const vowelized = words.filter(w => /[\u05B0-\u05BC\u05C1\u05C2\u05C7]/.test(w));
+  return vowelized.length / words.length >= 0.8;
+}
 
 function _resolveNakdanUrl() {
   if (typeof window === 'undefined') return NAKDAN_URL;
@@ -63,21 +116,32 @@ async function _fetchNikud(text) {
     throw new Error('Nakdan unavailable without proxy on this host');
   }
 
-  const resp = await fetch(nakdanUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      addmorph: true,
-      keepmetagim: false,
-      keepqq: false,
-      nodageshdefmem: false,
-      patachma: false,
-      task: 'nakdan',
-      data: text,
-      useTokenization: true,
-      genre: 'modern',
-    }),
-  });
+  // טיים-אאוט קשיח: בלעדיו fetch תלוי-רשת יכול להחזיק את מסך הטעינה
+  // של משחק שניות ארוכות במכשיר עם רשת גרועה.
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS) : null;
+
+  let resp;
+  try {
+    resp = await fetch(nakdanUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller?.signal,
+      body: JSON.stringify({
+        addmorph: true,
+        keepmetagim: false,
+        keepqq: false,
+        nodageshdefmem: false,
+        patachma: false,
+        task: 'nakdan',
+        data: text,
+        useTokenization: true,
+        genre: 'modern',
+      }),
+    });
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 
   if (!resp.ok) throw new Error(`Nakdan ${resp.status}`);
   const json = await resp.json();
@@ -95,12 +159,26 @@ export async function addNikud(text) {
   if (!text?.trim()) return text ?? '';
   if (_cache.has(text)) return _cache.get(text);
 
+  // טקסט שכבר מנוקד לא צריך רשת בכלל - זה המסלול של כל המשחקים,
+  // שמספקים את הטקסטים שלהם מנוקדים מראש.
+  if (isVowelized(text)) {
+    _cache.set(text, text);
+    return text;
+  }
+
+  // אופליין מדווח - אל תנסה בכלל; הטקסט יוצג כפי שהוא, בלי המתנה.
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    return text;
+  }
+
   try {
     const result = await _fetchNikud(text);
     _cache.set(text, result);
+    _persistCache();
     return result;
   } catch {
-    // שמור את הטקסט המקורי במטמון כדי למנוע קריאות חוזרות כושלות
+    // שמור את הטקסט המקורי במטמון בזיכרון כדי למנוע קריאות חוזרות כושלות
+    // באותו סשן; לא נשמר ל-localStorage כדי שניסיון רענן יקרה בסשן הבא.
     _cache.set(text, text);
     return text;
   }

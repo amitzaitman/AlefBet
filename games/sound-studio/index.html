@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>אֻלְפַּן הַצְּלִילִים — AlefBet</title>
+  <link rel="stylesheet" href="../../framework/dist/alefbet.css">
+  <link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <div id="studio"></div>
+  <script type="module">
+    import { startStudio } from './game.js';
+    startStudio(document.getElementById('studio')).catch(console.error);
+  </script>
+</body>
+</html>

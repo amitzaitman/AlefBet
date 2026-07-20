@@ -1,0 +1,68 @@
+/* קריאת הברות - סגנון המשחק */
+
+.sr-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(16px, 4dvh, 32px);
+  padding: clamp(12px, 3dvh, 24px);
+}
+
+/* כפתור ההשמעה הגדול */
+.sr-replay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+  min-height: 96px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #4f67ff, #7c94ff);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(79, 103, 255, 0.35);
+  transition: transform 0.15s;
+}
+
+.sr-replay:active {
+  transform: scale(0.96);
+}
+
+.sr-replay:disabled {
+  opacity: 0.7;
+}
+
+.sr-replay__icon {
+  font-size: clamp(34px, 8dvmin, 52px);
+  line-height: 1;
+}
+
+.sr-replay__label {
+  font-size: clamp(14px, 3dvmin, 18px);
+  font-weight: 700;
+}
+
+/* כרטיסי ההברות - אותיות גדולות במיוחד לגיל הרך */
+.sr-options .option-cards-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr));
+}
+
+.sr-options .option-card {
+  min-height: 120px;
+  min-width: 110px;
+}
+
+.sr-options .option-card__text {
+  font-size: clamp(44px, 11dvmin, 76px);
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+/* עמעום מסיחים ברמת עזרה מוגברת - התשובה נשארת בולטת */
+.sr-card--dimmed {
+  opacity: 0.35;
+  filter: grayscale(0.4);
+  transition: opacity 0.4s;
+}
