@@ -19,6 +19,7 @@ export { sounds } from './audio/sounds.js';
 export { createVowelDetector, matchNikudVowel, classifyFormants, extractFormantsFromSpectrum, VOWEL_TEMPLATES, NIKUD_VOWEL } from './audio/vowel-detector.js';
 export { createVoiceRecorder, isVoiceRecordingSupported } from './audio/voice-recorder.js';
 export { saveVoice, loadVoice, deleteVoice, listVoiceKeys, playVoice, hasVoice } from './audio/voice-store.js';
+export { getAudioContext, unlockAudioOutput, ensureAudioRunning, playBlob } from './audio/audio-context.js';
 export { isSynthSupported, vowelFormantSpec, consonantOnsetSpec, synthesizeVowel, synthesizeSyllable } from './audio/phoneme-synth.js';
 export {
   SOUND_BANK_ID, letterKey, nikudKey, syllableKey, wordKey,

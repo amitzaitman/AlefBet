@@ -1,7 +1,8 @@
 /* ==========================================================================
-   AlefBet Framework — Storybook Papercraft
-   ספריית עיצוב בהשראת ספרי-ילדים: נייר חם, דיו עמוק, רקע גרגירי וטייפ צבעוני.
-   שמות המחלקות והחתימה של ה-JS לא משתנים; רק החזות החליפה את עורהּ.
+   AlefBet Framework — Warm & Simple
+   עיצוב נקי ונעים לילדים: קרם חם, כרטיסים מעוגלים, צל רך וצבעים ידידותיים.
+   בלי קישוטים (טייפ, גרעין נייר, סיבובים) - פשטות שקל לקרוא ולגעת בה.
+   שמות המחלקות והחתימה של ה-JS לא משתנים; רק החזות.
    ========================================================================== */
 
 /* ── Local fonts ─────────────────────────────────────────────────────────────
@@ -80,22 +81,8 @@
   --ab-shadow:        rgba(60, 40, 18, 0.16);
   --ab-shadow-soft:   rgba(60, 40, 18, 0.10);
   --ab-shadow-deep:   rgba(60, 40, 18, 0.26);
-  --ab-paper-shadow:
-    0 1px 0 rgba(255, 250, 235, 0.9) inset,
-    0 -1px 0 rgba(110, 80, 40, 0.06) inset,
-    0 2px 0 var(--ab-border),
-    0 6px 14px var(--ab-shadow-soft),
-    0 14px 28px var(--ab-shadow);
-  --ab-paper-shadow-lifted:
-    0 1px 0 rgba(255, 250, 235, 0.9) inset,
-    0 -1px 0 rgba(110, 80, 40, 0.06) inset,
-    0 3px 0 var(--ab-border),
-    0 12px 22px var(--ab-shadow),
-    0 22px 40px var(--ab-shadow-soft);
-
-  /* Tape (decorative corner strip on cards) */
-  --ab-tape:        rgba(217, 146, 33, 0.55);
-  --ab-tape-edge:   rgba(217, 146, 33, 0.18);
+  --ab-paper-shadow:        0 2px 6px var(--ab-shadow-soft), 0 6px 16px var(--ab-shadow);
+  --ab-paper-shadow-lifted: 0 4px 10px var(--ab-shadow-soft), 0 12px 26px var(--ab-shadow);
 
   --ab-space-xs: 6px;
   --ab-space-sm: 12px;
@@ -117,8 +104,6 @@
 
   --ab-transition: 0.22s cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  /* Hand-rolled paper grain (inline SVG, no network round-trip) */
-  --ab-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.30  0 0 0 0 0.15  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.32'/></svg>");
 }
 
 /* ── RTL Foundation ──────────────────────────────────────────────────────── */
@@ -137,29 +122,15 @@
   color: var(--ab-text);
   background-color: var(--ab-bg);
   background-image:
-    radial-gradient(ellipse 90% 60% at 18% 0%, rgba(217, 146, 33, 0.10), transparent 60%),
-    radial-gradient(ellipse 80% 60% at 100% 100%, rgba(120, 57, 82, 0.08), transparent 65%),
-    var(--ab-grain);
-  background-attachment: fixed, fixed, fixed;
-  background-size: auto, auto, 220px 220px;
+    radial-gradient(ellipse 90% 60% at 18% 0%, rgba(217, 146, 33, 0.07), transparent 60%),
+    radial-gradient(ellipse 80% 60% at 100% 100%, rgba(120, 57, 82, 0.05), transparent 65%);
+  background-attachment: fixed, fixed;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   padding: clamp(12px, 3dvh, 24px) clamp(12px, 3dvw, 24px);
   overflow-x: hidden;
 }
-
-/* Subtle vignette so paper feels lit, not flat */
-.alefbet-game::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(70, 40, 12, 0.10) 100%);
-  z-index: 0;
-}
-
-.alefbet-game > * { position: relative; z-index: 1; }
 
 /* ── Game Header ─────────────────────────────────────────────────────────── */
 .game-header {
@@ -194,9 +165,8 @@
   height: 8px;
   background: var(--ab-ochre-soft);
   border-radius: 99px;
-  transform: rotate(-1deg);
   z-index: -1;
-  opacity: 0.65;
+  opacity: 0.55;
 }
 
 /* Back-to-library button — paper chip */
@@ -215,24 +185,20 @@
   color: var(--ab-ink);
   background: var(--ab-paper);
   border: 2px solid var(--ab-border);
-  box-shadow:
-    0 2px 0 var(--ab-border),
-    0 4px 10px var(--ab-shadow-soft);
+  box-shadow: var(--ab-paper-shadow);
   transition: transform var(--ab-transition), box-shadow var(--ab-transition), background var(--ab-transition);
 }
 
 .game-back-btn:hover {
   background: var(--ab-paper-2);
-  transform: translateY(-2px) rotate(-2deg);
-  box-shadow:
-    0 4px 0 var(--ab-border),
-    0 10px 18px var(--ab-shadow);
+  transform: translateY(-2px);
+  box-shadow: var(--ab-paper-shadow-lifted);
 }
 
 .game-back-btn:active { transform: translateY(0) scale(0.96); }
 
 .game-back-btn:focus-visible {
-  outline: 3px dashed var(--ab-tomato);
+  outline: 3px solid var(--ab-tomato);
   outline-offset: 4px;
 }
 
@@ -269,7 +235,7 @@
   min-height: clamp(64px, 13dvmin, 80px);
   min-width: clamp(64px, 13dvmin, 80px);
   padding: clamp(12px, 3dvh, 20px) clamp(24px, 5dvw, 40px);
-  border: 2.5px solid var(--ab-ink);
+  border: 2px solid var(--ab-border);
   border-radius: var(--ab-radius-md);
   font-family: var(--ab-font-display);
   font-size: clamp(18px, 4dvmin, 24px);
@@ -281,25 +247,24 @@
   transition: transform var(--ab-transition), box-shadow var(--ab-transition), background var(--ab-transition);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  box-shadow: 4px 4px 0 var(--ab-ink);
+  box-shadow: var(--ab-paper-shadow);
 }
 
-.btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ab-ink); }
-.btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ab-ink); }
+.btn:hover { transform: translateY(-2px); box-shadow: var(--ab-paper-shadow-lifted); }
+.btn:active { transform: translateY(1px) scale(0.98); box-shadow: 0 1px 4px var(--ab-shadow-soft); }
 
 .btn:focus-visible {
-  outline: 3px dashed var(--ab-ochre);
+  outline: 3px solid var(--ab-ochre);
   outline-offset: 4px;
 }
 
 .btn--primary {
   background: var(--ab-tomato);
-  color: var(--ab-paper);
-  box-shadow: 4px 4px 0 var(--ab-ink);
+  color: #fff;
+  border-color: transparent;
 }
 .btn--primary:hover {
   background: var(--ab-tomato-dk);
-  box-shadow: 6px 6px 0 var(--ab-ink);
 }
 
 .btn--secondary {
@@ -308,7 +273,7 @@
   border-color: var(--ab-ink);
 }
 
-/* ── Option Cards — Paper Cut-outs with Tape ─────────────────────────────── */
+/* ── Option Cards ────────────────────────────────────────────────────────── */
 .option-cards-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -339,40 +304,8 @@
   overflow: visible;
 }
 
-/* Subtle hand-cut inner ring + paper tooth */
-.option-card::after {
-  content: "";
-  position: absolute;
-  inset: 5px;
-  border-radius: calc(var(--ab-radius-lg) - 4px);
-  border: 1.5px dashed rgba(74, 58, 42, 0.18);
-  pointer-events: none;
-}
-
-/* Decorative tape strip — top-left corner, slight rotation */
-.option-card::before {
-  content: "";
-  position: absolute;
-  top: -10px;
-  inset-inline-start: 14%;
-  width: clamp(46px, 10dvmin, 72px);
-  height: clamp(16px, 3dvmin, 22px);
-  background:
-    linear-gradient(180deg, rgba(255, 250, 235, 0.55) 0%, transparent 30%, transparent 70%, rgba(60, 40, 18, 0.10) 100%),
-    var(--ab-tape);
-  border-inline: 1px dashed var(--ab-tape-edge);
-  transform: rotate(-6deg);
-  pointer-events: none;
-  z-index: 2;
-  box-shadow: 0 2px 4px rgba(60, 40, 18, 0.10);
-}
-
-/* Alternate tape rotation for grid-position even cards */
-.option-card:nth-child(2n)::before { transform: rotate(5deg); inset-inline-start: auto; inset-inline-end: 14%; }
-.option-card:nth-child(3n)::before { transform: rotate(-3deg); inset-inline-start: 50%; margin-inline-start: -36px; }
-
 .option-card:hover:not(:disabled) {
-  transform: translateY(-4px) rotate(-0.6deg);
+  transform: translateY(-4px);
   box-shadow: var(--ab-paper-shadow-lifted);
   background: #FFFCEF;
 }
@@ -381,7 +314,7 @@
 
 .option-card:disabled { cursor: default; opacity: 0.78; }
 
-.option-card:focus-visible { outline: 3px dashed var(--ab-tomato); outline-offset: 4px; }
+.option-card:focus-visible { outline: 3px solid var(--ab-tomato); outline-offset: 4px; }
 
 .option-card--correct {
   background: #EAF6F0 !important;
@@ -391,8 +324,6 @@
     var(--ab-paper-shadow-lifted) !important;
   animation: ab-stamp 0.5s ease-out;
 }
-.option-card--correct::before { background: var(--ab-teal-soft); }
-
 .option-card--wrong {
   background: #FBEAD7 !important;
   box-shadow:
@@ -440,24 +371,9 @@
   background: var(--ab-paper-3);
   border-radius: var(--ab-radius-full);
   overflow: hidden;
-  border: 2px solid var(--ab-ink-soft);
-  box-shadow: inset 0 2px 3px rgba(60, 40, 18, 0.18);
+  border: 2px solid var(--ab-border);
+  box-shadow: inset 0 1px 2px rgba(60, 40, 18, 0.10);
   position: relative;
-}
-
-/* Stitched look — repeating dashes along the track */
-.progress-bar__track::after {
-  content: "";
-  position: absolute;
-  inset: 4px 6px;
-  background-image: repeating-linear-gradient(
-    90deg,
-    rgba(60, 40, 18, 0.18) 0 6px,
-    transparent 6px 12px
-  );
-  border-radius: 99px;
-  pointer-events: none;
-  opacity: 0.5;
 }
 
 .progress-bar__fill {
@@ -506,24 +422,17 @@
 
 .feedback-message--correct {
   color: var(--ab-teal);
-  transform: rotate(-2deg);
-  text-shadow:
-    1px 1px 0 rgba(42, 123, 113, 0.18),
-    0 2px 0 rgba(60, 40, 18, 0.06);
 }
 
 .feedback-message--wrong {
   color: var(--ab-tomato);
-  transform: rotate(1.5deg);
-  text-shadow: 0 1px 0 rgba(60, 40, 18, 0.10);
 }
 
 .feedback-message--hint {
   color: var(--ab-plum);
-  transform: rotate(-1deg);
 }
 
-/* ── Completion Screen — Paper Certificate ───────────────────────────────── */
+/* ── Completion Screen ───────────────────────────────────────────────────── */
 .completion-screen {
   display: flex;
   align-items: center;
@@ -542,31 +451,10 @@
   background: var(--ab-paper);
   border-radius: var(--ab-radius-lg);
   padding: clamp(28px, 5.4dvh, 60px) clamp(28px, 5dvw, 52px);
-  box-shadow:
-    0 1px 0 rgba(255, 250, 235, 0.9) inset,
-    0 3px 0 var(--ab-border),
-    0 18px 36px var(--ab-shadow),
-    0 28px 60px var(--ab-shadow-soft);
+  box-shadow: var(--ab-paper-shadow-lifted);
   max-width: 440px;
   width: 100%;
-  /* Decorative inner border */
-  outline: 1px dashed rgba(74, 58, 42, 0.30);
-  outline-offset: -14px;
 }
-
-/* Corner tape on certificate (top-right + bottom-left for whimsy) */
-.completion-screen__content::before,
-.completion-screen__content::after {
-  content: "";
-  position: absolute;
-  width: 78px;
-  height: 22px;
-  background: var(--ab-tape);
-  border-inline: 1px dashed var(--ab-tape-edge);
-  pointer-events: none;
-}
-.completion-screen__content::before { top: -10px; right: 12%; transform: rotate(6deg); }
-.completion-screen__content::after  { bottom: -10px; left: 12%; transform: rotate(-7deg); }
 
 .completion-screen__stars {
   font-size: clamp(44px, 13dvmin, 76px);
@@ -592,8 +480,7 @@
   height: 6px;
   background: var(--ab-ochre-soft);
   border-radius: 99px;
-  transform: rotate(-1deg);
-  opacity: 0.7;
+  opacity: 0.6;
   z-index: -1;
 }
 
@@ -605,7 +492,7 @@
   font-weight: 500;
 }
 
-/* ── Letter Display — Big Ink Letter on Paper ───────────────────────────── */
+/* ── Letter Display ─────────────────────────────────────────────────────── */
 .letter-display {
   position: relative;
   display: flex;
@@ -615,45 +502,14 @@
   width: clamp(120px, 30dvmin, 200px);
   height: clamp(120px, 30dvmin, 200px);
   background: var(--ab-paper);
-  border: 3px solid var(--ab-ink);
+  border: 3px solid var(--ab-border);
   border-radius: var(--ab-radius-lg);
   font-family: var(--ab-font-display);
   font-size: clamp(64px, 22dvmin, 108px);
   font-weight: 900;
   color: var(--ab-ink);
   user-select: none;
-  box-shadow:
-    8px 8px 0 var(--ab-ink),
-    0 18px 32px var(--ab-shadow);
-  text-shadow: 0 1px 0 rgba(60, 40, 18, 0.10);
-}
-
-/* Tape strip on the letter card */
-.letter-display::before {
-  content: "";
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-3deg);
-  width: 60%;
-  height: 18px;
-  background: var(--ab-tape);
-  border-inline: 1px dashed var(--ab-tape-edge);
-  pointer-events: none;
-}
-
-/* Subtle inner ruled paper feel */
-.letter-display::after {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border-radius: calc(var(--ab-radius-lg) - 6px);
-  background-image: repeating-linear-gradient(
-    180deg,
-    transparent 0 22px,
-    rgba(74, 58, 42, 0.07) 22px 23px
-  );
-  pointer-events: none;
+  box-shadow: var(--ab-paper-shadow-lifted);
 }
 
 /* ── Instruction Text ────────────────────────────────────────────────────── */
@@ -683,23 +539,24 @@
     0 0 0 4px var(--ab-tomato),
     0 0 0 8px rgba(201, 68, 44, 0.20),
     var(--ab-paper-shadow-lifted);
-  transform: scale(1.05) rotate(-1deg);
+  transform: scale(1.05);
 }
 
 /* ── Drop Target ─────────────────────────────────────────────────────────── */
-/* ברירות מחדל חסרות !important כדי שמשחקים יוכלו לעקוף לפי ספציפיות. */
+/* ברירות מחדל חסרות !important כדי שמשחקים יוכלו לעקוף לפי ספציפיות.
+   drop-target--active מסומן דרך-קבע על כל יעד רשום, ולכן אין לו חיווי
+   חזותי - טבעת קבועה סביב כל אזור היא רעש; החיווי ניתן רק בריחוף גרירה. */
 .drop-target--active {
-  outline: 3px dashed var(--ab-tomato);
-  outline-offset: 4px;
+  outline: none;
 }
 
 .drop-target--hover {
-  transform: scale(1.04) rotate(-0.5deg);
+  transform: scale(1.04);
 }
 
 /* ── Nikud Letter Card (focus rule) ──────────────────────────────────────── */
 .nikud-letter-card:focus-visible {
-  outline: 3px dashed var(--ab-tomato);
+  outline: 3px solid var(--ab-tomato);
   outline-offset: 4px;
 }
 
@@ -818,7 +675,7 @@
 .anim-zone-in    { animation: ab-zone-in 0.44s ease-out both; }
 .anim-hint-pulse { animation: ab-hint-pulse 1.4s ease-in-out infinite; }
 
-/* ── Interactive Zones — Colored Paper Swatches ─────────────────────────── */
+/* ── Interactive Zones ──────────────────────────────────────────────────── */
 .ab-zone {
   position: relative;
   flex: 1;
@@ -835,49 +692,20 @@
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
-    0 6px 0 rgba(60, 40, 18, 0.18),
-    0 12px 24px var(--ab-shadow);
+    inset 0 -3px 0 rgba(0, 0, 0, 0.10),
+    0 8px 20px var(--ab-shadow);
   overflow: hidden;
-}
-
-/* Hand-cut inner outline */
-.ab-zone::before {
-  content: "";
-  position: absolute;
-  inset: 7px;
-  border-radius: inherit;
-  border: 1.5px dashed rgba(255, 255, 255, 0.45);
-  pointer-events: none;
-}
-
-/* Subtle grain on the colored paper */
-.ab-zone::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--ab-grain);
-  background-size: 220px 220px;
-  opacity: 0.22;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  border-radius: inherit;
 }
 
 .ab-zone:active { transform: translateY(2px) scale(0.97); }
 .ab-zone--hover {
-  transform: translateY(-4px) scale(1.03) rotate(-0.6deg);
+  transform: translateY(-4px) scale(1.03);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.20),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
-    0 10px 0 rgba(60, 40, 18, 0.20),
-    0 22px 36px var(--ab-shadow-deep);
+    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    0 16px 30px var(--ab-shadow-deep);
 }
 .ab-zone--correct {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.20),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
     0 0 0 4px var(--ab-teal),
     0 0 0 8px rgba(42, 123, 113, 0.25),
     0 12px 24px var(--ab-shadow-deep) !important;
@@ -975,8 +803,6 @@
   font-size: clamp(15px, 3.5dvmin, 18px);
   color: var(--ab-text);
   background-color: var(--ab-bg);
-  background-image: var(--ab-grain);
-  background-size: 220px 220px;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -1051,7 +877,7 @@
 }
 
 .ab-app-back-link:focus-visible {
-  outline: 3px dashed var(--ab-tomato);
+  outline: 3px solid var(--ab-tomato);
   outline-offset: 3px;
 }
 
@@ -1099,7 +925,7 @@
 }
 
 .ab-app-tab:focus-visible {
-  outline: 3px dashed var(--ab-tomato);
+  outline: 3px solid var(--ab-tomato);
   outline-offset: -3px;
 }
 
@@ -1165,7 +991,7 @@
 }
 
 .ab-app-nav-item:focus-visible {
-  outline: 3px dashed var(--ab-tomato);
+  outline: 3px solid var(--ab-tomato);
   outline-offset: -3px;
 }
 

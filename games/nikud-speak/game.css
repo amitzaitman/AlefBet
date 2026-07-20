@@ -1,4 +1,4 @@
-/* ── Nikud Speak — Papercraft styles ──────────────────────────────────── */
+/* ── Nikud Speak — clean & simple styles ─────────────────────────────────── */
 
 /* ── Main panel layout ──────────────────────────────────────────────────── */
 .nikud-speak-panel {
@@ -22,36 +22,10 @@
   background: var(--nikud-color, var(--ab-teal));
   border-radius: clamp(22px, 5dvmin, 36px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
-    0 8px 0 rgba(60, 40, 18, 0.18),
-    0 20px 36px var(--ab-shadow-deep);
+    inset 0 -3px 0 rgba(0, 0, 0, 0.10),
+    0 12px 28px var(--ab-shadow-deep);
   user-select: none;
-  transform: rotate(-1.5deg);
   overflow: hidden;
-}
-
-/* Hand-cut dashed inner ring */
-.nikud-speak-card::before {
-  content: "";
-  position: absolute;
-  inset: 9px;
-  border-radius: inherit;
-  border: 1.5px dashed rgba(255, 255, 255, 0.50);
-  pointer-events: none;
-}
-
-/* Grain overlay */
-.nikud-speak-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--ab-grain);
-  background-size: 220px 220px;
-  opacity: 0.22;
-  mix-blend-mode: overlay;
-  pointer-events: none;
 }
 
 .nikud-speak-card__symbol {
@@ -75,7 +49,7 @@
   z-index: 1;
 }
 
-/* ── Demo button (speaker) — paper chip ──────────────────────────────── */
+/* ── Demo button (speaker) ───────────────────────────────────────────────── */
 .demo-btn {
   display: inline-flex;
   align-items: center;
@@ -85,7 +59,7 @@
   min-height: 58px;
   padding: 0.7rem 1.5rem;
   background: var(--ab-paper);
-  border: 2.5px solid var(--ab-ink);
+  border: 2px solid var(--ab-border);
   border-radius: var(--ab-radius-md);
   font-family: var(--ab-font-display);
   font-size: clamp(16px, 3.6dvmin, 22px);
@@ -95,18 +69,18 @@
   transition: transform var(--ab-transition), box-shadow var(--ab-transition), background var(--ab-transition);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  box-shadow: 4px 4px 0 var(--ab-ink);
+  box-shadow: var(--ab-paper-shadow);
 }
 
 .demo-btn:hover {
   background: var(--ab-paper-2);
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 var(--ab-ink);
+  transform: translateY(-2px);
+  box-shadow: var(--ab-paper-shadow-lifted);
 }
 
 .demo-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--ab-ink);
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 1px 4px var(--ab-shadow-soft);
 }
 
 .demo-btn:disabled,
@@ -115,20 +89,20 @@
   cursor: not-allowed;
   background: var(--ab-paper);
   transform: none;
-  box-shadow: 4px 4px 0 var(--ab-ink);
+  box-shadow: var(--ab-paper-shadow);
 }
 
 .demo-btn:disabled:hover,
 .demo-btn[aria-disabled="true"]:hover {
   background: var(--ab-paper);
   transform: none;
-  box-shadow: 4px 4px 0 var(--ab-ink);
+  box-shadow: var(--ab-paper-shadow);
 }
 
 .demo-btn__icon { font-size: 1.4em; }
 .demo-btn__text { direction: rtl; }
 
-/* ── Mic button — wax-seal style red stamp ─────────────────────────────── */
+/* ── Mic button ──────────────────────────────────────────────────────────── */
 .mic-btn {
   position: relative;
   display: flex;
@@ -140,12 +114,10 @@
   height: clamp(86px, 21dvmin, 130px);
   border-radius: 50%;
   background: var(--ab-tomato);
-  border: 3px solid var(--ab-ink);
+  border: none;
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.20),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.20),
-    5px 5px 0 var(--ab-ink),
-    0 10px 24px var(--ab-shadow);
+    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
+    0 8px 20px var(--ab-shadow);
   cursor: pointer;
   transition: transform var(--ab-transition), box-shadow var(--ab-transition), background var(--ab-transition);
   -webkit-tap-highlight-color: transparent;
@@ -168,54 +140,29 @@
 }
 
 .mic-btn:hover {
-  transform: translate(-2px, -2px);
+  transform: translateY(-2px);
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.20),
-    7px 7px 0 var(--ab-ink),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
     0 14px 28px var(--ab-shadow-deep);
 }
 
 .mic-btn:active {
-  transform: translate(2px, 2px);
+  transform: translateY(1px) scale(0.97);
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.20),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.22),
-    2px 2px 0 var(--ab-ink),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.16),
     0 4px 10px var(--ab-shadow);
 }
 
-/* Recording — pulsing wax-seal glow */
+/* Recording — pulsing glow */
 .mic-btn--recording {
   background: var(--ab-tomato-dk);
   animation: mic-pulse 1.1s ease-in-out infinite;
 }
 
 @keyframes mic-pulse {
-  0% {
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.22),
-      inset 0 -3px 0 rgba(0, 0, 0, 0.22),
-      5px 5px 0 var(--ab-ink),
-      0 0 0 0 rgba(201, 68, 44, 0.55);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.24),
-      inset 0 -3px 0 rgba(0, 0, 0, 0.24),
-      5px 5px 0 var(--ab-ink),
-      0 0 0 22px rgba(201, 68, 44, 0);
-    transform: scale(1.08);
-  }
-  100% {
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.22),
-      inset 0 -3px 0 rgba(0, 0, 0, 0.22),
-      5px 5px 0 var(--ab-ink),
-      0 0 0 0 rgba(201, 68, 44, 0);
-    transform: scale(1);
-  }
+  0%   { box-shadow: 0 0 0 0 rgba(201, 68, 44, 0.55); transform: scale(1); }
+  50%  { box-shadow: 0 0 0 22px rgba(201, 68, 44, 0); transform: scale(1.08); }
+  100% { box-shadow: 0 0 0 0 rgba(201, 68, 44, 0); transform: scale(1); }
 }
 
 /* Disabled mic */
@@ -223,10 +170,7 @@
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.18),
-    5px 5px 0 var(--ab-ink),
-    0 4px 10px var(--ab-shadow-soft);
+  box-shadow: 0 4px 10px var(--ab-shadow-soft);
 }
 
 .mic-btn:disabled:hover {

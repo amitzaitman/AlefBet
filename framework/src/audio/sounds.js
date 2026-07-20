@@ -4,21 +4,22 @@
  * [נוסף על ידי: letter-match game]
  */
 
-let _ctx = null;
+import { getAudioContext } from './audio-context.js';
 
 function _getCtx() {
-  if (!_ctx) {
-    try {
-      _ctx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (e) {
-      return null;
-    }
-  }
+  const ctx = getAudioContext();
+  if (!ctx) return null;
   // Resume if suspended (autoplay policy)
-  if (_ctx.state === 'suspended') _ctx.resume();
-  return _ctx;
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
 }
 
+/**
+ * @param {number} freq
+ * @param {number} duration
+ * @param {OscillatorType} [type]
+ * @param {number} [gainVal]
+ */
 function _playTone(freq, duration, type = 'sine', gainVal = 0.3) {
   const ctx = _getCtx();
   if (!ctx) return;

@@ -10,10 +10,9 @@
   gap: clamp(12px, 2.8dvmin, 22px);
 }
 
-/* Letter panel: fixed size, doesn't grow — slight tilt for storybook feel */
+/* Letter panel: fixed size, doesn't grow */
 .round-panel--letter {
   flex: 0 0 auto;
-  transform: rotate(-1.5deg);
 }
 
 /* Options panel: expands to fill remaining space, wraps below the letter
