@@ -113,7 +113,7 @@ export async function startGame(container) {
     // עטיפה יציבה: סרגל ההתקדמות נוצר רק ב-start, אחרי יצירת המנהל.
     progressBar: { update: n => progressBar?.update(n) },
     buildRoundUI,
-    onWrong: async () => {
+    onWrong: () => {
       // עידוד בלבד: משמיעים שוב את ההברה - זו העזרה, לא עונש.
       feedback?.hint(ENCOURAGEMENTS[Math.min(hints.misses, ENCOURAGEMENTS.length - 1)]);
       const level = hints.miss();
@@ -126,7 +126,9 @@ export async function startGame(container) {
         cards?.highlight(round.targetId, 'hint');
         setTimeout(() => cards?.reset(), 1600);
       }
-      await playTarget();
+      // ללא await בכוונה: שמע לעולם לא חוסם את זרימת המשחק - גם כשקול
+      // המערכת איטי או תקוע, הילד יכול להמשיך לנסות מיד.
+      playTarget();
     },
   });
 
@@ -173,7 +175,9 @@ export async function startGame(container) {
         cards.highlight(option.id, 'correct');
         cards.disable();
         feedback.correct();
-        await roundManager.handleCorrect(() => playTarget());
+        // ההברה מושמעת ברקע; אין await כדי שהמעבר לסיבוב הבא לא ייתקע
+        // אם ספק השמע איטי.
+        await roundManager.handleCorrect(() => { playTarget(); });
       } else {
         // ללא סימון שלילי - הכרטיס רק "נושם" לאישור הלחיצה.
         const el = shell.bodyEl.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);

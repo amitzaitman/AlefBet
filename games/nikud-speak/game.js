@@ -20,6 +20,8 @@ import {
   showNikudSettingsDialog,
   injectHeaderButton,
   mountAudioStatusBanner,
+  speakNikudSound,
+  isSynthSupported,
 } from '../../framework/dist/alefbet.js';
 
 // ── Texts to preload ──────────────────────────────────────────────────────
@@ -78,7 +80,10 @@ export async function startGame(container) {
 
   function applyDemoBtnState(btn) {
     if (!btn) return;
-    if (ttsUnsupported) {
+    // ההדגמה עוברת דרך שרשרת השמע המלאה (הקלטה -> קול מערכת -> סינתזה),
+    // ולכן מנטרלים את הכפתור רק כשאף ספק אינו קיים.
+    const totallyVoiceless = ttsUnsupported && !isSynthSupported();
+    if (totallyVoiceless) {
       btn.disabled = true;
       btn.setAttribute('aria-disabled', 'true');
     } else {
@@ -131,7 +136,8 @@ export async function startGame(container) {
     demoBtn.innerHTML = '<span class="demo-btn__icon">🔊</span><span class="demo-btn__text">הַקְשֵׁב</span>';
     demoBtn.onclick = () => {
       handleFirstInteraction();
-      tts.speakVowel(nikud.id);
+      // שרשרת אופליין-תחילה: הקלטת מורה -> קול מערכת -> סינתזת תנועה.
+      speakNikudSound(nikud.id);
     };
     currentDemoBtn = demoBtn;
     applyDemoBtnState(demoBtn);

@@ -4,7 +4,41 @@
    שמות המחלקות והחתימה של ה-JS לא משתנים; רק החזות החליפה את עורהּ.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Rubik:wght@400;500;700;900&display=swap');
+/* ── Local fonts ─────────────────────────────────────────────────────────────
+   קבצי variable-font שמורים בריפו (framework/src/styles/fonts) ונארזים אל
+   dist בזמן build. אפס תלות רשת: המשחקים נראים זהים גם בלי אינטרנט.        */
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('./fonts/rubik-hebrew.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Rubik';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('./fonts/rubik-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Frank Ruhl Libre';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('./fonts/frank-ruhl-libre-hebrew.woff2') format('woff2');
+  unicode-range: U+0307-0308, U+0590-05FF, U+200C-2010, U+20AA, U+25CC, U+FB1D-FB4F;
+}
+@font-face {
+  font-family: 'Frank Ruhl Libre';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('./fonts/frank-ruhl-libre-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* ── CSS Custom Properties ───────────────────────────────────────────────── */
 :root {

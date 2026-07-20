@@ -16,6 +16,8 @@ import {
   speakSyllable,
   createVoiceRecordButton,
   isVoiceRecordingSupported,
+  compileSoundBank,
+  resolveTtsProxyUrl,
   tts,
 } from '../../framework/dist/alefbet.js';
 
@@ -36,6 +38,90 @@ function previewSound(key) {
   if (kind === 'nikud') return speakNikudSound(a);
   if (kind === 'syllable') return speakSyllable(a, b);
   return Promise.resolve('none');
+}
+
+/**
+ * בונה את כרטיס "מילוי אוטומטי בקול מחשב" - כולל מצב חסר-proxy,
+ * מצב אופליין, פס התקדמות וסיכום גלוי של הצלחות וכשלים.
+ * @param {{ onCompiled: () => void }} opts
+ * @returns {HTMLElement}
+ */
+function buildCompileSection({ onCompiled }) {
+  const section = document.createElement('section');
+  section.className = 'studio__compile';
+
+  const proxyUrl = resolveTtsProxyUrl();
+  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+
+  const title = document.createElement('h2');
+  title.className = 'studio__compile-title';
+  title.textContent = '⬇️ מִלּוּי אוֹטוֹמָטִי בְּקוֹל מַחְשֵׁב (פַּעַם אַחַת)';
+  section.appendChild(title);
+
+  const desc = document.createElement('p');
+  desc.className = 'studio__compile-desc';
+  desc.textContent =
+    'הוֹרָדָה חַד-פַּעֲמִית שֶׁל כָּל הַצְּלִילִים הַחֲסֵרִים אֶל הַמַּכְשִׁיר. ' +
+    'לְאַחַר מִכֵּן הַמִּשְׂחָקִים עוֹבְדִים לְלֹא אִינְטֶרְנֶט כְּלָל. הַקְלָטוֹת שֶׁלָּכֶם לֹא נִדְרָסוֹת.';
+  section.appendChild(desc);
+
+  const status = document.createElement('p');
+  status.className = 'studio__compile-status';
+  status.setAttribute('role', 'status');
+  section.appendChild(status);
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'studio__compile-btn';
+  button.textContent = 'הַתְחִילוּ מִלּוּי אוֹטוֹמָטִי';
+  section.appendChild(button);
+
+  if (!proxyUrl) {
+    button.disabled = true;
+    status.textContent =
+      'לֹא הֻגְדְּרָה כְּתֹבֶת שֵׁרוּת קוֹלוֹת. הוֹסִיפוּ ?ttsProxy=<כתובת> לַכְּתֹבֶת, אוֹ הַקְלִיטוּ בְּקוֹלְכֶם לְמַטָּה.';
+    return section;
+  }
+  if (offline) {
+    button.disabled = true;
+    status.textContent = 'אֵין חִבּוּר אִינְטֶרְנֶט כָּרֶגַע. הַמִּלּוּי דּוֹרֵשׁ חִבּוּר חַד-פַּעֲמִי; אֶפְשָׁר לְהַקְלִיט בְּקוֹלְכֶם גַּם עַכְשָׁיו.';
+    return section;
+  }
+
+  const progress = document.createElement('progress');
+  progress.className = 'studio__compile-progress';
+  progress.hidden = true;
+  section.appendChild(progress);
+
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    progress.hidden = false;
+    status.textContent = 'מוֹרִיד צְלִילִים...';
+    try {
+      const result = await compileSoundBank({
+        onProgress: (done, total) => {
+          progress.max = total;
+          progress.value = done;
+          status.textContent = `מוֹרִיד צְלִילִים... ${done}/${total}`;
+        },
+      });
+      const parts = [`הוּרְדוּ ${result.compiled} צְלִילִים`];
+      if (result.skipped) parts.push(`${result.skipped} כְּבָר הָיוּ קַיָּמִים`);
+      if (result.failures.length) {
+        parts.push(`${result.failures.length} נִכְשְׁלוּ - נַסּוּ שׁוּב אוֹ הַקְלִיטוּ אוֹתָם יְדָנִית`);
+        console.warn('[sound-studio] compile failures:', result.failures);
+      }
+      status.textContent = parts.join(' · ');
+      if (result.compiled > 0) onCompiled();
+    } catch (err) {
+      status.textContent = `הַמִּלּוּי נִכְשַׁל: ${err?.message ?? err}`;
+    } finally {
+      progress.hidden = true;
+      button.disabled = false;
+    }
+  });
+
+  return section;
 }
 
 export async function startStudio(container) {
@@ -78,6 +164,13 @@ export async function startStudio(container) {
     note.textContent = 'הַדַּפְדְּפָן הַזֶּה אֵינוֹ תּוֹמֵךְ בְּהַקְלָטָה. אֶפְשָׁר עֲדַיִן לְהַאֲזִין לַצְּלִילִים הַקַּיָּמִים.';
     container.appendChild(note);
   }
+
+  // ── מילוי אוטומטי חד-פעמי (קימפול) ──
+  // מוריד קולות מחשב דרך שרת הפרויקט ושומר אותם במכשיר. פעולה חד-פעמית:
+  // אחריה המשחקים לא ניגשים לרשת בכלל. הקלטות של המורה לא נדרסות.
+  container.appendChild(buildCompileSection({
+    onCompiled: () => startStudio(container),
+  }));
 
   // ── קבוצות ──
   for (const group of GROUPS) {

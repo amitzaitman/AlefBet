@@ -25,6 +25,7 @@ export {
   standardSoundKeys, keyLabel, isOffline, recordedKeys,
   speakLetter, speakNikudSound, speakSyllable, speakWord,
 } from './audio/hebrew-audio.js';
+export { resolveTtsProxyUrl, compileTextForKey, compileSoundBank } from './audio/sound-bank-compiler.js';
 
 // ===== Data =====
 export { hebrewLetters, getLetter, getLettersByGroup, randomLetters } from './data/hebrew-letters.js';
@@ -53,7 +54,7 @@ export { animate } from './render/animations.js';
 export { createDragSource, createDropTarget } from './input/drag.js';
 
 // ===== Utils =====
-export { addNikud, getNikud, preloadNikud } from './utils/nakdan.js';
+export { addNikud, getNikud, preloadNikud, isVowelized } from './utils/nakdan.js';
 
 // ===== Editor =====
 export { GameEditor }    from './editor/game-editor.js';

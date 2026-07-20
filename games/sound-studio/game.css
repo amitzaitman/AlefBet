@@ -3,7 +3,7 @@
 body {
   margin: 0;
   background: #f6f2ea;
-  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
+  font-family: 'Rubik', 'Heebo', 'Arial Hebrew', Arial, sans-serif;
   direction: rtl;
 }
 
@@ -67,6 +67,61 @@ body {
 .studio__progress--done {
   background: #d9f2e4;
   color: #1d7a4f;
+}
+
+/* ── מילוי אוטומטי (קימפול חד-פעמי) ── */
+.studio__compile {
+  margin-top: clamp(14px, 3dvh, 24px);
+  background: #eef6ff;
+  border: 2px dashed #7c94ff;
+  border-radius: 16px;
+  padding: clamp(14px, 3dvw, 22px);
+}
+
+.studio__compile-title {
+  margin: 0;
+  font-size: clamp(16px, 3dvmin, 21px);
+  font-weight: 900;
+  color: #1a1a2e;
+}
+
+.studio__compile-desc {
+  margin: 6px 0 10px;
+  color: #4a5568;
+  font-size: clamp(13px, 2.4dvmin, 15px);
+  line-height: 1.6;
+  max-width: 52em;
+}
+
+.studio__compile-status {
+  margin: 8px 0;
+  font-weight: 700;
+  color: #2a4365;
+  min-height: 1.4em;
+}
+
+.studio__compile-btn {
+  border: none;
+  background: #4f67ff;
+  color: #fff;
+  font-weight: 700;
+  font-size: clamp(14px, 2.8dvmin, 17px);
+  border-radius: 12px;
+  padding: 12px 22px;
+  min-height: 48px;
+  cursor: pointer;
+}
+
+.studio__compile-btn:disabled {
+  background: #aab4d4;
+  cursor: default;
+}
+
+.studio__compile-progress {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  accent-color: #4f67ff;
 }
 
 .studio__unsupported {
