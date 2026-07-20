@@ -1,0 +1,179 @@
+/* אולפן הצלילים - עמוד מורה להקלטת בנק הצלילים */
+
+body {
+  margin: 0;
+  background: #f6f2ea;
+  font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif;
+  direction: rtl;
+}
+
+.studio {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: clamp(12px, 3dvw, 32px);
+}
+
+/* ── כותרת ── */
+.studio__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: #fff;
+  border-radius: 20px;
+  padding: clamp(14px, 3dvw, 24px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+.studio__back {
+  font-size: 28px;
+  text-decoration: none;
+  color: #4f67ff;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: #eef1ff;
+  min-width: 64px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.studio__title {
+  margin: 0;
+  font-size: clamp(22px, 4dvmin, 30px);
+  font-weight: 900;
+  color: #1a1a2e;
+}
+
+.studio__subtitle {
+  margin: 4px 0 0;
+  color: #6c757d;
+  font-size: clamp(13px, 2.5dvmin, 16px);
+  max-width: 46em;
+  line-height: 1.5;
+}
+
+.studio__progress {
+  margin-inline-start: auto;
+  background: #fff4d6;
+  color: #8a6d1a;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 10px 18px;
+  white-space: nowrap;
+}
+
+.studio__progress--done {
+  background: #d9f2e4;
+  color: #1d7a4f;
+}
+
+.studio__unsupported {
+  background: #fdecec;
+  color: #a33;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 700;
+}
+
+/* ── קבוצות ── */
+.studio__section {
+  margin-top: clamp(18px, 4dvh, 32px);
+}
+
+.studio__section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.studio__section-title {
+  margin: 0;
+  font-size: clamp(18px, 3.5dvmin, 24px);
+  font-weight: 900;
+  color: #1a1a2e;
+}
+
+.studio__section-count {
+  font-size: 0.75em;
+  color: #6c757d;
+  font-weight: 700;
+}
+
+.studio__section-hint {
+  margin: 0;
+  color: #6c757d;
+  font-size: clamp(12px, 2.3dvmin, 15px);
+}
+
+.studio__grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+  gap: 12px;
+}
+
+/* ── כרטיס צליל ── */
+.studio__card {
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.studio__card--recorded {
+  border-color: #58b98a;
+  background: #f2fbf6;
+}
+
+.studio__card--recorded .studio__card-label::after {
+  content: ' ✓';
+  color: #1d7a4f;
+}
+
+.studio__card-label {
+  font-size: clamp(18px, 3.5dvmin, 26px);
+  font-weight: 900;
+  color: #1a1a2e;
+  flex: 1;
+  min-width: 3em;
+}
+
+.studio__listen {
+  font-size: 20px;
+  border: none;
+  background: #eef1ff;
+  border-radius: 12px;
+  min-width: 48px;
+  min-height: 48px;
+  cursor: pointer;
+}
+
+.studio__listen:disabled {
+  opacity: 0.5;
+}
+
+.studio__record {
+  display: flex;
+  align-items: center;
+}
+
+/* חיווי מקור ההשמעה האחרונה בכרטיס */
+.studio__card[data-source='bank']::after,
+.studio__card[data-source='tts']::after,
+.studio__card[data-source='synth']::after {
+  font-size: 11px;
+  color: #6c757d;
+  width: 100%;
+}
+
+.studio__card[data-source='bank']::after { content: 'הושמעה ההקלטה שלכם'; color: #1d7a4f; }
+.studio__card[data-source='tts']::after { content: 'הושמע קול מחשב (נדרשת רשת)'; }
+.studio__card[data-source='synth']::after { content: 'הושמע צליל מסונתז - מומלץ להקליט'; }

@@ -11,6 +11,7 @@ export { GameShell }         from './core/game-shell.js';
 export { createRoundManager } from './core/round-manager.js';
 export { createLocalState }  from './core/local-state.js';
 export { bootstrapGame }     from './core/bootstrap.js';
+export { createHintTracker } from './core/hints.js';
 
 // ===== Audio =====
 export { tts }    from './audio/tts.js';
@@ -18,6 +19,12 @@ export { sounds } from './audio/sounds.js';
 export { createVowelDetector, matchNikudVowel, classifyFormants, extractFormantsFromSpectrum, VOWEL_TEMPLATES, NIKUD_VOWEL } from './audio/vowel-detector.js';
 export { createVoiceRecorder, isVoiceRecordingSupported } from './audio/voice-recorder.js';
 export { saveVoice, loadVoice, deleteVoice, listVoiceKeys, playVoice, hasVoice } from './audio/voice-store.js';
+export { isSynthSupported, vowelFormantSpec, consonantOnsetSpec, synthesizeVowel, synthesizeSyllable } from './audio/phoneme-synth.js';
+export {
+  SOUND_BANK_ID, letterKey, nikudKey, syllableKey, wordKey,
+  standardSoundKeys, keyLabel, isOffline, recordedKeys,
+  speakLetter, speakNikudSound, speakSyllable, speakWord,
+} from './audio/hebrew-audio.js';
 
 // ===== Data =====
 export { hebrewLetters, getLetter, getLettersByGroup, randomLetters } from './data/hebrew-letters.js';

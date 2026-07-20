@@ -176,6 +176,29 @@
       color: #fff;
     }
 
+    /* Syllable Read icon */
+    .game-card__icon--syllables {
+      background: linear-gradient(135deg, #e3f7ef, #c7ecdd);
+    }
+
+    .icon--syllable {
+      font-size: clamp(50px, 12dvmin, 80px);
+      font-weight: 900;
+      color: #1d7a4f;
+      font-family: var(--font);
+      line-height: 1.4;
+    }
+
+    /* Sound Studio icon */
+    .game-card__icon--studio {
+      background: linear-gradient(135deg, #fff3d6, #ffe6ad);
+    }
+
+    .icon--studio-mic {
+      font-size: clamp(60px, 14dvmin, 90px);
+      position: absolute;
+    }
+
     /* Nikud Speak icon */
     .game-card__icon--speak {
       background: linear-gradient(135deg, #ffeef8, #ffd4e9);
@@ -281,6 +304,18 @@
         <span class="game-card__play">שַׂחֵק עַכְשָׁיו ▶</span>
       </a>
 
+      <!-- Syllable Read -->
+      <a href="games/syllable-read/" class="game-card">
+        <div class="game-card__icon game-card__icon--syllables">
+          <span class="icon--syllable">בָּ · מִ · שׁוֹ</span>
+        </div>
+        <div class="game-card__info">
+          <h3 class="game-card__name">קְרִיאַת הֲבָרוֹת</h3>
+          <p class="game-card__desc">הַקְשִׁיבוּ לַהֲבָרָה וּבַחֲרוּ אֶת הָאוֹת וְהַנִּיקּוּד הַמַּתְאִימִים — עִם רְמָזִים מַדְרִיכִים</p>
+        </div>
+        <span class="game-card__play">שַׂחֵק עַכְשָׁיו ▶</span>
+      </a>
+
       <!-- Nikud Speak -->
       <a href="games/nikud-speak/" class="game-card">
         <div class="game-card__icon game-card__icon--speak">
@@ -291,6 +326,18 @@
           <p class="game-card__desc">הַקְשִׁיבוּ לְשֵׁם הַנִּיקּוּד וְאִמְרוּ אוֹתוֹ בְּקוֹל — תַּרְגִּילֵי הִגּוּי עִם זִיהוּי דִּיבּוּר</p>
         </div>
         <span class="game-card__play">שַׂחֵק עַכְשָׁיו ▶</span>
+      </a>
+
+      <!-- Sound Studio (teacher tool) -->
+      <a href="games/sound-studio/" class="game-card">
+        <div class="game-card__icon game-card__icon--studio">
+          <span class="icon--studio-mic">🎙️</span>
+        </div>
+        <div class="game-card__info">
+          <h3 class="game-card__name">אֻלְפַּן הַצְּלִילִים (לַמּוֹרֶה)</h3>
+          <p class="game-card__desc">הַקְלִיטוּ אֶת הָאוֹתִיּוֹת, הַנִּיקּוּד וְהַהֲבָרוֹת בְּקוֹלְכֶם — הַמִּשְׂחָקִים יַשְׁמִיעוּ אוֹתָם גַּם לְלֹא אִינְטֶרְנֶט</p>
+        </div>
+        <span class="game-card__play">פִּתְחוּ אֶת הָאֻלְפָּן ▶</span>
       </a>
 
     </div>

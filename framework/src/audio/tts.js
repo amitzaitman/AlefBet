@@ -384,7 +384,10 @@ async function _browserSpeak(text) {
  */
 async function _speakWithFallback(text, opts = {}) {
   let lastReason = '';
-  if (_useGoogleTTS && typeof Audio !== 'undefined') {
+  // כשהדפדפן מדווח שאין רשת - אין טעם לחכות לכישלון של Google;
+  // מדלגים ישר לקול המקומי כדי שהמשחק יישאר מהיר ויציב אופליין.
+  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  if (_useGoogleTTS && !offline && typeof Audio !== 'undefined') {
     try {
       await _googleSpeak(text, opts);
       return { ok: true };

@@ -15,6 +15,11 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:8080',
     trace: 'retain-on-failure',
+    // סביבות מנוהלות (Claude Code on the web וכד') מספקות Chromium מותקן מראש
+    // בגרסה שונה מזו שהחבילה מצפה לה; PW_CHROMIUM_PATH עוקף את ההורדה.
+    ...(process.env.PW_CHROMIUM_PATH
+      ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } }
+      : {}),
   },
   projects: [
     {
