@@ -1069,3 +1069,47 @@
   background: rgba(255, 255, 255, 0.18);
   outline: none;
 }
+
+/* ── Global Error Screen ─────────────────────────────────────────────────── */
+/* כיסוי ידידותי המוצג על ידי installGlobalErrorScreen בשגיאה לא-מטופלת. */
+.ab-error-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(27, 20, 12, 0.45);
+  direction: rtl;
+}
+
+.ab-error-screen__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  background: var(--ab-paper, #FFFAEC);
+  border-radius: 26px;
+  padding: clamp(24px, 5dvh, 44px) clamp(24px, 5dvw, 44px);
+  box-shadow: 0 12px 40px rgba(27, 20, 12, 0.35);
+  max-width: 420px;
+  font-family: var(--ab-font-body, 'Rubik', 'Arial Hebrew', sans-serif);
+}
+
+.ab-error-screen__emoji { font-size: clamp(44px, 12dvmin, 72px); line-height: 1; }
+
+.ab-error-screen__title {
+  margin: 0;
+  font-size: clamp(22px, 5dvmin, 32px);
+  font-weight: 900;
+  color: var(--ab-ink, #1B140C);
+}
+
+.ab-error-screen__text {
+  margin: 0;
+  font-size: clamp(15px, 3.2dvmin, 19px);
+  color: var(--ab-ink-soft, #4A3A2A);
+  line-height: 1.6;
+}

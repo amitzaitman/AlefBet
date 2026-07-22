@@ -12,6 +12,7 @@ export { createRoundManager } from './core/round-manager.js';
 export { createLocalState }  from './core/local-state.js';
 export { bootstrapGame }     from './core/bootstrap.js';
 export { createHintTracker } from './core/hints.js';
+export { starsFor, recordGameResult, getGameProgress, getAllProgress } from './core/progress.js';
 
 // ===== Audio =====
 export { tts }    from './audio/tts.js';
@@ -47,6 +48,7 @@ export { nikudGlyphSvg, NIKUD_GLYPH_IDS } from './ui/nikud-glyphs.js';
 export { createAppShell }          from './ui/app-shell.js';
 export { createVoiceRecordButton } from './ui/voice-record-button.js';
 export { mountAudioStatusBanner } from './ui/audio-status-banner.js';
+export { installGlobalErrorScreen } from './ui/error-screen.js';
 
 // ===== Render =====
 export { animate } from './render/animations.js';

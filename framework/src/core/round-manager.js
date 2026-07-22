@@ -52,7 +52,7 @@ export function createRoundManager(shell, container, {
     } else {
       showCompletionScreen(container, shell.state.score, totalRounds, () => {
         location.reload();
-      });
+      }, { gameId: shell.gameId });
     }
   }
 

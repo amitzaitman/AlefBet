@@ -168,7 +168,7 @@ export async function startGame(container) {
         } else {
           // מסך הסיום מחליף את ה-DOM; פירוק הבאנר משחרר מאזיני window שלא יידרשו עוד.
           audioBanner?.destroy?.();
-          showCompletionScreen(container, shell.state.score, ROUNDS, () => startGame(container));
+          showCompletionScreen(container, shell.state.score, ROUNDS, () => startGame(container), { gameId: 'nikud-match' });
         }
       }, 1800);
     } else {

@@ -115,7 +115,7 @@ describe('createRoundManager — handleCorrect', () => {
     await p2;
 
     expect(showCompletionScreen).toHaveBeenCalledOnce();
-    expect(showCompletionScreen).toHaveBeenCalledWith(container, shell.state.score, 2, expect.any(Function));
+    expect(showCompletionScreen).toHaveBeenCalledWith(container, shell.state.score, 2, expect.any(Function), { gameId: shell.gameId });
     expect(buildRoundUI).toHaveBeenCalledTimes(1); // only after round 1
   });
 

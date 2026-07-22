@@ -194,7 +194,7 @@ export async function startGame(container) {
         if (hasMore && roundIndex < roundNikud.length) {
           buildRoundUI(roundNikud[roundIndex]);
         } else {
-          showCompletionScreen(container, shell.state.score, 8, () => startGame(container));
+          showCompletionScreen(container, shell.state.score, 8, () => startGame(container), { gameId: 'nikud-speak' });
         }
       }, 1600);
 
@@ -214,7 +214,7 @@ export async function startGame(container) {
           if (hasMore && roundIndex < roundNikud.length) {
             buildRoundUI(roundNikud[roundIndex]);
           } else {
-            showCompletionScreen(container, shell.state.score, 8, () => startGame(container));
+            showCompletionScreen(container, shell.state.score, 8, () => startGame(container), { gameId: 'nikud-speak' });
           }
         }, 1600);
 

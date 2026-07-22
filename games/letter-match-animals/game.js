@@ -152,7 +152,7 @@ export async function startGame(container) {
           currentRoundIndex++;
           buildRoundUI(activeRounds[currentRoundIndex]);
         } else {
-          showCompletionScreen(container, shell.state.score, activeRounds.length, () => startGame(container));
+          showCompletionScreen(container, shell.state.score, activeRounds.length, () => startGame(container), { gameId: 'letter-match-animals' });
         }
       }, 1600);
 
