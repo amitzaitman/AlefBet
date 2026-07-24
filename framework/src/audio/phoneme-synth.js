@@ -19,6 +19,7 @@
  *   synthesizeSyllable(consonantSound, vowel, opts) - השמעת הברה עיצור+תנועה.
  */
 import { VOWEL_TEMPLATES } from './vowel-detector.js';
+import { getAudioContext, ensureAudioRunning } from './audio-context.js';
 
 /** תדר יסוד ברירת מחדל (Hz) - קול נשי/ילדי נעים. */
 const DEFAULT_PITCH_HZ = 210;
@@ -101,31 +102,14 @@ export function consonantOnsetSpec(sound) {
   return CONSONANT_ONSETS[sound] ?? CONSONANT_ONSETS[''];
 }
 
-// ── AudioContext משותף ─────────────────────────────────────────────────────
-
-/** @type {AudioContext | null} */
-let _ctx = null;
-
-function _getCtx() {
-  if (typeof window === 'undefined') return null;
-  const Ctor = window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
-  if (!Ctor) return null;
-  if (!_ctx) {
-    try { _ctx = new Ctor(); } catch { return null; }
-  }
-  if (_ctx.state === 'suspended') {
-    try { _ctx.resume(); } catch { /* noop */ }
-  }
-  return _ctx;
-}
+// ── AudioContext משותף (ראו audio-context.js) ─────────────────────────────
 
 /**
  * האם סינתזת פונמות זמינה בסביבה הנוכחית.
  * @returns {boolean}
  */
 export function isSynthSupported() {
-  return typeof window !== 'undefined' &&
-    !!(window.AudioContext || /** @type {any} */ (window).webkitAudioContext);
+  return getAudioContext() !== null;
 }
 
 /** באפר רעש לבן ממוחזר (שנייה אחת). */
@@ -293,8 +277,11 @@ function _waitUntil(ctx, endTime) {
  */
 export async function synthesizeVowel(vowel, opts = {}) {
   const spec = vowelFormantSpec(vowel);
-  const ctx = _getCtx();
-  if (!spec || !ctx) return false;
+  if (!spec) return false;
+  // ensureAudioRunning ולא getAudioContext: קונטקסט 'suspended' (iOS לפני
+  // מחווה) היה "מנגן" לתוך שקט ומדווח הצלחה כוזבת.
+  const ctx = await ensureAudioRunning();
+  if (!ctx) return false;
   let end;
   try {
     const start = ctx.currentTime + 0.03;
@@ -316,8 +303,9 @@ export async function synthesizeVowel(vowel, opts = {}) {
  */
 export async function synthesizeSyllable(consonantSound, vowel, opts = {}) {
   const spec = vowelFormantSpec(vowel);
-  const ctx = _getCtx();
-  if (!spec || !ctx) return false;
+  if (!spec) return false;
+  const ctx = await ensureAudioRunning();
+  if (!ctx) return false;
 
   const onset = consonantOnsetSpec(consonantSound);
   const pitchHz = opts.pitchHz ?? DEFAULT_PITCH_HZ;

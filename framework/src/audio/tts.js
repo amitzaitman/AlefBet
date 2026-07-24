@@ -13,6 +13,7 @@
  */
 import { getNikud } from '../utils/nakdan.js';
 import { nikudList } from '../data/nikud.js';
+import { unlockAudioOutput } from './audio-context.js';
 
 /** טיים-אאוט להמתנה לטעינת קולות עבריים מהדפדפן (במילישניות). */
 const VOICE_LOAD_TIMEOUT_MS = 2000;
@@ -449,6 +450,10 @@ export const tts = {
   unlock() {
     _interactionReady = true;
     _awaitingInteractionEmitted = false;
+    // שחרור ה-AudioContext המשותף (סינתזה, אפקטים, נגינת הקלטות) - קריטי
+    // ל-iOS, שם הקונטקסט קפוא עד מחוות משתמש. כל המשחקים קוראים unlock
+    // במחווה הראשונה, כך שכל מסלולי השמע משתחררים בבת אחת.
+    unlockAudioOutput().catch(() => {});
     // Pre-warm the speech engine so the first real speak doesn't hit autoplay restrictions.
     if (typeof speechSynthesis !== 'undefined' && typeof SpeechSynthesisUtterance !== 'undefined') {
       try {

@@ -6,6 +6,12 @@
   <title>AlefBet — סִפְרִיַּית מִשְׂחָקִים</title>
   <!-- הגופנים מגיעים מ-alefbet.css המקומי (ללא רשת); המחלקות שלו ממושמעות
        תחת .alefbet-game ולכן אינן משפיעות על עיצוב דף הבית. -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#C9442C">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="stylesheet" href="framework/dist/alefbet.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -248,6 +254,22 @@
       background: #3451e0;
     }
 
+    /* ── Progress stars badge (from localStorage) ── */
+    .game-card { position: relative; }
+
+    .game-card__stars {
+      position: absolute;
+      top: 10px;
+      inset-inline-start: 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: clamp(13px, 2.6dvmin, 16px);
+      letter-spacing: 2px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      pointer-events: none;
+    }
+
     /* ── Footer ── */
     .hub-footer {
       text-align: center;
@@ -275,7 +297,7 @@
     <div class="games-grid">
 
       <!-- Letter Match Animals -->
-      <a href="games/letter-match-animals/" class="game-card">
+      <a href="games/letter-match-animals/" class="game-card" data-game-id="letter-match-animals">
         <div class="game-card__icon game-card__icon--letters">
           <span class="icon--letters-letter">א</span>
           <span class="icon--letters-emoji">🦁</span>
@@ -288,7 +310,7 @@
       </a>
 
       <!-- Nikud Match -->
-      <a href="games/nikud-match/" class="game-card">
+      <a href="games/nikud-match/" class="game-card" data-game-id="nikud-match">
         <div class="game-card__icon game-card__icon--nikud">
           <div class="icon--nikud-samples">
             <div class="icon--nikud-chip" style="background:#FF6B6B;">אָ</div>
@@ -305,7 +327,7 @@
       </a>
 
       <!-- Syllable Read -->
-      <a href="games/syllable-read/" class="game-card">
+      <a href="games/syllable-read/" class="game-card" data-game-id="syllable-read">
         <div class="game-card__icon game-card__icon--syllables">
           <span class="icon--syllable">בָּ · מִ · שׁוֹ</span>
         </div>
@@ -317,7 +339,7 @@
       </a>
 
       <!-- Nikud Speak -->
-      <a href="games/nikud-speak/" class="game-card">
+      <a href="games/nikud-speak/" class="game-card" data-game-id="nikud-speak">
         <div class="game-card__icon game-card__icon--speak">
           <span class="icon--speak-mic">🎤</span>
         </div>
@@ -347,5 +369,29 @@
     AlefBet — מִשְׂחָקִים חִינּוּכִיִּים לִילָדִים
   </footer>
 
+
+  <script>
+    // כוכבי התקדמות: core/progress.js שומר שיאים ב-localStorage;
+    // דף הבית מציג את הכוכבים הטובים ביותר על כרטיס כל משחק.
+    (function showProgressStars() {
+      var progress;
+      try { progress = JSON.parse(localStorage.getItem('alefbet.progress.v1')) || {}; }
+      catch (e) { progress = {}; }
+      document.querySelectorAll('.game-card[data-game-id]').forEach(function (card) {
+        var entry = progress[card.dataset.gameId];
+        if (!entry || !entry.bestStars) return;
+        var badge = document.createElement('span');
+        badge.className = 'game-card__stars';
+        badge.textContent = '\u2b50'.repeat(entry.bestStars);
+        badge.setAttribute('aria-label', entry.bestStars + ' כוכבים');
+        card.appendChild(badge);
+      });
+    })();
+
+    // Service Worker: אחרי ביקור ראשון האתר כולו עובד ללא אינטרנט.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    }
+  </script>
 </body>
 </html>

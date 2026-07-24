@@ -8,6 +8,7 @@
  */
 import { sounds } from '../audio/sounds.js';
 import { animate } from '../render/animations.js';
+import { randomPraise } from '../data/encouragement.js';
 
 export function createFeedback(container) {
   const el = document.createElement('div');
@@ -29,10 +30,10 @@ export function createFeedback(container) {
   }
 
   return {
-    /** הצג משוב חיובי */
-    correct(text = '!כָּל הַכָּבוֹד') {
+    /** הצג משוב חיובי - טקסט מפורש, או ביטוי שבח אקראי אם לא סופק */
+    correct(text) {
       sounds.correct();
-      show(text, 'correct');
+      show(text ?? `!${randomPraise()}`, 'correct');
       animate(el, 'bounce');
     },
 

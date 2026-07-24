@@ -3,6 +3,8 @@
  * משמש לשמירת הקלטות מורה לסיבובי משחק, הוראות וניקוד
  */
 
+import { playBlob } from './audio-context.js';
+
 const DB_NAME    = 'alefbet-voices';
 const STORE_NAME = 'recordings';
 const DB_VERSION = 1;
@@ -92,6 +94,10 @@ export async function listVoiceKeys(gameId) {
 
 /**
  * נגן הקלטה שמורה.
+ *
+ * מסלול ראשי: Web Audio (decodeAudioData) - עובד ב-iOS גם עמוק בתוך
+ * שרשראות async אחרי unlock אחד, בניגוד לאלמנט <audio> שנחסם שם.
+ * מסלול גיבוי: אלמנט <audio> עם blob URL (דפדפנים ללא decode לפורמט).
  * @returns {Promise<boolean>} true אם ניגן בהצלחה, false אם אין הקלטה
  */
 export async function playVoice(gameId, voiceKey) {
@@ -102,6 +108,8 @@ export async function playVoice(gameId, voiceKey) {
     return false;
   }
   if (!blob) return false;
+
+  if (await playBlob(blob)) return true;
 
   return new Promise(resolve => {
     const url   = URL.createObjectURL(blob);

@@ -52,7 +52,7 @@ deploy/           Cloudflare Worker (Nakdan proxy) + infra
 
 ## Adding things
 
-- **New game:** copy `games/_template/` → edit `game.js` → add a card in the root `index.html`.
+- **New game:** copy `games/_template/` → edit `game.js` → add a card in the root `index.html` → add the game folder to the `GAMES` list in root `sw.js` (so it precaches for offline).
 - **New framework module:** put it under the right `framework/src/<category>/`, export from `index.ts`, add CSS to `styles/alefbet.css` if it renders, add a vitest in `__tests__/`, then `npm run build`.
 
 ## Deploy

@@ -20,6 +20,12 @@ export class GameShell {
     };
     this.events = new EventBus();
     this.state = new GameState(this.config.totalRounds);
+    /**
+     * מזהה המשחק לצורך זיכרון התקדמות (core/progress.js).
+     * מוגדר על ידי bootstrapGame; ריק במעטפות שנבנו ידנית.
+     * @type {string}
+     */
+    this.gameId = typeof config.gameId === 'string' ? config.gameId : '';
     this._buildShell();
   }
 

@@ -12,6 +12,7 @@ export { createRoundManager } from './core/round-manager.js';
 export { createLocalState }  from './core/local-state.js';
 export { bootstrapGame }     from './core/bootstrap.js';
 export { createHintTracker } from './core/hints.js';
+export { starsFor, recordGameResult, getGameProgress, getAllProgress } from './core/progress.js';
 
 // ===== Audio =====
 export { tts }    from './audio/tts.js';
@@ -19,6 +20,7 @@ export { sounds } from './audio/sounds.js';
 export { createVowelDetector, matchNikudVowel, classifyFormants, extractFormantsFromSpectrum, VOWEL_TEMPLATES, NIKUD_VOWEL } from './audio/vowel-detector.js';
 export { createVoiceRecorder, isVoiceRecordingSupported } from './audio/voice-recorder.js';
 export { saveVoice, loadVoice, deleteVoice, listVoiceKeys, playVoice, hasVoice } from './audio/voice-store.js';
+export { getAudioContext, unlockAudioOutput, ensureAudioRunning, playBlob } from './audio/audio-context.js';
 export { isSynthSupported, vowelFormantSpec, consonantOnsetSpec, synthesizeVowel, synthesizeSyllable } from './audio/phoneme-synth.js';
 export {
   SOUND_BANK_ID, letterKey, nikudKey, syllableKey, wordKey,
@@ -30,6 +32,7 @@ export { resolveTtsProxyUrl, compileTextForKey, compileSoundBank } from './audio
 // ===== Data =====
 export { hebrewLetters, getLetter, getLettersByGroup, randomLetters } from './data/hebrew-letters.js';
 export { nikudList, nikudBaseLetters, letterWithNikud, randomNikud }  from './data/nikud.js';
+export { PRAISE_PHRASES, RETRY_HINTS, randomPraise, randomRetryHint } from './data/encouragement.js';
 
 // ===== UI =====
 export { createOptionCards }       from './ui/option-cards.js';
@@ -46,6 +49,7 @@ export { nikudGlyphSvg, NIKUD_GLYPH_IDS } from './ui/nikud-glyphs.js';
 export { createAppShell }          from './ui/app-shell.js';
 export { createVoiceRecordButton } from './ui/voice-record-button.js';
 export { mountAudioStatusBanner } from './ui/audio-status-banner.js';
+export { installGlobalErrorScreen } from './ui/error-screen.js';
 
 // ===== Render =====
 export { animate } from './render/animations.js';

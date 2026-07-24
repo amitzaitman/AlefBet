@@ -12,6 +12,7 @@
  * שחיים באי ה-TS של העורך.
  */
 import { GameShell } from './game-shell.js';
+import { installGlobalErrorScreen } from '../ui/error-screen.js';
 import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
 import { preloadNikud } from '../utils/nakdan.js';
 import { loadGameData } from '../editor/editor-storage.js';
@@ -67,6 +68,10 @@ export interface BootstrapResult {
  * מציג מסך טעינה, טוען ניקוד, בונה GameShell ומחבר עורך - הכל בקריאה אחת.
  */
 export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptions): Promise<BootstrapResult> {
+  // רשת ביטחון: שגיאה לא-מטופלת בכל שלב במשחק מציגה מסך ידידותי עם
+  // כפתור "להתחיל מחדש" במקום מסך לבן. ההתקנה אידמפוטנטית.
+  installGlobalErrorScreen();
+
   showLoadingScreen(container, opts.loadingMessage ?? 'טוֹעֵן...');
 
   await preloadNikud(opts.preloadTexts ?? []);
@@ -86,6 +91,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
   const shell = new GameShell(container, {
     totalRounds: opts.totalRounds ?? activeRounds.length,
     title:       opts.title,
+    gameId:      opts.gameId,
   });
 
   let gameData: GameData | null = null;

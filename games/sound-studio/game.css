@@ -73,7 +73,7 @@ body {
 .studio__compile {
   margin-top: clamp(14px, 3dvh, 24px);
   background: #eef6ff;
-  border: 2px dashed #7c94ff;
+  border: 2px solid #c9d4ff;
   border-radius: 16px;
   padding: clamp(14px, 3dvw, 22px);
 }

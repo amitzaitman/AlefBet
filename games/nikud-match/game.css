@@ -1,4 +1,4 @@
-/* ── Nikud Match — Kid-friendly papercraft layout ────────────────────────── */
+/* ── Nikud Match — clean & simple layout ─────────────────────────────────── */
 
 /* Arena: zones on sides, letter in center. גובה זורם לפי תוכן כדי שלא ייווצרו
    שטחים ריקים גדולים במצב landscape. */
@@ -31,55 +31,26 @@
   user-select: none;
   animation: ab-zone-in 0.44s ease-out both;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
-    0 6px 0 rgba(60, 40, 18, 0.18),
-    0 14px 26px var(--ab-shadow);
+    inset 0 -3px 0 rgba(0, 0, 0, 0.10),
+    0 8px 20px var(--ab-shadow);
   overflow: hidden;
 }
 
-/* Hand-cut dashed inner ring */
-.nm-zone::before {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border-radius: inherit;
-  border: 1.5px dashed rgba(255, 255, 255, 0.48);
-  pointer-events: none;
-}
-
-/* Subtle paper grain */
-.nm-zone::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--ab-grain);
-  background-size: 220px 220px;
-  opacity: 0.22;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-}
-
-.nm-zone--left { animation-delay: 0s; transform: rotate(-1deg); }
-.nm-zone--right { animation-delay: 0.1s; transform: rotate(1deg); }
+.nm-zone--left { animation-delay: 0s; }
+.nm-zone--right { animation-delay: 0.1s; }
 
 .nm-zone:active { transform: translateY(2px) scale(0.97); }
 
 .nm-zone--hover,
 .nm-zone.drop-target--hover {
-  transform: translateY(-4px) scale(1.04) rotate(-0.6deg);
+  transform: translateY(-4px) scale(1.04);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.20),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
-    0 10px 0 rgba(60, 40, 18, 0.20),
-    0 24px 38px var(--ab-shadow-deep);
+    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    0 16px 30px var(--ab-shadow-deep);
 }
 
 .nm-zone--correct {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.20),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
     0 0 0 4px var(--ab-teal),
     0 0 0 8px rgba(42, 123, 113, 0.25),
     0 12px 24px var(--ab-shadow-deep) !important;
@@ -89,7 +60,7 @@
 
 /* Nikud box uses shared ab-nikud-box from framework CSS */
 
-/* ── Center: the letter with nikud — paper card with ink letter ────────── */
+/* ── Center: the letter with nikud ───────────────────────────────────────── */
 .nm-center {
   display: flex;
   align-items: center;
@@ -106,58 +77,26 @@
   width: clamp(110px, 28dvmin, 180px);
   height: clamp(110px, 28dvmin, 180px);
   background: var(--ab-paper);
-  border: 3px solid var(--ab-ink);
+  border: 3px solid var(--ab-border);
   border-radius: clamp(20px, 5dvmin, 32px);
   font-family: var(--ab-font-display);
   font-size: clamp(60px, 20dvmin, 108px);
   font-weight: 900;
   color: var(--ab-ink);
   user-select: none;
-  box-shadow:
-    7px 7px 0 var(--ab-ink),
-    0 16px 28px var(--ab-shadow);
+  box-shadow: var(--ab-paper-shadow-lifted);
   animation: ab-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   animation-delay: 0.15s;
   z-index: 10;
   /* cursor/touch-action/opacity בזמן גרירה מגיעים מברירות המחדל של .drag-source ב-framework */
 }
 
-/* Tape on the letter card */
-.nm-letter::before {
-  content: "";
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-4deg);
-  width: 64%;
-  height: 18px;
-  background: var(--ab-tape);
-  border-inline: 1px dashed var(--ab-tape-edge);
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Subtle ruled-paper texture inside */
-.nm-letter::after {
-  content: "";
-  position: absolute;
-  inset: 8px;
-  border-radius: calc(clamp(20px, 5dvmin, 32px) - 6px);
-  background-image: repeating-linear-gradient(
-    180deg,
-    transparent 0 22px,
-    rgba(74, 58, 42, 0.06) 22px 23px
-  );
-  pointer-events: none;
-}
-
 .nm-letter--correct {
   border-color: var(--ab-teal);
   background: #EAF6F0;
   box-shadow:
-    7px 7px 0 var(--ab-teal),
-    0 0 0 4px rgba(42, 123, 113, 0.18),
-    0 16px 28px var(--ab-shadow);
+    0 0 0 4px rgba(42, 123, 113, 0.25),
+    var(--ab-paper-shadow-lifted);
   animation: ab-stamp 0.5s ease-out;
 }
 

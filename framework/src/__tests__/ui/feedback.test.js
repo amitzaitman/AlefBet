@@ -14,6 +14,7 @@ vi.mock('../../render/animations.js', () => ({ animate: vi.fn() }));
 import { createFeedback } from '../../ui/feedback.js';
 import { sounds } from '../../audio/sounds.js';
 import { animate } from '../../render/animations.js';
+import { PRAISE_PHRASES } from '../../data/encouragement.js';
 import { mountContainer } from '../helpers.js';
 
 let container;
@@ -34,14 +35,15 @@ describe('createFeedback — element setup', () => {
 });
 
 describe('createFeedback — correct', () => {
-  it('plays the correct sound, shows Hebrew praise and bounces', () => {
+  it('plays the correct sound, shows a random praise phrase and bounces', () => {
     const fb = createFeedback(container);
     fb.correct();
 
     const el = container.querySelector('.feedback-message');
     expect(sounds.correct).toHaveBeenCalledOnce();
-    expect(el.textContent).toMatch(/כ.*ב.*ד/); // "כל הכבוד" with any nikud
-    expect(el.textContent.length).toBeGreaterThan(0);
+    // הטקסט הוא "!" + אחד מביטויי השבח המשותפים - לא נניח איזה נבחר.
+    expect(el.textContent.startsWith('!')).toBe(true);
+    expect(PRAISE_PHRASES).toContain(el.textContent.slice(1));
     expect(el.className).toBe('feedback-message feedback-message--correct');
     expect(animate).toHaveBeenCalledWith(el, 'bounce');
   });
