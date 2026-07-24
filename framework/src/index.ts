@@ -32,6 +32,7 @@ export { resolveTtsProxyUrl, compileTextForKey, compileSoundBank } from './audio
 // ===== Data =====
 export { hebrewLetters, getLetter, getLettersByGroup, randomLetters } from './data/hebrew-letters.js';
 export { nikudList, nikudBaseLetters, letterWithNikud, randomNikud }  from './data/nikud.js';
+export { PRAISE_PHRASES, RETRY_HINTS, randomPraise, randomRetryHint } from './data/encouragement.js';
 
 // ===== UI =====
 export { createOptionCards }       from './ui/option-cards.js';

@@ -28,7 +28,10 @@ async function pickAndClickCorrectCard(page) {
   // The correct round letter is the first/only `.letter-display` on screen.
   const letter = (await page.locator('.letter-display').first().textContent())?.trim() || '';
 
-  // Mapping mirrors ROUNDS in games/letter-match-animals/game.js.
+  // Mapping mirrors hebrewLetters' exampleWord in framework/src/data/hebrew-letters.js
+  // (stripped of nikud). The game now randomizes its 8 target letters out of
+  // all 22 regular letters each session, so every regular letter needs an
+  // entry here or the golden-path assertion could flake.
   const correctByLetter = {
     'א': 'אריה',
     'ב': 'בית',
@@ -38,6 +41,20 @@ async function pickAndClickCorrectCard(page) {
     'ו': 'ורד',
     'ז': 'זאב',
     'ח': 'חתול',
+    'ט': 'טלה',
+    'י': 'יונה',
+    'כ': 'כלב',
+    'ל': 'לב',
+    'מ': 'מים',
+    'נ': 'נחש',
+    'ס': 'סוס',
+    'ע': 'עוגה',
+    'פ': 'פיל',
+    'צ': 'צב',
+    'ק': 'קוף',
+    'ר': 'רכב',
+    'ש': 'שמש',
+    'ת': 'תפוח',
   };
   const wantedBase = correctByLetter[letter];
 

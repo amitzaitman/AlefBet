@@ -1,53 +1,53 @@
 /**
  * משחק התאמת אותיות לחיות
  * הצג אות עברית — בחר את החיה שמתחילה באותה אות
- * 8 סיבובים, אותיות א–ח
+ * 8 סיבובים; בכל הפעלה נבחרות 8 אותיות אקראיות מתוך 22 האותיות הרגילות,
+ * כך שמשחקים חוזרים חושפים בסופו של דבר את כל האלף-בית (לא רק א-ח).
  */
 import {
   bootstrapGame,
   getLetter,
+  getLettersByGroup,
+  randomLetters,
   createOptionCards,
   createProgressBar,
   createFeedback,
   showCompletionScreen,
   getNikud,
   tts,
+  animate,
   mountAudioStatusBanner,
+  PRAISE_PHRASES,
+  RETRY_HINTS,
+  randomPraise,
+  randomRetryHint,
 } from '../../framework/dist/alefbet.js';
 
 // ── Game data ─────────────────────────────────────────────────────────────
+// הסיבובים והמסיחים נגזרים מ-hebrewLetters (מקור אמת יחיד) ולא ממערכים
+// מקומיים משוכפלים - כל 22 האותיות הרגילות זמינות כמטרה או כמסיח.
 
-const ROUNDS = [
-  { target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' },
-  { target: 'ב', correct: 'בַּיִת', correctEmoji: '🏠' },
-  { target: 'ג', correct: 'גָּמָל', correctEmoji: '🐪' },
-  { target: 'ד', correct: 'דָּג', correctEmoji: '🐟' },
-  { target: 'ה', correct: 'הַר', correctEmoji: '⛰️' },
-  { target: 'ו', correct: 'וֶרֶד', correctEmoji: '🌹' },
-  { target: 'ז', correct: 'זְאֵב', correctEmoji: '🐺' },
-  { target: 'ח', correct: 'חָתוּל', correctEmoji: '🐱' },
-];
+/** בחר 8 אותיות מטרה אקראיות להפעלה נוכחית של המשחק. */
+function buildRounds() {
+  return randomLetters(8, 'regular').map(l => ({
+    target: l.letter,
+    correct: l.exampleWord,
+    correctEmoji: l.emoji,
+  }));
+}
 
-const DISTRACTORS = [
-  { text: 'טָלֶה', emoji: '🐑' }, { text: 'יוֹנָה', emoji: '🕊️' },
-  { text: 'כֶּלֶב', emoji: '🐕' }, { text: 'מַיִם', emoji: '💧' },
-  { text: 'נָחָשׁ', emoji: '🐍' }, { text: 'סוּס', emoji: '🐎' },
-  { text: 'עַיִט', emoji: '🦅' }, { text: 'פִּיל', emoji: '🐘' },
-  { text: 'צָב', emoji: '🐢' }, { text: 'קוֹף', emoji: '🐒' },
-  { text: 'רֶכֶב', emoji: '🚗' }, { text: 'שֶׁמֶשׁ', emoji: '☀️' },
-  { text: 'תַּפּוּחַ', emoji: '🍎' },
-];
+/** כל 22 המילים לדוגמה - למאגר המסיחים של העורך ולטעינה מראש של ניקוד. */
+const ALL_REGULAR_WORDS = getLettersByGroup('regular').map(l => ({ text: l.exampleWord, emoji: l.emoji }));
 
 // ── All texts that need nikud ──────────────────────────────────────────────
 
 const STATIC_TEXTS = [
-  'מָצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת:',
-  'בְּרוּכִים הַבָּאִים! מָצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת',
-  'כָּל הַכָּבוֹד',
-  'נַסֵּה שׁוּב',
+  'מָצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת:',
+  'בְּרוּכִים הַבָּאִים! מָצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת',
   'הָאוֹת',
-  ...ROUNDS.map(r => r.correct),
-  ...DISTRACTORS.map(d => d.text),
+  ...PRAISE_PHRASES,
+  ...RETRY_HINTS,
+  ...ALL_REGULAR_WORDS.map(w => w.text),
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────
@@ -56,8 +56,9 @@ function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
 function buildOptions(round) {
   const correct = { id: 'correct', text: getNikud(round.correct), emoji: round.correctEmoji };
-  const distractors = shuffle(DISTRACTORS).slice(0, 3)
-    .map((d, i) => ({ id: `wrong-${i}`, text: getNikud(d.text), emoji: d.emoji }));
+  const pool = getLettersByGroup('regular').filter(l => l.letter !== round.target);
+  const distractors = shuffle(pool).slice(0, 3)
+    .map((l, i) => ({ id: `wrong-${i}`, text: getNikud(l.exampleWord), emoji: l.emoji }));
   return shuffle([correct, ...distractors]);
 }
 
@@ -68,11 +69,11 @@ export async function startGame(container) {
     gameId: 'letter-match-animals',
     title: getNikud('התאמת אותיות') || 'התאמת אותיות',
     preloadTexts: STATIC_TEXTS,
-    defaultRounds: ROUNDS,
+    defaultRounds: buildRounds(),
     editor: {
       type: 'multiple-choice',
       title: 'התאמת אותיות',
-      distractors: DISTRACTORS,
+      distractors: ALL_REGULAR_WORDS,
       restartGame: startGame,
     },
   });
@@ -142,7 +143,7 @@ export async function startGame(container) {
 
     if (option.id === 'correct') {
       cards.highlight('correct', 'correct');
-      feedback.correct(`!נָכוֹן — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
+      feedback.correct(`!${randomPraise()} — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
 
       setTimeout(() => {
         shell.state.addScore(1);
@@ -157,8 +158,11 @@ export async function startGame(container) {
       }, 1600);
 
     } else {
-      cards.highlight(option.id, 'wrong');
-      feedback.wrong(`!נַסֵּה שׁוּב — חַפֵּשׂ אֶת ${letterName}`);
+      // ללא סימון שלילי או צליל שגוי - רק פעימה עדינה על הכרטיס שנלחץ
+      // ורמז מעודד, כמו בשאר משחקי הפלטפורמה.
+      const pressedEl = rightPanelEl?.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);
+      if (pressedEl) animate(pressedEl, 'pulse');
+      feedback.hint(`${randomRetryHint()} — חַפְּשׂוּ אֶת ${letterName}`);
 
       setTimeout(() => {
         cards.reset();

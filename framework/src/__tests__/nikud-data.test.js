@@ -5,6 +5,7 @@ import {
   letterWithNikud,
   randomNikud,
 } from '../data/nikud.js';
+import { hebrewLetters } from '../data/hebrew-letters.js';
 
 describe('nikudList data integrity', () => {
   it('has 7 entries', () => {
@@ -51,10 +52,19 @@ describe('nikudBaseLetters', () => {
   });
 
   it('contains no final-form letters', () => {
-    const finalForms = ['ךְ', 'םִ', 'ן', 'ף', 'ץ'];
+    const finalForms = ['ך', 'ם', 'ן', 'ף', 'ץ'];
     for (const ch of nikudBaseLetters) {
       expect(finalForms).not.toContain(ch);
     }
+  });
+
+  it('covers all 22 regular letters - matches hebrewLetters exactly', () => {
+    // רגרסיה: הרשימה הייתה מוגבלת בעבר ל-12 אותיות בלבד, ומנעה תרגול
+    // ניקוד/הברות על ה,ו,ז,ח,ט,י,כ,ס,ע,צ. נגזרת עכשיו מ-hebrewLetters
+    // כדי שלא תוכל להתפצל שוב.
+    const expectedLetters = new Set(hebrewLetters.filter(l => !l.isFinal).map(l => l.letter));
+    expect(nikudBaseLetters).toHaveLength(22);
+    expect(new Set(nikudBaseLetters)).toEqual(expectedLetters);
   });
 });
 

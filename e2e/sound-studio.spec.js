@@ -10,11 +10,12 @@ test.describe('sound-studio', () => {
     await expect(page.locator('.studio__title')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('.studio__section')).toHaveCount(3);
 
-    // 27 letters + 7 nikud + 12x7 syllables = 118 sound cards.
-    await expect(page.locator('.studio__card')).toHaveCount(118);
+    // 27 letters + 7 nikud + 22x7 syllables = 188 sound cards
+    // (nikudBaseLetters now covers all 22 regular letters, not just 12).
+    await expect(page.locator('.studio__card')).toHaveCount(188);
 
     const progress = await page.locator('.studio__progress').textContent();
-    expect(progress).toContain('118');
+    expect(progress).toContain('188');
   });
 
   test('listen button previews a sound without breaking when offline', async ({ page }) => {

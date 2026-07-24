@@ -22,15 +22,17 @@ import {
   mountAudioStatusBanner,
   speakNikudSound,
   isSynthSupported,
+  RETRY_HINTS,
+  randomRetryHint,
 } from '../../framework/dist/alefbet.js';
 
 // ── Texts to preload ──────────────────────────────────────────────────────
 const STATIC_TEXTS = [
   'בְּרוּכִים הַבָּאִים! אֱמוֹר אֶת הַנִּיקּוּד',
   'כָּל הַכָּבוֹד',
-  'נַסֵּה שׁוּב! הַקְשֵׁב לַצְּלִיל',
   'הַמִּשְׂחָק דּוֹרֵשׁ גִּישָׁה לַמִּיקְרוֹפוֹן',
-  ...nikudList.map(n => n.name),
+  ...RETRY_HINTS,
+  ...nikudList.map(n => n.nameNikud),
 ];
 
 // ── Game ──────────────────────────────────────────────────────────────────
@@ -219,7 +221,7 @@ export async function startGame(container) {
         }, 1600);
 
       } else {
-        feedback.hint(getNikud('נַסֵּה שׁוּב! הַקְשֵׁב לַצְּלִיל 🔊'));
+        feedback.hint(`${getNikud(randomRetryHint())} 🔊`);
         micBtn.disabled = false;
         listening = false;
       }

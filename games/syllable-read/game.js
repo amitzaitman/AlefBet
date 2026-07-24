@@ -28,20 +28,16 @@ import {
   showNikudSettingsDialog,
   mountAudioStatusBanner,
   animate,
+  RETRY_HINTS,
+  randomRetryHint,
 } from '../../framework/dist/alefbet.js';
 
 const ROUNDS = 8;
 
-const ENCOURAGEMENTS = [
-  'נַסּוּ שׁוּב, אַתֶּם יְכוֹלִים!',
-  'כִּמְעַט! הַקְשִׁיבוּ שׁוּב',
-  'עוֹד נִסָּיוֹן קָטָן',
-];
-
 const STATIC_TEXTS = [
   'הַקְשִׁיבוּ לַהֲבָרָה וּבַחֲרוּ אוֹתָהּ',
   'כָּל הַכָּבוֹד',
-  ...ENCOURAGEMENTS,
+  ...RETRY_HINTS,
 ];
 
 function pickOther(pool, exclude) {
@@ -115,7 +111,7 @@ export async function startGame(container) {
     buildRoundUI,
     onWrong: () => {
       // עידוד בלבד: משמיעים שוב את ההברה - זו העזרה, לא עונש.
-      feedback?.hint(ENCOURAGEMENTS[Math.min(hints.misses, ENCOURAGEMENTS.length - 1)]);
+      feedback?.hint(randomRetryHint());
       const level = hints.miss();
       if (level >= 2) {
         // עזרה מוגברת: מעמעמים את המסיחים ומשאירים את התשובה בולטת.

@@ -58,6 +58,15 @@ describe('getLetter', () => {
     expect(getLetter('ת')?.name).toBe('תָּו');
   });
 
+  it('name field matches nameNikud for the letters that had corrupted spellings', () => {
+    // רגרסיה: ל היה שמור בעבר כ-'לָמַד' (הפועל "למד", לא שם האות),
+    // צ כ-'צִדֵּי' (ניקוד שגוי), ו-פ/ף ללא ניקוד כלל ('פא'/'פא סופית').
+    expect(getLetter('ל')?.name).toBe('לָמֵד');
+    expect(getLetter('צ')?.name).toBe('צַדִּי');
+    expect(getLetter('פ')?.name).toBe('פֵּא');
+    expect(getLetter('ף')?.name).toBe('פֵּא סוֹפִית');
+  });
+
   it('returns null for characters not in the alphabet', () => {
     expect(getLetter('X')).toBeNull();
     expect(getLetter('a')).toBeNull();

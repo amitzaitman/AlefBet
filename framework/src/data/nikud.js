@@ -3,20 +3,24 @@
  * כולל את סמלי הניקוד, שמותיהם ואופן הגייתם
  * [נוסף על ידי: nikud-match game]
  */
+import { hebrewLetters } from './hebrew-letters.js';
 
 /** רשימת סימני הניקוד העיקריים */
 export const nikudList = [
   { id: 'kamatz', name: 'קָמָץ', nameNikud: 'קָמָץ', symbol: '\u05B8', sound: 'אָה', color: '#C9442C', textColor: '#fff' },
-  { id: 'patah', name: 'פֶּתַח', nameNikud: 'פָּתַח', symbol: '\u05B7', sound: 'אָה', color: '#C58119', textColor: '#fff' },
+  { id: 'patah', name: 'פָּתַח', nameNikud: 'פָּתַח', symbol: '\u05B7', sound: 'אָה', color: '#C58119', textColor: '#fff' },
   { id: 'hiriq', name: 'חִירִיק', nameNikud: 'חִירִיק', symbol: '\u05B4', sound: 'אִי', color: '#2A7B71', textColor: '#fff' },
-  { id: 'tzere', name: 'צָרָה', nameNikud: 'צֵרֶה', symbol: '\u05B5', sound: 'אֶה', color: '#4A6B8C', textColor: '#fff' },
-  { id: 'segol', name: 'סָגֹול', nameNikud: 'סְגוֹל', symbol: '\u05B6', sound: 'אֶה', color: '#783952', textColor: '#fff' },
-  { id: 'holam', name: 'חוֹלֵם', nameNikud: 'חוֹלָם', symbol: '\u05B9', sound: 'אוֹ', color: '#5F7A42', textColor: '#fff' },
-  { id: 'kubbutz', name: 'קֻובּוּץ', nameNikud: 'קֻבּוּץ', symbol: '\u05BB', sound: 'אוּ', color: '#6B4A8A', textColor: '#fff' },
+  { id: 'tzere', name: 'צֵרֶה', nameNikud: 'צֵרֶה', symbol: '\u05B5', sound: 'אֶה', color: '#4A6B8C', textColor: '#fff' },
+  { id: 'segol', name: 'סְגוֹל', nameNikud: 'סְגוֹל', symbol: '\u05B6', sound: 'אֶה', color: '#783952', textColor: '#fff' },
+  { id: 'holam', name: 'חוֹלָם', nameNikud: 'חוֹלָם', symbol: '\u05B9', sound: 'אוֹ', color: '#5F7A42', textColor: '#fff' },
+  { id: 'kubbutz', name: 'קֻבּוּץ', nameNikud: 'קֻבּוּץ', symbol: '\u05BB', sound: 'אוּ', color: '#6B4A8A', textColor: '#fff' },
 ];
 
-/** אותיות בסיס לשימוש עם ניקוד (ללא אותיות סופיות) */
-export const nikudBaseLetters = ['א', 'ב', 'ג', 'ד', 'מ', 'נ', 'ל', 'ר', 'ש', 'ת', 'פ', 'ק'];
+/**
+ * אותיות בסיס לשימוש עם ניקוד (ללא אותיות סופיות) - נגזר מ-hebrewLetters
+ * כדי לכסות את כל 22 האותיות הרגילות ולא להתפצל למקור נתונים נפרד.
+ */
+export const nikudBaseLetters = hebrewLetters.filter(l => !l.isFinal).map(l => l.letter);
 
 /**
  * בנה מחרוזת של אות עם ניקוד
