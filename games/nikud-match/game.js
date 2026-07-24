@@ -20,6 +20,7 @@ import {
   createDragSource,
   createDropTarget,
   mountAudioStatusBanner,
+  speakSyllable,
 } from '../../framework/dist/alefbet.js';
 
 const ROUNDS = 8;
@@ -155,7 +156,9 @@ export async function startGame(container) {
 
       animate(zone, 'bounce');
       sounds.correct();
-      tts.speakNikud(letter, targetNikud.symbol);
+      // שרשרת אופליין-תחילה: הקלטת מורה -> קול מערכת -> סינתזת פונמות.
+      // חשוב במיוחד באייפון/Safari, שלרוב אין בו קול עברי מותקן כברירת מחדל.
+      speakSyllable(letter, targetNikud.id);
 
       shell.state.addScore(1);
       progressBar?.update(shell.state.currentRound);
