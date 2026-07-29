@@ -13,6 +13,15 @@ let _activeSource = null;   // currently dragging source
 let _clone        = null;   // floating clone during drag
 let _halfW = 0, _halfH = 0; // half-dimensions of clone
 
+// ── rAF-batched pointer tracking ──────────────────────────────────────────
+// גרירה גולמית (pointermove) יכולה לירות הרבה יותר מהר מקצב הרינדור של
+// המסך, במיוחד במגע. עדכון מיידי של style.left/top על כל אירוע מכריח
+// layout+paint שוב ושוב ומרגיש מקוטע. במקום זה שומרים רק את המיקום
+// האחרון ומעדכנים את ה-DOM פעם אחת לפריים דרך requestAnimationFrame,
+// וגם התזוזה עצמה עוברת ל-transform (compositor-only, אין layout).
+let _rafId = null;
+let _pendingX = 0, _pendingY = 0;
+
 // ── Drop Target Registry ──────────────────────────────────────────────────
 
 const _targets = new Map(); // el → { onDrop }
@@ -33,27 +42,48 @@ function _createClone(sourceEl, x, y) {
   _clone = sourceEl.cloneNode(true);
   Object.assign(_clone.style, {
     position:      'fixed',
-    left:          `${x - _halfW}px`,
-    top:           `${y - _halfH}px`,
+    left:          '0',
+    top:           '0',
     width:         `${rect.width}px`,
     height:        `${rect.height}px`,
     pointerEvents: 'none',   // keeps it out of elementFromPoint + hit-testing
     zIndex:        '9999',
     opacity:       '0.85',
-    transform:     'scale(1.12)',
     cursor:        'grabbing',
     margin:        '0',
+    willChange:    'transform', // מקדם שכבת compositor מראש - בלי זה הפריים הראשון של תזוזה עלול לגמגם
   });
+  _paintClonePosition(x, y);
   document.body.appendChild(_clone);
 }
 
-function _moveClone(x, y) {
+/** כותב את מיקום השיבוט דרך transform בלבד - compositor-only, ללא layout. */
+function _paintClonePosition(x, y) {
   if (!_clone) return;
-  _clone.style.left = `${x - _halfW}px`;
-  _clone.style.top  = `${y - _halfH}px`;
+  _clone.style.transform = `translate3d(${x - _halfW}px, ${y - _halfH}px, 0) scale(1.12)`;
+}
+
+/**
+ * מתזמן עדכון מיקום פעם אחת לפריים: שומר את המיקום העדכני ומצרף בקשת
+ * rAF יחידה (אם כבר יש אחת ממתינה, לא נוספת בקשה נוספת). כך גם 200
+ * אירועי pointermove בשנייה מתורגמים לכל היותר לעדכון DOM אחד לפריים.
+ */
+function _scheduleMove(x, y) {
+  _pendingX = x;
+  _pendingY = y;
+  if (_rafId !== null) return;
+  _rafId = requestAnimationFrame(() => {
+    _rafId = null;
+    _paintClonePosition(_pendingX, _pendingY);
+    _highlightTarget(_findTargetAt(_pendingX, _pendingY));
+  });
 }
 
 function _destroyClone() {
+  if (_rafId !== null) {
+    cancelAnimationFrame(_rafId);
+    _rafId = null;
+  }
   _clone?.remove();
   _clone = null;
 }
@@ -120,8 +150,7 @@ export function createDragSource(el, data) {
     el.setPointerCapture(e.pointerId);
 
     _moveHandler = (ev) => {
-      _moveClone(ev.clientX, ev.clientY);
-      _highlightTarget(_findTargetAt(ev.clientX, ev.clientY));
+      _scheduleMove(ev.clientX, ev.clientY);
     };
 
     _upHandler = (ev) => {
