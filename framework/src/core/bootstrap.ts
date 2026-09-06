@@ -16,9 +16,9 @@ import { attachGameAudio } from '../audio/game-audio.js';
 import { installGlobalErrorScreen } from '../ui/error-screen.js';
 import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
 import { preloadNikud } from '../utils/nakdan.js';
-import { loadGameData } from '../editor/editor-storage.js';
-import { GameData } from '../editor/game-data.js';
-import { GameEditor } from '../editor/game-editor.js';
+import { loadGameData } from './editor-storage.js';
+import { GameData } from './game-data.js';
+import { attachLazyEditor } from './lazy-editor.js';
 import type { RoundRecord } from '../editor/schemas.js';
 
 const starts = new WeakMap<HTMLElement, object>();
@@ -95,7 +95,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
 
   hideLoadingScreen(container);
 
-  const saved = loadGameData(opts.gameId);
+  const saved = opts.editor ? loadGameData(opts.gameId) : null;
   const activeRounds: RoundRecord[] = saved ? saved.rounds : (opts.defaultRounds ?? []);
 
   const shell = new GameShell(container, {
@@ -112,8 +112,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
       type:  opts.editor.type  ?? 'multiple-choice',
     };
     gameData = GameData.fromRoundsArray(opts.gameId, activeRounds, meta, opts.editor.distractors ?? []);
-    const editor = new GameEditor(container, gameData, { restartGame: opts.editor.restartGame });
-    shell.on('end', () => editor.destroy());
+    attachLazyEditor(shell, gameData, { restartGame: opts.editor.restartGame });
   }
 
   return { shell, activeRounds, gameData, aborted: false };

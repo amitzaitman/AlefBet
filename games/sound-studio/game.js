@@ -19,7 +19,7 @@ import {
   compileSoundBank,
   resolveTtsProxyUrl,
   tts,
-} from '../../framework/dist/alefbet.js';
+} from '../../framework/dist/runtime.js';
 
 const GROUPS = [
   { id: 'letters',   title: 'שְׁמוֹת הָאוֹתִיּוֹת',  hint: 'הַקְלִיטוּ אֶת שֵׁם הָאוֹת, לְמָשָׁל: "בֵּית"' },

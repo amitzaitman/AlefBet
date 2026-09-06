@@ -23,7 +23,7 @@ import {
   isSynthSupported,
   RETRY_HINTS,
   randomRetryHint,
-} from '../../framework/dist/alefbet.js';
+} from '../../framework/dist/runtime.js';
 
 // ── Texts to preload ──────────────────────────────────────────────────────
 const STATIC_TEXTS = [
