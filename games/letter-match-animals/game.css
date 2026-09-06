@@ -18,10 +18,16 @@
 /* Options panel: expands to fill remaining space, wraps below the letter
    in portrait and sits beside it in landscape. */
 .round-panel--options {
-  flex: 1 0 min(280px, 85dvw);
+  flex: 1 1 min(280px, 85dvw);
+  min-width: 0;
   max-width: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(12px, 2.8dvmin, 22px);
+}
+
+/* Let both columns use the panel width instead of shrinking to the text. */
+.letter-match-options {
+  width: 100%;
 }
