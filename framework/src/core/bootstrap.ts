@@ -13,6 +13,8 @@
  */
 import { GameShell, endGame } from './game-shell.js';
 import { attachGameAudio } from '../audio/game-audio.js';
+import { createRoundManager } from './round-manager.js';
+import { createProgressBar } from '../ui/progress-bar.js';
 import { installGlobalErrorScreen } from '../ui/error-screen.js';
 import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
 import { preloadNikud } from '../utils/nakdan.js';
@@ -116,4 +118,77 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
   }
 
   return { shell, activeRounds, gameData, aborted: false };
+}
+
+export interface RoundContext {
+  shell: GameShell;
+  round: RoundRecord;
+  index: number;
+  onCorrect: (action?: () => void | Promise<void>) => Promise<void>;
+  onWrong: (action?: () => void | Promise<void>) => Promise<void>;
+  isAnswered: () => boolean;
+  isActive: () => boolean;
+  schedule: (action: () => void, delayMs: number) => void;
+}
+
+export interface RunGameOptions extends Omit<BootstrapOptions, 'totalRounds'> {
+  buildRound: (context: RoundContext) => void | (() => void);
+  onStart?: (shell: GameShell) => void;
+  onReplay?: () => void;
+  transitionMs?: number;
+  playCorrectSound?: boolean;
+}
+
+/**
+ * עזר אופציונלי למשחקי סיבובים. המשחק מגדיר תוכן ומשוב; העזר מנהל
+ * ניקוד, מעבר, סיום ופירוק רכיבי הסיבוב. אולפנים וכלים אינם חייבים להשתמש בו.
+ */
+export async function runGame(container: HTMLElement, opts: RunGameOptions): Promise<BootstrapResult> {
+  const result = await bootstrapGame(container, opts);
+  if (result.aborted) return result;
+  const { shell, activeRounds } = result;
+  if (!activeRounds.length) {
+    shell.bodyEl.textContent = 'אֵין סִבּוּבִים לַמִּשְׂחָק.';
+    shell.end();
+    return result;
+  }
+  const progress = createProgressBar(shell.footerEl as HTMLElement, activeRounds.length);
+  let generation = 0;
+  let cleanup: (() => void) | void;
+  const disposeRound = () => {
+    generation++;
+    if (cleanup) cleanup();
+    cleanup = undefined;
+  };
+  const manager = createRoundManager(shell, container, {
+    totalRounds: activeRounds.length,
+    progressBar: progress,
+    transitionMs: opts.transitionMs,
+    playCorrectSound: opts.playCorrectSound,
+    onReplay: opts.onReplay ?? (() => { void runGame(container, opts); }),
+    buildRoundUI,
+  });
+  shell.on('end', disposeRound);
+  shell.on('start', () => {
+    progress.update(0);
+    opts.onStart?.(shell);
+    manager.reset();
+  });
+  shell.on('start', buildRoundUI);
+  function buildRoundUI() {
+    disposeRound();
+    shell.bodyEl.innerHTML = '';
+    const current = generation;
+    const isActive = () => !shell.ended && generation === current;
+    const index = shell.state.currentRound - 1;
+    cleanup = opts.buildRound({
+      shell, index, round: activeRounds[index], isActive,
+      isAnswered: () => !isActive() || manager.isAnswered(),
+      onCorrect: async action => { if (isActive()) await manager.handleCorrect(action); },
+      onWrong: async action => { if (isActive()) await manager.handleWrong(action); },
+      schedule: (action, ms) => shell.schedule(() => { if (isActive()) action(); }, ms),
+    });
+  }
+  shell.start();
+  return result;
 }

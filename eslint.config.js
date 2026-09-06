@@ -17,6 +17,8 @@ export default [
       'games/_template/**',
       '.a5c/**',
       'package-lock.json',
+      'test-results/**',
+      'playwright-report/**',
     ],
   },
   js.configs.recommended,

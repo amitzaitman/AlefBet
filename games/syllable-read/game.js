@@ -11,7 +11,7 @@
  *   (הבהוב התשובה, ואז עמעום המסיחים) דרך createHintTracker.
  */
 import {
-  bootstrapGame,
+  runGame,
   shuffle,
   sounds,
   nikudList,
@@ -20,8 +20,6 @@ import {
   randomNikud,
   speakSyllable,
   createOptionCards,
-  createProgressBar,
-  createRoundManager,
   createFeedback,
   createHintTracker,
   injectHeaderButton,
@@ -71,117 +69,99 @@ function buildRound(targetNikud) {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  const { shell, aborted } = await bootstrapGame(container, {
+  return runGame(container, {
     gameId: 'syllable-read',
     title: 'קְרִיאַת הֲבָרוֹת',
     preloadTexts: STATIC_TEXTS,
     loadingMessage: 'טוֹעֵן הֲבָרוֹת...',
-    totalRounds: ROUNDS,
-  });
-  if (aborted) return;
-
-  injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
-  const roundNikud = randomNikud(ROUNDS);
-  let progressBar = null;
-  let feedback = null;
-  let cards = null;
-  let round = null;
-  const hints = createHintTracker({ hintAfter: 2, escalateAfter: 4 });
-
-  function playTarget() {
-    return speakSyllable(round.target.letter, round.target.nikud.id);
-  }
-
-  const roundManager = createRoundManager(shell, container, {
-    totalRounds: ROUNDS,
-    // עטיפה יציבה: סרגל ההתקדמות נוצר רק ב-start, אחרי יצירת המנהל.
-    progressBar: { update: n => progressBar?.update(n) },
-    buildRoundUI,
-    onWrong: () => {
-      // עידוד בלבד: משמיעים שוב את ההברה - זו העזרה, לא עונש.
-      feedback?.hint(randomRetryHint());
-      const level = hints.miss();
-      if (level >= 2) {
-        // עזרה מוגברת: מעמעמים את המסיחים ומשאירים את התשובה בולטת.
-        cards?.highlight(round.targetId, 'hint');
-        dimWrongOptions();
-      } else if (level === 1) {
-        // רמז עדין: הבהוב קצר של התשובה הנכונה.
-        cards?.highlight(round.targetId, 'hint');
-        shell.schedule(() => cards?.reset(), 1600);
+    defaultRounds: randomNikud(ROUNDS).map(buildRound),
+    playCorrectSound: false, // createFeedback already owns the success sound.
+    onReplay: () => startGame(container),
+    onStart: () => {
+      injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
+      sounds.click();
+    },
+    buildRound: ({ shell, round, onCorrect, onWrong, isAnswered, schedule }) => {
+      let feedback = null;
+      let cards = null;
+      const hints = createHintTracker({ hintAfter: 2, escalateAfter: 4 });
+      function playTarget() {
+        return speakSyllable(round.target.letter, round.target.nikud.id);
       }
-      // ללא await בכוונה: שמע לעולם לא חוסם את זרימת המשחק - גם כשקול
-      // המערכת איטי או תקוע, הילד יכול להמשיך לנסות מיד.
-      playTarget();
+      function showHint() {
+        // עידוד בלבד: משמיעים שוב את ההברה - זו העזרה, לא עונש.
+        feedback?.hint(randomRetryHint());
+        const level = hints.miss();
+        if (level >= 2) {
+          // עזרה מוגברת: מעמעמים את המסיחים ומשאירים את התשובה בולטת.
+          cards?.highlight(round.targetId, 'hint');
+          dimWrongOptions();
+        } else if (level === 1) {
+          // רמז עדין: הבהוב קצר של התשובה הנכונה.
+          cards?.highlight(round.targetId, 'hint');
+          schedule(() => cards?.reset(), 1600);
+        }
+        // ללא await בכוונה: שמע לעולם לא חוסם את זרימת המשחק - גם כשקול
+        // המערכת איטי או תקוע, הילד יכול להמשיך לנסות מיד.
+        playTarget();
+      }
+      function dimWrongOptions() {
+        shell.bodyEl.querySelectorAll('.option-card').forEach(el => {
+          if (el.dataset.id !== round.targetId) el.classList.add('sr-card--dimmed');
+        });
+      }
+
+      function buildRoundUI() {
+        hints.reset();
+        const stage = document.createElement('div');
+        stage.className = 'sr-stage';
+
+        // כפתור השמעה גדול - הילד תמיד יכול לשמוע שוב.
+        const replay = document.createElement('button');
+        replay.type = 'button';
+        replay.className = 'sr-replay';
+        replay.setAttribute('aria-label', 'השמע שוב את ההברה');
+        replay.innerHTML = '<span class="sr-replay__icon">🔊</span><span class="sr-replay__label">הַקְשִׁיבוּ</span>';
+        replay.addEventListener('click', async () => {
+          replay.disabled = true;
+          animate(replay, 'pulse');
+          await playTarget();
+          replay.disabled = false;
+        });
+        stage.appendChild(replay);
+
+        const optionsHost = document.createElement('div');
+        optionsHost.className = 'sr-options';
+        stage.appendChild(optionsHost);
+
+        shell.bodyEl.appendChild(stage);
+
+        feedback?.destroy();
+        feedback = createFeedback(stage);
+
+        cards = createOptionCards(optionsHost, round.options, async (option) => {
+          if (isAnswered()) return;
+          if (option.id === round.targetId) {
+            cards.highlight(option.id, 'correct');
+            cards.disable();
+            feedback.correct();
+            // ההברה מושמעת ברקע; אין await כדי שהמעבר לסיבוב הבא לא ייתקע
+            // אם ספק השמע איטי.
+            await onCorrect(() => { playTarget(); });
+          } else {
+            // ללא סימון שלילי - הכרטיס רק "נושם" לאישור הלחיצה.
+            const el = shell.bodyEl.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);
+            if (el) animate(el, 'pulse');
+            await onWrong(showHint);
+          }
+        });
+
+        // השמעה אוטומטית של ההברה בפתיחת הסיבוב (אחרי אינטראקציה ראשונה).
+        playTarget();
+      }
+
+      buildRoundUI();
+      return () => feedback?.destroy();
     },
   });
-
-  function dimWrongOptions() {
-    shell.bodyEl.querySelectorAll('.option-card').forEach(el => {
-      if (el.dataset.id !== round.targetId) el.classList.add('sr-card--dimmed');
-    });
-  }
-
-  function buildRoundUI() {
-    hints.reset();
-    shell.bodyEl.innerHTML = '';
-    round = buildRound(roundNikud[shell.state.currentRound % roundNikud.length]);
-
-    const stage = document.createElement('div');
-    stage.className = 'sr-stage';
-
-    // כפתור השמעה גדול - הילד תמיד יכול לשמוע שוב.
-    const replay = document.createElement('button');
-    replay.type = 'button';
-    replay.className = 'sr-replay';
-    replay.setAttribute('aria-label', 'השמע שוב את ההברה');
-    replay.innerHTML = '<span class="sr-replay__icon">🔊</span><span class="sr-replay__label">הַקְשִׁיבוּ</span>';
-    replay.addEventListener('click', async () => {
-      replay.disabled = true;
-      animate(replay, 'pulse');
-      await playTarget();
-      replay.disabled = false;
-    });
-    stage.appendChild(replay);
-
-    const optionsHost = document.createElement('div');
-    optionsHost.className = 'sr-options';
-    stage.appendChild(optionsHost);
-
-    shell.bodyEl.appendChild(stage);
-
-    feedback?.destroy();
-    feedback = createFeedback(stage);
-
-    cards = createOptionCards(optionsHost, round.options, async (option) => {
-      if (roundManager.isAnswered()) return;
-      if (option.id === round.targetId) {
-        cards.highlight(option.id, 'correct');
-        cards.disable();
-        feedback.correct();
-        // ההברה מושמעת ברקע; אין await כדי שהמעבר לסיבוב הבא לא ייתקע
-        // אם ספק השמע איטי.
-        await roundManager.handleCorrect(() => { playTarget(); });
-      } else {
-        // ללא סימון שלילי - הכרטיס רק "נושם" לאישור הלחיצה.
-        const el = shell.bodyEl.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);
-        if (el) animate(el, 'pulse');
-        await roundManager.handleWrong();
-      }
-    });
-
-    // השמעה אוטומטית של ההברה בפתיחת הסיבוב (אחרי אינטראקציה ראשונה).
-    playTarget();
-  }
-
-  shell.on('start', () => {
-    shell.footerEl.innerHTML = '';
-    progressBar = createProgressBar(shell.footerEl, ROUNDS);
-    progressBar.update(0);
-    buildRoundUI();
-  });
-
-
-  shell.start();
-  sounds.click();
 }
