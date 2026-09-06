@@ -972,7 +972,7 @@ async function Vt(t, e) {
   if (e.onBeforeHide && (await e.onBeforeHide() === !1 || ce.get(t) !== n))
     return { shell: null, activeRounds: [], gameData: null, aborted: !0 };
   Bt(t);
-  const a = e.editor ? Ze(e.gameId) : null, r = a ? a.rounds : e.defaultRounds ?? [], o = new rt(t, {
+  const a = e.editor ? Ze(e.gameId) : null, r = a != null && a.rounds.length ? a.rounds : e.defaultRounds ?? [], o = new rt(t, {
     totalRounds: e.totalRounds ?? r.length,
     title: e.title,
     gameId: e.gameId

@@ -1207,7 +1207,7 @@ async function Fo(e, t) {
   if (t.onBeforeHide && (await t.onBeforeHide() === !1 || _t.get(e) !== n))
     return { shell: null, activeRounds: [], gameData: null, aborted: !0 };
   Oo(e);
-  const r = t.editor ? Zn(t.gameId) : null, o = r ? r.rounds : t.defaultRounds ?? [], i = new Yr(e, {
+  const r = t.editor ? Zn(t.gameId) : null, o = r != null && r.rounds.length ? r.rounds : t.defaultRounds ?? [], i = new Yr(e, {
     totalRounds: t.totalRounds ?? o.length,
     title: t.title,
     gameId: t.gameId

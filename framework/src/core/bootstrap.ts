@@ -98,7 +98,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
   hideLoadingScreen(container);
 
   const saved = opts.editor ? loadGameData(opts.gameId) : null;
-  const activeRounds: RoundRecord[] = saved ? saved.rounds : (opts.defaultRounds ?? []);
+  const activeRounds: RoundRecord[] = saved?.rounds.length ? saved.rounds : (opts.defaultRounds ?? []);
 
   const shell = new GameShell(container, {
     totalRounds: opts.totalRounds ?? activeRounds.length,
