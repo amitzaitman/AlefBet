@@ -3,7 +3,6 @@
  * עוזר משותף לניהול זרימת תשובה נכונה / שגויה בין סיבובים
  */
 import { sounds } from '../audio/sounds.js';
-import { tts } from '../audio/tts.js';
 import { showCompletionScreen } from '../ui/completion-screen.js';
 
 /**
@@ -16,6 +15,9 @@ import { showCompletionScreen } from '../ui/completion-screen.js';
  * @param {function} opts.buildRoundUI - קולבק לבניית ממשק הסיבוב הבא
  * @param {function} [opts.onCorrect] - קולבק אופציונלי לאחר תשובה נכונה (לפני קידום)
  * @param {function} [opts.onWrong] - קולבק אופציונלי לאחר תשובה שגויה
+ * @param {number} [opts.transitionMs] - זמן לפני הסיבוב הבא
+ * @param {boolean} [opts.playCorrectSound] - כבה אם המשחק כבר משמיע משוב
+ * @param {function} [opts.onReplay] - התחלה מחדש ללא טעינת העמוד
  * @returns {{ handleCorrect: function, handleWrong: function, isAnswered: function, reset: function }}
  */
 export function createRoundManager(shell, container, {
@@ -24,6 +26,9 @@ export function createRoundManager(shell, container, {
   buildRoundUI,
   onCorrect,
   onWrong,
+  transitionMs = 1200,
+  playCorrectSound = true,
+  onReplay = () => location.reload(),
 }) {
   let answered = false;
 
@@ -35,38 +40,45 @@ export function createRoundManager(shell, container, {
     if (answered || shell.ended) return;
     answered = true;
 
-    sounds.correct();
+    if (playCorrectSound) sounds.correct();
 
-    if (extraAction) await extraAction();
-    if (onCorrect) await onCorrect();
+    try {
+      if (extraAction) await extraAction();
+      if (shell.ended) return;
+      if (onCorrect) await onCorrect();
+    } catch (error) {
+      answered = false;
+      throw error;
+    }
 
     if (shell.ended) return;
     shell.state.addScore(1);
     progressBar?.update(shell.state.currentRound);
 
-    if (!await shell.delay(1200)) return;
+    if (!await shell.delay(transitionMs)) return;
 
     const hasMore = shell.nextRound();
     if (hasMore) {
       answered = false;
       buildRoundUI();
     } else {
-      showCompletionScreen(container, shell.state.score, totalRounds, () => {
-        location.reload();
-      }, { gameId: shell.gameId });
+      showCompletionScreen(container, shell.state.score, totalRounds, onReplay, { gameId: shell.gameId });
     }
   }
 
   /**
    * טפל בתשובה שגויה — בלי משוב שלילי!
    */
-  async function handleWrong() {
+  async function handleWrong(extraAction) {
     if (answered || shell.ended) return;
     answered = true;
 
-    if (onWrong) await onWrong();
-
-    answered = false;
+    try {
+      if (extraAction) await extraAction();
+      if (!shell.ended && onWrong) await onWrong();
+    } finally {
+      answered = false;
+    }
   }
 
   /** בדוק אם הסיבוב נעול (כבר ענו) */

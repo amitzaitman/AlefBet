@@ -13,7 +13,7 @@ vi.mock('../utils/nakdan.js', () => ({
   getNikud: vi.fn(t => t),
 }));
 
-import { bootstrapGame } from '../core/bootstrap.ts';
+import { bootstrapGame, runGame } from '../core/bootstrap.ts';
 import { GameData } from '../editor/game-data.ts';
 import { mountContainer } from './helpers.js';
 import { preloadNikud } from '../utils/nakdan.js';
@@ -24,6 +24,56 @@ beforeEach(() => {
 });
 
 describe('bootstrapGame', () => {
+  it('runs rounds, ignores stale answers and cleans up on completion and replay', async () => {
+    vi.useFakeTimers();
+    try {
+      const host = mountContainer();
+      const rounds = [];
+      const dispose = vi.fn();
+      const replay = vi.fn();
+      const result = await runGame(host, {
+        gameId: 'runner', title: 'בדיקה', preloadTexts: [], audio: false,
+        defaultRounds: [{ target: 'א' }, { target: 'ב' }],
+        transitionMs: 20, onReplay: replay,
+        buildRound: context => { rounds.push(context); return dispose; },
+      });
+      expect(rounds[0].round.target).toBe('א');
+      const first = rounds[0].onCorrect();
+      await vi.runAllTimersAsync();
+      await first;
+      expect(rounds[1].round.target).toBe('ב');
+      await rounds[0].onCorrect();
+      expect(result.shell.state.score).toBe(1);
+      const second = rounds[1].onCorrect();
+      await vi.runAllTimersAsync();
+      await second;
+      expect(result.shell.ended).toBe(true);
+      expect(dispose).toHaveBeenCalledTimes(2);
+      expect(host.querySelector('.completion-screen')).not.toBeNull();
+      host.querySelector('.completion-screen__replay').click();
+      expect(replay).toHaveBeenCalledOnce();
+    } finally { vi.useRealTimers(); }
+  });
+
+  it('cancels a pending round transition when another game starts', async () => {
+    vi.useFakeTimers();
+    try {
+      const host = mountContainer();
+      let round;
+      const result = await runGame(host, {
+        gameId: 'cancel-runner', title: 'ישן', preloadTexts: [], audio: false,
+        defaultRounds: [{ target: 'א' }, { target: 'ב' }],
+        buildRound: context => { round = context; },
+      });
+      const pending = round.onCorrect();
+      await bootstrapGame(host, { gameId: 'next', title: 'חדש', preloadTexts: [], audio: false });
+      await vi.runAllTimersAsync();
+      await pending;
+      expect(result.shell.ended).toBe(true);
+      expect(host.querySelector('.game-title').textContent).toBe('חדש');
+      expect(host.querySelector('.completion-screen')).toBeNull();
+    } finally { vi.useRealTimers(); }
+  });
   it('does not let a slow start overwrite a newer game', async () => {
     const host = mountContainer();
     let release;
