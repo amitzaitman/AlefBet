@@ -1,6 +1,11 @@
 קול-אלף-בית — רשימת פיצ'רים לפיתוח עתידי
 (AlefBet — Feature Backlog)
 
+> **תשתית:** הריפקטור נעשה בצעדים קטנים לפי [`MIGRATION.md`](./MIGRATION.md). לא שבוע ריפקטור אחד. פיצ'רים מכאן (פאזל, מעקב תלמיד, ייצוא) — רק אחרי שלב 4 של המיגרציה, כמשימה נפרדת.
+
+מעקב מיגרציה (סמנו ב-`MIGRATION.md` אחרי merge ל-`main`):
+`catalog` → `shared helpers` → `split entries` → `lazy editor` → `runGame` משחק-משחק → `vite app` (אופציונלי).
+
 ## ✅ הושלם (Done)
 
 - [x] עורך אזורים (Zone Editor) — ציור מלבנים על תמונה, סימון תשובות נכונות/שגויות
@@ -17,10 +22,14 @@
 - [x] הסרת Google Translate מזמן ריצה — TTS מקומי בלבד עם watchdog; "קימפול" חד-פעמי של בנק הצלילים דרך ה-worker (`audio/sound-bank-compiler.js`)
 - [x] נקדן עמיד — דילוג על טקסט מנוקד, timeout, מטמון מתמיד ב-localStorage
 - [x] גופנים מקומיים (Rubik, Frank Ruhl Libre) — אפס תלות ב-Google Fonts
+- [x] PWA / Offline — `sw.js` + manifest + אייקונים; ביקור אחד מספיק לכל האתר בלי רשת
+- [x] בדיקות E2E — Playwright לכל חמשת המשחקים החיים + PWA (`e2e/`)
 
 ---
 
 ## 📋 עדיפות בינונית (Medium Priority)
+
+> לא לגעת בזמן צעדי 0–4 של [`MIGRATION.md`](./MIGRATION.md).
 
 ### פאזל / סדר (Puzzle / Arrange)
 גרירת חלקי תמונה למיקום הנכון — כמו פאזל.
@@ -52,7 +61,7 @@
 
 ### דבר או הקלד (Talk or Type)
 תלמידים רואים אזור וצריכים להקליד או לומר את התשובה.
-- שילוב speech recognition קיים (`audio/speech-recognition.js`)
+- שילוב `audio/vowel-detector.js` (זיהוי פורמנטים מקומי; אין `speech-recognition.js` בריפו)
 - שדה הקלדה per-zone
 - השוואת טקסט fuzzy לעברית
 
@@ -90,19 +99,9 @@
 
 ## 🏗️ שיפורי תשתית (Infrastructure)
 
+ריפקטור התשתית החי — קטלוג, פיצול runtime/editor, `runGame`, Vite — מנוהל ב-[`MIGRATION.md`](./MIGRATION.md), לא כאן.
+
 ### מעבר ל-IndexedDB מלא
 localStorage מוגבל ל-5MB — תמונות גדולות יכולות לגרום לבעיות.
 - שמירת images ב-IndexedDB (voice store כבר שם)
 - מיגרציה שקופה מ-localStorage
-
-### בדיקות E2E
-בדיקות אוטומטיות עם Playwright לזרימות משתמש.
-- ציור אזור → סימון נכון → שמירה → נגינה
-- הקלטת קול (mock) → נגינה
-- ייצוא/ייבוא
-
-### PWA / Offline Support
-משחקים עובדים ללא אינטרנט.
-- Service Worker + cache strategy
-- אייקון מסך הבית
-- סנכרון כש-online חוזר
