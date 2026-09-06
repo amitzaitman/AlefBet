@@ -175,3 +175,35 @@ test('editor loads on demand, preserves saved content, and reopens offline', asy
   await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
   await expect(page.locator('#game')).toHaveClass(/ab-editor-active/);
 });
+
+test('completion and replay do not accumulate audio listeners', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('alefbet.editor.letter-match-animals', JSON.stringify({
+      id: 'letter-match-animals', version: 1, meta: { type: 'multiple-choice' },
+      rounds: [{ id: 'only', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }],
+    }));
+    const listeners = new Set();
+    const add = window.addEventListener.bind(window);
+    const remove = window.removeEventListener.bind(window);
+    window.addEventListener = (type, listener, options) => {
+      if (type === 'alefbet:tts-state') listeners.add(listener);
+      return add(type, listener, options);
+    };
+    window.removeEventListener = (type, listener, options) => {
+      if (type === 'alefbet:tts-state') listeners.delete(listener);
+      return remove(type, listener, options);
+    };
+    window.audioListenerCount = () => listeners.size;
+  });
+  await page.goto(GAME_URL);
+  for (let replay = 0; replay < 2; replay++) {
+    await expect(page.locator('.option-card')).toHaveCount(4);
+    expect(await page.evaluate(() => window.audioListenerCount())).toBe(1);
+    await page.locator('.option-card[data-id="correct"]').click();
+    await expect(page.locator('.completion-screen')).toBeVisible();
+    expect(await page.evaluate(() => window.audioListenerCount())).toBe(0);
+    await page.locator('.completion-screen__replay').click();
+  }
+  await expect(page.locator('.option-card')).toHaveCount(4);
+  expect(await page.evaluate(() => window.audioListenerCount())).toBe(1);
+});

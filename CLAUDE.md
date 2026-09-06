@@ -1,16 +1,16 @@
 # AlefBet — notes for Claude / coding agents
 
-Hebrew-literacy games for ages 3–8. Vanilla JS + Vite library build, no runtime framework. Each game is a standalone folder that imports the shared framework bundle.
+Hebrew-literacy games for ages 3–8. Vanilla JS + Vite library builds, no runtime framework. Each game is a standalone folder that imports the shared framework bundle.
 
-## The one invariant rule
+## Shared code boundary
 
-**Grow the framework; don't hardcode in games.** If a game needs functionality that doesn't exist in `framework/src/`, add it there as a named-export module and re-export it from `framework/src/index.ts`. Reuse beats duplication — every new game should leave the framework richer.
+Keep game-specific rules and rendering in the game. Extract a shared named-export module when multiple games need the same behavior. `runGame` is optional composition for round-based games, not a requirement for every game or teacher tool. New games do not have to grow the framework.
 
 ## Infra changes
 
 Read [`MIGRATION.md`](./MIGRATION.md) before touching build, `sw.js`, `framework/src/index.ts`, or more than one `games/*/game.js` in the same PR.
 
-- Two contracts in parallel until the old one is dead: games still import `framework/dist/alefbet.js` + `bootstrapGame`; the new contract (runtime entry + `runGame`) lands game-by-game.
+- Games import `framework/dist/runtime.js`. The combined `alefbet.js`/UMD entry remains for compatibility. Runtime must not statically import editor UI or zod; saved content belongs to core.
 - One step per branch. `npm run check` + the touched game's e2e must pass. Merge to `main` so Pages stays shippable.
 - Do **not** start with a Vite multi-page rewrite of the site. That is step 5, last on purpose.
 - Do **not** convert runtime JS to TypeScript "while the file is open". Separate PR, never required.
@@ -31,7 +31,9 @@ framework/src/
   utils/     nakdan (Dicta auto-vowelization)
   editor/    in-browser game/zone editor (TypeScript + zod)
   styles/    alefbet.css
-  index.ts   the public API — re-export every new module from here
+  runtime/index.ts  public gameplay API
+  editor/index.ts   optional editor API
+  index.ts         compatibility re-exports
   __tests__/ vitest suites
 
 games/<name>/     index.html + game.js + game.css  (single-screen games)
@@ -43,7 +45,9 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 
 ## Build contract
 
-- Games load from `../../framework/dist/alefbet.js` (a committed artifact).
+- Games load `../../framework/dist/runtime.js` and `runtime.css` (committed artifacts). The legacy bundle is still built for compatibility.
+- The runtime build generates `runtime-assets.js` from the static dependency graph for the service worker. Editor JS/CSS load only on request and cache on first use.
+- Saved content loads independently of editor UI. Preserve the existing `alefbet.editor.*` keys.
 - **After editing `framework/src/`, run `npm run build`** or games won't see the change. `framework/dist/` is committed on purpose so games open without a build step. Un-committing it is migration step 5, not a drive-by.
 - Dev server: `node start.js` (or double-click `start.bat` on Windows). Node 20+.
 
@@ -69,8 +73,15 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 ## Adding things
 
 - **New game:** copy `games/_template/` → edit `game.js` → add one row to `games/catalog.js`. The home page and the service worker both read that file. Do not also edit `index.html` or a `GAMES` list in `sw.js`.
-- **New framework module:** put it under the right `framework/src/<category>/`, export from `index.ts`, add CSS to `styles/alefbet.css` if it renders, add a vitest in `__tests__/`, then `npm run build`.
+- **New framework module:** put it under the right `framework/src/<category>/`, export from `runtime/index.ts` or `editor/index.ts`, add CSS to `styles/alefbet.css` if it renders, add a vitest in `__tests__/`, then `npm run build`.
 
 ## Deploy
 
 Pushing to `main` triggers `.github/workflows/deploy.yml`, which serves `index.html`, `games/`, and `framework/dist/` from GitHub Pages.
+
+## Lifecycle
+
+- `runGame` owns score, progression and completion for syllable-read, letter-match-animals and nikud-match. `buildRound` returns its cleanup function; its callbacks and `schedule` belong to that round.
+- Custom games use `bootstrapGame` and `shell.nextRound()` (never bypass the shell with `shell.state.nextRound()`). Use `shell.schedule` for delayed work, check `shell.ended` after awaits, and dispose resources on `end`.
+- nikud-speak keeps its three-attempt policy locally. sound-studio remains outside the round runner.
+- Do not delete `createRoundManager`: runGame still uses it internally and it remains a compatibility export.

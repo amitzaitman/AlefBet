@@ -76,16 +76,21 @@ npm run build        # בניית framework/dist/ (מחויב לריפו בכו�
 npx playwright test  # בדיקות e2e (בסביבה מנוהלת: PW_CHROMIUM_PATH=/opt/pw-browsers/chromium)
 ```
 
-**הכלל החשוב:** מגדילים את התשתית, לא מקודדים במשחקים. פונקציונליות
-חדשה נכנסת ל-`framework/src/` כמודול named-export, מיוצאת מ-`index.ts`,
-ומקבלת בדיקה ב-`__tests__/`. אחרי שינוי בתשתית — `npm run build`,
-אחרת המשחקים לא יראו אותו.
+**גבולות השיתוף:** לוגיקה ייחודית נשארת במשחק; רכיב משותף מחלצים כשכמה
+משחקים צריכים אותה התנהגות. `runGame` הוא עזר אופציונלי למשחקי סיבובים.
+הוא מטפל בניקוד, מעבר וסיום; המשחק מגדיר רינדור, תשובות ורמזים ומחזיר
+פונקציית ניקוי לכל סיבוב. משחק הדיבור והאולפן שומרים על הזרימה הייעודית שלהם.
+
+המשחקים טוענים `framework/dist/runtime.js` ו-`runtime.css`. העורך וה-CSS שלו
+נטענים רק בלחיצה על **ערוך** או **קול**, ונשמרים במטמון לשימוש חוזר ללא רשת.
+פתיחת העורך לראשונה דורשת חיבור, אך המשחק עצמו והתוכן השמור אינם תלויים בו.
+חבילת `alefbet.js` הישנה נשארת לתאימות. אחרי שינוי בתשתית מריצים `npm run build`.
 
 ### מבנה הפרויקט
 
 ```
 framework/src/
-  core/      GameShell, GameState, round-manager, hints, bootstrap
+  core/      GameShell, GameState, round-manager, hints, bootstrap/runGame, content storage
   audio/     hebrew-audio (שרשרת ההשמעה), tts, phoneme-synth,
              sound-bank-compiler, audio-context (שחרור iOS),
              voice-recorder, voice-store, vowel-detector, sounds
@@ -93,7 +98,8 @@ framework/src/
   ui/        option-cards, progress-bar, feedback, zones, nikud-box,
              audio-status-banner, completion-screen, ...
   utils/     nakdan (ניקוד אוטומטי, עם מטמון מתמיד)
-  editor/    עורך משחקים בדפדפן (TypeScript + zod)
+  runtime/   API לרכיבי המשחק
+  editor/    עורך משחקים בדפדפן (TypeScript + zod), נטען לפי בקשה
   styles/    alefbet.css + גופנים מקומיים
 framework/dist/   תוצר בנוי ומחויב — המשחקים טוענים ממנו ישירות
 games/<name>/     index.html + game.js + game.css למשחק
@@ -104,7 +110,7 @@ deploy/           Cloudflare Worker: proxy לנקדן + מסלול /tts לקימ
 ### משחק חדש
 
 1. מעתיקים את `games/_template/` לתיקייה חדשה.
-2. עורכים את `game.js` — מייבאים מ-`../../framework/dist/alefbet.js`.
+2. עורכים את `game.js` — מייבאים מ-`../../framework/dist/runtime.js`.
 3. מוסיפים שורה ב-`games/catalog.js` (דף הבית וה-service worker קוראים משם).
 
 ---

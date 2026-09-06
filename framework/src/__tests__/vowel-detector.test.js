@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   VOWEL_TEMPLATES,
   NIKUD_VOWEL,
@@ -6,7 +6,66 @@ import {
   cepstralEnvelope,
   extractFormantsFromSpectrum,
   matchNikudVowel,
+  createVowelDetector,
 } from '../audio/vowel-detector.js';
+
+it('cancels immediately during permission and stops a late microphone stream', async () => {
+  const descriptor = Object.getOwnPropertyDescriptor(navigator, 'mediaDevices');
+  let grant;
+  Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: {
+    getUserMedia: () => new Promise(resolve => { grant = resolve; }),
+  } });
+  const audio = vi.fn(function () {});
+  vi.stubGlobal('AudioContext', audio);
+  try {
+    const detector = createVowelDetector();
+    const pending = detector.listen();
+    await Promise.resolve();
+    detector.cancel();
+    expect(await pending).toMatchObject({ vowel: '' });
+    const stop = vi.fn();
+    grant({ getTracks: () => [{ stop }] });
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(stop).toHaveBeenCalledOnce();
+    expect(audio).not.toHaveBeenCalled();
+  } finally {
+    if (descriptor) Object.defineProperty(navigator, 'mediaDevices', descriptor);
+    else delete navigator.mediaDevices;
+    vi.unstubAllGlobals();
+  }
+});
+
+it('cancels recording without waiting for another animation frame', async () => {
+  const descriptor = Object.getOwnPropertyDescriptor(navigator, 'mediaDevices');
+  const stop = vi.fn(), close = vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: {
+    getUserMedia: async () => ({ getTracks: () => [{ stop }] }),
+  } });
+  vi.stubGlobal('AudioContext', vi.fn(function () {
+    return { close, sampleRate: 48000,
+      createMediaStreamSource: () => ({ connect() {} }),
+      createAnalyser: () => ({ frequencyBinCount: 2048 }),
+    };
+  }));
+  const raf = vi.fn(() => 42), cancelFrame = vi.fn();
+  vi.stubGlobal('requestAnimationFrame', raf);
+  vi.stubGlobal('cancelAnimationFrame', cancelFrame);
+  try {
+    const detector = createVowelDetector();
+    const pending = detector.listen();
+    await new Promise(resolve => setTimeout(resolve, 0));
+    expect(raf).toHaveBeenCalled();
+    detector.cancel();
+    expect(await pending).toMatchObject({ vowel: '' });
+    expect(stop).toHaveBeenCalledOnce();
+    expect(close).toHaveBeenCalledOnce();
+    expect(cancelFrame).toHaveBeenCalledWith(42);
+  } finally {
+    if (descriptor) Object.defineProperty(navigator, 'mediaDevices', descriptor);
+    else delete navigator.mediaDevices;
+    vi.unstubAllGlobals();
+  }
+});
 
 describe('classifyFormants', () => {
   it('returns empty result for invalid input', () => {

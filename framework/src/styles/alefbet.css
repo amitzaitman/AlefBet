@@ -133,6 +133,23 @@
 }
 
 /* ── Game Header ─────────────────────────────────────────────────────────── */
+.ab-lazy-editor {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-block-end: 8px;
+}
+
+.ab-lazy-editor [role="status"] {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 0.85em;
+}
+
+.ab-lazy-editor [role="status"]:empty { display: none; }
+
 .game-header {
   display: flex;
   align-items: center;

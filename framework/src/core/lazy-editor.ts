@@ -9,7 +9,7 @@ export function attachLazyEditor(
   gameData: import('./game-data.js').GameData,
   options: import('../editor/game-editor.js').GameEditorOptions,
 ) {
-  const host = shell.container.querySelector('.game-header__spacer');
+  const host = shell.container.querySelector('.game-header');
   if (!host) return;
   const toolbar = document.createElement('div');
   toolbar.className = 'ab-lazy-editor';
@@ -47,7 +47,10 @@ export function attachLazyEditor(
         editor = new module.GameEditor(shell.container, gameData, options);
         // The editor injects its toolbar on the next frame.
         await new Promise(resolve => requestAnimationFrame(resolve));
-        if (!shell.ended) editor.enterEditMode();
+        if (!shell.ended) {
+          editor.enterEditMode();
+          toolbar.remove();
+        }
       }
       notice.textContent = '';
     } catch {
@@ -65,6 +68,6 @@ export function attachLazyEditor(
     toolbar.appendChild(button);
   }
   toolbar.appendChild(notice);
-  host.appendChild(toolbar);
+  host.after(toolbar);
   shell.on('end', () => { editor?.destroy(); toolbar.remove(); });
 }

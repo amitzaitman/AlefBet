@@ -175,87 +175,78 @@ export function createVowelDetector() {
   const AudioCtx = hasWindow ? (window.AudioContext || window.webkitAudioContext) : null;
   const available = hasGUM && !!AudioCtx;
 
-  let currentStream = null;
-  let currentCtx = null;
-  let cancelled = false;
-
+  let activeCancel = null;
   const empty = () => ({ vowel: '', confidence: 0, F1: 0, F2: 0 });
-
-  const cleanup = () => {
-    if (currentStream) {
-      for (const t of currentStream.getTracks()) { try { t.stop(); } catch { /* ignore */ } }
-    }
-    if (currentCtx) { try { currentCtx.close(); } catch { /* ignore */ } }
-    currentStream = null;
-    currentCtx = null;
-  };
 
   return {
     available,
 
-    async listen(timeoutMs = 3000) {
-      if (!available) return empty();
-      cancelled = false;
-
-      let stream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      } catch {
-        return empty();
-      }
-      currentStream = stream;
-
-      const ctx = new AudioCtx();
-      currentCtx = ctx;
-      const source = ctx.createMediaStreamSource(stream);
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 4096;
-      analyser.smoothingTimeConstant = 0.2;
-      source.connect(analyser);
-
-      const binHz = ctx.sampleRate / analyser.fftSize;
-      const spectrum = new Float32Array(analyser.frequencyBinCount);
-      const timeDomain = new Float32Array(analyser.fftSize);
-      const VOICE_RMS_THRESHOLD = 0.015;
-      const samples = [];
-      const start = performance.now();
-
-      return new Promise((resolve) => {
-        const finish = () => {
-          cleanup();
-          if (samples.length < 3) { resolve(empty()); return; }
-          const f1s = samples.map(s => s.F1).sort((a, b) => a - b);
-          const f2s = samples.map(s => s.F2).sort((a, b) => a - b);
-          const mid = Math.floor(samples.length / 2);
-          const F1 = f1s[mid];
-          const F2 = f2s[mid];
-          const classified = classifyFormants(F1, F2);
-          resolve({ ...classified, F1, F2 });
+    listen(timeoutMs = 3000) {
+      activeCancel?.();
+      if (!available) return Promise.resolve(empty());
+      return new Promise(resolve => {
+        let finished = false;
+        let stream = null;
+        let ctx = null;
+        let frame = null;
+        const finish = result => {
+          if (finished) return;
+          finished = true;
+          if (frame !== null) cancelAnimationFrame(frame);
+          stream?.getTracks().forEach(track => { try { track.stop(); } catch { /* noop */ } });
+          try { ctx?.close()?.catch(() => {}); } catch { /* noop */ }
+          if (activeCancel === cancel) activeCancel = null;
+          resolve(result);
         };
+        const cancel = () => finish(empty());
+        activeCancel = cancel;
 
-        const tick = () => {
-          if (cancelled) { cleanup(); resolve(empty()); return; }
-          if (performance.now() - start > timeoutMs) { finish(); return; }
-
-          analyser.getFloatTimeDomainData(timeDomain);
-          let sumSq = 0;
-          for (let i = 0; i < timeDomain.length; i++) sumSq += timeDomain[i] * timeDomain[i];
-          const rms = Math.sqrt(sumSq / timeDomain.length);
-
-          if (rms > VOICE_RMS_THRESHOLD) {
-            analyser.getFloatFrequencyData(spectrum);
-            const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
-            if (F1 > 0 && F2 > 0 && F2 > F1) samples.push({ F1, F2 });
+        // Cancellation settles immediately, even while a permission dialog is open.
+        // If permission arrives later, release that stream without opening an AudioContext.
+        Promise.resolve().then(() => navigator.mediaDevices.getUserMedia({ audio: true })).then(acquired => {
+          if (finished) {
+            acquired.getTracks().forEach(track => { try { track.stop(); } catch { /* noop */ } });
+            return;
           }
-          requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
+          stream = acquired;
+          ctx = new AudioCtx();
+          const source = ctx.createMediaStreamSource(stream);
+          const analyser = ctx.createAnalyser();
+          analyser.fftSize = 4096;
+          analyser.smoothingTimeConstant = 0.2;
+          source.connect(analyser);
+
+          const binHz = ctx.sampleRate / analyser.fftSize;
+          const spectrum = new Float32Array(analyser.frequencyBinCount);
+          const timeDomain = new Float32Array(analyser.fftSize);
+          const samples = [];
+          const start = performance.now();
+          const tick = () => {
+            if (finished) return;
+            if (performance.now() - start > timeoutMs) {
+              if (samples.length < 3) { finish(empty()); return; }
+              const f1s = samples.map(s => s.F1).sort((a, b) => a - b);
+              const f2s = samples.map(s => s.F2).sort((a, b) => a - b);
+              const mid = Math.floor(samples.length / 2);
+              const F1 = f1s[mid], F2 = f2s[mid];
+              finish({ ...classifyFormants(F1, F2), F1, F2 });
+              return;
+            }
+            analyser.getFloatTimeDomainData(timeDomain);
+            let sumSq = 0;
+            for (let i = 0; i < timeDomain.length; i++) sumSq += timeDomain[i] * timeDomain[i];
+            if (Math.sqrt(sumSq / timeDomain.length) > 0.015) {
+              analyser.getFloatFrequencyData(spectrum);
+              const { F1, F2 } = extractFormantsFromSpectrum(spectrum, binHz);
+              if (F1 > 0 && F2 > 0 && F2 > F1) samples.push({ F1, F2 });
+            }
+            frame = requestAnimationFrame(tick);
+          };
+          frame = requestAnimationFrame(tick);
+        }).catch(() => finish(empty()));
       });
     },
 
-    cancel() {
-      cancelled = true;
-      cleanup();
-    },
+    cancel() { activeCancel?.(); },
   };
 }
