@@ -16,8 +16,7 @@ async function blockGoogleTTS(page) {
 /**
  * Picks the option card whose text matches the correct animal for the current
  * round, by reading the on-screen Hebrew letter and matching it against the
- * known animal list. Falls back to clicking the first card to avoid hangs —
- * round progression is the only thing the test asserts.
+ * known animal list. Fails explicitly if the expected answer is missing.
  */
 async function pickAndClickCorrectCard(page) {
   // Wait for the round UI: an instruction line plus 4 option cards.
@@ -71,10 +70,7 @@ async function pickAndClickCorrectCard(page) {
       }
     }
   }
-  // Fallback: click the first card. Either way, the UI moves to the next
-  // round (correct → score++, wrong → re-roll). For golden-path we expect
-  // a correct match because the mapping above is exhaustive over ROUNDS.
-  await cards.first().click();
+  throw new Error(`No correct card found for letter ${letter}`);
 }
 
 test.describe('letter-match-animals', () => {
@@ -124,7 +120,7 @@ test.describe('letter-match-animals', () => {
     // with speechSynthesis undef and Audio.play rejecting, this drives the
     // state machine to `failed`, which the banner surfaces.
     await page.evaluate(async () => {
-      const mod = await import('/framework/dist/alefbet.js');
+      const mod = await import('/framework/dist/runtime.js');
       await mod.tts.speak('שלום');
     });
 
@@ -206,4 +202,56 @@ test('completion and replay do not accumulate audio listeners', async ({ page })
   }
   await expect(page.locator('.option-card')).toHaveCount(4);
   expect(await page.evaluate(() => window.audioListenerCount())).toBe(1);
+});
+
+
+test('wrong answer keeps the same choices and allows a correct retry', async ({ page }) => {
+  await blockGoogleTTS(page);
+  await page.goto(GAME_URL);
+  const cards = page.locator('.option-card');
+  await expect(cards).toHaveCount(4);
+  const choices = await cards.allTextContents();
+  const letter = await page.locator('.letter-display').textContent();
+  const progress = await page.locator('.progress-bar__label').textContent();
+  await page.locator('.option-card[data-id="wrong-0"]').click();
+  await expect(page.locator('.feedback-message--hint')).toBeVisible();
+  await expect(cards.first()).toBeDisabled();
+  await expect(cards.first()).toBeEnabled();
+  expect(await cards.allTextContents()).toEqual(choices);
+  await expect(page.locator('.letter-display')).toHaveText(letter);
+  await expect(page.locator('.progress-bar__label')).toHaveText(progress);
+  await pickAndClickCorrectCard(page);
+  await expect(page.locator('.progress-bar__label')).not.toHaveText(progress);
+});
+
+test('all eight rounds complete with word instructions and full score', async ({ page }) => {
+  await blockGoogleTTS(page);
+  await page.goto(GAME_URL);
+  const letters = new Set();
+  for (let round = 0; round < 8; round++) {
+    const instruction = page.locator('.game-instruction');
+    await expect(instruction).toHaveText('מִצְאוּ אֶת הַמִּלָּה שֶׁמַּתְחִילָה בָּאוֹת:');
+    const letter = await page.locator('.letter-display').textContent();
+    expect(letters.has(letter)).toBe(false);
+    letters.add(letter);
+    await pickAndClickCorrectCard(page);
+    if (round < 7) await expect(page.locator('.letter-display')).not.toHaveText(letter);
+  }
+  await expect(page.locator('.completion-screen')).toBeVisible();
+  await expect(page.locator('.completion-screen__score')).toContainText('8');
+});
+
+test('phone choices fill the panel and remain inside the screen', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await blockGoogleTTS(page);
+  await page.goto(GAME_URL);
+  const cards = page.locator('.option-card');
+  await expect(cards).toHaveCount(4);
+  for (const card of await cards.all()) {
+    const box = await card.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.width).toBeGreaterThanOrEqual(120);
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(390);
+  }
 });

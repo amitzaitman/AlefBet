@@ -1,6 +1,6 @@
 /**
- * משחק התאמת אותיות לחיות
- * הצג אות עברית — בחר את החיה שמתחילה באותה אות
+ * משחק התאמת אותיות למילים
+ * הצג אות עברית — בחר את המילה שמתחילה באותה אות
  * 8 סיבובים; בכל הפעלה נבחרות 8 אותיות אקראיות מתוך 22 האותיות הרגילות,
  * כך שמשחקים חוזרים חושפים בסופו של דבר את כל האלף-בית (לא רק א-ח).
  */
@@ -38,9 +38,10 @@ const ALL_REGULAR_WORDS = getLettersByGroup('regular').map(l => ({ text: l.examp
 
 // ── All texts that need nikud ──────────────────────────────────────────────
 
+const INSTRUCTION = 'מִצְאוּ אֶת הַמִּלָּה שֶׁמַּתְחִילָה בָּאוֹת:';
+
 const STATIC_TEXTS = [
-  'מָצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת:',
-  'בְּרוּכִים הַבָּאִים! מָצָא אֶת הַחַיָּה שֶׁמַּתְחִילָה בָּאוֹת',
+  INSTRUCTION,
   'הָאוֹת',
   ...PRAISE_PHRASES,
   ...RETRY_HINTS,
@@ -87,7 +88,7 @@ export async function startGame(container) {
 
         const instruction = document.createElement('p');
         instruction.className = 'game-instruction';
-        instruction.textContent = getNikud('מצא את החיה שמתחילה באות:');
+        instruction.textContent = INSTRUCTION;
         leftPanel.appendChild(instruction);
 
         const letterInfo = getLetter(roundData.target);
@@ -104,6 +105,7 @@ export async function startGame(container) {
         rightPanel.className = 'round-panel round-panel--options';
 
         const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'letter-match-options';
         rightPanel.appendChild(optionsContainer);
 
         const feedbackContainer = document.createElement('div');
@@ -135,15 +137,8 @@ export async function startGame(container) {
           if (pressedEl) animate(pressedEl, 'pulse');
           feedback.hint(`${randomRetryHint()} — חַפְּשׂוּ אֶת ${letterName}`);
 
-          schedule(() => {
-            cards.reset();
-            const optionsEl = rightPanelEl?.querySelector('.option-cards-grid')?.parentElement;
-            if (optionsEl) {
-              optionsEl.innerHTML = '';
-              cards = createOptionCards(optionsEl, buildOptions(roundData),
-                o => onSelect(o, roundData, rightPanelEl));
-            }
-          }, 1200);
+          // ניסיון חוזר על אותן אפשרויות, בלי להזיז את המטרה לילד.
+          schedule(() => cards.reset(), 1200);
         }
       }
 
