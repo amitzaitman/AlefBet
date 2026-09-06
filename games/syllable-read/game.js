@@ -29,7 +29,7 @@ import {
   animate,
   RETRY_HINTS,
   randomRetryHint,
-} from '../../framework/dist/alefbet.js';
+} from '../../framework/dist/runtime.js';
 
 const ROUNDS = 8;
 

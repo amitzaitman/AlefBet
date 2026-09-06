@@ -20,7 +20,7 @@ import {
   RETRY_HINTS,
   randomPraise,
   randomRetryHint,
-} from '../../framework/dist/alefbet.js';
+} from '../../framework/dist/runtime.js';
 
 // ── Game data ─────────────────────────────────────────────────────────────
 // הסיבובים והמסיחים נגזרים מ-hebrewLetters (מקור אמת יחיד) ולא ממערכים

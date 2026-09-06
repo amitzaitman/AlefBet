@@ -21,7 +21,7 @@ test.describe('PWA', () => {
         const requests = await cache.keys();
         return requests.map(r => new URL(r.url).pathname);
       });
-      expect(cached).toEqual(expect.arrayContaining(['/framework/dist/alefbet.js', '/framework/dist/alefbet.css']));
+      expect(cached).toEqual(expect.arrayContaining(['/framework/dist/runtime.js', '/framework/dist/runtime.css']));
     }).toPass({ timeout: 10_000 });
   });
 
@@ -88,5 +88,31 @@ test.describe('PWA', () => {
       });
       expect(cached).toEqual(expect.arrayContaining(['/games/catalog.js']));
     }).toPass({ timeout: 10_000 });
+  });
+});
+
+test('an unvisited editable game plays offline without downloading the editor', async ({ page, context }) => {
+  const scripts = [];
+  page.on('request', request => scripts.push(request.url()));
+  await page.goto('/games/syllable-read/');
+  await expect(page.locator('.option-card')).toHaveCount(3);
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  expect(scripts.some(url => /\/editor\.(js|css)/.test(url))).toBe(false);
+  await context.setOffline(true);
+  await page.goto('/games/letter-match-animals/');
+  await expect(page.locator('.option-card')).toHaveCount(4);
+  expect(scripts.some(url => /\/editor\.(js|css)/.test(url))).toBe(false);
+});
+
+test.describe('editor download failure', () => {
+  test.use({ serviceWorkers: 'block' });
+
+  test('keeps the game playable when the editor cannot download', async ({ page }) => {
+    await page.route('**/framework/dist/editor.*', route => route.abort());
+    await page.goto('/games/letter-match-animals/');
+    await expect(page.locator('.option-card')).toHaveCount(4);
+    await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
+    await expect(page.locator('.ab-lazy-editor [role="status"]')).toContainText('לֹא הִצְלַחְנוּ');
+    await expect(page.locator('.option-card')).toHaveCount(4);
   });
 });

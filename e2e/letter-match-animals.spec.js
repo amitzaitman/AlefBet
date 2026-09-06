@@ -145,3 +145,33 @@ test.describe('letter-match-animals', () => {
     }).toPass({ timeout: 5_000 });
   });
 });
+
+test('editor loads on demand, preserves saved content, and reopens offline', async ({ page, context }) => {
+  const editorRequests = [];
+  page.on('request', request => {
+    if (/\/editor\.(js|css)/.test(request.url())) editorRequests.push(request.url());
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem('alefbet.editor.letter-match-animals', JSON.stringify({
+      id: 'letter-match-animals', version: 1, meta: { type: 'multiple-choice' },
+      rounds: [{ id: 'saved', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }],
+    }));
+  });
+  await page.goto('/games/letter-match-animals/');
+  await expect(page.locator('.letter-display')).toHaveText('א');
+  expect(editorRequests).toEqual([]);
+  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
+  await expect(page.locator('#game')).toHaveClass(/ab-editor-active/);
+  expect(editorRequests.some(url => url.endsWith('editor.js'))).toBe(true);
+  expect(editorRequests.some(url => url.endsWith('editor.css'))).toBe(true);
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await expect(async () => {
+    const css = await page.evaluate(async () => !!await caches.match('/framework/dist/editor.css'));
+    expect(css).toBe(true);
+  }).toPass();
+  await context.setOffline(true);
+  await page.reload();
+  await expect(page.locator('.letter-display')).toHaveText('א');
+  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
+  await expect(page.locator('#game')).toHaveClass(/ab-editor-active/);
+});

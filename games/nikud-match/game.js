@@ -19,7 +19,7 @@ import {
   createDragSource,
   createDropTarget,
   speakSyllable,
-} from '../../framework/dist/alefbet.js';
+} from '../../framework/dist/runtime.js';
 
 const ROUNDS = 8;
 

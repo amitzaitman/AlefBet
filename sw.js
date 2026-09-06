@@ -10,8 +10,9 @@
  */
 
 importScripts('./games/catalog.js');
+importScripts('./framework/dist/runtime-assets.js');
 
-const CACHE_VERSION = 'alefbet-v1';
+const CACHE_VERSION = 'alefbet-v2-runtime';
 
 /** מזהי המשחקים - נגזרים מ-games/catalog.js, לא מרשימה נפרדת. */
 const GAMES = self.ALEFBET_CATALOG.map(game => game.id);
@@ -25,8 +26,8 @@ const CORE_ASSETS = [
   './index.html',
   './games/catalog.js',
   './manifest.webmanifest',
-  './framework/dist/alefbet.js',
-  './framework/dist/alefbet.css',
+  './framework/dist/runtime-assets.js',
+  ...self.ALEFBET_RUNTIME_ASSETS.map(file => `./framework/dist/${file}`),
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/apple-touch-icon.png',
@@ -51,7 +52,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE_VERSION).map(k => caches.delete(k))
+        keys.filter(k => k.startsWith('alefbet-') && k !== CACHE_VERSION).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );
@@ -67,8 +68,8 @@ self.addEventListener('fetch', (event) => {
     caches.open(CACHE_VERSION).then(async (cache) => {
       const cached = await cache.match(request);
       const refresh = fetch(request)
-        .then((response) => {
-          if (response && response.ok) cache.put(request, response.clone());
+        .then(async (response) => {
+          if (response && response.ok) await cache.put(request, response.clone());
           return response;
         })
         .catch(() => null);

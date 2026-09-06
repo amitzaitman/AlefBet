@@ -13,7 +13,7 @@ import {
   createProgressBar,
   createFeedback,
   showCompletionScreen,
-} from '../../framework/dist/alefbet.js';
+} from '../../framework/dist/runtime.js';
 
 const STATIC_TEXTS = [
   'בְּרוּכִים הַבָּאִים',
