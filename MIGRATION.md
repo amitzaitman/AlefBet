@@ -10,7 +10,7 @@
 
 ## מעקב (סמנו אחרי כל merge ל-`main`)
 
-- [ ] 0 catalog — מקור אמת אחד למשחקים
+- [x] 0 catalog — מקור אמת אחד למשחקים
 - [ ] 1 shared helpers — shuffle + unlock-שמע + באנר כמודולי runtime
 - [ ] 2 split entries (ה-dist עדיין מונוליטי כ-re-export)
 - [ ] 3 lazy editor

@@ -294,75 +294,7 @@
   <main class="hub-main">
     <h2 class="hub-subtitle">בַּחֲרוּ מִשְׂחָק:</h2>
 
-    <div class="games-grid">
-
-      <!-- Letter Match Animals -->
-      <a href="games/letter-match-animals/" class="game-card" data-game-id="letter-match-animals">
-        <div class="game-card__icon game-card__icon--letters">
-          <span class="icon--letters-letter">א</span>
-          <span class="icon--letters-emoji">🦁</span>
-        </div>
-        <div class="game-card__info">
-          <h3 class="game-card__name">הַתְאָמַת אוֹתִיּוֹת</h3>
-          <p class="game-card__desc">חָבַר כָּל אוֹת לַחַיָּה שֶׁמַּתְחִילָה בָּהּ — 8 סִיבוּבִים, אוֹתִיּוֹת אַ–ח</p>
-        </div>
-        <span class="game-card__play">שַׂחֵק עַכְשָׁיו ▶</span>
-      </a>
-
-      <!-- Nikud Match -->
-      <a href="games/nikud-match/" class="game-card" data-game-id="nikud-match">
-        <div class="game-card__icon game-card__icon--nikud">
-          <div class="icon--nikud-samples">
-            <div class="icon--nikud-chip" style="background:#FF6B6B;">אָ</div>
-            <div class="icon--nikud-chip" style="background:#4ECDC4;">אִ</div>
-            <div class="icon--nikud-chip" style="background:#2ECC71;">אֹ</div>
-            <div class="icon--nikud-chip" style="background:#9B59B6;">אֶ</div>
-          </div>
-        </div>
-        <div class="game-card__info">
-          <h3 class="game-card__name">לִימּוּד נִיקּוּד</h3>
-          <p class="game-card__desc">גְּרֹור אֶת סֵמֶל הַנִּיקּוּד לְאוֹת הַמַּתְאִימָה — לוֹמְדִים קָמָץ, חִירִיק, חוֹלֵם וְעוֹד</p>
-        </div>
-        <span class="game-card__play">שַׂחֵק עַכְשָׁיו ▶</span>
-      </a>
-
-      <!-- Syllable Read -->
-      <a href="games/syllable-read/" class="game-card" data-game-id="syllable-read">
-        <div class="game-card__icon game-card__icon--syllables">
-          <span class="icon--syllable">בָּ · מִ · שׁוֹ</span>
-        </div>
-        <div class="game-card__info">
-          <h3 class="game-card__name">קְרִיאַת הֲבָרוֹת</h3>
-          <p class="game-card__desc">הַקְשִׁיבוּ לַהֲבָרָה וּבַחֲרוּ אֶת הָאוֹת וְהַנִּיקּוּד הַמַּתְאִימִים — עִם רְמָזִים מַדְרִיכִים</p>
-        </div>
-        <span class="game-card__play">שַׂחֵק עַכְשָׁיו ▶</span>
-      </a>
-
-      <!-- Nikud Speak -->
-      <a href="games/nikud-speak/" class="game-card" data-game-id="nikud-speak">
-        <div class="game-card__icon game-card__icon--speak">
-          <span class="icon--speak-mic">🎤</span>
-        </div>
-        <div class="game-card__info">
-          <h3 class="game-card__name">אֱמוֹר אֶת הַנִּיקּוּד</h3>
-          <p class="game-card__desc">הַקְשִׁיבוּ לְשֵׁם הַנִּיקּוּד וְאִמְרוּ אוֹתוֹ בְּקוֹל — תַּרְגִּילֵי הִגּוּי עִם זִיהוּי דִּיבּוּר</p>
-        </div>
-        <span class="game-card__play">שַׂחֵק עַכְשָׁיו ▶</span>
-      </a>
-
-      <!-- Sound Studio (teacher tool) -->
-      <a href="games/sound-studio/" class="game-card">
-        <div class="game-card__icon game-card__icon--studio">
-          <span class="icon--studio-mic">🎙️</span>
-        </div>
-        <div class="game-card__info">
-          <h3 class="game-card__name">אֻלְפַּן הַצְּלִילִים (לַמּוֹרֶה)</h3>
-          <p class="game-card__desc">הַקְלִיטוּ אֶת הָאוֹתִיּוֹת, הַנִּיקּוּד וְהַהֲבָרוֹת בְּקוֹלְכֶם — הַמִּשְׂחָקִים יַשְׁמִיעוּ אוֹתָם גַּם לְלֹא אִינְטֶרְנֶט</p>
-        </div>
-        <span class="game-card__play">פִּתְחוּ אֶת הָאֻלְפָּן ▶</span>
-      </a>
-
-    </div>
+    <div class="games-grid"></div>
   </main>
 
   <footer class="hub-footer">
@@ -370,10 +302,59 @@
   </footer>
 
 
+  <script src="games/catalog.js"></script>
   <script>
-    // כוכבי התקדמות: core/progress.js שומר שיאים ב-localStorage;
-    // דף הבית מציג את הכוכבים הטובים ביותר על כרטיס כל משחק.
-    (function showProgressStars() {
+    (function renderHub() {
+      var ICONS = {
+        letters:
+          '<span class="icon--letters-letter">א</span>' +
+          '<span class="icon--letters-emoji">🦁</span>',
+        nikud:
+          '<div class="icon--nikud-samples">' +
+            '<div class="icon--nikud-chip" style="background:#FF6B6B;">אָ</div>' +
+            '<div class="icon--nikud-chip" style="background:#4ECDC4;">אִ</div>' +
+            '<div class="icon--nikud-chip" style="background:#2ECC71;">אֹ</div>' +
+            '<div class="icon--nikud-chip" style="background:#9B59B6;">אֶ</div>' +
+          '</div>',
+        syllables: '<span class="icon--syllable">בָּ · מִ · שׁוֹ</span>',
+        speak: '<span class="icon--speak-mic">🎤</span>',
+        studio: '<span class="icon--studio-mic">🎙️</span>',
+      };
+
+      var grid = document.querySelector('.games-grid');
+      var catalog = self.ALEFBET_CATALOG || [];
+      catalog.forEach(function (game) {
+        var card = document.createElement('a');
+        card.href = 'games/' + game.id + '/';
+        card.className = 'game-card';
+        if (game.kind === 'game') card.setAttribute('data-game-id', game.id);
+
+        var icon = document.createElement('div');
+        icon.className = 'game-card__icon game-card__icon--' + game.icon;
+        icon.innerHTML = ICONS[game.icon] || '';
+        card.appendChild(icon);
+
+        var info = document.createElement('div');
+        info.className = 'game-card__info';
+        var name = document.createElement('h3');
+        name.className = 'game-card__name';
+        name.textContent = game.title;
+        var desc = document.createElement('p');
+        desc.className = 'game-card__desc';
+        desc.textContent = game.desc;
+        info.appendChild(name);
+        info.appendChild(desc);
+        card.appendChild(info);
+
+        var play = document.createElement('span');
+        play.className = 'game-card__play';
+        play.textContent = game.play;
+        card.appendChild(play);
+
+        grid.appendChild(card);
+      });
+
+      // כוכבי התקדמות: core/progress.js שומר שיאים ב-localStorage.
       var progress;
       try { progress = JSON.parse(localStorage.getItem('alefbet.progress.v1')) || {}; }
       catch (e) { progress = {}; }
@@ -386,12 +367,11 @@
         badge.setAttribute('aria-label', entry.bestStars + ' כוכבים');
         card.appendChild(badge);
       });
-    })();
 
-    // Service Worker: אחרי ביקור ראשון האתר כולו עובד ללא אינטרנט.
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(function () {});
-    }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      }
+    })();
   </script>
 </body>
 </html>

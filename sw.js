@@ -9,16 +9,12 @@
  * החלפת גרסה: העלאת CACHE_VERSION מפנה מטמונים ישנים ב-activate.
  */
 
+importScripts('./games/catalog.js');
+
 const CACHE_VERSION = 'alefbet-v1';
 
-/** תיקיות המשחקים - בעת הוספת משחק חדש יש להוסיף אותו גם כאן. */
-const GAMES = [
-  'letter-match-animals',
-  'nikud-match',
-  'nikud-speak',
-  'syllable-read',
-  'sound-studio',
-];
+/** מזהי המשחקים - נגזרים מ-games/catalog.js, לא מרשימה נפרדת. */
+const GAMES = self.ALEFBET_CATALOG.map(game => game.id);
 
 /**
  * כל האתר נשמר מראש כבר בהתקנה: ביקור יחיד בכל עמוד שהוא מספיק
@@ -27,6 +23,7 @@ const GAMES = [
 const CORE_ASSETS = [
   './',
   './index.html',
+  './games/catalog.js',
   './manifest.webmanifest',
   './framework/dist/alefbet.js',
   './framework/dist/alefbet.css',

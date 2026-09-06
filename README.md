@@ -19,7 +19,7 @@ node start.js        # http://localhost:8080
 node start.js 3000   # פורט אחר
 ```
 
-> דרוש [Node.js](https://nodejs.org) גרסה 18 ומעלה. אין תלויות נוספות להרצה.
+> דרוש [Node.js](https://nodejs.org) גרסה 20 ומעלה. אין תלויות נוספות להרצה.
 
 ---
 
@@ -105,7 +105,7 @@ deploy/           Cloudflare Worker: proxy לנקדן + מסלול /tts לקימ
 
 1. מעתיקים את `games/_template/` לתיקייה חדשה.
 2. עורכים את `game.js` — מייבאים מ-`../../framework/dist/alefbet.js`.
-3. מוסיפים כרטיס בדף הבית `index.html`.
+3. מוסיפים שורה ב-`games/catalog.js` (דף הבית וה-service worker קוראים משם).
 
 ---
 

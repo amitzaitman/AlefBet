@@ -68,4 +68,25 @@ test.describe('PWA', () => {
     await expect(page.locator('.option-card')).toHaveCount(3);
     await context.setOffline(false);
   });
+
+  test('home cards come from the catalog and catalog is precached', async ({ page }) => {
+    await page.goto('/');
+    const cards = page.locator('.game-card');
+    await expect(cards).toHaveCount(5);
+    await expect(page.locator('.game-card[data-game-id="letter-match-animals"]')).toBeVisible();
+    await expect(page.locator('.game-card[href$="games/sound-studio/"]')).toBeVisible();
+    await expect(page.locator('.game-card[data-game-id="letter-match-animals"] .game-card__desc'))
+      .toContainText('22');
+
+    await expect(async () => {
+      const cached = await page.evaluate(async () => {
+        const keys = await caches.keys();
+        const key = keys.find(k => k.startsWith('alefbet-'));
+        if (!key) return [];
+        const cache = await caches.open(key);
+        return (await cache.keys()).map(r => new URL(r.url).pathname);
+      });
+      expect(cached).toEqual(expect.arrayContaining(['/games/catalog.js']));
+    }).toPass({ timeout: 10_000 });
+  });
 });

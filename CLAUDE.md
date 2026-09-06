@@ -68,7 +68,7 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 
 ## Adding things
 
-- **New game:** copy `games/_template/` → edit `game.js` → add a card in the root `index.html` → add the game folder to the `GAMES` list in root `sw.js` (so it precaches for offline). After migration step 0 this collapses to one catalog row; until then keep both lists in sync.
+- **New game:** copy `games/_template/` → edit `game.js` → add one row to `games/catalog.js`. The home page and the service worker both read that file. Do not also edit `index.html` or a `GAMES` list in `sw.js`.
 - **New framework module:** put it under the right `framework/src/<category>/`, export from `index.ts`, add CSS to `styles/alefbet.css` if it renders, add a vitest in `__tests__/`, then `npm run build`.
 
 ## Deploy
