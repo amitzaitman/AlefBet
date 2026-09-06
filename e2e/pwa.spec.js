@@ -101,7 +101,18 @@ test('an unvisited editable game plays offline without downloading the editor', 
   await context.setOffline(true);
   await page.goto('/games/letter-match-animals/');
   await expect(page.locator('.option-card')).toHaveCount(4);
-  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
-  await expect(page.locator('.ab-lazy-editor [role="status"]')).toContainText('לֹא הִצְלַחְנוּ');
-  await expect(page.locator('.option-card')).toHaveCount(4);
+  expect(scripts.some(url => /\/editor\.(js|css)/.test(url))).toBe(false);
+});
+
+test.describe('editor download failure', () => {
+  test.use({ serviceWorkers: 'block' });
+
+  test('keeps the game playable when the editor cannot download', async ({ page }) => {
+    await page.route('**/framework/dist/editor.*', route => route.abort());
+    await page.goto('/games/letter-match-animals/');
+    await expect(page.locator('.option-card')).toHaveCount(4);
+    await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
+    await expect(page.locator('.ab-lazy-editor [role="status"]')).toContainText('לֹא הִצְלַחְנוּ');
+    await expect(page.locator('.option-card')).toHaveCount(4);
+  });
 });
