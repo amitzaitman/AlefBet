@@ -92,7 +92,14 @@ export async function startGame(container) {
     applyDemoBtnState(currentDemoBtn);
   });
 
+  const onHidden = () => { if (document.hidden) listener.cancel(); };
+  const onPageHide = () => listener.cancel();
+  document.addEventListener('visibilitychange', onHidden);
+  window.addEventListener('pagehide', onPageHide);
+
   shell.on('end', () => {
+    document.removeEventListener('visibilitychange', onHidden);
+    window.removeEventListener('pagehide', onPageHide);
     listener.cancel();
     unsubTtsState();
   });
@@ -161,6 +168,11 @@ export async function startGame(container) {
     if (shell.ended) return;
 
     micBtn.classList.remove('mic-btn--recording');
+    if (document.hidden) {
+      listening = false;
+      micBtn.disabled = false;
+      return;
+    }
 
     const isMatch = matchNikudVowel(result.vowel, nikud.id);
 
