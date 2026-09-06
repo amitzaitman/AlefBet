@@ -19,7 +19,6 @@ import {
   randomNikud,
   showNikudSettingsDialog,
   injectHeaderButton,
-  mountAudioStatusBanner,
   speakNikudSound,
   isSynthSupported,
   RETRY_HINTS,
@@ -65,17 +64,11 @@ export async function startGame(container) {
   // Inject Settings button into header spacer
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
 
-  // Audio status banner — independent of the voice-recorder gate at line 45.
-  // Mounted on container so it sits above the shell; torn down on shell 'end'
-  // so a restart re-mounts cleanly.
-  const audioBanner = mountAudioStatusBanner(container);
-
   let progressBar = null;
   let feedback = null;
   let roundIndex = 0;
   let failCount = 0;
   let listening = false;
-  let firstInteractionHandled = false;
   let ttsUnsupported = tts.audioState === 'unsupported';
   /** @type {HTMLButtonElement | null} */
   let currentDemoBtn = null;
@@ -99,16 +92,8 @@ export async function startGame(container) {
     applyDemoBtnState(currentDemoBtn);
   });
 
-  function handleFirstInteraction() {
-    if (firstInteractionHandled) return;
-    firstInteractionHandled = true;
-    // Pre-warm both audio paths from a real user gesture so the first speak()
-    // doesn't trip autoplay restrictions and surface the awaiting-interaction banner.
-    tts.unlock();
-  }
-
   shell.on('end', () => {
-    audioBanner.destroy();
+    listener.cancel();
     unsubTtsState();
   });
 
@@ -137,7 +122,6 @@ export async function startGame(container) {
     demoBtn.setAttribute('aria-label', 'הַשְׁמַע צְלִיל');
     demoBtn.innerHTML = '<span class="demo-btn__icon">🔊</span><span class="demo-btn__text">הַקְשֵׁב</span>';
     demoBtn.onclick = () => {
-      handleFirstInteraction();
       // שרשרת אופליין-תחילה: הקלטת מורה -> קול מערכת -> סינתזת תנועה.
       speakNikudSound(nikud.id);
     };
@@ -151,7 +135,6 @@ export async function startGame(container) {
     micBtn.setAttribute('aria-label', 'הַקְלֵט');
     micBtn.innerHTML = '<span class="mic-btn__icon">🎤</span><span class="mic-btn__text">לְחַץ וּדְבַּר</span>';
     micBtn.onclick = () => {
-      handleFirstInteraction();
       onMicPress(nikud, micBtn);
     };
     panel.appendChild(micBtn);
@@ -175,6 +158,7 @@ export async function startGame(container) {
     micBtn.classList.add('mic-btn--recording');
 
     const result = await listener.listen(3000);
+    if (shell.ended) return;
 
     micBtn.classList.remove('mic-btn--recording');
 
@@ -190,9 +174,9 @@ export async function startGame(container) {
       shell.state.addScore(1);
       progressBar?.update(shell.state.currentRound);
 
-      setTimeout(() => {
+      shell.schedule(() => {
         roundIndex++;
-        const hasMore = shell.state.nextRound();
+        const hasMore = shell.nextRound();
         if (hasMore && roundIndex < roundNikud.length) {
           buildRoundUI(roundNikud[roundIndex]);
         } else {
@@ -210,9 +194,9 @@ export async function startGame(container) {
 
         progressBar?.update(shell.state.currentRound);
 
-        setTimeout(() => {
+        shell.schedule(() => {
           roundIndex++;
-          const hasMore = shell.state.nextRound();
+          const hasMore = shell.nextRound();
           if (hasMore && roundIndex < roundNikud.length) {
             buildRoundUI(roundNikud[roundIndex]);
           } else {

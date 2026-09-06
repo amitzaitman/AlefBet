@@ -5,7 +5,6 @@
  */
 import {
   bootstrapGame,
-  tts,
   nikudList,
   nikudBaseLetters,
   letterWithNikud,
@@ -19,7 +18,6 @@ import {
   createNikudBox,
   createDragSource,
   createDropTarget,
-  mountAudioStatusBanner,
   speakSyllable,
 } from '../../framework/dist/alefbet.js';
 
@@ -43,7 +41,7 @@ function pickLetter() {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  const { shell } = await bootstrapGame(container, {
+  const { shell, aborted } = await bootstrapGame(container, {
     gameId: 'nikud-match',
     title: 'לִמּוּד נִיקּוּד',
     preloadTexts: STATIC_TEXTS,
@@ -55,23 +53,11 @@ export async function startGame(container) {
       restartGame: startGame,
     },
   });
+  if (aborted) return;
 
   const roundNikud = randomNikud(ROUNDS);
 
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
-
-  // הבאנר מציג הודעות "הקש להפעלת קול"/"הקול אינו זמין" מבלי לחסום את המשחק.
-  // ממוקם בתוך המיכל של המשחק כדי שיפורק אוטומטית כשהמשחק מתחיל מחדש.
-  const audioBanner = mountAudioStatusBanner(container);
-
-  // נשחרר את ה-audio context בלחיצה הראשונה כדי לא להיכנס למצב awaiting-interaction באמצע הסיבוב.
-  let audioUnlocked = false;
-  const unlockAudioOnce = () => {
-    if (audioUnlocked) return;
-    audioUnlocked = true;
-    try { tts.unlock?.(); } catch { /* noop */ }
-  };
-  container.addEventListener('pointerdown', unlockAudioOnce, { once: true, capture: true });
 
   let progressBar = null;
   let roundIndex = 0;
@@ -163,14 +149,13 @@ export async function startGame(container) {
       shell.state.addScore(1);
       progressBar?.update(shell.state.currentRound);
 
-      setTimeout(() => {
+      shell.schedule(() => {
         roundIndex++;
-        const hasMore = shell.state.nextRound();
+        const hasMore = shell.nextRound();
         if (hasMore && roundIndex < ROUNDS) {
           buildRoundUI(roundNikud[roundIndex]);
         } else {
           // מסך הסיום מחליף את ה-DOM; פירוק הבאנר משחרר מאזיני window שלא יידרשו עוד.
-          audioBanner?.destroy?.();
           showCompletionScreen(container, shell.state.score, ROUNDS, () => startGame(container), { gameId: 'nikud-match' });
         }
       }, 1800);
@@ -178,7 +163,7 @@ export async function startGame(container) {
       // עידוד חיובי בלבד: פעימה עדינה של האות לאישור הלחיצה,
       // ולאחריה רמז עדין על האזור הנכון. ללא סימון שלילי או צליל שגוי.
       animate(letterEl, 'pulse');
-      setTimeout(() => {
+      shell.schedule(() => {
         if (!answered) animate(correctZone, 'pulse');
       }, 700);
     }

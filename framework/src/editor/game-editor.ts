@@ -45,13 +45,26 @@ export class GameEditor {
   private _shortcutHandler: ((e: KeyboardEvent) => void) | null = null;
   private _zoneEditor: ZoneEditor | null = null;
   private _zoneModal: HTMLElement | null = null;
+  private _toolbarFrame: number;
 
   constructor(container: HTMLElement, gameData: GameData, options: GameEditorOptions = {}) {
     this._container   = container;
     this._gameData    = gameData;
     this._restartGame = options.restartGame;
     this._roundSchema = options.roundSchema;
-    requestAnimationFrame(() => this._injectToolbar());
+    this._toolbarFrame = requestAnimationFrame(() => this._injectToolbar());
+  }
+
+  /** הסרת מאזינים ורכיבי עריכה כשהמשחק מסתיים או מוחלף. */
+  destroy() {
+    cancelAnimationFrame(this._toolbarFrame);
+    this._detachShortcuts();
+    this._closeZoneEditor();
+    this._overlay?.destroy();
+    this._navigator?.destroy();
+    this._inspector?.destroy();
+    this._toolbar?.remove();
+    this._container.classList.remove('ab-editor-active');
   }
 
   // ── Toolbar ───────────────────────────────────────────────────────────────

@@ -12,7 +12,7 @@
  */
 import {
   bootstrapGame,
-  tts,
+  shuffle,
   sounds,
   nikudList,
   nikudBaseLetters,
@@ -26,7 +26,6 @@ import {
   createHintTracker,
   injectHeaderButton,
   showNikudSettingsDialog,
-  mountAudioStatusBanner,
   animate,
   RETRY_HINTS,
   randomRetryHint,
@@ -45,9 +44,6 @@ function pickOther(pool, exclude) {
   return others[Math.floor(Math.random() * others.length)];
 }
 
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
 
 /**
  * בונה סיבוב: הברת מטרה + שני מסיחים מכוונים
@@ -75,24 +71,16 @@ function buildRound(targetNikud) {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  const { shell } = await bootstrapGame(container, {
+  const { shell, aborted } = await bootstrapGame(container, {
     gameId: 'syllable-read',
     title: 'קְרִיאַת הֲבָרוֹת',
     preloadTexts: STATIC_TEXTS,
     loadingMessage: 'טוֹעֵן הֲבָרוֹת...',
     totalRounds: ROUNDS,
   });
+  if (aborted) return;
 
   injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
-  const audioBanner = mountAudioStatusBanner(container);
-
-  let audioUnlocked = false;
-  container.addEventListener('pointerdown', () => {
-    if (audioUnlocked) return;
-    audioUnlocked = true;
-    try { tts.unlock?.(); } catch { /* noop */ }
-  }, { once: true, capture: true });
-
   const roundNikud = randomNikud(ROUNDS);
   let progressBar = null;
   let feedback = null;
@@ -120,7 +108,7 @@ export async function startGame(container) {
       } else if (level === 1) {
         // רמז עדין: הבהוב קצר של התשובה הנכונה.
         cards?.highlight(round.targetId, 'hint');
-        setTimeout(() => cards?.reset(), 1600);
+        shell.schedule(() => cards?.reset(), 1600);
       }
       // ללא await בכוונה: שמע לעולם לא חוסם את זרימת המשחק - גם כשקול
       // המערכת איטי או תקוע, הילד יכול להמשיך לנסות מיד.
@@ -193,7 +181,6 @@ export async function startGame(container) {
     buildRoundUI();
   });
 
-  shell.on('end', () => audioBanner?.destroy?.());
 
   shell.start();
   sounds.click();

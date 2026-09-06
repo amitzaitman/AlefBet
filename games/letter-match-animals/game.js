@@ -6,6 +6,7 @@
  */
 import {
   bootstrapGame,
+  shuffle,
   getLetter,
   getLettersByGroup,
   randomLetters,
@@ -14,9 +15,7 @@ import {
   createFeedback,
   showCompletionScreen,
   getNikud,
-  tts,
   animate,
-  mountAudioStatusBanner,
   PRAISE_PHRASES,
   RETRY_HINTS,
   randomPraise,
@@ -52,7 +51,6 @@ const STATIC_TEXTS = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
-function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
 function buildOptions(round) {
   const correct = { id: 'correct', text: getNikud(round.correct), emoji: round.correctEmoji };
@@ -65,7 +63,7 @@ function buildOptions(round) {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  const { shell, activeRounds } = await bootstrapGame(container, {
+  const { shell, activeRounds, aborted } = await bootstrapGame(container, {
     gameId: 'letter-match-animals',
     title: getNikud('התאמת אותיות') || 'התאמת אותיות',
     preloadTexts: STATIC_TEXTS,
@@ -77,25 +75,12 @@ export async function startGame(container) {
       restartGame: startGame,
     },
   });
+  if (aborted) return;
 
   let progressBar = null;
   let feedback = null;
   let cards = null;
   let currentRoundIndex = 0;
-  let firstInteractionHandled = false;
-
-  // Mounted on container so the banner sits above the game shell;
-  // teardown fires on shell 'end' so a restart re-mounts cleanly.
-  const audioBanner = mountAudioStatusBanner(container);
-  shell.on('end', () => audioBanner.destroy());
-
-  function handleFirstInteraction() {
-    if (firstInteractionHandled) return;
-    firstInteractionHandled = true;
-    // Pre-warm audio from a real user gesture so the first speak() inside a round
-    // doesn't trip autoplay restrictions and surface the awaiting-interaction banner.
-    tts.unlock();
-  }
 
   function buildRoundUI(roundData) {
     shell.bodyEl.innerHTML = '';
@@ -137,7 +122,6 @@ export async function startGame(container) {
   }
 
   function onSelect(option, roundData, rightPanelEl) {
-    handleFirstInteraction();
     cards.disable();
     const letterName = getLetter(roundData.target)?.nameNikud || roundData.target;
 
@@ -145,10 +129,10 @@ export async function startGame(container) {
       cards.highlight('correct', 'correct');
       feedback.correct(`!${randomPraise()} — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
 
-      setTimeout(() => {
+      shell.schedule(() => {
         shell.state.addScore(1);
         progressBar?.update(shell.state.currentRound);
-        const hasMore = shell.state.nextRound();
+        const hasMore = shell.nextRound();
         if (hasMore) {
           currentRoundIndex++;
           buildRoundUI(activeRounds[currentRoundIndex]);
@@ -164,7 +148,7 @@ export async function startGame(container) {
       if (pressedEl) animate(pressedEl, 'pulse');
       feedback.hint(`${randomRetryHint()} — חַפְּשׂוּ אֶת ${letterName}`);
 
-      setTimeout(() => {
+      shell.schedule(() => {
         cards.reset();
         const optionsEl = rightPanelEl?.querySelector('.option-cards-grid')?.parentElement;
         if (optionsEl) {

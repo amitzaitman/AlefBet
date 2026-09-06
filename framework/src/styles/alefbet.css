@@ -1026,6 +1026,9 @@
 
 .alefbet-audio-banner.is-visible { opacity: 1; transform: translateY(0); }
 
+.alefbet-audio-banner[hidden],
+.alefbet-audio-banner__dismiss[hidden] { display: none; }
+
 .alefbet-audio-banner.is-await {
   background: var(--ab-tomato);
   cursor: pointer;

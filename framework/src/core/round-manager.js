@@ -32,7 +32,7 @@ export function createRoundManager(shell, container, {
    * @param {function} [extraAction] - פעולה נוספת להרצה לפני קידום (async)
    */
   async function handleCorrect(extraAction) {
-    if (answered) return;
+    if (answered || shell.ended) return;
     answered = true;
 
     sounds.correct();
@@ -40,12 +40,13 @@ export function createRoundManager(shell, container, {
     if (extraAction) await extraAction();
     if (onCorrect) await onCorrect();
 
+    if (shell.ended) return;
     shell.state.addScore(1);
     progressBar?.update(shell.state.currentRound);
 
-    await new Promise(r => setTimeout(r, 1200));
+    if (!await shell.delay(1200)) return;
 
-    const hasMore = shell.state.nextRound();
+    const hasMore = shell.nextRound();
     if (hasMore) {
       answered = false;
       buildRoundUI();
@@ -60,7 +61,7 @@ export function createRoundManager(shell, container, {
    * טפל בתשובה שגויה — בלי משוב שלילי!
    */
   async function handleWrong() {
-    if (answered) return;
+    if (answered || shell.ended) return;
     answered = true;
 
     if (onWrong) await onWrong();
