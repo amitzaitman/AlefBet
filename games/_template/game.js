@@ -1,41 +1,44 @@
 /**
- * תבנית משחק — AlefBet
- * Claude מייצר קובץ זה לכל משחק חדש
- *
- * אחרי העתקה: הוסיפו שורה ב-games/catalog.js. בלי זה המשחק לא יופיע בבית ולא יישמר אופליין.
- *
- * הצעד הראשון בכל משחק הוא קריאה ל-bootstrapGame — עוטפת לטעינת ניקוד,
- * הקמת GameShell וחיווט העורך. ראה framework/src/core/bootstrap.js לאופציות.
+ * תבנית למשחק סיבובים. הוסיפו את המשחק ל-games/catalog.js אחרי ההעתקה.
+ * runGame הוא עזר אופציונלי; כלי או משחק עם זרימה אחרת יכול להשתמש ברכיבים ישירות.
  */
-import {
-  bootstrapGame,
-  createOptionCards,
-  createProgressBar,
-  createFeedback,
-  showCompletionScreen,
-} from '../../framework/dist/runtime.js';
-
-const STATIC_TEXTS = [
-  'בְּרוּכִים הַבָּאִים',
-];
+import { runGame, createOptionCards, createFeedback, shuffle } from '../../framework/dist/runtime.js';
 
 const ROUNDS = [
-  // { target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' },
+  { target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁', other: 'כֶּלֶב' },
+  { target: 'ב', correct: 'בַּיִת', correctEmoji: '🏠', other: 'שֶׁמֶשׁ' },
 ];
 
 export async function startGame(container) {
-  const { shell, aborted } = await bootstrapGame(container, {
+  return runGame(container, {
     gameId: 'template-game',
     title: 'שֵׁם הַמִּשְׂחָק',
-    preloadTexts: STATIC_TEXTS,
+    preloadTexts: [],
     defaultRounds: ROUNDS,
+    playCorrectSound: false,
+    onReplay: () => startGame(container),
+    buildRound: ({ shell, round, onCorrect, onWrong, isAnswered }) => {
+      const target = document.createElement('p');
+      target.className = 'letter-display';
+      target.textContent = round.target;
+      shell.bodyEl.appendChild(target);
+      const options = document.createElement('div');
+      shell.bodyEl.appendChild(options);
+      const feedback = createFeedback(shell.bodyEl);
+      const cards = createOptionCards(options, shuffle([
+        { id: 'correct', text: round.correct, emoji: round.correctEmoji },
+        { id: 'other', text: round.other, emoji: '' },
+      ]), option => {
+        if (isAnswered()) return;
+        if (option.id === 'correct') {
+          cards.disable();
+          feedback.correct();
+          void onCorrect();
+        } else {
+          void onWrong(() => feedback.hint('נַסּוּ שׁוּב'));
+        }
+      });
+      return () => feedback.destroy();
+    },
   });
-  if (aborted) return;
-
-  shell.bodyEl.innerHTML = '<p style="text-align:center;padding:2rem">הַמִּשְׂחָק שֶׁלְּךָ יוֹפִיעַ כָּאן</p>';
-
-  shell.on('start', () => {
-  });
-
-  shell.start();
 }

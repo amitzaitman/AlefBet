@@ -5,15 +5,13 @@
  * כך שמשחקים חוזרים חושפים בסופו של דבר את כל האלף-בית (לא רק א-ח).
  */
 import {
-  bootstrapGame,
+  runGame,
   shuffle,
   getLetter,
   getLettersByGroup,
   randomLetters,
   createOptionCards,
-  createProgressBar,
   createFeedback,
-  showCompletionScreen,
   getNikud,
   animate,
   PRAISE_PHRASES,
@@ -63,113 +61,94 @@ function buildOptions(round) {
 // ── Game ──────────────────────────────────────────────────────────────────
 
 export async function startGame(container) {
-  const { shell, activeRounds, aborted } = await bootstrapGame(container, {
+  return runGame(container, {
     gameId: 'letter-match-animals',
     title: getNikud('התאמת אותיות') || 'התאמת אותיות',
     preloadTexts: STATIC_TEXTS,
     defaultRounds: buildRounds(),
+    transitionMs: 1600,
+    playCorrectSound: false,
+    onReplay: () => startGame(container),
     editor: {
       type: 'multiple-choice',
       title: 'התאמת אותיות',
       distractors: ALL_REGULAR_WORDS,
       restartGame: startGame,
     },
-  });
-  if (aborted) return;
+    buildRound: ({ shell, round, onCorrect, isAnswered, schedule }) => {
+      let feedback = null;
+      let cards = null;
+      function buildRoundUI(roundData) {
+        shell.bodyEl.innerHTML = '';
 
-  let progressBar = null;
-  let feedback = null;
-  let cards = null;
-  let currentRoundIndex = 0;
+        // ── Left panel: instruction + letter ──
+        const leftPanel = document.createElement('div');
+        leftPanel.className = 'round-panel round-panel--letter';
 
-  function buildRoundUI(roundData) {
-    shell.bodyEl.innerHTML = '';
+        const instruction = document.createElement('p');
+        instruction.className = 'game-instruction';
+        instruction.textContent = getNikud('מצא את החיה שמתחילה באות:');
+        leftPanel.appendChild(instruction);
 
-    // ── Left panel: instruction + letter ──
-    const leftPanel = document.createElement('div');
-    leftPanel.className = 'round-panel round-panel--letter';
+        const letterInfo = getLetter(roundData.target);
+        const letterEl = document.createElement('div');
+        letterEl.className = 'letter-display anim-appear';
+        letterEl.textContent = roundData.target;
+        letterEl.setAttribute('aria-label', `הָאוֹת ${letterInfo?.nameNikud || letterInfo?.name || roundData.target}`);
+        leftPanel.appendChild(letterEl);
 
-    const instruction = document.createElement('p');
-    instruction.className = 'game-instruction';
-    instruction.textContent = getNikud('מצא את החיה שמתחילה באות:');
-    leftPanel.appendChild(instruction);
+        shell.bodyEl.appendChild(leftPanel);
 
-    const letterInfo = getLetter(roundData.target);
-    const letterEl = document.createElement('div');
-    letterEl.className = 'letter-display anim-appear';
-    letterEl.textContent = roundData.target;
-    letterEl.setAttribute('aria-label', `הָאוֹת ${letterInfo?.nameNikud || letterInfo?.name || roundData.target}`);
-    leftPanel.appendChild(letterEl);
+        // ── Right panel: options + feedback ──
+        const rightPanel = document.createElement('div');
+        rightPanel.className = 'round-panel round-panel--options';
 
-    shell.bodyEl.appendChild(leftPanel);
+        const optionsContainer = document.createElement('div');
+        rightPanel.appendChild(optionsContainer);
 
-    // ── Right panel: options + feedback ──
-    const rightPanel = document.createElement('div');
-    rightPanel.className = 'round-panel round-panel--options';
+        const feedbackContainer = document.createElement('div');
+        rightPanel.appendChild(feedbackContainer);
+        feedback = createFeedback(feedbackContainer);
 
-    const optionsContainer = document.createElement('div');
-    rightPanel.appendChild(optionsContainer);
+        const options = buildOptions(roundData);
+        cards = createOptionCards(optionsContainer, options,
+          option => onSelect(option, roundData, rightPanel));
 
-    const feedbackContainer = document.createElement('div');
-    rightPanel.appendChild(feedbackContainer);
-    feedback = createFeedback(feedbackContainer);
+        shell.bodyEl.appendChild(rightPanel);
+      }
 
-    const options = buildOptions(roundData);
-    cards = createOptionCards(optionsContainer, options,
-      option => onSelect(option, roundData, rightPanel));
+      function onSelect(option, roundData, rightPanelEl) {
+        if (isAnswered()) return;
+        cards.disable();
+        const letterName = getLetter(roundData.target)?.nameNikud || roundData.target;
 
-    shell.bodyEl.appendChild(rightPanel);
-  }
+        if (option.id === 'correct') {
+          cards.highlight('correct', 'correct');
+          feedback.correct(`!${randomPraise()} — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
 
-  function onSelect(option, roundData, rightPanelEl) {
-    cards.disable();
-    const letterName = getLetter(roundData.target)?.nameNikud || roundData.target;
+          void onCorrect();
 
-    if (option.id === 'correct') {
-      cards.highlight('correct', 'correct');
-      feedback.correct(`!${randomPraise()} — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
-
-      shell.schedule(() => {
-        shell.state.addScore(1);
-        progressBar?.update(shell.state.currentRound);
-        const hasMore = shell.nextRound();
-        if (hasMore) {
-          currentRoundIndex++;
-          buildRoundUI(activeRounds[currentRoundIndex]);
         } else {
-          showCompletionScreen(container, shell.state.score, activeRounds.length, () => startGame(container), { gameId: 'letter-match-animals' });
+          // ללא סימון שלילי או צליל שגוי - רק פעימה עדינה על הכרטיס שנלחץ
+          // ורמז מעודד, כמו בשאר משחקי הפלטפורמה.
+          const pressedEl = rightPanelEl?.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);
+          if (pressedEl) animate(pressedEl, 'pulse');
+          feedback.hint(`${randomRetryHint()} — חַפְּשׂוּ אֶת ${letterName}`);
+
+          schedule(() => {
+            cards.reset();
+            const optionsEl = rightPanelEl?.querySelector('.option-cards-grid')?.parentElement;
+            if (optionsEl) {
+              optionsEl.innerHTML = '';
+              cards = createOptionCards(optionsEl, buildOptions(roundData),
+                o => onSelect(o, roundData, rightPanelEl));
+            }
+          }, 1200);
         }
-      }, 1600);
+      }
 
-    } else {
-      // ללא סימון שלילי או צליל שגוי - רק פעימה עדינה על הכרטיס שנלחץ
-      // ורמז מעודד, כמו בשאר משחקי הפלטפורמה.
-      const pressedEl = rightPanelEl?.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);
-      if (pressedEl) animate(pressedEl, 'pulse');
-      feedback.hint(`${randomRetryHint()} — חַפְּשׂוּ אֶת ${letterName}`);
-
-      shell.schedule(() => {
-        cards.reset();
-        const optionsEl = rightPanelEl?.querySelector('.option-cards-grid')?.parentElement;
-        if (optionsEl) {
-          optionsEl.innerHTML = '';
-          cards = createOptionCards(optionsEl, buildOptions(roundData),
-            o => onSelect(o, roundData, rightPanelEl));
-        }
-      }, 1200);
-    }
-  }
-
-  // ── Lifecycle ──────────────────────────────────────────────────────────
-
-  shell.on('start', () => {
-    shell.footerEl.innerHTML = '';
-    progressBar = createProgressBar(shell.footerEl, activeRounds.length);
-    progressBar.update(0);
-
-    currentRoundIndex = 0;
-    buildRoundUI(activeRounds[currentRoundIndex]);
+      buildRoundUI(round);
+      return () => feedback?.destroy();
+    },
   });
-
-  shell.start();
 }
