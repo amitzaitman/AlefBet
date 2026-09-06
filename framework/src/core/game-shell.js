@@ -5,12 +5,23 @@
 import { EventBus } from './events.js';
 import { GameState } from './state.js';
 
+const activeShells = new WeakMap();
+
+/** מסיים משחק קודם לפני החלפת תוכן המיכל. */
+export function endGame(container) {
+  activeShells.get(container)?.end();
+}
+
 export class GameShell {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
    */
   constructor(containerEl, config = {}) {
+    endGame(containerEl);
+    activeShells.set(containerEl, this);
+    this.ended = false;
+    this._timers = new Set();
     this.container = containerEl;
     this.config = {
       totalRounds: 8,
@@ -59,12 +70,14 @@ export class GameShell {
 
   /** התחל את המשחק */
   start() {
+    if (this.ended) return;
     this.state.nextRound();
     this.events.emit('start', { state: this.state });
   }
 
   /** עבור לסיבוב הבא */
   nextRound() {
+    if (this.ended) return false;
     const hasMore = this.state.nextRound();
     if (hasMore) {
       this.events.emit('round', { state: this.state });
@@ -75,8 +88,36 @@ export class GameShell {
   }
 
   /** סיים את המשחק */
-  end(score) {
+  end(score = this.state.score) {
+    if (this.ended) return;
+    this.ended = true;
+    for (const timer of this._timers) clearTimeout(timer);
+    this._timers.clear();
+    if (activeShells.get(this.container) === this) activeShells.delete(this.container);
     this.events.emit('end', { score, state: this.state });
+  }
+
+  /** פעולה מושהית מתבטלת אוטומטית בסיום או בהפעלה מחדש. */
+  schedule(callback, delayMs) {
+    if (this.ended) return;
+    const timer = setTimeout(() => {
+      this._timers.delete(timer);
+      if (!this.ended) callback();
+    }, delayMs);
+    this._timers.add(timer);
+  }
+
+  /** המתנה מתבטלת בסיום; false אומר שאין להמשיך בפעולה. */
+  delay(delayMs) {
+    return new Promise(resolve => {
+      if (this.ended) { resolve(false); return; }
+      const cancel = () => resolve(false);
+      this.events.on('end', cancel);
+      this.schedule(() => {
+        this.events.off('end', cancel);
+        resolve(true);
+      }, delayMs);
+    });
   }
 
   /** קבל את מצב המשחק הנוכחי */

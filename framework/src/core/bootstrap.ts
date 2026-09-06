@@ -11,7 +11,8 @@
  * המודול כתוב ב-TypeScript כי הוא ניגש ל-GameEditor/GameData/loadGameData
  * שחיים באי ה-TS של העורך.
  */
-import { GameShell } from './game-shell.js';
+import { GameShell, endGame } from './game-shell.js';
+import { attachGameAudio } from '../audio/game-audio.js';
 import { installGlobalErrorScreen } from '../ui/error-screen.js';
 import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
 import { preloadNikud } from '../utils/nakdan.js';
@@ -19,6 +20,8 @@ import { loadGameData } from '../editor/editor-storage.js';
 import { GameData } from '../editor/game-data.js';
 import { GameEditor } from '../editor/game-editor.js';
 import type { RoundRecord } from '../editor/schemas.js';
+
+const starts = new WeakMap<HTMLElement, object>();
 
 export interface BootstrapEditorOptions {
   /** סוג המשחק (meta.type), למשל 'multiple-choice' או 'drag-match' */
@@ -46,6 +49,7 @@ export interface BootstrapOptions {
   totalRounds?:    number;
   /** השמט כדי להשבית את העורך */
   editor?:         BootstrapEditorOptions;
+  audio?:          boolean;
   /**
    * הפעל בין preload ל-hide. החזרת false מאותתת שהמשחק טיפל ב-DOM בעצמו
    * והאתחול יבוטל; במצב זה bootstrap לא יסיר את מסך הטעינה ולא יבנה shell.
@@ -68,6 +72,9 @@ export interface BootstrapResult {
  * מציג מסך טעינה, טוען ניקוד, בונה GameShell ומחבר עורך - הכל בקריאה אחת.
  */
 export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptions): Promise<BootstrapResult> {
+  endGame(container);
+  const start = {};
+  starts.set(container, start);
   // רשת ביטחון: שגיאה לא-מטופלת בכל שלב במשחק מציגה מסך ידידותי עם
   // כפתור "להתחיל מחדש" במקום מסך לבן. ההתקנה אידמפוטנטית.
   installGlobalErrorScreen();
@@ -75,10 +82,13 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
   showLoadingScreen(container, opts.loadingMessage ?? 'טוֹעֵן...');
 
   await preloadNikud(opts.preloadTexts ?? []);
+  if (starts.get(container) !== start) {
+    return { shell: null, activeRounds: [], gameData: null, aborted: true };
+  }
 
   if (opts.onBeforeHide) {
     const proceed = await opts.onBeforeHide();
-    if (proceed === false) {
+    if (proceed === false || starts.get(container) !== start) {
       return { shell: null, activeRounds: [], gameData: null, aborted: true };
     }
   }
@@ -93,6 +103,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
     title:       opts.title,
     gameId:      opts.gameId,
   });
+  if (opts.audio !== false) attachGameAudio(shell);
 
   let gameData: GameData | null = null;
   if (opts.editor) {
@@ -101,7 +112,8 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
       type:  opts.editor.type  ?? 'multiple-choice',
     };
     gameData = GameData.fromRoundsArray(opts.gameId, activeRounds, meta, opts.editor.distractors ?? []);
-    new GameEditor(container, gameData, { restartGame: opts.editor.restartGame });
+    const editor = new GameEditor(container, gameData, { restartGame: opts.editor.restartGame });
+    shell.on('end', () => editor.destroy());
   }
 
   return { shell, activeRounds, gameData, aborted: false };

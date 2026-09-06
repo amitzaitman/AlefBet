@@ -1,3 +1,4 @@
+import { GameShell } from '../core/game-shell.js';
 /**
  * עוזרי בדיקה משותפים
  *
@@ -34,21 +35,7 @@ export function tick(ms = 0) {
  * @param {number} totalRounds
  */
 export function makeShellStub(totalRounds = 3) {
-  let current = 0;
-  let score = 0;
-  return {
-    state: {
-      get currentRound() { return current; },
-      get score() { return score; },
-      get totalRounds() { return totalRounds; },
-      addScore(points) { score += points; },
-      nextRound() {
-        if (current >= totalRounds) return false;
-        current++;
-        return current <= totalRounds;
-      },
-    },
-  };
+  return new GameShell(document.createElement('div'), { totalRounds });
 }
 
 // ── IndexedDB mock (משותף ל-voice-store tests) ──────────────────────────────

@@ -24,6 +24,34 @@ beforeEach(() => {
 });
 
 describe('bootstrapGame', () => {
+  it('does not let a slow start overwrite a newer game', async () => {
+    const host = mountContainer();
+    let release;
+    preloadNikud.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+    const older = bootstrapGame(host, { gameId: 'old', title: 'ישן', preloadTexts: [] });
+    const newer = await bootstrapGame(host, { gameId: 'new', title: 'חדש', preloadTexts: [] });
+    release();
+    expect((await older).aborted).toBe(true);
+    expect(host.querySelector('.game-title').textContent).toBe('חדש');
+    newer.shell.end();
+  });
+
+  it('restarts without accumulating window audio listeners', async () => {
+    const host = mountContainer();
+    const add = vi.spyOn(window, 'addEventListener');
+    const remove = vi.spyOn(window, 'removeEventListener');
+    const opts = { gameId: 'again', title: 'שוב', preloadTexts: [] };
+    const first = await bootstrapGame(host, opts);
+    const listener = add.mock.calls.find(([name]) => name === 'alefbet:tts-state')[1];
+    const second = await bootstrapGame(host, opts);
+    expect(first.shell.ended).toBe(true);
+    expect(remove).toHaveBeenCalledWith('alefbet:tts-state', listener);
+    expect(host.querySelectorAll('#alefbet-audio-status-banner')).toHaveLength(1);
+    second.shell.end();
+    expect(host.querySelector('#alefbet-audio-status-banner')).toBeNull();
+    add.mockRestore();
+    remove.mockRestore();
+  });
   it('builds shell + editor + gameData when editor options are provided', async () => {
     const host = mountContainer();
     const rounds = [{ target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }];

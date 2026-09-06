@@ -41,6 +41,27 @@ describe('GameShell — DOM scaffold', () => {
 });
 
 describe('GameShell — lifecycle events', () => {
+  it('replacing a game ends it once and cancels its pending work', async () => {
+    vi.useFakeTimers();
+    try {
+      const shell = new GameShell(container);
+      const end = vi.fn();
+      const staleUI = vi.fn();
+      shell.on('end', end);
+      shell.schedule(staleUI, 100);
+      const waiting = shell.delay(200);
+      const replacement = new GameShell(container);
+      shell.end();
+      await vi.runAllTimersAsync();
+      expect(await waiting).toBe(false);
+      expect(end).toHaveBeenCalledOnce();
+      expect(staleUI).not.toHaveBeenCalled();
+      expect(shell.nextRound()).toBe(false);
+      expect(replacement.ended).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it('emits "start" with the current state when start() is called', () => {
     const shell = new GameShell(container, { totalRounds: 3 });
     const onStart = vi.fn();
