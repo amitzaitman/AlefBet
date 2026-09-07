@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from './network-server.js';
 
-test('touch retry, audio failure, completion, replay and offline reload', async ({ page, context }) => {
+test('touch retry, audio failure, completion, replay and offline reload', async ({ page, context, browserName, network }) => {
   await page.route('**/translate.google.com/**', route => route.abort());
   await page.route('**/translate_tts**', route => route.abort());
   await page.addInitScript(() => {
@@ -14,7 +15,7 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => undefined });
     HTMLAudioElement.prototype.play = () => Promise.reject(new DOMException('blocked', 'NotAllowedError'));
   });
-  await page.goto('/games/letter-match-animals/');
+  await page.goto(`${network.url}/games/letter-match-animals/`);
   const cards = page.locator('.option-card');
   await expect(cards).toHaveCount(4);
   const choices = await cards.allTextContents();
@@ -35,7 +36,11 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await expect(cards).toHaveCount(4);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.evaluate(() => navigator.serviceWorker.ready);
-  await context.setOffline(true);
+  network.disconnect();
+  // WebKit's setOffline navigation fails inside the automation backend (playwright#34402).
+  // The origin is physically disconnected for both engines; Chromium also toggles navigator.onLine.
+  if (browserName !== 'webkit') await context.setOffline(true);
+  expect(await page.evaluate(() => fetch('/network-probe', { cache: 'no-store' }).then(() => false, () => true))).toBe(true);
   await page.reload();
   await expect(cards).toHaveCount(4);
   await page.locator('[data-id="correct"]').tap();
