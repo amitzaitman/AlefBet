@@ -41,6 +41,11 @@ export function attachLazyEditor(
     try {
       const [module] = await Promise.all([import('../editor/index.js'), loadStyles()]);
       if (shell.ended) return;
+      if ('serviceWorker' in navigator) {
+        void navigator.serviceWorker.ready.then(registration => {
+          registration.active?.postMessage({ type: 'cache-editor' });
+        }).catch(() => {});
+      }
       if (mode === 'audio') {
         module.showAudioManager(gameData.id, gameData);
       } else {

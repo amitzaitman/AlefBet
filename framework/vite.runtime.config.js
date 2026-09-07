@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { writeReleaseManifest } from '../scripts/build-release.js';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -23,6 +24,7 @@ export default defineConfig({
   },
   plugins: [{
     name: 'runtime-precache',
+    closeBundle() { writeReleaseManifest(resolve(root, '..')); },
     generateBundle(_options, bundle) {
       const files = new Set();
       const visit = name => {
