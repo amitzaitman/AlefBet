@@ -5,10 +5,12 @@ import { createHash } from 'node:crypto';
 
 const worker = readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
 
-test('an interrupted update preserves offline play; a complete update waits for old tabs', async ({ page, context }) => {
+test('an interrupted update preserves offline play; a complete update waits for old tabs', async ({ page, context, browserName }) => {
   let version = 1;
   let interrupted = false;
+  let disconnected = false;
   const server = createServer((req, res) => {
+    if (disconnected) { req.socket.destroy(); return; }
     const html = '<!doctype html><script src="/app.js"></script>';
     const app = `document.documentElement.dataset.version = '${version}';`;
     const assets = { './': html, './index.html': html, './app.js': app };
@@ -48,11 +50,17 @@ test('an interrupted update preserves offline play; a complete update waits for 
       await registration.update();
       await finished;
     });
-    await context.setOffline(true);
+    disconnected = true;
+    // The server outage also reaches worker requests; WebKit's offline override breaks navigation.
+    if (browserName !== 'webkit') await context.setOffline(true);
+    expect(await page.evaluate(() => fetch('/network-probe', { cache: 'no-store' }).then(() => false, () => true))).toBe(true);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-version', '1');
-    await context.setOffline(false);
+    if (browserName !== 'webkit') await context.setOffline(false);
+    disconnected = false;
     interrupted = false;
+    // Confirm the origin is reachable again before requesting a new worker update.
+    expect(await page.evaluate(() => fetch('/network-probe', { cache: 'no-store' }).then(response => response.status))).toBe(503);
     await page.evaluate(async () => {
       const registration = await navigator.serviceWorker.getRegistration();
       await registration.update();
@@ -64,11 +72,13 @@ test('an interrupted update preserves offline play; a complete update waits for 
     const next = await context.newPage();
     await next.goto(url);
     await expect(next.locator('html')).toHaveAttribute('data-version', '2');
-    await context.setOffline(true);
+    disconnected = true;
+    if (browserName !== 'webkit') await context.setOffline(true);
+    expect(await next.evaluate(() => fetch('/network-probe', { cache: 'no-store' }).then(() => false, () => true))).toBe(true);
     await next.reload();
     await expect(next.locator('html')).toHaveAttribute('data-version', '2');
   } finally {
-    await context.setOffline(false);
+    if (browserName !== 'webkit') await context.setOffline(false);
     server.closeAllConnections();
     await new Promise(resolve => server.close(resolve));
   }
