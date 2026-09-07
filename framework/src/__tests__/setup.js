@@ -78,6 +78,6 @@ if (typeof window !== 'undefined' && typeof window.AudioContext === 'undefined')
 
 // ── נקה את ה-DOM בין בדיקות ────────────────────────────────────────────────
 afterEach(() => {
-  document.body.innerHTML = '';
+  if (typeof document !== 'undefined') document.body.innerHTML = '';
   vi.useRealTimers();
 });

@@ -1,94 +1,77 @@
 /**
- * AlefBet Service Worker - אופליין אמיתי לכל האתר.
- *
- * אסטרטגיה: stale-while-revalidate לכל בקשת GET באותו מקור -
- * עונים מיד מהמטמון (מהיר ועובד אופליין) ומרעננים ברקע. ביקור אחד
- * בכל עמוד מספיק כדי שהוא יעבוד לתמיד ללא רשת; ליבת האתר (דף הבית
- * וה-framework) נשמרת מראש כבר בהתקנה.
- *
- * החלפת גרסה: העלאת CACHE_VERSION מפנה מטמונים ישנים ב-activate.
+ * Each release owns an immutable cache. A failed installation leaves the
+ * working release intact; updates wait until its open tabs are closed.
  */
+importScripts('./framework/dist/release-manifest.js');
 
-importScripts('./games/catalog.js');
-importScripts('./framework/dist/runtime-assets.js');
+const release = self.ALEFBET_RELEASE;
+const CACHE_VERSION = `alefbet-release-${release.version}`;
+const absolute = path => new URL(path, self.location.href).href;
+const assets = new Map(Object.entries(release.assets).map(([path, hash]) => [absolute(path), hash]));
 
-const CACHE_VERSION = 'alefbet-v2-runtime';
+async function fetchVerified(url) {
+  const response = await fetch(new Request(url, { cache: 'no-store' }));
+  if (!response.ok) throw new Error(`Release asset unavailable: ${url}`);
+  const bytes = await response.clone().arrayBuffer();
+  const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))]
+    .map(byte => byte.toString(16).padStart(2, '0')).join('');
+  if (hash !== assets.get(url)) throw new Error(`Release asset changed: ${url}`);
+  return response;
+}
 
-/** מזהי המשחקים - נגזרים מ-games/catalog.js, לא מרשימה נפרדת. */
-const GAMES = self.ALEFBET_CATALOG.map(game => game.id);
-
-/**
- * כל האתר נשמר מראש כבר בהתקנה: ביקור יחיד בכל עמוד שהוא מספיק
- * כדי שכל המשחקים יעבדו אופליין - לא רק העמוד שביקרו בו.
- */
-const CORE_ASSETS = [
-  './',
-  './index.html',
-  './games/catalog.js',
-  './manifest.webmanifest',
-  './framework/dist/runtime-assets.js',
-  ...self.ALEFBET_RUNTIME_ASSETS.map(file => `./framework/dist/${file}`),
-  './assets/icons/icon-192.png',
-  './assets/icons/icon-512.png',
-  './assets/icons/apple-touch-icon.png',
-  ...GAMES.flatMap(game => [
-    `./games/${game}/`,
-    `./games/${game}/index.html`,
-    `./games/${game}/game.js`,
-    `./games/${game}/game.css`,
-  ]),
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_VERSION)
-      .then(cache => cache.addAll(CORE_ASSETS))
-      .catch(() => { /* התקנה חלקית עדיפה על כישלון התקנה */ })
-      .then(() => self.skipWaiting())
-  );
+self.addEventListener('install', event => {
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_VERSION);
+    // Wait for all writes before deleting a failed staging cache.
+    const results = await Promise.allSettled(release.core.map(async path => {
+      const url = absolute(path);
+      await cache.put(url, await fetchVerified(url));
+    }));
+    if (results.some(result => result.status === 'rejected')) {
+      await caches.delete(CACHE_VERSION);
+      throw new Error('Incomplete offline release');
+    }
+    // No skipWaiting: existing pages must keep their original runtime.
+  })());
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(
-        keys.filter(k => k.startsWith('alefbet-') && k !== CACHE_VERSION).map(k => caches.delete(k))
-      ))
-      .then(() => self.clients.claim())
-  );
+self.addEventListener('activate', event => {
+  event.waitUntil(caches.keys().then(keys => Promise.all(
+    keys.filter(key => key.startsWith('alefbet-') && key !== CACHE_VERSION)
+      .map(key => caches.delete(key)),
+  )));
+  // No clients.claim: do not change the release underneath an already loaded page.
 });
 
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  if (request.method !== 'GET') return;
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return; // רק נכסים שלנו
-
-  event.respondWith(
-    caches.open(CACHE_VERSION).then(async (cache) => {
-      const cached = await cache.match(request);
-      const refresh = fetch(request)
-        .then(async (response) => {
-          if (response && response.ok) await cache.put(request, response.clone());
-          return response;
-        })
-        .catch(() => null);
-
-      if (cached) {
-        // stale-while-revalidate: עונים מהמטמון, הרענון רץ ברקע.
-        refresh.catch(() => {});
-        return cached;
-      }
-
-      const fresh = await refresh;
-      if (fresh) return fresh;
-
-      // אופליין ועמוד שלא בוקר בו: ניווט נופל לדף הבית שנשמר בהתקנה.
-      if (request.mode === 'navigate') {
-        const home = await cache.match('./index.html');
-        if (home) return home;
-      }
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  url.search = '';
+  if (!assets.has(url.href)) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_VERSION);
+    const cached = await cache.match(url.href);
+    if (cached) return cached;
+    try {
+      const response = await fetchVerified(url.href);
+      await cache.put(url.href, response.clone());
+      return response;
+    } catch {
       return Response.error();
-    })
-  );
+    }
+  })());
+});
+
+// The first page can open the editor before any worker controls that page.
+// Cache it explicitly on demand without claiming or reloading that document.
+self.addEventListener('message', event => {
+  if (event.data?.type !== 'cache-editor') return;
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_VERSION);
+    const core = new Set(release.core);
+    await Promise.allSettled(Object.keys(release.assets).filter(path => !core.has(path)).map(async path => {
+      const url = absolute(path);
+      if (!await cache.match(url)) await cache.put(url, await fetchVerified(url));
+    }));
+  })());
 });

@@ -1,5 +1,5 @@
-import { u as Xe, g as Ae, c as Ye, l as Ze, G as Je, e as Fe, a as Me, p as W, s as et } from "./drag-CI6877qN.js";
-import { b as In, d as Bn, f as $n, h as qn, i as Vn, j as Un, k as Hn, m as Wn, n as jn } from "./drag-CI6877qN.js";
+import { u as Xe, g as Ae, c as Ye, l as Ze, G as Je, e as Fe, a as Me, p as H, s as et } from "./drag-CI6877qN.js";
+import { b as In, d as Bn, f as $n, h as qn, i as Vn, j as Un, k as Wn, m as Hn, n as jn } from "./drag-CI6877qN.js";
 class tt {
   constructor() {
     this._handlers = {};
@@ -636,8 +636,8 @@ function xt(t = typeof document < "u" ? document.body : null, e = {}) {
   function l() {
     d(), r.hidden = !0, r.classList.remove("is-visible", "is-await", "is-unsupported", "is-failed"), r.onclick = null, i.hidden = !0;
   }
-  function c(h) {
-    const p = Nt(h);
+  function c(m) {
+    const p = Nt(m);
     if (!p) {
       l();
       return;
@@ -652,8 +652,8 @@ function xt(t = typeof document < "u" ? document.body : null, e = {}) {
       y.stopPropagation(), l();
     }) : p.kind === "failed" && (r.onclick = null, i.hidden = !0, s = setTimeout(() => l(), 6e3));
   }
-  function f(h) {
-    const y = /** @type {CustomEvent} */ (h.detail || {}).state;
+  function f(m) {
+    const y = /** @type {CustomEvent} */ (m.detail || {}).state;
     if (y === "ready" || y === "idle") {
       l();
       return;
@@ -821,7 +821,7 @@ function Ct(t, e, {
     if (t.ended || (t.state.addScore(1), a == null || a.update(t.state.currentRound), !await t.delay(s))) return;
     t.nextRound() ? (c = !1, r()) : Mt(e, t.state.score, n, l, { gameId: t.gameId });
   }
-  async function h(g) {
+  async function m(g) {
     if (!(c || t.ended)) {
       c = !0;
       try {
@@ -837,7 +837,7 @@ function Ct(t, e, {
   function y() {
     c = !1;
   }
-  return { handleCorrect: f, handleWrong: h, isAnswered: p, reset: y };
+  return { handleCorrect: f, handleWrong: m, isAnswered: p, reset: y };
 }
 function zt(t, e) {
   const n = document.createElement("div");
@@ -863,7 +863,7 @@ function zt(t, e) {
     }
   };
 }
-let le = !1, fe = !1, H = null;
+let le = !1, fe = !1, W = null;
 const Pt = [
   "ResizeObserver loop",
   // אזהרת דפדפן שפירה
@@ -908,10 +908,10 @@ function It() {
     );
     Ee((a == null ? void 0 : a.message) ?? a) || (console.error("[alefbet] unhandled rejection:", a), Ne());
   };
-  return window.addEventListener("error", t), window.addEventListener("unhandledrejection", e), H = () => {
+  return window.addEventListener("error", t), window.addEventListener("unhandledrejection", e), W = () => {
     window.removeEventListener("error", t), window.removeEventListener("unhandledrejection", e), le = !1, fe = !1;
   }, { destroy: () => {
-    H == null || H(), H = null;
+    W == null || W(), W = null;
   } };
 }
 function Bt(t, e = "טוֹעֵן...") {
@@ -933,8 +933,8 @@ function qt(t, e, n) {
     const c = document.createElement("link");
     c.rel = "stylesheet";
     const f = new URL(".", import.meta.url);
-    c.href = new URL("editor.css", f).href, c.dataset.alefbetEditor = "", await new Promise((h, p) => {
-      c.onload = () => h(), c.onerror = () => {
+    c.href = new URL("editor.css", f).href, c.dataset.alefbetEditor = "", await new Promise((m, p) => {
+      c.onload = () => m(), c.onerror = () => {
         c.remove(), p(new Error("Editor styles unavailable"));
       }, document.head.appendChild(c);
     });
@@ -945,7 +945,11 @@ function qt(t, e, n) {
       try {
         const [f] = await Promise.all([import("./editor.js"), d()]);
         if (t.ended) return;
-        c === "audio" ? f.showAudioManager(e.id, e) : (s = new f.GameEditor(t.container, e, n), await new Promise((h) => requestAnimationFrame(h)), t.ended || (s.enterEditMode(), r.remove())), o.textContent = "";
+        "serviceWorker" in navigator && navigator.serviceWorker.ready.then((m) => {
+          var p;
+          (p = m.active) == null || p.postMessage({ type: "cache-editor" });
+        }).catch(() => {
+        }), c === "audio" ? f.showAudioManager(e.id, e) : (s = new f.GameEditor(t.container, e, n), await new Promise((m) => requestAnimationFrame(m)), t.ended || (s.enterEditMode(), r.remove())), o.textContent = "";
       } catch {
         t.ended || (o.textContent = "לֹא הִצְלַחְנוּ לִטְעֹן אֶת הָעוֹרֵךְ. הִתְחַבְּרוּ לָרֶשֶׁת וְנַסּוּ שׁוּב.");
       } finally {
@@ -954,10 +958,10 @@ function qt(t, e, n) {
     }
   }
   for (const [c, f] of [["✏️ ערוך", "edit"], ["🎤 קול", "audio"]]) {
-    const h = document.createElement("button");
-    h.className = "btn", h.textContent = c, h.addEventListener("click", () => {
+    const m = document.createElement("button");
+    m.className = "btn", m.textContent = c, m.addEventListener("click", () => {
       l(f);
-    }), r.appendChild(h);
+    }), r.appendChild(m);
   }
   r.appendChild(o), a.after(r), t.on("end", () => {
     s == null || s.destroy(), r.remove();
@@ -1014,21 +1018,21 @@ async function Ut(t, e) {
   }), a.on("start", c);
   function c() {
     d(), a.bodyEl.innerHTML = "";
-    const f = i, h = () => !a.ended && i === f, p = a.state.currentRound - 1;
+    const f = i, m = () => !a.ended && i === f, p = a.state.currentRound - 1;
     s = e.buildRound({
       shell: a,
       index: p,
       round: r[p],
-      isActive: h,
-      isAnswered: () => !h() || l.isAnswered(),
+      isActive: m,
+      isAnswered: () => !m() || l.isAnswered(),
       onCorrect: async (y) => {
-        h() && await l.handleCorrect(y);
+        m() && await l.handleCorrect(y);
       },
       onWrong: async (y) => {
-        h() && await l.handleWrong(y);
+        m() && await l.handleWrong(y);
       },
       schedule: (y, g) => a.schedule(() => {
-        h() && y();
+        m() && y();
       }, g)
     });
   }
@@ -1075,7 +1079,7 @@ const $e = {
   holam: "o",
   kubbutz: "u"
 };
-function Ht(t, e) {
+function Wt(t, e) {
   if (!Number.isFinite(t) || !Number.isFinite(e) || t <= 0 || e <= 0 || e <= t)
     return { vowel: "", confidence: 0 };
   const n = Math.log2(t), a = Math.log2(e), r = [];
@@ -1090,7 +1094,7 @@ function Ht(t, e) {
 function pn(t, e) {
   return !t || !e ? !1 : pe[e] === t;
 }
-function Wt(t, e) {
+function Ht(t, e) {
   const n = t.length, a = Math.max(1, Math.min(e, n)), r = new Float32Array(a);
   for (let s = 0; s < a; s++) {
     let d = 0;
@@ -1111,7 +1115,7 @@ function Wt(t, e) {
 function jt(t, e) {
   if (!t || t.length === 0 || !Number.isFinite(e) || e <= 0)
     return { F1: 0, F2: 0 };
-  const n = Wt(t, 80), a = Math.min(n.length - 3, Math.floor(3500 / e)), r = [];
+  const n = Ht(t, 80), a = Math.min(n.length - 3, Math.floor(3500 / e)), r = [];
   for (let l = 3; l <= a; l++) {
     const c = n[l];
     c > n[l - 1] && c > n[l - 2] && c > n[l + 1] && c > n[l + 2] && r.push({ freq: l * e, mag: c });
@@ -1132,11 +1136,11 @@ function yn() {
     available: a,
     listen(s = 3e3) {
       return r == null || r(), a ? new Promise((d) => {
-        let l = !1, c = null, f = null, h = null;
+        let l = !1, c = null, f = null, m = null;
         const p = (g) => {
           var v;
           if (!l) {
-            l = !0, h !== null && cancelAnimationFrame(h), c == null || c.getTracks().forEach((b) => {
+            l = !0, m !== null && cancelAnimationFrame(m), c == null || c.getTracks().forEach((b) => {
               try {
                 b.stop();
               } catch {
@@ -1170,21 +1174,21 @@ function yn() {
                 p(o());
                 return;
               }
-              const m = _.map((C) => C.F1).sort((C, ae) => C - ae), w = _.map((C) => C.F2).sort((C, ae) => C - ae), M = Math.floor(_.length / 2), ye = m[M], ge = w[M];
-              p({ ...Ht(ye, ge), F1: ye, F2: ge });
+              const h = _.map((C) => C.F1).sort((C, ae) => C - ae), w = _.map((C) => C.F2).sort((C, ae) => C - ae), M = Math.floor(_.length / 2), ye = h[M], ge = w[M];
+              p({ ...Wt(ye, ge), F1: ye, F2: ge });
               return;
             }
             b.getFloatTimeDomainData(N);
             let u = 0;
-            for (let m = 0; m < N.length; m++) u += N[m] * N[m];
+            for (let h = 0; h < N.length; h++) u += N[h] * N[h];
             if (Math.sqrt(u / N.length) > 0.015) {
               b.getFloatFrequencyData(F);
-              const { F1: m, F2: w } = jt(F, A);
-              m > 0 && w > 0 && w > m && _.push({ F1: m, F2: w });
+              const { F1: h, F2: w } = jt(F, A);
+              h > 0 && w > 0 && w > h && _.push({ F1: h, F2: w });
             }
-            h = requestAnimationFrame(O);
+            m = requestAnimationFrame(O);
           };
-          h = requestAnimationFrame(O);
+          m = requestAnimationFrame(O);
         }).catch(() => p(o()));
       }) : Promise.resolve(o());
     },
@@ -1263,13 +1267,13 @@ function de(t, e, n, a) {
   const s = t.createGain();
   return s.gain.setValueAtTime(0, e), s.gain.linearRampToValueAtTime(a, e + Math.min(0.01, r / 3)), s.gain.linearRampToValueAtTime(1e-4, e + r), o.connect(i), i.connect(s), s.connect(t.destination), o.start(e), o.stop(e + r + 0.02), e + r;
 }
-function He(t, e, n, a, r, o) {
+function We(t, e, n, a, r, o) {
   const i = a / 1e3, { source: s, filters: d, master: l } = Ue(t, n, r);
   if (s.frequency.setValueAtTime(r * 1.04, e), s.frequency.linearRampToValueAtTime(r * 0.92, e + i), o) {
-    const h = Math.min(0.09, i / 3);
+    const m = Math.min(0.09, i / 3);
     d.forEach((p, y) => {
       const g = o[y];
-      g && (p.frequency.setValueAtTime(g, e), p.frequency.exponentialRampToValueAtTime(n.formants[y], e + h));
+      g && (p.frequency.setValueAtTime(g, e), p.frequency.exponentialRampToValueAtTime(n.formants[y], e + m));
     });
   }
   const c = 0.04, f = 0.12;
@@ -1279,7 +1283,7 @@ function Kt(t, e, n, a) {
   const r = n / 1e3, o = { formants: [250, 1100, 2200], bandwidths: [80, 200, 300], gains: [1, 0.12, 0.05] }, { source: i, master: s } = Ue(t, o, a);
   return s.gain.setValueAtTime(0, e), s.gain.linearRampToValueAtTime(0.35, e + 0.02), s.gain.setValueAtTime(0.35, e + r - 0.02), s.gain.linearRampToValueAtTime(1e-4, e + r), i.start(e), i.stop(e + r + 0.05), e + r;
 }
-function We(t, e) {
+function He(t, e) {
   const n = Math.max(0, (e - t.currentTime) * 1e3) + 60;
   return new Promise((a) => setTimeout(a, n));
 }
@@ -1291,11 +1295,11 @@ async function Qt(t, e = {}) {
   let r;
   try {
     const o = a.currentTime + 0.03;
-    r = He(a, o, n, e.durationMs ?? Ve, e.pitchHz ?? qe, null);
+    r = We(a, o, n, e.durationMs ?? Ve, e.pitchHz ?? qe, null);
   } catch {
     return !1;
   }
-  return await We(a, r), !0;
+  return await He(a, r), !0;
 }
 async function je(t, e, n = {}) {
   const a = J(e);
@@ -1309,7 +1313,7 @@ async function je(t, e, n = {}) {
   } catch {
     return !1;
   }
-  return await We(r, d), !0;
+  return await He(r, d), !0;
 }
 function Xt(t, e, n, a, r, o) {
   let i = t.currentTime + 0.03, s = null;
@@ -1340,7 +1344,7 @@ function Xt(t, e, n, a, r, o) {
       break;
     }
   }
-  return He(t, i, a, r, o, s);
+  return We(t, i, a, r, o, s);
 }
 const ee = "sound-bank";
 function De(t) {
@@ -1381,7 +1385,7 @@ function Zt() {
 }
 async function te(t) {
   try {
-    return typeof indexedDB > "u" ? !1 : await W(ee, t);
+    return typeof indexedDB > "u" ? !1 : await H(ee, t);
   } catch {
     return !1;
   }
@@ -1633,12 +1637,12 @@ function Rn(t, e) {
   }, document.getElementById("save-settings-btn").onclick = () => {
     const l = parseFloat(s.value);
     localStorage.setItem("alefbet.nikudRate", String(l)), R.setNikudEmphasis({ rate: l });
-    const c = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((h) => (
+    const c = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((m) => (
       /** @type {HTMLInputElement} */
-      h.checked
-    )).map((h) => (
+      m.checked
+    )).map((m) => (
       /** @type {HTMLInputElement} */
-      h.value
+      m.value
     )), f = new URL(window.location.href);
     c.length > 0 && c.length < k.length ? f.searchParams.set("allowedNikud", c.join(",")) : f.searchParams.delete("allowedNikud"), f.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", f), e && e(t);
   }, document.getElementById("close-settings-btn").onclick = () => {
@@ -1685,7 +1689,7 @@ function An(t, e) {
     onAllCorrect: l,
     onZoneTap: c,
     showZones: f = !1,
-    autoPlayInstruction: h = !0,
+    autoPlayInstruction: m = !0,
     hintAfter: p = 3
   } = e, y = r === "soundboard", g = document.createElement("div");
   g.className = "ab-zp-wrap";
@@ -1699,7 +1703,7 @@ function An(t, e) {
     if (!(!o || N)) {
       N = !0;
       try {
-        await W(o, `zone-${u}`);
+        await H(o, `zone-${u}`);
       } catch {
       }
       N = !1;
@@ -1709,53 +1713,53 @@ function An(t, e) {
     if (_ || p <= 0 || y || F < p) return;
     _ = !0;
     const u = b.querySelectorAll(".ab-zp-zone");
-    u.forEach((m, w) => {
+    u.forEach((h, w) => {
       var M;
-      (M = a[w]) != null && M.correct && !A.has(a[w].id) && m.classList.add("ab-zp-zone--hint");
+      (M = a[w]) != null && M.correct && !A.has(a[w].id) && h.classList.add("ab-zp-zone--hint");
     }), setTimeout(() => {
-      u.forEach((m) => m.classList.remove("ab-zp-zone--hint")), _ = !1, F = 0;
+      u.forEach((h) => h.classList.remove("ab-zp-zone--hint")), _ = !1, F = 0;
     }, 1500);
   }
   return a.forEach((u) => {
-    const m = document.createElement("button");
-    if (m.className = "ab-zp-zone", (f || y) && m.classList.add("ab-zp-zone--visible"), y && m.classList.add("ab-zp-zone--soundboard"), m.style.left = `${u.x}%`, m.style.top = `${u.y}%`, m.style.width = `${u.width}%`, m.style.height = `${u.height}%`, m.setAttribute("aria-label", u.label || (u.correct ? "correct zone" : "zone")), u.shape === "polygon" && u.points && u.points.length >= 3) {
+    const h = document.createElement("button");
+    if (h.className = "ab-zp-zone", (f || y) && h.classList.add("ab-zp-zone--visible"), y && h.classList.add("ab-zp-zone--soundboard"), h.style.left = `${u.x}%`, h.style.top = `${u.y}%`, h.style.width = `${u.width}%`, h.style.height = `${u.height}%`, h.setAttribute("aria-label", u.label || (u.correct ? "correct zone" : "zone")), u.shape === "polygon" && u.points && u.points.length >= 3) {
       const w = `zp-clip-${u.id}`;
-      m.innerHTML = `<svg class="ab-zp-zone__poly-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+      h.innerHTML = `<svg class="ab-zp-zone__poly-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs><clipPath id="${w}"><polygon points="${an(u.points, u.x, u.y, u.width, u.height)}"/></clipPath></defs>
         <rect x="0" y="0" width="100" height="100" clip-path="url(#${w})" fill="transparent"/>
-      </svg>`, m.classList.add("ab-zp-zone--poly");
+      </svg>`, h.classList.add("ab-zp-zone--poly");
     }
     if (y && u.label) {
       const w = document.createElement("span");
-      w.className = "ab-zp-zone__label", w.textContent = u.label, m.appendChild(w);
+      w.className = "ab-zp-zone__label", w.textContent = u.label, h.appendChild(w);
     }
-    m.addEventListener("click", () => {
+    h.addEventListener("click", () => {
       if (c && c(u), re(u.id), y) {
-        m.classList.add("ab-zp-zone--tapped"), setTimeout(() => m.classList.remove("ab-zp-zone--tapped"), 400);
+        h.classList.add("ab-zp-zone--tapped"), setTimeout(() => h.classList.remove("ab-zp-zone--tapped"), 400);
         return;
       }
       if (!A.has(u.id))
         if (u.correct) {
-          A.add(u.id), m.classList.add("ab-zp-zone--correct"), s && s(u);
+          A.add(u.id), h.classList.add("ab-zp-zone--correct"), s && s(u);
           const w = a.filter((M) => M.correct).length;
           A.size >= w && l && l();
         } else
-          m.classList.add("ab-zp-zone--wrong"), F++, d && d(u), setTimeout(() => m.classList.remove("ab-zp-zone--wrong"), 600), O();
-    }), b.appendChild(m);
-  }), h && o && i && setTimeout(() => {
-    W(o, i).catch(() => {
+          h.classList.add("ab-zp-zone--wrong"), F++, d && d(u), setTimeout(() => h.classList.remove("ab-zp-zone--wrong"), 600), O();
+    }), b.appendChild(h);
+  }), m && o && i && setTimeout(() => {
+    H(o, i).catch(() => {
     });
   }, 400), {
     async playInstruction() {
-      return o && i ? W(o, i) : !1;
+      return o && i ? H(o, i) : !1;
     },
     async playZoneAudio(u) {
-      return o ? W(o, `zone-${u}`) : !1;
+      return o ? H(o, `zone-${u}`) : !1;
     },
     revealCorrect() {
-      b.querySelectorAll(".ab-zp-zone").forEach((u, m) => {
+      b.querySelectorAll(".ab-zp-zone").forEach((u, h) => {
         var w;
-        (w = a[m]) != null && w.correct && u.classList.add("ab-zp-zone--revealed");
+        (w = a[h]) != null && w.correct && u.classList.add("ab-zp-zone--revealed");
       });
     },
     reset() {
@@ -1823,7 +1827,7 @@ export {
   X as animate,
   Lt as attachGameAudio,
   Vt as bootstrapGame,
-  Ht as classifyFormants,
+  Wt as classifyFormants,
   En as compileSoundBank,
   tn as compileTextForKey,
   Ot as consonantOnsetSpec,
@@ -1858,13 +1862,13 @@ export {
   It as installGlobalErrorScreen,
   Zt as isOffline,
   gn as isSynthSupported,
-  Hn as isVoiceRecordingSupported,
+  Wn as isVoiceRecordingSupported,
   st as isVowelized,
   wn as keyLabel,
   De as letterKey,
   Pe as letterWithNikud,
   Me as listVoiceKeys,
-  Wn as loadVoice,
+  Hn as loadVoice,
   pn as matchNikudVowel,
   xt as mountAudioStatusBanner,
   pt as nikudBaseLetters,
@@ -1872,7 +1876,7 @@ export {
   Oe as nikudKey,
   k as nikudList,
   jn as playBlob,
-  W as playVoice,
+  H as playVoice,
   mt as preloadNikud,
   cn as randomLetters,
   dn as randomNikud,
