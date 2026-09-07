@@ -99,7 +99,7 @@ export async function startGame(container) {
         } else if (level === 1) {
           // רמז עדין: הבהוב קצר של התשובה הנכונה.
           cards?.highlight(round.targetId, 'hint');
-          schedule(() => cards?.reset(), 1600);
+          schedule(() => { if (!isAnswered()) cards?.reset(); }, 1600);
         }
         // ללא await בכוונה: שמע לעולם לא חוסם את זרימת המשחק - גם כשקול
         // המערכת איטי או תקוע, הילד יכול להמשיך לנסות מיד.

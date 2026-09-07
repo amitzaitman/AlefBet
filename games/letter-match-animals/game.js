@@ -84,7 +84,7 @@ export async function startGame(container) {
       distractors: ALL_REGULAR_WORDS,
       restartGame: startGame,
     },
-    buildRound: ({ shell, round, onCorrect, isAnswered, schedule }) => {
+    buildRound: ({ shell, round, onCorrect, isAnswered }) => {
       let feedback = null;
       let cards = null;
       function buildRoundUI(roundData) {
@@ -129,10 +129,10 @@ export async function startGame(container) {
 
       function onSelect(option, roundData, rightPanelEl) {
         if (isAnswered()) return;
-        cards.disable();
         const letterName = getLetter(roundData.target)?.nameNikud || roundData.target;
 
         if (option.id === 'correct') {
+          cards.disable();
           cards.highlight('correct', 'correct');
           feedback.correct(`!${randomPraise()} — ${getNikud(roundData.correct)} ${roundData.correctEmoji}`);
 
@@ -145,8 +145,7 @@ export async function startGame(container) {
           if (pressedEl) animate(pressedEl, 'pulse');
           feedback.hint(`${randomRetryHint()} — חַפְּשׂוּ אֶת ${letterName}`);
 
-          // ניסיון חוזר על אותן אפשרויות, בלי להזיז את המטרה לילד.
-          schedule(() => cards.reset(), 1200);
+          // הרמז נשאר מוצג, והילד יכול לבחור שוב מיד באותן אפשרויות.
         }
       }
 

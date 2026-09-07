@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "923c8aa8be923ef2022e15cec33638a96c8804e6bc0e7cf6ea450dc7698806b9",
+  "version": "4d04734e5db5a2b743b2efb949fdac43b30b1468a9645476959e2d7e651b5e32",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -47,7 +47,7 @@ self.ALEFBET_RELEASE = {
     "./games/catalog.js": "0b40fb5aebae8729b4f6440de684ad6e2540b45c02f535f5156a8a24730c9779",
     "./games/letter-match-animals/": "2664d7fe3510deb8f277d4f4b298bf91ef68f72c426429d10c589ee75c370487",
     "./games/letter-match-animals/game.css": "044ee4c668db5bff688728131075e51f03895885d69c3b4a237815ceecc1614e",
-    "./games/letter-match-animals/game.js": "1d64dc6c4e8b5861ddcb9e5f4edc05059dad76c4007972a806d11551dc600383",
+    "./games/letter-match-animals/game.js": "24a164cb2ab85db330d8968766e28c6980784de782e525c0ee9be5b354f2ac8e",
     "./games/letter-match-animals/index.html": "2664d7fe3510deb8f277d4f4b298bf91ef68f72c426429d10c589ee75c370487",
     "./games/nikud-match/": "852b39b1923b30a3d3f9c1cd8ffd5f2acd3f85fcbb91e3725505856a49ffb147",
     "./games/nikud-match/game.css": "78db989fba4eeb2ec909ed90e10e7b68857f018d3c9eec40bb6cf6e9f8886cb4",
@@ -63,7 +63,7 @@ self.ALEFBET_RELEASE = {
     "./games/sound-studio/index.html": "42c5e28c285ef24c0b230bca4ca5b906e5aa89224ff3209425c63efb0e5bd975",
     "./games/syllable-read/": "55246cea53f33d126031063d05e5674865f8aa1a12262cebfcadbd2b308c1b19",
     "./games/syllable-read/game.css": "c78e53c64e0f40a762ac47b2cfe2f8272954145a9c8fb7817be6b70a04c0d242",
-    "./games/syllable-read/game.js": "cc4b6cecd54174e40b9bbed7efe87c4eb1f5880b26d7607629039b106a27e113",
+    "./games/syllable-read/game.js": "9793e9945837f6d49b9adb120d46ed1ac82676527e0e7529a7710e7e9f8389e0",
     "./games/syllable-read/index.html": "55246cea53f33d126031063d05e5674865f8aa1a12262cebfcadbd2b308c1b19",
     "./index.html": "3fe84a2a54358274a633c6591fab48bfecdc56d67967daae96feacbd87b04943",
     "./manifest.webmanifest": "61199ec6fe79202159f986f7fd7fd2058697d890788a97993b4db5eafef9c9d4"

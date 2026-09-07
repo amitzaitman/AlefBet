@@ -74,3 +74,31 @@ test.describe('syllable-read', () => {
     }).toPass({ timeout: 10_000 });
   });
 });
+
+
+test('a pending hint cannot unlock cards after a correct answer', async ({ page }) => {
+  await blockGoogleTTS(page);
+  await page.clock.install();
+  await page.goto(GAME_URL);
+  const cards = page.locator('.option-card');
+  await expect(cards).toHaveCount(3);
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  const ids = await cards.evaluateAll(elements => elements.map(el => el.dataset.id));
+  // The target shares its letter with one distractor and its vowel with the other.
+  const target = ids.find(id => {
+    const [letter, vowel] = id.split(':');
+    return ids.filter(other => other.split(':')[0] === letter).length === 2
+      && ids.filter(other => other.split(':')[1] === vowel).length === 2;
+  });
+  expect(target).toBeTruthy();
+  const wrongIndex = ids.findIndex(id => id !== target);
+  await cards.nth(wrongIndex).dispatchEvent('click');
+  await cards.nth(wrongIndex).dispatchEvent('click');
+  await expect(page.locator('.option-card--hint')).toHaveCount(1);
+  await page.clock.runFor(800);
+  await cards.nth(ids.indexOf(target)).dispatchEvent('click');
+  await page.clock.runFor(900);
+  expect(await cards.evaluateAll(elements => elements.every(el => el.disabled))).toBe(true);
+  await page.clock.runFor(400);
+  expect(await cards.evaluateAll(elements => elements.every(el => !el.disabled))).toBe(true);
+});
