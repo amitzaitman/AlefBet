@@ -15,16 +15,27 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:8080',
     trace: 'retain-on-failure',
-    // סביבות מנוהלות (Claude Code on the web וכד') מספקות Chromium מותקן מראש
-    // בגרסה שונה מזו שהחבילה מצפה לה; PW_CHROMIUM_PATH עוקף את ההורדה.
-    ...(process.env.PW_CHROMIUM_PATH
-      ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } }
-      : {}),
+
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      testIgnore: /mobile\.spec\.js/,
+      use: { ...devices['Desktop Chrome'],
+        ...(process.env.PW_CHROMIUM_PATH ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } } : {}),
+      },
+    },
+    {
+      name: 'mobile-chromium',
+      testMatch: /mobile\.spec\.js/,
+      use: { ...devices['Pixel 7'],
+        ...(process.env.PW_CHROMIUM_PATH ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } } : {}),
+      },
+    },
+    {
+      name: 'mobile-webkit',
+      testMatch: /mobile\.spec\.js|pwa-upgrade\.spec\.js/,
+      use: { ...devices['iPhone 13'] },
     },
   ],
   webServer: {
