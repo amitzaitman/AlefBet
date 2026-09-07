@@ -255,3 +255,26 @@ test('phone choices fill the panel and remain inside the screen', async ({ page 
     expect(box.x + box.width).toBeLessThanOrEqual(390);
   }
 });
+
+
+test('failed editor save stays editable and permits export and retry', async ({ page }) => {
+  await blockGoogleTTS(page);
+  await page.goto(GAME_URL);
+  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
+  await page.locator('.ab-editor-btn--add').click();
+  await page.evaluate(() => {
+    window.originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = () => { throw new DOMException('Full', 'QuotaExceededError'); };
+  });
+  await page.getByRole('button', { name: '💾 שמור', exact: true }).click();
+  await expect(page.locator('.ab-editor-save-status')).toContainText('לא נשמר');
+  await expect(page.locator('.ab-editor-toast')).toHaveCount(0);
+  await page.getByRole('button', { name: '▶ שחק', exact: true }).click();
+  await expect(page.locator('.ab-editor-active')).toHaveCount(1);
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: '⬇ ייצוא', exact: true }).click();
+  expect((await download).suggestedFilename()).toBe('letter-match-animals-rounds.json');
+  await page.evaluate(() => { Storage.prototype.setItem = window.originalSetItem; });
+  await page.getByRole('button', { name: '💾 שמור', exact: true }).click();
+  await expect(page.locator('.ab-editor-save-status')).toHaveText('נשמר');
+});

@@ -1671,3 +1671,31 @@
     font-size: 12px;
   }
 }
+
+
+/* Keep edit actions reachable above both fixed panels, including wrapped notices. */
+.ab-editor-active .ab-editor-toolbar {
+  position: fixed;
+  inset: 0 0 auto;
+  transform: none;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 8px;
+  background: var(--ab-editor-surface);
+  box-shadow: var(--ab-editor-shadow);
+  z-index: calc(var(--ab-editor-z) + 1);
+}
+
+.ab-editor-save-status {
+  flex-basis: 100%;
+  font-size: 14px;
+  color: var(--ab-editor-text);
+}
+
+.ab-editor-save-status:empty { display: none; }
+
+.ab-editor-active .ab-editor-nav,
+.ab-editor-active .ab-editor-inspector {
+  top: var(--ab-editor-toolbar-h);
+  height: calc(100% - var(--ab-editor-toolbar-h));
+}

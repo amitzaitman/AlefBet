@@ -4,7 +4,7 @@
  * @template T
  * @param {string} storageKey - המפתח לשמירה ב-localStorage
  * @param {T} defaultValue - ערך ברירת המחדל אם אין נתונים שמורים
- * @returns {{ get: () => T, set: (v: T) => void, update: (fn: (v: T) => T) => void, subscribe: (fn: (v: T) => void) => () => void }}
+ * @returns {{ get: () => T, set: (v: T) => boolean, update: (fn: (v: T) => T) => boolean, subscribe: (fn: (v: T) => void) => () => void }}
  *
  * @example
  * const state = createLocalState('myApp:tasks', []);
@@ -39,8 +39,10 @@ export function createLocalState(storageKey, defaultValue) {
       localStorage.setItem(storageKey, JSON.stringify(newVal));
     } catch (err) {
       console.warn(`[createLocalState] שגיאה בשמירת "${storageKey}":`, err);
+      return false;
     }
     subscribers.forEach(fn => fn(newVal));
+    return true;
   }
 
   /**
@@ -48,7 +50,7 @@ export function createLocalState(storageKey, defaultValue) {
    * @param {(v: T) => T} fn - פונקציה שמקבלת את הערך הנוכחי ומחזירה ערך חדש
    */
   function update(fn) {
-    set(fn(get()));
+    return set(fn(get()));
   }
 
   /**

@@ -1,5 +1,5 @@
-import { u as Xe, g as Ae, c as Ye, l as Ze, G as Je, e as Fe, a as Me, p as W, s as et } from "./drag-CGFmXd-t.js";
-import { b as In, d as Bn, f as $n, h as qn, i as Vn, j as Un, k as Hn, m as Wn, n as jn } from "./drag-CGFmXd-t.js";
+import { u as Xe, g as Ae, c as Ye, l as Ze, G as Je, e as Fe, a as Me, p as W, s as et } from "./drag-CI6877qN.js";
+import { b as In, d as Bn, f as $n, h as qn, i as Vn, j as Un, k as Hn, m as Wn, n as jn } from "./drag-CI6877qN.js";
 class tt {
   constructor() {
     this._handlers = {};
@@ -972,7 +972,7 @@ async function Vt(t, e) {
   if (e.onBeforeHide && (await e.onBeforeHide() === !1 || ce.get(t) !== n))
     return { shell: null, activeRounds: [], gameData: null, aborted: !0 };
   $t(t);
-  const a = e.editor ? Ze(e.gameId) : null, r = a != null && a.rounds.length ? a.rounds : e.defaultRounds ?? [], o = new rt(t, {
+  const a = e.editor ? Ze(e.gameId, e.editor.content) : null, r = a != null && a.rounds.length ? a.rounds : e.defaultRounds ?? [], o = new rt(t, {
     totalRounds: e.totalRounds ?? r.length,
     title: e.title,
     gameId: e.gameId
@@ -984,7 +984,7 @@ async function Vt(t, e) {
       title: e.editor.title ?? e.title,
       type: e.editor.type ?? "multiple-choice"
     };
-    i = Je.fromRoundsArray(e.gameId, r, s, e.editor.distractors ?? []), qt(o, i, { restartGame: e.editor.restartGame });
+    i = Je.fromRoundsArray(e.gameId, r, s, e.editor.distractors ?? [], e.editor.content), qt(o, i, { restartGame: e.editor.restartGame });
   }
   return { shell: o, activeRounds: r, gameData: i, aborted: !1 };
 }

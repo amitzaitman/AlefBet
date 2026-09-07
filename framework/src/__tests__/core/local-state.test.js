@@ -87,3 +87,19 @@ describe('createLocalState — subscribe', () => {
     expect(b).toHaveBeenCalledWith(99);
   });
 });
+
+
+it('reports failed persistence without publishing an unsaved value', () => {
+  const s = createLocalState('test:quota', 0);
+  s.set(1);
+  const listener = vi.fn();
+  s.subscribe(listener);
+  const fail = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new DOMException('Full', 'QuotaExceededError');
+  });
+  try {
+    expect(s.update(n => n + 1)).toBe(false);
+    expect(s.get()).toBe(1);
+    expect(listener).not.toHaveBeenCalled();
+  } finally { fail.mockRestore(); }
+});

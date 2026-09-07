@@ -46,8 +46,16 @@ export class GameEditor {
   private _zoneEditor: ZoneEditor | null = null;
   private _zoneModal: HTMLElement | null = null;
   private _toolbarFrame: number;
+  private _toolbarObserver: ResizeObserver | null = null;
+  private _dirty = false;
+  private _unsubscribe: () => void;
+  private _saveStatus: HTMLElement | null = null;
 
   constructor(container: HTMLElement, gameData: GameData, options: GameEditorOptions = {}) {
+    this._unsubscribe = gameData.onChange(() => {
+      this._dirty = true;
+      if (this._saveStatus) this._saveStatus.textContent = 'שינויים שלא נשמרו';
+    });
     this._container   = container;
     this._gameData    = gameData;
     this._restartGame = options.restartGame;
@@ -57,6 +65,9 @@ export class GameEditor {
 
   /** הסרת מאזינים ורכיבי עריכה כשהמשחק מסתיים או מוחלף. */
   destroy() {
+    this._toolbarObserver?.disconnect();
+    this._container.style.removeProperty('--ab-editor-toolbar-h');
+    this._unsubscribe();
     cancelAnimationFrame(this._toolbarFrame);
     this._detachShortcuts();
     this._closeZoneEditor();
@@ -112,10 +123,22 @@ export class GameEditor {
       this._makeBtn('🎤 קול',  'ab-editor-btn--audio',  () => this._openAudioManager()),
       this._makeBtn('⬇ ייצוא','ab-editor-btn--export',  () => exportGameDataAsJSON(this._gameData)),
     );
+    this._saveStatus = document.createElement('span');
+    this._saveStatus.setAttribute('role', 'status');
+    this._saveStatus.className = 'ab-editor-save-status';
+    this._saveStatus.textContent = this._dirty ? 'שינויים שלא נשמרו' : '';
+    this._toolbar.appendChild(this._saveStatus);
+    this._toolbarObserver?.disconnect();
+    this._toolbarObserver = new ResizeObserver(() => {
+      if (this._toolbar) this._container.style.setProperty('--ab-editor-toolbar-h', `${this._toolbar.offsetHeight}px`);
+    });
+    this._toolbarObserver.observe(this._toolbar);
     this._refreshUndoButtons();
   }
 
   private _setToolbarPlayMode() {
+    this._toolbarObserver?.disconnect();
+    this._container.style.removeProperty('--ab-editor-toolbar-h');
     if (!this._toolbar) return;
     this._toolbar.innerHTML = '';
     this._undoBtn = null;
@@ -160,6 +183,7 @@ export class GameEditor {
 
   enterPlayMode() {
     if (this._mode === 'play') return;
+    if (this._dirty && !this._save()) return;
     this._mode = 'play';
     this._container.classList.remove('ab-editor-active');
     this._setToolbarPlayMode();
@@ -389,8 +413,20 @@ export class GameEditor {
   private _openAudioManager() { showAudioManager(this._gameData.id, this._gameData); }
 
   private _save() {
-    saveGameData(this._gameData);
+    if (!this._gameData.validate()) {
+      this._dirty = true;
+      if (this._saveStatus) this._saveStatus.textContent = 'לא נשמר. בדקו את התוכן בכל הסיבובים.';
+      return false;
+    }
+    if (!saveGameData(this._gameData)) {
+      this._dirty = true;
+      if (this._saveStatus) this._saveStatus.textContent = 'לא נשמר. נסו שוב או הורידו עותק בכפתור ייצוא.';
+      return false;
+    }
+    this._dirty = false;
+    if (this._saveStatus) this._saveStatus.textContent = 'נשמר';
     this._showToast('✅ נשמר!');
+    return true;
   }
 
   private _showToast(message: string) {

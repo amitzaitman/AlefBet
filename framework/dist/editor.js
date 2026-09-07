@@ -1,5 +1,5 @@
-import { b as Vt, d as Ht, f as lt, c as Yt, o as Gt, q as Xt } from "./drag-CGFmXd-t.js";
-import { G as aa, r as ca, l as ua } from "./drag-CGFmXd-t.js";
+import { b as Vt, d as Ht, f as lt, c as Yt, o as Gt, q as Xt } from "./drag-CI6877qN.js";
+import { G as aa, r as ca, l as ua } from "./drag-CI6877qN.js";
 function Kt(e, { onClick: t } = {}) {
   const n = document.createElement("div");
   n.className = "ab-editor-overlay", t && n.addEventListener("pointerdown", t);
@@ -32,8 +32,8 @@ function qt(e, t, { onSelectRound: n, onAddRound: o, onDuplicateRound: r, onMove
     m.className = "ab-editor-nav__thumb", C.id === l && m.classList.add("ab-editor-nav__thumb--active"), m.setAttribute("role", "button"), m.setAttribute("tabindex", "0"), m.setAttribute("aria-label", `סיבוב ${S + 1}`), m.dataset.roundId = C.id, C.image && (m.style.backgroundImage = `url(${C.image})`, m.classList.add("ab-editor-nav__thumb--has-img"));
     const k = document.createElement("div");
     k.className = "ab-editor-nav__grip", k.innerHTML = "⠿", k.setAttribute("aria-hidden", "true"), k.title = "גרור לשינוי סדר", m.appendChild(k);
-    const g = document.createElement("div");
-    if (g.className = "ab-editor-nav__num", g.textContent = String(S + 1), m.appendChild(g), C.correctEmoji && !C.image) {
+    const b = document.createElement("div");
+    if (b.className = "ab-editor-nav__num", b.textContent = String(S + 1), m.appendChild(b), C.correctEmoji && !C.image) {
       const z = document.createElement("div");
       z.className = "ab-editor-nav__emoji", z.textContent = C.correctEmoji, m.appendChild(z);
     }
@@ -121,7 +121,7 @@ function pt(e) {
 function Ce(e, t) {
   return typeof t == "bigint" ? t.toString() : t;
 }
-function Ie(e) {
+function Oe(e) {
   return {
     get value() {
       {
@@ -131,7 +131,7 @@ function Ie(e) {
     }
   };
 }
-function Oe(e) {
+function Ie(e) {
   return e == null;
 }
 function xe(e) {
@@ -192,7 +192,7 @@ const ft = "captureStackTrace" in Error ? Error.captureStackTrace : (...e) => {
 function me(e) {
   return typeof e == "object" && e !== null && !Array.isArray(e);
 }
-const en = Ie(() => {
+const en = Oe(() => {
   var e;
   if (typeof navigator < "u" && ((e = navigator == null ? void 0 : navigator.userAgent) != null && e.includes("Cloudflare")))
     return !1;
@@ -427,7 +427,7 @@ const _t = (e, t) => {
     value: () => e.message,
     enumerable: !1
   });
-}, gt = h("$ZodError", _t), bt = h("$ZodError", _t, { Parent: Error });
+}, bt = h("$ZodError", _t), gt = h("$ZodError", _t, { Parent: Error });
 function hn(e, t = (n) => n.message) {
   const n = {}, o = [];
   for (const r of e.issues)
@@ -478,19 +478,19 @@ const Ae = (e) => (t, n, o, r) => {
     throw new re();
   return i.issues.length ? {
     success: !1,
-    error: new (e ?? gt)(i.issues.map((s) => q(s, r, K())))
+    error: new (e ?? bt)(i.issues.map((s) => q(s, r, K())))
   } : { success: !0, data: i.value };
-}, fn = /* @__PURE__ */ ke(bt), ze = (e) => async (t, n, o) => {
+}, fn = /* @__PURE__ */ ke(gt), ze = (e) => async (t, n, o) => {
   const r = o ? Object.assign(o, { async: !0 }) : { async: !0 };
   let i = t._zod.run({ value: n, issues: [] }, r);
   return i instanceof Promise && (i = await i), i.issues.length ? {
     success: !1,
     error: new e(i.issues.map((s) => q(s, r, K())))
   } : { success: !0, data: i.value };
-}, mn = /* @__PURE__ */ ze(bt), _n = (e) => (t, n, o) => {
+}, mn = /* @__PURE__ */ ze(gt), _n = (e) => (t, n, o) => {
   const r = o ? Object.assign(o, { direction: "backward" }) : { direction: "backward" };
   return Ae(e)(t, n, r);
-}, gn = (e) => (t, n, o) => Ae(e)(t, n, o), bn = (e) => async (t, n, o) => {
+}, bn = (e) => (t, n, o) => Ae(e)(t, n, o), gn = (e) => async (t, n, o) => {
   const r = o ? Object.assign(o, { direction: "backward" }) : { direction: "backward" };
   return Re(e)(t, n, r);
 }, vn = (e) => async (t, n, o) => Re(e)(t, n, o), yn = (e) => (t, n, o) => {
@@ -499,7 +499,7 @@ const Ae = (e) => (t, n, o, r) => {
 }, wn = (e) => (t, n, o) => ke(e)(t, n, o), kn = (e) => async (t, n, o) => {
   const r = o ? Object.assign(o, { direction: "backward" }) : { direction: "backward" };
   return ze(e)(t, n, r);
-}, zn = (e) => async (t, n, o) => ze(e)(t, n, o), En = /^[cC][^\s-]{8,}$/, $n = /^[0-9a-z]+$/, Zn = /^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$/, Sn = /^[0-9a-vA-V]{20}$/, Cn = /^[A-Za-z0-9]{27}$/, Nn = /^[a-zA-Z0-9_-]{21}$/, Tn = /^P(?:(\d+W)|(?!.*W)(?=\d|T\d)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+([.,]\d+)?S)?)?)$/, In = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/, Fe = (e) => e ? new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${e}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`) : /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/, On = /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/, xn = "^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$";
+}, zn = (e) => async (t, n, o) => ze(e)(t, n, o), En = /^[cC][^\s-]{8,}$/, $n = /^[0-9a-z]+$/, Zn = /^[0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{26}$/, Sn = /^[0-9a-vA-V]{20}$/, Cn = /^[A-Za-z0-9]{27}$/, Nn = /^[a-zA-Z0-9_-]{21}$/, Tn = /^P(?:(\d+W)|(?!.*W)(?=\d|T\d)(\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+([.,]\d+)?S)?)?)$/, On = /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$/, Fe = (e) => e ? new RegExp(`^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-${e}[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$`) : /^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/, In = /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/, xn = "^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$";
 function Pn() {
   return new RegExp(xn, "u");
 }
@@ -643,7 +643,7 @@ const Jn = (e) => {
   var n;
   B.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
     const r = o.value;
-    return !Oe(r) && r.length !== void 0;
+    return !Ie(r) && r.length !== void 0;
   }), e._zod.onattach.push((o) => {
     const r = o._zod.bag.maximum ?? Number.POSITIVE_INFINITY;
     t.maximum < r && (o._zod.bag.maximum = t.maximum);
@@ -666,7 +666,7 @@ const Jn = (e) => {
   var n;
   B.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
     const r = o.value;
-    return !Oe(r) && r.length !== void 0;
+    return !Ie(r) && r.length !== void 0;
   }), e._zod.onattach.push((o) => {
     const r = o._zod.bag.minimum ?? Number.NEGATIVE_INFINITY;
     t.minimum > r && (o._zod.bag.minimum = t.minimum);
@@ -689,7 +689,7 @@ const Jn = (e) => {
   var n;
   B.init(e, t), (n = e._zod.def).when ?? (n.when = (o) => {
     const r = o.value;
-    return !Oe(r) && r.length !== void 0;
+    return !Ie(r) && r.length !== void 0;
   }), e._zod.onattach.push((o) => {
     const r = o._zod.bag;
     r.minimum = t.length, r.maximum = t.length, r.length = t.length;
@@ -918,10 +918,10 @@ const co = {
       inst: e
     }), o;
   };
-}), O = /* @__PURE__ */ h("$ZodStringFormat", (e, t) => {
+}), I = /* @__PURE__ */ h("$ZodStringFormat", (e, t) => {
   Ee.init(e, t), Le.init(e, t);
 }), uo = /* @__PURE__ */ h("$ZodGUID", (e, t) => {
-  t.pattern ?? (t.pattern = In), O.init(e, t);
+  t.pattern ?? (t.pattern = On), I.init(e, t);
 }), lo = /* @__PURE__ */ h("$ZodUUID", (e, t) => {
   if (t.version) {
     const o = {
@@ -939,11 +939,11 @@ const co = {
     t.pattern ?? (t.pattern = Fe(o));
   } else
     t.pattern ?? (t.pattern = Fe());
-  O.init(e, t);
+  I.init(e, t);
 }), ho = /* @__PURE__ */ h("$ZodEmail", (e, t) => {
-  t.pattern ?? (t.pattern = On), O.init(e, t);
+  t.pattern ?? (t.pattern = In), I.init(e, t);
 }), po = /* @__PURE__ */ h("$ZodURL", (e, t) => {
-  O.init(e, t), e._zod.check = (n) => {
+  I.init(e, t), e._zod.check = (n) => {
     try {
       const o = n.value.trim(), r = new URL(o);
       t.hostname && (t.hostname.lastIndex = 0, t.hostname.test(r.hostname) || n.issues.push({
@@ -975,31 +975,31 @@ const co = {
     }
   };
 }), fo = /* @__PURE__ */ h("$ZodEmoji", (e, t) => {
-  t.pattern ?? (t.pattern = Pn()), O.init(e, t);
+  t.pattern ?? (t.pattern = Pn()), I.init(e, t);
 }), mo = /* @__PURE__ */ h("$ZodNanoID", (e, t) => {
-  t.pattern ?? (t.pattern = Nn), O.init(e, t);
+  t.pattern ?? (t.pattern = Nn), I.init(e, t);
 }), _o = /* @__PURE__ */ h("$ZodCUID", (e, t) => {
-  t.pattern ?? (t.pattern = En), O.init(e, t);
-}), go = /* @__PURE__ */ h("$ZodCUID2", (e, t) => {
-  t.pattern ?? (t.pattern = $n), O.init(e, t);
-}), bo = /* @__PURE__ */ h("$ZodULID", (e, t) => {
-  t.pattern ?? (t.pattern = Zn), O.init(e, t);
+  t.pattern ?? (t.pattern = En), I.init(e, t);
+}), bo = /* @__PURE__ */ h("$ZodCUID2", (e, t) => {
+  t.pattern ?? (t.pattern = $n), I.init(e, t);
+}), go = /* @__PURE__ */ h("$ZodULID", (e, t) => {
+  t.pattern ?? (t.pattern = Zn), I.init(e, t);
 }), vo = /* @__PURE__ */ h("$ZodXID", (e, t) => {
-  t.pattern ?? (t.pattern = Sn), O.init(e, t);
+  t.pattern ?? (t.pattern = Sn), I.init(e, t);
 }), yo = /* @__PURE__ */ h("$ZodKSUID", (e, t) => {
-  t.pattern ?? (t.pattern = Cn), O.init(e, t);
+  t.pattern ?? (t.pattern = Cn), I.init(e, t);
 }), wo = /* @__PURE__ */ h("$ZodISODateTime", (e, t) => {
-  t.pattern ?? (t.pattern = Fn(t)), O.init(e, t);
+  t.pattern ?? (t.pattern = Fn(t)), I.init(e, t);
 }), ko = /* @__PURE__ */ h("$ZodISODate", (e, t) => {
-  t.pattern ?? (t.pattern = Un), O.init(e, t);
+  t.pattern ?? (t.pattern = Un), I.init(e, t);
 }), zo = /* @__PURE__ */ h("$ZodISOTime", (e, t) => {
-  t.pattern ?? (t.pattern = Bn(t)), O.init(e, t);
+  t.pattern ?? (t.pattern = Bn(t)), I.init(e, t);
 }), Eo = /* @__PURE__ */ h("$ZodISODuration", (e, t) => {
-  t.pattern ?? (t.pattern = Tn), O.init(e, t);
+  t.pattern ?? (t.pattern = Tn), I.init(e, t);
 }), $o = /* @__PURE__ */ h("$ZodIPv4", (e, t) => {
-  t.pattern ?? (t.pattern = An), O.init(e, t), e._zod.bag.format = "ipv4";
+  t.pattern ?? (t.pattern = An), I.init(e, t), e._zod.bag.format = "ipv4";
 }), Zo = /* @__PURE__ */ h("$ZodIPv6", (e, t) => {
-  t.pattern ?? (t.pattern = Rn), O.init(e, t), e._zod.bag.format = "ipv6", e._zod.check = (n) => {
+  t.pattern ?? (t.pattern = Rn), I.init(e, t), e._zod.bag.format = "ipv6", e._zod.check = (n) => {
     try {
       new URL(`http://[${n.value}]`);
     } catch {
@@ -1013,9 +1013,9 @@ const co = {
     }
   };
 }), So = /* @__PURE__ */ h("$ZodCIDRv4", (e, t) => {
-  t.pattern ?? (t.pattern = Ln), O.init(e, t);
+  t.pattern ?? (t.pattern = Ln), I.init(e, t);
 }), Co = /* @__PURE__ */ h("$ZodCIDRv6", (e, t) => {
-  t.pattern ?? (t.pattern = jn), O.init(e, t), e._zod.check = (n) => {
+  t.pattern ?? (t.pattern = jn), I.init(e, t), e._zod.check = (n) => {
     const o = n.value.split("/");
     try {
       if (o.length !== 2)
@@ -1052,7 +1052,7 @@ function Zt(e) {
   }
 }
 const No = /* @__PURE__ */ h("$ZodBase64", (e, t) => {
-  t.pattern ?? (t.pattern = Dn), O.init(e, t), e._zod.bag.contentEncoding = "base64", e._zod.check = (n) => {
+  t.pattern ?? (t.pattern = Dn), I.init(e, t), e._zod.bag.contentEncoding = "base64", e._zod.check = (n) => {
     Zt(n.value) || n.issues.push({
       code: "invalid_format",
       format: "base64",
@@ -1068,8 +1068,8 @@ function To(e) {
   const t = e.replace(/[-_]/g, (o) => o === "-" ? "+" : "/"), n = t.padEnd(Math.ceil(t.length / 4) * 4, "=");
   return Zt(n);
 }
-const Io = /* @__PURE__ */ h("$ZodBase64URL", (e, t) => {
-  t.pattern ?? (t.pattern = vt), O.init(e, t), e._zod.bag.contentEncoding = "base64url", e._zod.check = (n) => {
+const Oo = /* @__PURE__ */ h("$ZodBase64URL", (e, t) => {
+  t.pattern ?? (t.pattern = vt), I.init(e, t), e._zod.bag.contentEncoding = "base64url", e._zod.check = (n) => {
     To(n.value) || n.issues.push({
       code: "invalid_format",
       format: "base64url",
@@ -1078,8 +1078,8 @@ const Io = /* @__PURE__ */ h("$ZodBase64URL", (e, t) => {
       continue: !t.abort
     });
   };
-}), Oo = /* @__PURE__ */ h("$ZodE164", (e, t) => {
-  t.pattern ?? (t.pattern = Mn), O.init(e, t);
+}), Io = /* @__PURE__ */ h("$ZodE164", (e, t) => {
+  t.pattern ?? (t.pattern = Mn), I.init(e, t);
 });
 function xo(e, t = null) {
   try {
@@ -1096,7 +1096,7 @@ function xo(e, t = null) {
   }
 }
 const Po = /* @__PURE__ */ h("$ZodJWT", (e, t) => {
-  O.init(e, t), e._zod.check = (n) => {
+  I.init(e, t), e._zod.check = (n) => {
     xo(n.value, t.alg) || n.issues.push({
       code: "invalid_format",
       format: "jwt",
@@ -1232,7 +1232,7 @@ const Mo = /* @__PURE__ */ h("$ZodObject", (e, t) => {
       }
     });
   }
-  const o = Ie(() => Ct(t));
+  const o = Oe(() => Ct(t));
   T(e._zod, "propValues", () => {
     const a = t.shape, c = {};
     for (const u in a) {
@@ -1267,11 +1267,11 @@ const Mo = /* @__PURE__ */ h("$ZodObject", (e, t) => {
   };
 }), Uo = /* @__PURE__ */ h("$ZodObjectJIT", (e, t) => {
   Mo.init(e, t);
-  const n = e._zod.parse, o = Ie(() => Ct(t)), r = (_) => {
+  const n = e._zod.parse, o = Oe(() => Ct(t)), r = (_) => {
     var m;
     const f = new ao(["shape", "payload", "ctx"]), v = o.value, w = (k) => {
-      const g = Be(k);
-      return `shape[${g}]._zod.run({ value: input[${g}], issues: [] }, ctx)`;
+      const b = Be(k);
+      return `shape[${b}]._zod.run({ value: input[${b}], issues: [] }, ctx)`;
     };
     f.write("const input = payload.value;");
     const N = /* @__PURE__ */ Object.create(null);
@@ -1280,46 +1280,46 @@ const Mo = /* @__PURE__ */ h("$ZodObject", (e, t) => {
       N[k] = `key_${C++}`;
     f.write("const newResult = {};");
     for (const k of v.keys) {
-      const g = N[k], $ = Be(k), z = _[k], J = ((m = z == null ? void 0 : z._zod) == null ? void 0 : m.optout) === "optional";
-      f.write(`const ${g} = ${w(k)};`), J ? f.write(`
-        if (${g}.issues.length) {
+      const b = N[k], $ = Be(k), z = _[k], J = ((m = z == null ? void 0 : z._zod) == null ? void 0 : m.optout) === "optional";
+      f.write(`const ${b} = ${w(k)};`), J ? f.write(`
+        if (${b}.issues.length) {
           if (${$} in input) {
-            payload.issues = payload.issues.concat(${g}.issues.map(iss => ({
+            payload.issues = payload.issues.concat(${b}.issues.map(iss => ({
               ...iss,
               path: iss.path ? [${$}, ...iss.path] : [${$}]
             })));
           }
         }
         
-        if (${g}.value === undefined) {
+        if (${b}.value === undefined) {
           if (${$} in input) {
             newResult[${$}] = undefined;
           }
         } else {
-          newResult[${$}] = ${g}.value;
+          newResult[${$}] = ${b}.value;
         }
         
       `) : f.write(`
-        if (${g}.issues.length) {
-          payload.issues = payload.issues.concat(${g}.issues.map(iss => ({
+        if (${b}.issues.length) {
+          payload.issues = payload.issues.concat(${b}.issues.map(iss => ({
             ...iss,
             path: iss.path ? [${$}, ...iss.path] : [${$}]
           })));
         }
         
-        if (${g}.value === undefined) {
+        if (${b}.value === undefined) {
           if (${$} in input) {
             newResult[${$}] = undefined;
           }
         } else {
-          newResult[${$}] = ${g}.value;
+          newResult[${$}] = ${b}.value;
         }
         
       `);
     }
     f.write("payload.value = newResult;"), f.write("return payload;");
     const S = f.compile();
-    return (k, g) => S(_, k, g);
+    return (k, b) => S(_, k, b);
   };
   let i;
   const s = me, a = !ht.jitless, u = a && en.value, l = t.catchall;
@@ -1832,7 +1832,7 @@ function _r(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function gr(e, t) {
+function br(e, t) {
   return new e({
     type: "string",
     format: "ksuid",
@@ -1842,7 +1842,7 @@ function gr(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function br(e, t) {
+function gr(e, t) {
   return new e({
     type: "string",
     format: "ipv4",
@@ -1970,7 +1970,7 @@ function Tr(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function Ir(e, t) {
+function Or(e, t) {
   return new e({
     type: "number",
     check: "number_format",
@@ -1980,7 +1980,7 @@ function Ir(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function Or(e, t) {
+function Ir(e, t) {
   return new e({
     type: "boolean",
     ...y(t)
@@ -2044,7 +2044,7 @@ function nt(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function It(e, t) {
+function Ot(e, t) {
   return new qn({
     check: "max_length",
     ...y(t),
@@ -2052,7 +2052,7 @@ function It(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function ge(e, t) {
+function be(e, t) {
   return new Wn({
     check: "min_length",
     ...y(t),
@@ -2060,7 +2060,7 @@ function ge(e, t) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function Ot(e, t) {
+function It(e, t) {
   return new Qn({
     check: "length_equals",
     ...y(t),
@@ -2364,8 +2364,8 @@ function At(e, t) {
       value: {
         ...t["~standard"],
         jsonSchema: {
-          input: be(t, "input", e.processors),
-          output: be(t, "output", e.processors)
+          input: ge(t, "input", e.processors),
+          output: ge(t, "output", e.processors)
         }
       },
       enumerable: !1,
@@ -2420,7 +2420,7 @@ function M(e, t) {
 const Kr = (e, t = {}) => (n) => {
   const o = xt({ ...n, processors: t });
   return D(e, o), Pt(o, e), At(o, e);
-}, be = (e, t, n = {}) => (o) => {
+}, ge = (e, t, n = {}) => (o) => {
   const { libraryOptions: r, target: i } = o ?? {}, s = xt({ ...r ?? {}, target: i, io: t, processors: n });
   return D(e, s), Pt(s, e), At(s, e);
 }, qr = {
@@ -2559,7 +2559,7 @@ const Kr = (e, t = {}) => (n) => {
   D(i, t, o);
   const s = t.seen.get(e);
   s.ref = i;
-}, gi = (e, t, n, o) => {
+}, bi = (e, t, n, o) => {
   const r = e._zod.def;
   D(r.innerType, t, o);
   const i = t.seen.get(e);
@@ -2569,11 +2569,11 @@ const Kr = (e, t = {}) => (n) => {
   D(r.innerType, t, o);
   const i = t.seen.get(e);
   i.ref = r.innerType;
-}, bi = /* @__PURE__ */ h("ZodISODateTime", (e, t) => {
+}, gi = /* @__PURE__ */ h("ZodISODateTime", (e, t) => {
   wo.init(e, t), x.init(e, t);
 });
 function vi(e) {
-  return /* @__PURE__ */ Zr(bi, e);
+  return /* @__PURE__ */ Zr(gi, e);
 }
 const yi = /* @__PURE__ */ h("ZodISODate", (e, t) => {
   ko.init(e, t), x.init(e, t);
@@ -2594,7 +2594,7 @@ function $i(e) {
   return /* @__PURE__ */ Nr(Ei, e);
 }
 const Zi = (e, t) => {
-  gt.init(e, t), e.name = "ZodError", Object.defineProperties(e, {
+  bt.init(e, t), e.name = "ZodError", Object.defineProperties(e, {
     format: {
       value: (n) => pn(e, n)
       // enumerable: false,
@@ -2624,10 +2624,10 @@ const Zi = (e, t) => {
   });
 }, F = h("ZodError", Zi, {
   Parent: Error
-}), Si = /* @__PURE__ */ Ae(F), Ci = /* @__PURE__ */ Re(F), Ni = /* @__PURE__ */ ke(F), Ti = /* @__PURE__ */ ze(F), Ii = /* @__PURE__ */ _n(F), Oi = /* @__PURE__ */ gn(F), xi = /* @__PURE__ */ bn(F), Pi = /* @__PURE__ */ vn(F), Ai = /* @__PURE__ */ yn(F), Ri = /* @__PURE__ */ wn(F), Li = /* @__PURE__ */ kn(F), ji = /* @__PURE__ */ zn(F), A = /* @__PURE__ */ h("ZodType", (e, t) => (P.init(e, t), Object.assign(e["~standard"], {
+}), Si = /* @__PURE__ */ Ae(F), Ci = /* @__PURE__ */ Re(F), Ni = /* @__PURE__ */ ke(F), Ti = /* @__PURE__ */ ze(F), Oi = /* @__PURE__ */ _n(F), Ii = /* @__PURE__ */ bn(F), xi = /* @__PURE__ */ gn(F), Pi = /* @__PURE__ */ vn(F), Ai = /* @__PURE__ */ yn(F), Ri = /* @__PURE__ */ wn(F), Li = /* @__PURE__ */ kn(F), ji = /* @__PURE__ */ zn(F), A = /* @__PURE__ */ h("ZodType", (e, t) => (P.init(e, t), Object.assign(e["~standard"], {
   jsonSchema: {
-    input: be(e, "input"),
-    output: be(e, "output")
+    input: ge(e, "input"),
+    output: ge(e, "output")
   }
 }), e.toJSONSchema = Kr(e, {}), e.def = t, e.type = t.type, Object.defineProperty(e, "_def", { value: t }), e.check = (...n) => e.clone(W(t, {
   checks: [
@@ -2636,7 +2636,7 @@ const Zi = (e, t) => {
   ]
 }), {
   parent: !0
-}), e.with = e.check, e.clone = (n, o) => Q(e, n, o), e.brand = () => e, e.register = (n, o) => (n.add(e, o), e), e.parse = (n, o) => Si(e, n, o, { callee: e.parse }), e.safeParse = (n, o) => Ni(e, n, o), e.parseAsync = async (n, o) => Ci(e, n, o, { callee: e.parseAsync }), e.safeParseAsync = async (n, o) => Ti(e, n, o), e.spa = e.safeParseAsync, e.encode = (n, o) => Ii(e, n, o), e.decode = (n, o) => Oi(e, n, o), e.encodeAsync = async (n, o) => xi(e, n, o), e.decodeAsync = async (n, o) => Pi(e, n, o), e.safeEncode = (n, o) => Ai(e, n, o), e.safeDecode = (n, o) => Ri(e, n, o), e.safeEncodeAsync = async (n, o) => Li(e, n, o), e.safeDecodeAsync = async (n, o) => ji(e, n, o), e.refine = (n, o) => e.check(Ts(n, o)), e.superRefine = (n) => e.check(Is(n)), e.overwrite = (n) => e.check(/* @__PURE__ */ se(n)), e.optional = () => it(e), e.exactOptional = () => bs(e), e.nullable = () => st(e), e.nullish = () => it(st(e)), e.nonoptional = (n) => zs(e, n), e.array = () => le(e), e.or = (n) => ls([e, n]), e.and = (n) => hs(e, n), e.transform = (n) => at(e, _s(n)), e.default = (n) => ys(e, n), e.prefault = (n) => ks(e, n), e.catch = (n) => $s(e, n), e.pipe = (n) => at(e, n), e.readonly = () => Cs(e), e.describe = (n) => {
+}), e.with = e.check, e.clone = (n, o) => Q(e, n, o), e.brand = () => e, e.register = (n, o) => (n.add(e, o), e), e.parse = (n, o) => Si(e, n, o, { callee: e.parse }), e.safeParse = (n, o) => Ni(e, n, o), e.parseAsync = async (n, o) => Ci(e, n, o, { callee: e.parseAsync }), e.safeParseAsync = async (n, o) => Ti(e, n, o), e.spa = e.safeParseAsync, e.encode = (n, o) => Oi(e, n, o), e.decode = (n, o) => Ii(e, n, o), e.encodeAsync = async (n, o) => xi(e, n, o), e.decodeAsync = async (n, o) => Pi(e, n, o), e.safeEncode = (n, o) => Ai(e, n, o), e.safeDecode = (n, o) => Ri(e, n, o), e.safeEncodeAsync = async (n, o) => Li(e, n, o), e.safeDecodeAsync = async (n, o) => ji(e, n, o), e.refine = (n, o) => e.check(Ts(n, o)), e.superRefine = (n) => e.check(Os(n)), e.overwrite = (n) => e.check(/* @__PURE__ */ se(n)), e.optional = () => it(e), e.exactOptional = () => gs(e), e.nullable = () => st(e), e.nullish = () => it(st(e)), e.nonoptional = (n) => zs(e, n), e.array = () => le(e), e.or = (n) => ls([e, n]), e.and = (n) => hs(e, n), e.transform = (n) => at(e, _s(n)), e.default = (n) => ys(e, n), e.prefault = (n) => ks(e, n), e.catch = (n) => $s(e, n), e.pipe = (n) => at(e, n), e.readonly = () => Cs(e), e.describe = (n) => {
   const o = e.clone();
   return ce.add(o, { description: n }), o;
 }, Object.defineProperty(e, "description", {
@@ -2653,15 +2653,15 @@ const Zi = (e, t) => {
 }, e.isOptional = () => e.safeParse(void 0).success, e.isNullable = () => e.safeParse(null).success, e.apply = (n) => n(e), e)), Lt = /* @__PURE__ */ h("_ZodString", (e, t) => {
   Le.init(e, t), A.init(e, t), e._zod.processJSONSchema = (o, r, i) => Wr(e, o, r);
   const n = e._zod.bag;
-  e.format = n.format ?? null, e.minLength = n.minimum ?? null, e.maxLength = n.maximum ?? null, e.regex = (...o) => e.check(/* @__PURE__ */ Ar(...o)), e.includes = (...o) => e.check(/* @__PURE__ */ jr(...o)), e.startsWith = (...o) => e.check(/* @__PURE__ */ Dr(...o)), e.endsWith = (...o) => e.check(/* @__PURE__ */ Mr(...o)), e.min = (...o) => e.check(/* @__PURE__ */ ge(...o)), e.max = (...o) => e.check(/* @__PURE__ */ It(...o)), e.length = (...o) => e.check(/* @__PURE__ */ Ot(...o)), e.nonempty = (...o) => e.check(/* @__PURE__ */ ge(1, ...o)), e.lowercase = (o) => e.check(/* @__PURE__ */ Rr(o)), e.uppercase = (o) => e.check(/* @__PURE__ */ Lr(o)), e.trim = () => e.check(/* @__PURE__ */ Br()), e.normalize = (...o) => e.check(/* @__PURE__ */ Ur(...o)), e.toLowerCase = () => e.check(/* @__PURE__ */ Fr()), e.toUpperCase = () => e.check(/* @__PURE__ */ Jr()), e.slugify = () => e.check(/* @__PURE__ */ Vr());
+  e.format = n.format ?? null, e.minLength = n.minimum ?? null, e.maxLength = n.maximum ?? null, e.regex = (...o) => e.check(/* @__PURE__ */ Ar(...o)), e.includes = (...o) => e.check(/* @__PURE__ */ jr(...o)), e.startsWith = (...o) => e.check(/* @__PURE__ */ Dr(...o)), e.endsWith = (...o) => e.check(/* @__PURE__ */ Mr(...o)), e.min = (...o) => e.check(/* @__PURE__ */ be(...o)), e.max = (...o) => e.check(/* @__PURE__ */ Ot(...o)), e.length = (...o) => e.check(/* @__PURE__ */ It(...o)), e.nonempty = (...o) => e.check(/* @__PURE__ */ be(1, ...o)), e.lowercase = (o) => e.check(/* @__PURE__ */ Rr(o)), e.uppercase = (o) => e.check(/* @__PURE__ */ Lr(o)), e.trim = () => e.check(/* @__PURE__ */ Br()), e.normalize = (...o) => e.check(/* @__PURE__ */ Ur(...o)), e.toLowerCase = () => e.check(/* @__PURE__ */ Fr()), e.toUpperCase = () => e.check(/* @__PURE__ */ Jr()), e.slugify = () => e.check(/* @__PURE__ */ Vr());
 }), jt = /* @__PURE__ */ h("ZodString", (e, t) => {
-  Le.init(e, t), Lt.init(e, t), e.email = (n) => e.check(/* @__PURE__ */ ir(Di, n)), e.url = (n) => e.check(/* @__PURE__ */ lr(Mi, n)), e.jwt = (n) => e.check(/* @__PURE__ */ $r(ts, n)), e.emoji = (n) => e.check(/* @__PURE__ */ dr(Ui, n)), e.guid = (n) => e.check(/* @__PURE__ */ Qe(ot, n)), e.uuid = (n) => e.check(/* @__PURE__ */ sr(fe, n)), e.uuidv4 = (n) => e.check(/* @__PURE__ */ ar(fe, n)), e.uuidv6 = (n) => e.check(/* @__PURE__ */ cr(fe, n)), e.uuidv7 = (n) => e.check(/* @__PURE__ */ ur(fe, n)), e.nanoid = (n) => e.check(/* @__PURE__ */ hr(Bi, n)), e.guid = (n) => e.check(/* @__PURE__ */ Qe(ot, n)), e.cuid = (n) => e.check(/* @__PURE__ */ pr(Fi, n)), e.cuid2 = (n) => e.check(/* @__PURE__ */ fr(Ji, n)), e.ulid = (n) => e.check(/* @__PURE__ */ mr(Vi, n)), e.base64 = (n) => e.check(/* @__PURE__ */ kr(Wi, n)), e.base64url = (n) => e.check(/* @__PURE__ */ zr(Qi, n)), e.xid = (n) => e.check(/* @__PURE__ */ _r(Hi, n)), e.ksuid = (n) => e.check(/* @__PURE__ */ gr(Yi, n)), e.ipv4 = (n) => e.check(/* @__PURE__ */ br(Gi, n)), e.ipv6 = (n) => e.check(/* @__PURE__ */ vr(Xi, n)), e.cidrv4 = (n) => e.check(/* @__PURE__ */ yr(Ki, n)), e.cidrv6 = (n) => e.check(/* @__PURE__ */ wr(qi, n)), e.e164 = (n) => e.check(/* @__PURE__ */ Er(es, n)), e.datetime = (n) => e.check(vi(n)), e.date = (n) => e.check(wi(n)), e.time = (n) => e.check(zi(n)), e.duration = (n) => e.check($i(n));
+  Le.init(e, t), Lt.init(e, t), e.email = (n) => e.check(/* @__PURE__ */ ir(Di, n)), e.url = (n) => e.check(/* @__PURE__ */ lr(Mi, n)), e.jwt = (n) => e.check(/* @__PURE__ */ $r(ts, n)), e.emoji = (n) => e.check(/* @__PURE__ */ dr(Ui, n)), e.guid = (n) => e.check(/* @__PURE__ */ Qe(ot, n)), e.uuid = (n) => e.check(/* @__PURE__ */ sr(fe, n)), e.uuidv4 = (n) => e.check(/* @__PURE__ */ ar(fe, n)), e.uuidv6 = (n) => e.check(/* @__PURE__ */ cr(fe, n)), e.uuidv7 = (n) => e.check(/* @__PURE__ */ ur(fe, n)), e.nanoid = (n) => e.check(/* @__PURE__ */ hr(Bi, n)), e.guid = (n) => e.check(/* @__PURE__ */ Qe(ot, n)), e.cuid = (n) => e.check(/* @__PURE__ */ pr(Fi, n)), e.cuid2 = (n) => e.check(/* @__PURE__ */ fr(Ji, n)), e.ulid = (n) => e.check(/* @__PURE__ */ mr(Vi, n)), e.base64 = (n) => e.check(/* @__PURE__ */ kr(Wi, n)), e.base64url = (n) => e.check(/* @__PURE__ */ zr(Qi, n)), e.xid = (n) => e.check(/* @__PURE__ */ _r(Hi, n)), e.ksuid = (n) => e.check(/* @__PURE__ */ br(Yi, n)), e.ipv4 = (n) => e.check(/* @__PURE__ */ gr(Gi, n)), e.ipv6 = (n) => e.check(/* @__PURE__ */ vr(Xi, n)), e.cidrv4 = (n) => e.check(/* @__PURE__ */ yr(Ki, n)), e.cidrv6 = (n) => e.check(/* @__PURE__ */ wr(qi, n)), e.e164 = (n) => e.check(/* @__PURE__ */ Er(es, n)), e.datetime = (n) => e.check(vi(n)), e.date = (n) => e.check(wi(n)), e.time = (n) => e.check(zi(n)), e.duration = (n) => e.check($i(n));
 });
 function U(e) {
   return /* @__PURE__ */ rr(jt, e);
 }
 const x = /* @__PURE__ */ h("ZodStringFormat", (e, t) => {
-  O.init(e, t), Lt.init(e, t);
+  I.init(e, t), Lt.init(e, t);
 }), Di = /* @__PURE__ */ h("ZodEmail", (e, t) => {
   ho.init(e, t), x.init(e, t);
 }), ot = /* @__PURE__ */ h("ZodGUID", (e, t) => {
@@ -2677,9 +2677,9 @@ const x = /* @__PURE__ */ h("ZodStringFormat", (e, t) => {
 }), Fi = /* @__PURE__ */ h("ZodCUID", (e, t) => {
   _o.init(e, t), x.init(e, t);
 }), Ji = /* @__PURE__ */ h("ZodCUID2", (e, t) => {
-  go.init(e, t), x.init(e, t);
-}), Vi = /* @__PURE__ */ h("ZodULID", (e, t) => {
   bo.init(e, t), x.init(e, t);
+}), Vi = /* @__PURE__ */ h("ZodULID", (e, t) => {
+  go.init(e, t), x.init(e, t);
 }), Hi = /* @__PURE__ */ h("ZodXID", (e, t) => {
   vo.init(e, t), x.init(e, t);
 }), Yi = /* @__PURE__ */ h("ZodKSUID", (e, t) => {
@@ -2695,9 +2695,9 @@ const x = /* @__PURE__ */ h("ZodStringFormat", (e, t) => {
 }), Wi = /* @__PURE__ */ h("ZodBase64", (e, t) => {
   No.init(e, t), x.init(e, t);
 }), Qi = /* @__PURE__ */ h("ZodBase64URL", (e, t) => {
-  Io.init(e, t), x.init(e, t);
-}), es = /* @__PURE__ */ h("ZodE164", (e, t) => {
   Oo.init(e, t), x.init(e, t);
+}), es = /* @__PURE__ */ h("ZodE164", (e, t) => {
+  Io.init(e, t), x.init(e, t);
 }), ts = /* @__PURE__ */ h("ZodJWT", (e, t) => {
   Po.init(e, t), x.init(e, t);
 }), je = /* @__PURE__ */ h("ZodNumber", (e, t) => {
@@ -2712,13 +2712,13 @@ const ns = /* @__PURE__ */ h("ZodNumberFormat", (e, t) => {
   Ao.init(e, t), je.init(e, t);
 });
 function rt(e) {
-  return /* @__PURE__ */ Ir(ns, e);
+  return /* @__PURE__ */ Or(ns, e);
 }
 const Dt = /* @__PURE__ */ h("ZodBoolean", (e, t) => {
   Ro.init(e, t), A.init(e, t), e._zod.processJSONSchema = (n, o, r) => ei(e, n, o);
 });
 function os(e) {
-  return /* @__PURE__ */ Or(Dt, e);
+  return /* @__PURE__ */ Ir(Dt, e);
 }
 const rs = /* @__PURE__ */ h("ZodUnknown", (e, t) => {
   Lo.init(e, t), A.init(e, t), e._zod.processJSONSchema = (n, o, r) => ni();
@@ -2733,7 +2733,7 @@ function ss(e) {
   return /* @__PURE__ */ Pr(is, e);
 }
 const as = /* @__PURE__ */ h("ZodArray", (e, t) => {
-  Do.init(e, t), A.init(e, t), e._zod.processJSONSchema = (n, o, r) => si(e, n, o, r), e.element = t.element, e.min = (n, o) => e.check(/* @__PURE__ */ ge(n, o)), e.nonempty = (n) => e.check(/* @__PURE__ */ ge(1, n)), e.max = (n, o) => e.check(/* @__PURE__ */ It(n, o)), e.length = (n, o) => e.check(/* @__PURE__ */ Ot(n, o)), e.unwrap = () => e.element;
+  Do.init(e, t), A.init(e, t), e._zod.processJSONSchema = (n, o, r) => si(e, n, o, r), e.element = t.element, e.min = (n, o) => e.check(/* @__PURE__ */ be(n, o)), e.nonempty = (n) => e.check(/* @__PURE__ */ be(1, n)), e.max = (n, o) => e.check(/* @__PURE__ */ Ot(n, o)), e.length = (n, o) => e.check(/* @__PURE__ */ It(n, o)), e.unwrap = () => e.element;
 });
 function le(e, t) {
   return /* @__PURE__ */ Hr(as, e, t);
@@ -2850,11 +2850,11 @@ function it(e) {
     innerType: e
   });
 }
-const gs = /* @__PURE__ */ h("ZodExactOptional", (e, t) => {
+const bs = /* @__PURE__ */ h("ZodExactOptional", (e, t) => {
   Yo.init(e, t), A.init(e, t), e._zod.processJSONSchema = (n, o, r) => Rt(e, n, o, r), e.unwrap = () => e._zod.def.innerType;
 });
-function bs(e) {
-  return new gs({
+function gs(e) {
+  return new bs({
     type: "optional",
     innerType: e
   });
@@ -2924,7 +2924,7 @@ function at(e, t) {
   });
 }
 const Ss = /* @__PURE__ */ h("ZodReadonly", (e, t) => {
-  er.init(e, t), A.init(e, t), e._zod.processJSONSchema = (n, o, r) => gi(e, n, o, r), e.unwrap = () => e._zod.def.innerType;
+  er.init(e, t), A.init(e, t), e._zod.processJSONSchema = (n, o, r) => bi(e, n, o, r), e.unwrap = () => e._zod.def.innerType;
 });
 function Cs(e) {
   return new Ss({
@@ -2938,17 +2938,17 @@ const Ns = /* @__PURE__ */ h("ZodCustom", (e, t) => {
 function Ts(e, t = {}) {
   return /* @__PURE__ */ Yr(Ns, e, t);
 }
-function Is(e) {
+function Os(e) {
   return /* @__PURE__ */ Gr(e);
 }
-const Os = /* @__PURE__ */ new Set(["id", "image"]);
+const Is = /* @__PURE__ */ new Set(["id", "image"]);
 function Te(e) {
   return e instanceof De ? Te(e.unwrap()) : e instanceof Ut ? Te(e._def.innerType) : e;
 }
 function xs(e) {
   const t = [];
   for (const [n, o] of Object.entries(e.shape)) {
-    if (Os.has(n)) continue;
+    if (Is.has(n)) continue;
     const r = o, i = Te(r), s = r.description ?? n;
     if (i instanceof Dt) {
       t.push({ key: n, label: s, type: "boolean" });
@@ -3039,68 +3039,68 @@ function Ms(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
   }
   function l(m, k = "multiple-choice") {
     c = m.id, s.innerHTML = "", a.hidden = !1;
-    const g = o ?? ct[k] ?? ct["multiple-choice"];
-    xs(g).forEach((z) => s.appendChild(d(z, m))), s.appendChild(C(m)), a.onclick = () => {
+    const b = o ?? ct[k] ?? ct["multiple-choice"];
+    xs(b).forEach((z) => s.appendChild(d(z, m))), s.appendChild(C(m)), a.onclick = () => {
       confirm("למחוק את הסיבוב הזה?") && (n(c), u());
     };
   }
   function d(m, k) {
-    const g = document.createElement("div");
-    g.className = "ab-editor-field";
+    const b = document.createElement("div");
+    b.className = "ab-editor-field";
     const $ = document.createElement("label");
-    switch ($.className = "ab-editor-field__label", $.textContent = m.label, g.appendChild($), m.type) {
+    switch ($.className = "ab-editor-field__label", $.textContent = m.label, b.appendChild($), m.type) {
       case "emoji":
-        g.appendChild(f(m, k));
+        b.appendChild(f(m, k));
         break;
       case "boolean":
-        g.appendChild(v(m, k));
+        b.appendChild(v(m, k));
         break;
       case "select":
-        g.appendChild(w(m, k));
+        b.appendChild(w(m, k));
         break;
       case "number":
-        g.appendChild(N(m, k));
+        b.appendChild(N(m, k));
         break;
       default:
-        g.appendChild(_(m, k));
+        b.appendChild(_(m, k));
         break;
     }
-    return g;
+    return b;
   }
   function _(m, k) {
-    const g = document.createElement("input");
-    return g.className = "ab-editor-field__input", g.type = "text", g.value = String(k[m.key] ?? ""), g.dir = "rtl", m.maxLength && (g.maxLength = m.maxLength), g.addEventListener("input", () => t(c, m.key, g.value)), g;
+    const b = document.createElement("input");
+    return b.className = "ab-editor-field__input", b.type = "text", b.value = String(k[m.key] ?? ""), b.dir = "rtl", m.maxLength && (b.maxLength = m.maxLength), b.addEventListener("input", () => t(c, m.key, b.value)), b;
   }
   function f(m, k) {
-    const g = document.createElement("div");
-    g.className = "ab-editor-field__emoji-row";
+    const b = document.createElement("div");
+    b.className = "ab-editor-field__emoji-row";
     const $ = document.createElement("div");
-    $.className = "ab-editor-field__emoji-preview", $.textContent = String(k[m.key] ?? "❓"), g.appendChild($);
+    $.className = "ab-editor-field__emoji-preview", $.textContent = String(k[m.key] ?? "❓"), b.appendChild($);
     const z = document.createElement("input");
     return z.className = "ab-editor-field__input", z.type = "text", z.value = String(k[m.key] ?? ""), z.maxLength = 8, z.placeholder = "🐱", z.style.fontSize = "20px", z.addEventListener("input", () => {
       $.textContent = z.value || "❓", t(c, m.key, z.value);
-    }), g.appendChild(z), g;
+    }), b.appendChild(z), b;
   }
   function v(m, k) {
-    const g = document.createElement("input");
-    return g.type = "checkbox", g.checked = !!k[m.key], g.addEventListener("change", () => t(c, m.key, g.checked)), g;
+    const b = document.createElement("input");
+    return b.type = "checkbox", b.checked = !!k[m.key], b.addEventListener("change", () => t(c, m.key, b.checked)), b;
   }
   function w(m, k) {
-    const g = document.createElement("select");
-    return g.className = "ab-editor-field__input", (m.options ?? []).forEach(($) => {
+    const b = document.createElement("select");
+    return b.className = "ab-editor-field__input", (m.options ?? []).forEach(($) => {
       const z = document.createElement("option");
-      z.value = $, z.textContent = $, k[m.key] === $ && (z.selected = !0), g.appendChild(z);
-    }), g.addEventListener("change", () => t(c, m.key, g.value)), g;
+      z.value = $, z.textContent = $, k[m.key] === $ && (z.selected = !0), b.appendChild(z);
+    }), b.addEventListener("change", () => t(c, m.key, b.value)), b;
   }
   function N(m, k) {
-    const g = document.createElement("input");
-    return g.className = "ab-editor-field__input", g.type = "number", g.value = String(k[m.key] ?? ""), m.min !== void 0 && (g.min = String(m.min)), m.max !== void 0 && (g.max = String(m.max)), g.addEventListener("input", () => t(c, m.key, Number(g.value))), g;
+    const b = document.createElement("input");
+    return b.className = "ab-editor-field__input", b.type = "number", b.value = String(k[m.key] ?? ""), m.min !== void 0 && (b.min = String(m.min)), m.max !== void 0 && (b.max = String(m.max)), b.addEventListener("input", () => t(c, m.key, Number(b.value))), b;
   }
   function C(m) {
     const k = document.createElement("div");
     k.className = "ab-editor-field ab-editor-field--image";
-    const g = document.createElement("label");
-    g.className = "ab-editor-field__label", g.textContent = "🖼 תמונה", k.appendChild(g);
+    const b = document.createElement("label");
+    b.className = "ab-editor-field__label", b.textContent = "🖼 תמונה", k.appendChild(b);
     const $ = document.createElement("div");
     $.className = "ab-editor-field__img-row";
     const z = document.createElement("div");
@@ -3113,8 +3113,8 @@ function Ms(e, { onFieldChange: t, onDeleteRound: n, roundSchema: o }) {
       const V = (p = Y.files) == null ? void 0 : p[0];
       if (!V) return;
       const ae = new FileReader();
-      ae.onload = (b) => {
-        const E = b.target.result;
+      ae.onload = (g) => {
+        const E = g.target.result;
         z.style.backgroundImage = `url(${E})`, X.textContent = "🔄 החלף", t(c, "image", E), G.isConnected || J.appendChild(G);
       }, ae.readAsDataURL(V);
     }), J.appendChild(Y);
@@ -3304,43 +3304,43 @@ function Ks(e, t, { onChange: n, gameId: o }) {
     N.innerHTML = "";
     const p = document.createElement("button");
     p.className = `ab-ze-tool-btn${s === "rect" ? " ab-ze-tool-btn--active" : ""}`, p.textContent = "▭ מלבן", p.addEventListener("click", () => {
-      g("rect");
+      b("rect");
     }), N.appendChild(p);
-    const b = document.createElement("button");
-    b.className = `ab-ze-tool-btn${s === "polygon" ? " ab-ze-tool-btn--active" : ""}`, b.textContent = "✎ חופשי", b.addEventListener("click", () => {
-      g("polygon");
-    }), N.appendChild(b);
+    const g = document.createElement("button");
+    g.className = `ab-ze-tool-btn${s === "polygon" ? " ab-ze-tool-btn--active" : ""}`, g.textContent = "✎ חופשי", g.addEventListener("click", () => {
+      b("polygon");
+    }), N.appendChild(g);
     const E = document.createElement("span");
     E.className = "ab-ze-toolbar__hint", E.textContent = s === "rect" ? "גררו לציור מלבן" : "לחצו נקודות, לחצו פעמיים לסגירה", N.appendChild(E);
   }
   e.style.position = "relative", e.appendChild(f), C();
-  function S(p, b) {
+  function S(p, g) {
     const E = f.getBoundingClientRect();
     return {
       px: Math.max(0, Math.min(100, (p - E.left) / E.width * 100)),
-      py: Math.max(0, Math.min(100, (b - E.top) / E.height * 100))
+      py: Math.max(0, Math.min(100, (g - E.top) / E.height * 100))
     };
   }
   function m() {
     a.forEach((p) => p.destroy()), a = [], f.querySelectorAll(".ab-ze-zone").forEach((p) => p.remove()), f.querySelectorAll(".ab-ze-panel").forEach((p) => p.remove()), r.forEach((p) => {
-      const b = document.createElement("div");
-      if (b.className = "ab-ze-zone", p.correct && b.classList.add("ab-ze-zone--correct"), p.id === i && b.classList.add("ab-ze-zone--selected"), b.dataset.zoneId = p.id, b.style.left = `${p.x}%`, b.style.top = `${p.y}%`, b.style.width = `${p.width}%`, b.style.height = `${p.height}%`, p.shape === "polygon" && p.points && p.points.length >= 3) {
+      const g = document.createElement("div");
+      if (g.className = "ab-ze-zone", p.correct && g.classList.add("ab-ze-zone--correct"), p.id === i && g.classList.add("ab-ze-zone--selected"), g.dataset.zoneId = p.id, g.style.left = `${p.x}%`, g.style.top = `${p.y}%`, g.style.width = `${p.width}%`, g.style.height = `${p.height}%`, p.shape === "polygon" && p.points && p.points.length >= 3) {
         const Z = `clip-${p.id}`;
-        b.innerHTML = `<svg class="ab-ze-zone__poly-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        g.innerHTML = `<svg class="ab-ze-zone__poly-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
           <defs><clipPath id="${Z}"><polygon points="${Xs(p.points, p.x, p.y, p.width, p.height)}"/></clipPath></defs>
           <rect x="0" y="0" width="100" height="100" clip-path="url(#${Z})" fill="currentColor"/>
-        </svg>`, b.classList.add("ab-ze-zone--poly");
+        </svg>`, g.classList.add("ab-ze-zone--poly");
       }
       const E = document.createElement("div");
-      E.className = "ab-ze-zone__badge", E.textContent = p.correct ? "✓" : "", p.label && (E.textContent = p.label), b.appendChild(E);
+      E.className = "ab-ze-zone__badge", E.textContent = p.correct ? "✓" : "", p.label && (E.textContent = p.label), g.appendChild(E);
       const R = document.createElement("button");
       R.className = "ab-ze-zone__toggle", R.textContent = p.correct ? "✓ נכון" : "✗ לא נכון", R.title = "סמן כתשובה נכונה / לא נכונה", R.addEventListener("pointerdown", (Z) => Z.stopPropagation()), R.addEventListener("click", (Z) => {
         Z.stopPropagation(), p.correct = !p.correct, V(), m();
-      }), b.appendChild(R);
-      const I = document.createElement("button");
-      if (I.className = "ab-ze-zone__delete", I.textContent = "✕", I.title = "מחק אזור", I.addEventListener("pointerdown", (Z) => Z.stopPropagation()), I.addEventListener("click", (Z) => {
+      }), g.appendChild(R);
+      const O = document.createElement("button");
+      if (O.className = "ab-ze-zone__delete", O.textContent = "✕", O.title = "מחק אזור", O.addEventListener("pointerdown", (Z) => Z.stopPropagation()), O.addEventListener("click", (Z) => {
         Z.stopPropagation(), r = r.filter((L) => L.id !== p.id), i === p.id && (i = null), V(), m();
-      }), b.appendChild(I), p.shape !== "polygon" && p.id === i)
+      }), g.appendChild(O), p.shape !== "polygon" && p.id === i)
         for (const Z of ["nw", "ne", "sw", "se"]) {
           const L = document.createElement("div");
           L.className = `ab-ze-zone__handle ab-ze-zone__handle--${Z}`, L.dataset.handle = Z, L.addEventListener("pointerdown", (j) => {
@@ -3351,14 +3351,14 @@ function Ks(e, t, { onChange: n, gameId: o }) {
               startX: j.clientX,
               startY: j.clientY
             };
-          }), b.appendChild(L);
+          }), g.appendChild(L);
         }
-      if (b.addEventListener("pointerdown", (Z) => {
+      if (g.addEventListener("pointerdown", (Z) => {
         if (Z.stopPropagation(), _) return;
         i = p.id, m();
         const { px: L, py: j } = S(Z.clientX, Z.clientY);
         d = { zoneId: p.id, offsetX: L - p.x, offsetY: j - p.y };
-      }), f.appendChild(b), p.id === i) {
+      }), f.appendChild(g), p.id === i) {
         const Z = document.createElement("div");
         Z.className = "ab-ze-panel", Z.style.left = `${p.x}%`, Z.style.top = `${p.y + p.height + 1}%`;
         const L = document.createElement("div");
@@ -3386,31 +3386,31 @@ function Ks(e, t, { onChange: n, gameId: o }) {
     if (w.innerHTML = "", u.length === 0) return;
     const p = [...u];
     l && p.push(l);
-    const b = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    b.setAttribute("points", p.map((E) => `${E.x},${E.y}`).join(" ")), b.setAttribute("fill", "rgba(251,191,36,0.15)"), b.setAttribute("stroke", "#fbbf24"), b.setAttribute("stroke-width", "0.4"), b.setAttribute("stroke-dasharray", "1,0.5"), w.appendChild(b), u.forEach((E, R) => {
-      const I = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-      I.setAttribute("cx", String(E.x)), I.setAttribute("cy", String(E.y)), I.setAttribute("r", "0.8"), I.setAttribute("fill", R === 0 ? "#22c55e" : "#fbbf24"), I.setAttribute("stroke", "#fff"), I.setAttribute("stroke-width", "0.3"), w.appendChild(I);
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    g.setAttribute("points", p.map((E) => `${E.x},${E.y}`).join(" ")), g.setAttribute("fill", "rgba(251,191,36,0.15)"), g.setAttribute("stroke", "#fbbf24"), g.setAttribute("stroke-width", "0.4"), g.setAttribute("stroke-dasharray", "1,0.5"), w.appendChild(g), u.forEach((E, R) => {
+      const O = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      O.setAttribute("cx", String(E.x)), O.setAttribute("cy", String(E.y)), O.setAttribute("r", "0.8"), O.setAttribute("fill", R === 0 ? "#22c55e" : "#fbbf24"), O.setAttribute("stroke", "#fff"), O.setAttribute("stroke-width", "0.3"), w.appendChild(O);
     });
   }
-  function g(p) {
+  function b(p) {
     u.length > 0 && (u = [], l = null, k()), s = p, f.classList.toggle("ab-ze-overlay--poly-mode", p === "polygon"), C();
   }
   function $() {
     if (!c) return;
-    const p = Math.min(c.startX, c.curX), b = Math.min(c.startY, c.curY), E = Math.abs(c.curX - c.startX), R = Math.abs(c.curY - c.startY);
-    v.style.left = `${p}%`, v.style.top = `${b}%`, v.style.width = `${E}%`, v.style.height = `${R}%`;
+    const p = Math.min(c.startX, c.curX), g = Math.min(c.startY, c.curY), E = Math.abs(c.curX - c.startX), R = Math.abs(c.curY - c.startY);
+    v.style.left = `${p}%`, v.style.top = `${g}%`, v.style.width = `${E}%`, v.style.height = `${R}%`;
   }
   function z() {
     if (u.length < 3) {
       u = [], l = null, k();
       return;
     }
-    const p = [...u], b = Gs(p);
-    if (b.width > 1 && b.height > 1) {
+    const p = [...u], g = Gs(p);
+    if (g.width > 1 && g.height > 1) {
       const E = {
         id: ut(),
         shape: "polygon",
-        ...b,
+        ...g,
         points: p,
         correct: !1
       };
@@ -3421,67 +3421,67 @@ function Ks(e, t, { onChange: n, gameId: o }) {
   function J(p) {
     if (p.button !== 0 || p.target.closest(".ab-ze-zone") || p.target.closest(".ab-ze-toolbar") || p.target.closest(".ab-ze-panel")) return;
     if (i = null, s === "polygon") {
-      const { px: R, py: I } = S(p.clientX, p.clientY);
+      const { px: R, py: O } = S(p.clientX, p.clientY);
       if (u.length >= 3) {
         const Z = u[0];
-        if (Math.abs(R - Z.x) < 2 && Math.abs(I - Z.y) < 2) {
+        if (Math.abs(R - Z.x) < 2 && Math.abs(O - Z.y) < 2) {
           z();
           return;
         }
       }
-      u.push({ x: R, y: I }), k(), m();
+      u.push({ x: R, y: O }), k(), m();
       return;
     }
-    const { px: b, py: E } = S(p.clientX, p.clientY);
-    c = { startX: b, startY: E, curX: b, curY: E }, v.hidden = !1, $(), m();
+    const { px: g, py: E } = S(p.clientX, p.clientY);
+    c = { startX: g, startY: E, curX: g, curY: E }, v.hidden = !1, $(), m();
   }
   function Y(p) {
     s === "polygon" && u.length >= 3 && (p.preventDefault(), z());
   }
   function X(p) {
     if (s === "polygon" && u.length > 0) {
-      const { px: b, py: E } = S(p.clientX, p.clientY);
-      l = { x: b, y: E }, k();
+      const { px: g, py: E } = S(p.clientX, p.clientY);
+      l = { x: g, y: E }, k();
     }
     if (c) {
-      const { px: b, py: E } = S(p.clientX, p.clientY);
-      c.curX = b, c.curY = E, $();
+      const { px: g, py: E } = S(p.clientX, p.clientY);
+      c.curX = g, c.curY = E, $();
       return;
     }
     if (_) {
       p.preventDefault();
-      const b = r.find((j) => j.id === _.zoneId);
-      if (!b) return;
-      const E = _.origZone, R = f.getBoundingClientRect(), I = (p.clientX - _.startX) / R.width * 100, Z = (p.clientY - _.startY) / R.height * 100, L = _.handle;
-      L.includes("e") && (b.width = Math.max(3, E.width + I)), L.includes("w") && (b.x = E.x + I, b.width = Math.max(3, E.width - I)), L.includes("s") && (b.height = Math.max(3, E.height + Z)), L.includes("n") && (b.y = E.y + Z, b.height = Math.max(3, E.height - Z)), m();
+      const g = r.find((j) => j.id === _.zoneId);
+      if (!g) return;
+      const E = _.origZone, R = f.getBoundingClientRect(), O = (p.clientX - _.startX) / R.width * 100, Z = (p.clientY - _.startY) / R.height * 100, L = _.handle;
+      L.includes("e") && (g.width = Math.max(3, E.width + O)), L.includes("w") && (g.x = E.x + O, g.width = Math.max(3, E.width - O)), L.includes("s") && (g.height = Math.max(3, E.height + Z)), L.includes("n") && (g.y = E.y + Z, g.height = Math.max(3, E.height - Z)), m();
       return;
     }
     if (d) {
       p.preventDefault();
-      const b = r.find((L) => L.id === d.zoneId);
-      if (!b) return;
-      const { px: E, py: R } = S(p.clientX, p.clientY), I = Math.max(0, Math.min(100 - b.width, E - d.offsetX)), Z = Math.max(0, Math.min(100 - b.height, R - d.offsetY));
-      if (b.shape === "polygon" && b.points) {
-        const L = I - b.x, j = Z - b.y;
-        b.points = b.points.map((H) => ({ x: H.x + L, y: H.y + j }));
+      const g = r.find((L) => L.id === d.zoneId);
+      if (!g) return;
+      const { px: E, py: R } = S(p.clientX, p.clientY), O = Math.max(0, Math.min(100 - g.width, E - d.offsetX)), Z = Math.max(0, Math.min(100 - g.height, R - d.offsetY));
+      if (g.shape === "polygon" && g.points) {
+        const L = O - g.x, j = Z - g.y;
+        g.points = g.points.map((H) => ({ x: H.x + L, y: H.y + j }));
       }
-      b.x = I, b.y = Z, m();
+      g.x = O, g.y = Z, m();
     }
   }
   function G() {
     if (c) {
-      const p = Math.min(c.startX, c.curX), b = Math.min(c.startY, c.curY), E = Math.abs(c.curX - c.startX), R = Math.abs(c.curY - c.startY);
+      const p = Math.min(c.startX, c.curX), g = Math.min(c.startY, c.curY), E = Math.abs(c.curX - c.startX), R = Math.abs(c.curY - c.startY);
       if (E > 3 && R > 3) {
-        const I = {
+        const O = {
           id: ut(),
           shape: "rect",
           x: p,
-          y: b,
+          y: g,
           width: E,
           height: R,
           correct: !1
         };
-        r.push(I), i = I.id, V();
+        r.push(O), i = O.id, V();
       }
       c = null, v.hidden = !0, m();
       return;
@@ -3504,7 +3504,7 @@ function Ks(e, t, { onChange: n, gameId: o }) {
       z();
       return;
     }
-    i && ((p.key === "Delete" || p.key === "Backspace") && (r = r.filter((b) => b.id !== i), i = null, V(), m()), p.key === "Escape" && (i = null, m()));
+    i && ((p.key === "Delete" || p.key === "Backspace") && (r = r.filter((g) => g.id !== i), i = null, V(), m()), p.key === "Escape" && (i = null, m()));
   }
   return f.addEventListener("pointerdown", J), f.addEventListener("dblclick", Y), document.addEventListener("pointermove", X), document.addEventListener("pointerup", G), document.addEventListener("keydown", ae), m(), {
     setZones(p) {
@@ -3514,7 +3514,7 @@ function Ks(e, t, { onChange: n, gameId: o }) {
       return structuredClone(r);
     },
     setTool(p) {
-      g(p);
+      b(p);
     },
     destroy() {
       f.removeEventListener("pointerdown", J), f.removeEventListener("dblclick", Y), document.removeEventListener("pointermove", X), document.removeEventListener("pointerup", G), document.removeEventListener("keydown", ae), a.forEach((p) => p.destroy()), f.remove();
@@ -3660,12 +3660,14 @@ function ta(e) {
 }
 class ra {
   constructor(t, n, o = {}) {
-    this._mode = "play", this._overlay = null, this._navigator = null, this._inspector = null, this._toolbar = null, this._selectedId = null, this._undoBtn = null, this._redoBtn = null, this._shortcutHandler = null, this._zoneEditor = null, this._zoneModal = null, this._container = t, this._gameData = n, this._restartGame = o.restartGame, this._roundSchema = o.roundSchema, this._toolbarFrame = requestAnimationFrame(() => this._injectToolbar());
+    this._mode = "play", this._overlay = null, this._navigator = null, this._inspector = null, this._toolbar = null, this._selectedId = null, this._undoBtn = null, this._redoBtn = null, this._shortcutHandler = null, this._zoneEditor = null, this._zoneModal = null, this._toolbarObserver = null, this._dirty = !1, this._saveStatus = null, this._unsubscribe = n.onChange(() => {
+      this._dirty = !0, this._saveStatus && (this._saveStatus.textContent = "שינויים שלא נשמרו");
+    }), this._container = t, this._gameData = n, this._restartGame = o.restartGame, this._roundSchema = o.roundSchema, this._toolbarFrame = requestAnimationFrame(() => this._injectToolbar());
   }
   /** הסרת מאזינים ורכיבי עריכה כשהמשחק מסתיים או מוחלף. */
   destroy() {
-    var t, n, o, r;
-    cancelAnimationFrame(this._toolbarFrame), this._detachShortcuts(), this._closeZoneEditor(), (t = this._overlay) == null || t.destroy(), (n = this._navigator) == null || n.destroy(), (o = this._inspector) == null || o.destroy(), (r = this._toolbar) == null || r.remove(), this._container.classList.remove("ab-editor-active");
+    var t, n, o, r, i;
+    (t = this._toolbarObserver) == null || t.disconnect(), this._container.style.removeProperty("--ab-editor-toolbar-h"), this._unsubscribe(), cancelAnimationFrame(this._toolbarFrame), this._detachShortcuts(), this._closeZoneEditor(), (n = this._overlay) == null || n.destroy(), (o = this._navigator) == null || o.destroy(), (r = this._inspector) == null || r.destroy(), (i = this._toolbar) == null || i.remove(), this._container.classList.remove("ab-editor-active");
   }
   // ── Toolbar ───────────────────────────────────────────────────────────────
   _injectToolbar() {
@@ -3680,6 +3682,7 @@ class ra {
     return r.className = `ab-editor-btn ${n}`, r.innerHTML = t, r.addEventListener("click", o), r;
   }
   _setToolbarEditMode() {
+    var t;
     this._toolbar && (this._toolbar.innerHTML = "", this._undoBtn = this._makeBtn("↩", "ab-editor-btn--undo", () => this._undo()), this._undoBtn.title = "בטל (Ctrl+Z)", this._redoBtn = this._makeBtn("↪", "ab-editor-btn--redo", () => this._redo()), this._redoBtn.title = "בצע שנית (Ctrl+Y)", this._toolbar.append(
       this._makeBtn("▶ שחק", "ab-editor-btn--play", () => this.enterPlayMode()),
       this._makeBtn("+ הוסף", "ab-editor-btn--add", () => this._addRound()),
@@ -3689,10 +3692,13 @@ class ra {
       this._makeBtn("💾 שמור", "ab-editor-btn--save", () => this._save()),
       this._makeBtn("🎤 קול", "ab-editor-btn--audio", () => this._openAudioManager()),
       this._makeBtn("⬇ ייצוא", "ab-editor-btn--export", () => Gt(this._gameData))
-    ), this._refreshUndoButtons());
+    ), this._saveStatus = document.createElement("span"), this._saveStatus.setAttribute("role", "status"), this._saveStatus.className = "ab-editor-save-status", this._saveStatus.textContent = this._dirty ? "שינויים שלא נשמרו" : "", this._toolbar.appendChild(this._saveStatus), (t = this._toolbarObserver) == null || t.disconnect(), this._toolbarObserver = new ResizeObserver(() => {
+      this._toolbar && this._container.style.setProperty("--ab-editor-toolbar-h", `${this._toolbar.offsetHeight}px`);
+    }), this._toolbarObserver.observe(this._toolbar), this._refreshUndoButtons());
   }
   _setToolbarPlayMode() {
-    this._toolbar && (this._toolbar.innerHTML = "", this._undoBtn = null, this._redoBtn = null, this._toolbar.append(
+    var t;
+    (t = this._toolbarObserver) == null || t.disconnect(), this._container.style.removeProperty("--ab-editor-toolbar-h"), this._toolbar && (this._toolbar.innerHTML = "", this._undoBtn = null, this._redoBtn = null, this._toolbar.append(
       this._makeBtn("✏️ ערוך", "ab-editor-btn--edit", () => this.enterEditMode()),
       this._makeBtn("🎤 קול", "ab-editor-btn--audio", () => this._openAudioManager())
     ));
@@ -3718,7 +3724,7 @@ class ra {
   }
   enterPlayMode() {
     var t, n, o, r;
-    this._mode !== "play" && (this._mode = "play", this._container.classList.remove("ab-editor-active"), this._setToolbarPlayMode(), this._detachShortcuts(), this._closeZoneEditor(), (t = this._overlay) == null || t.destroy(), (n = this._navigator) == null || n.destroy(), (o = this._inspector) == null || o.destroy(), this._overlay = this._navigator = this._inspector = null, this._selectedId = null, (r = this._restartGame) == null || r.call(this, this._container));
+    this._mode !== "play" && (this._dirty && !this._save() || (this._mode = "play", this._container.classList.remove("ab-editor-active"), this._setToolbarPlayMode(), this._detachShortcuts(), this._closeZoneEditor(), (t = this._overlay) == null || t.destroy(), (n = this._navigator) == null || n.destroy(), (o = this._inspector) == null || o.destroy(), this._overlay = this._navigator = this._inspector = null, this._selectedId = null, (r = this._restartGame) == null || r.call(this, this._container)));
   }
   // ── Round management ──────────────────────────────────────────────────────
   _selectRound(t) {
@@ -3853,7 +3859,7 @@ class ra {
     Js(this._gameData.id, this._gameData);
   }
   _save() {
-    Xt(this._gameData), this._showToast("✅ נשמר!");
+    return this._gameData.validate() ? Xt(this._gameData) ? (this._dirty = !1, this._saveStatus && (this._saveStatus.textContent = "נשמר"), this._showToast("✅ נשמר!"), !0) : (this._dirty = !0, this._saveStatus && (this._saveStatus.textContent = "לא נשמר. נסו שוב או הורידו עותק בכפתור ייצוא."), !1) : (this._dirty = !0, this._saveStatus && (this._saveStatus.textContent = "לא נשמר. בדקו את התוכן בכל הסיבובים."), !1);
   }
   _showToast(t) {
     const n = document.createElement("div");

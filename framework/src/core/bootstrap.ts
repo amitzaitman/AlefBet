@@ -20,12 +20,14 @@ import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
 import { preloadNikud } from '../utils/nakdan.js';
 import { loadGameData } from './editor-storage.js';
 import { GameData } from './game-data.js';
+import type { ContentContract } from './game-data.js';
 import { attachLazyEditor } from './lazy-editor.js';
 import type { RoundRecord } from '../editor/schemas.js';
 
 const starts = new WeakMap<HTMLElement, object>();
 
 export interface BootstrapEditorOptions {
+  content?: ContentContract;
   /** סוג המשחק (meta.type), למשל 'multiple-choice' או 'drag-match' */
   type?:        string;
   /** כותרת לתצוגה בעורך (meta.title) - ברירת מחדל title של bootstrap */
@@ -97,7 +99,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
 
   hideLoadingScreen(container);
 
-  const saved = opts.editor ? loadGameData(opts.gameId) : null;
+  const saved = opts.editor ? loadGameData(opts.gameId, opts.editor.content) : null;
   const activeRounds: RoundRecord[] = saved?.rounds.length ? saved.rounds : (opts.defaultRounds ?? []);
 
   const shell = new GameShell(container, {
@@ -113,7 +115,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
       title: opts.editor.title ?? opts.title,
       type:  opts.editor.type  ?? 'multiple-choice',
     };
-    gameData = GameData.fromRoundsArray(opts.gameId, activeRounds, meta, opts.editor.distractors ?? []);
+    gameData = GameData.fromRoundsArray(opts.gameId, activeRounds, meta, opts.editor.distractors ?? [], opts.editor.content);
     attachLazyEditor(shell, gameData, { restartGame: opts.editor.restartGame });
   }
 
