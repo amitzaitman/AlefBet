@@ -425,3 +425,26 @@ describe('GameData.fromRoundsArray', () => {
     expect(gd.rounds).toHaveLength(0);
   });
 });
+
+
+describe('content boundary', () => {
+  const contract = {
+    version: 2,
+    createRound: () => ({ prompt: 'new' }),
+    validateRound: round => typeof round.prompt === 'string',
+    migrate: data => ({ ...data, version: 2, rounds: data.rounds.map(r => ({ ...r, prompt: r.target })) }),
+  };
+  it('migrates legacy content and creates game-owned rounds', () => {
+    const data = GameData.fromJSON(makeGame().toJSON(), contract);
+    expect(data.toJSON().version).toBe(2);
+    expect(data.getRound('r1').prompt).toBe('א');
+    expect(data.getRound(data.addRound())).toMatchObject({ prompt: 'new' });
+  });
+  it.each([null, { id: 'x', rounds: [null] }, { id: 'x', rounds: [], version: 99 },
+    { id: 'x', rounds: [{ id: 'same' }, { id: 'same' }] }])('rejects invalid content %j', value => {
+    expect(() => GameData.fromJSON(value)).toThrow();
+  });
+  it('rejects valid JSON with invalid game fields', () => {
+    expect(() => GameData.fromJSON({ id: 'x', version: 2, rounds: [{ prompt: 42 }] }, contract)).toThrow();
+  });
+});

@@ -4,6 +4,37 @@
  */
 import type { GameDataJson, RoundRecord } from '../editor/schemas.js';
 
+/** Game-owned content rules; no editor or schema library is loaded at runtime. */
+export interface ContentContract {
+  version?: number;
+  createRound: () => Record<string, unknown>;
+  validateRound: (round: Record<string, unknown>) => boolean;
+  migrate?: (data: GameDataJson) => GameDataJson;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function readContent(value: unknown): GameDataJson {
+  if (!isRecord(value) || typeof value.id !== 'string' || !value.id
+    || !Array.isArray(value.rounds) || !value.rounds.every(isRecord)
+    || (value.meta !== undefined && !isRecord(value.meta))
+    || (value.distractors !== undefined && !Array.isArray(value.distractors))) {
+    throw new Error('Invalid game content');
+  }
+  const version = value.version ?? 1;
+  if (!Number.isInteger(version) || Number(version) < 1) throw new Error('Invalid content version');
+  const ids = new Set();
+  for (const round of value.rounds) {
+    if (round.id !== undefined) {
+      if (typeof round.id !== 'string' || !round.id || ids.has(round.id)) throw new Error('Invalid round id');
+      ids.add(round.id);
+    }
+  }
+  return { ...value, version } as GameDataJson;
+}
+
 let _idCounter = 0;
 function generateId(): string {
   return `round-${Date.now()}-${_idCounter++}`;
@@ -19,7 +50,7 @@ export class GameData {
   private _past:        RoundRecord[][];  // undo stack (oldest first)
   private _future:      RoundRecord[][];  // redo stack
 
-  constructor(schema: Partial<GameDataJson> & { id?: string }) {
+  constructor(schema: Partial<GameDataJson> & { id?: string }, private _contract?: ContentContract) {
     this._id          = schema.id ?? 'game';
     this._version     = schema.version ?? 1;
     this._meta        = { title: '', type: 'multiple-choice', ...(schema.meta as object ?? {}) };
@@ -61,7 +92,7 @@ export class GameData {
 
   addRound(afterId: string | null = null): string {
     this._saveHistory();
-    const blank: RoundRecord = { id: generateId(), target: '', correct: '', correctEmoji: '❓' };
+    const blank: RoundRecord = { ...this._contract?.createRound(), id: generateId() };
     if (afterId === null) {
       this._rounds.push(blank);
     } else {
@@ -156,8 +187,22 @@ export class GameData {
     };
   }
 
-  static fromJSON(json: GameDataJson): GameData {
-    return new GameData(json);
+  validate(): boolean {
+    return !this._contract || this._rounds.every(round => this._contract.validateRound(round));
+  }
+
+  static fromJSON(value: unknown, contract?: ContentContract): GameData {
+    let json = readContent(value);
+    const version = contract?.version ?? 1;
+    if (json.version < version && contract?.migrate) {
+      const id = json.id;
+      json = readContent(contract.migrate(json));
+      if (json.id !== id) throw new Error('Migration changed game identity');
+    }
+    if (json.version !== version) throw new Error('Unsupported content version');
+    const data = new GameData(json, contract);
+    if (!data.validate()) throw new Error('Invalid round content');
+    return data;
   }
 
   static fromRoundsArray(
@@ -165,7 +210,8 @@ export class GameData {
     rounds: RoundRecord[],
     meta:   Record<string, unknown> = {},
     distractors: unknown[] = [],
+    contract?: ContentContract,
   ): GameData {
-    return new GameData({ id: gameId, meta: meta as GameDataJson['meta'], rounds: rounds as GameDataJson['rounds'], distractors });
+    return new GameData({ id: gameId, meta: meta as GameDataJson['meta'], rounds: rounds as GameDataJson['rounds'], distractors, version: contract?.version ?? 1 }, contract);
   }
 }

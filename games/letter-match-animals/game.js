@@ -72,6 +72,14 @@ export async function startGame(container) {
     onReplay: () => startGame(container),
     editor: {
       type: 'multiple-choice',
+      content: {
+        version: 1,
+        createRound: () => ({ target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }),
+        validateRound: round => typeof round.target === 'string' && !!getLetter(round.target)
+          && typeof round.correct === 'string' && !!round.correct.trim()
+          && round.correct.replace(/[\u0591-\u05C7]/g, '').startsWith(round.target)
+          && typeof round.correctEmoji === 'string',
+      },
       title: 'התאמת אותיות',
       distractors: ALL_REGULAR_WORDS,
       restartGame: startGame,
