@@ -38,6 +38,9 @@ jobs:
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium webkit
 
+      - name: WebKit upgrade stability
+        run: npx playwright test e2e/pwa-upgrade.spec.js --project=mobile-webkit --repeat-each=3 --retries=0
+
       - name: End-to-end tests
         run: npx playwright test
 
