@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "5e3e274dc86794aa9710daef1b7df21ef7f3209b60fb5e948a9d6faa3eb785ef",
+  "version": "91a8423223a1f203270ca0dd282469133c9ff07a13d06dc77727025ff14267de",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -42,7 +42,7 @@ self.ALEFBET_RELEASE = {
     "./framework/dist/editor.css": "7688c131e8863b56609441bc8412eed9a51c0f11063fdcc77d1fc863aa758fb9",
     "./framework/dist/editor.js": "e56a831e5286714029cb0c2872786db252d4280b93f6736b673fb145f7640c17",
     "./framework/dist/runtime-assets.js": "ce5ffc41e2098dc94de986b9323e840d456e816f88aced95a01d41f855d9bd8e",
-    "./framework/dist/runtime.css": "f5ccddd2f83583b3a4c353df92f2fbc74c5497eeb5aaef112944e6de8fa0d8d6",
+    "./framework/dist/runtime.css": "87eba5271978a6eee488b7e8f2b7e36b43ba3e3ba88d553b69eb6ca772951200",
     "./framework/dist/runtime.js": "d33f0ae788b5bf2bb9e13f76ec1528584c34e2b60bd94c0bbc5d509ec98af0d9",
     "./games/catalog.js": "0b40fb5aebae8729b4f6440de684ad6e2540b45c02f535f5156a8a24730c9779",
     "./games/letter-match-animals/": "2664d7fe3510deb8f277d4f4b298bf91ef68f72c426429d10c589ee75c370487",

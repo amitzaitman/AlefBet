@@ -74,6 +74,8 @@ test.describe('PWA', () => {
     const cards = page.locator('.game-card');
     await expect(cards).toHaveCount(5);
     await expect(page.locator('.game-card[data-game-id="letter-match-animals"]')).toBeVisible();
+    await expect(page.locator('.game-card[href$="games/sound-studio/"]')).toBeHidden();
+    await page.getByText('להורים ולמורים', { exact: true }).click();
     await expect(page.locator('.game-card[href$="games/sound-studio/"]')).toBeVisible();
     await expect(page.locator('.game-card[data-game-id="letter-match-animals"] .game-card__desc'))
       .toContainText('22');

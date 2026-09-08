@@ -1137,7 +1137,8 @@
 
 /* כלי המבוגר נפתחים מעל המשחק, בלי להזיז את מטרות המגע. */
 .game-header { padding-inline: 72px; min-height: 84px; }
-.game-header > .game-header__spacer { display: none; }
+.alefbet-game:not(.ab-editor-active) .game-header > .game-header__spacer { display: none; }
+.ab-editor-active .adult-tools { display: none; }
 .adult-tools { position: absolute; inset-inline-start: 0; top: 4px; z-index: 20; }
 .adult-tools > summary {
   min-width: 64px; min-height: 64px; display: flex; flex-direction: column;
