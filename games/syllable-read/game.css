@@ -66,3 +66,12 @@
   filter: grayscale(0.4);
   transition: opacity 0.4s;
 }
+
+.sr-stage { width: min(100%, 640px); box-sizing: border-box; gap: 16px; }
+.sr-options { width: 100%; }
+@media (max-width: 639px) {
+  .game-body { align-items: flex-start; }
+  .sr-stage { padding: 8px 0; }
+  .sr-options .option-cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sr-options .option-card { min-width: 0; min-height: 100px; padding-inline: 6px; }
+}

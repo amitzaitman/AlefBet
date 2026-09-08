@@ -1,3 +1,4 @@
+import { getAdultTools } from '../ui/adult-tools.js';
 /**
  * טעינת כלי העריכה רק בעקבות בקשת המורה; משחק ותוכן שמור זמינים גם בלעדיהם.
  * @param {import('./game-shell.js').GameShell} shell
@@ -9,7 +10,7 @@ export function attachLazyEditor(
   gameData: import('./game-data.js').GameData,
   options: import('../editor/game-editor.js').GameEditorOptions,
 ) {
-  const host = shell.container.querySelector('.game-header');
+  const host = getAdultTools(shell.container);
   if (!host) return;
   const toolbar = document.createElement('div');
   toolbar.className = 'ab-lazy-editor';
@@ -73,6 +74,6 @@ export function attachLazyEditor(
     toolbar.appendChild(button);
   }
   toolbar.appendChild(notice);
-  host.after(toolbar);
+  host.appendChild(toolbar);
   shell.on('end', () => { editor?.destroy(); toolbar.remove(); });
 }

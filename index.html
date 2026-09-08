@@ -270,6 +270,10 @@
       pointer-events: none;
     }
 
+    .hub-adult-tools { margin-top: 28px; }
+    .hub-adult-tools summary { cursor: pointer; padding: 20px; min-height: 64px; font-weight: 700; }
+    .hub-adult-tools[open] summary { margin-bottom: 12px; }
+
     /* ── Footer ── */
     .hub-footer {
       text-align: center;
@@ -295,6 +299,10 @@
     <h2 class="hub-subtitle">בַּחֲרוּ מִשְׂחָק:</h2>
 
     <div class="games-grid"></div>
+    <details class="hub-adult-tools">
+      <summary>להורים ולמורים</summary>
+      <div class="teacher-tools-grid games-grid"></div>
+    </details>
   </main>
 
   <footer class="hub-footer">
@@ -351,7 +359,7 @@
         play.textContent = game.play;
         card.appendChild(play);
 
-        grid.appendChild(card);
+        (game.kind === 'teacher-tool' ? document.querySelector('.teacher-tools-grid') : grid).appendChild(card);
       });
 
       // כוכבי התקדמות: core/progress.js שומר שיאים ב-localStorage.

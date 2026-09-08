@@ -67,7 +67,7 @@ export async function startGame(container) {
     title: getNikud('התאמת אותיות') || 'התאמת אותיות',
     preloadTexts: STATIC_TEXTS,
     defaultRounds: buildRounds(),
-    transitionMs: 1600,
+    transitionMs: 800,
     playCorrectSound: false,
     onReplay: () => startGame(container),
     editor: {

@@ -45,3 +45,27 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await page.locator('[data-id="correct"]').tap();
   await expect(page.locator('.letter-display')).toHaveText('ב');
 });
+
+test('adult tools stay separate and feedback does not move the choices', async ({ page }) => {
+  await page.goto('/');
+  const studio = page.locator('a[href="games/sound-studio/"]');
+  await expect(studio).toBeHidden();
+  await page.getByText('להורים ולמורים', { exact: true }).click();
+  await expect(studio).toBeVisible();
+  await page.goto('/games/letter-match-animals/');
+  const cards = page.locator('.option-cards-grid');
+  await expect(cards).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  const before = await cards.boundingBox();
+  await expect(page.getByRole('button', { name: '✏️ ערוך', exact: true })).toBeHidden();
+  await page.getByText('למבוגרים', { exact: true }).tap();
+  expect(await cards.boundingBox()).toEqual(before);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.adult-tools')).not.toHaveAttribute('open', '');
+  await page.locator('[data-id="wrong-0"]').tap();
+  await expect(page.locator('.feedback-message--hint')).toBeVisible();
+  const after = await cards.boundingBox();
+  expect(Math.abs(after.y - before.y)).toBeLessThan(1);
+  expect(Math.abs(after.width - before.width)).toBeLessThan(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

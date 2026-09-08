@@ -1,3 +1,4 @@
+import { getAdultTools } from './adult-tools.js';
 /**
  * הזרקת כפתור לכותרת המשחק
  */
@@ -11,14 +12,17 @@
  * @returns {HTMLElement|null}
  */
 export function injectHeaderButton(container, icon, ariaLabel, onClick) {
-  const spacer = container.querySelector('.game-header__spacer');
+  const spacer = getAdultTools(container);
   if (!spacer) return null;
   const btn = document.createElement('button');
-  btn.className = 'ab-header-btn';
+  btn.className = 'btn';
   btn.setAttribute('aria-label', ariaLabel);
-  btn.textContent = icon;
-  btn.onclick = onClick;
-  spacer.innerHTML = '';
+  btn.textContent = `${icon} ${ariaLabel}`;
+  btn.onclick = event => {
+    const menu = btn.closest('details');
+    if (menu) menu.open = false;
+    onClick(event);
+  };
   spacer.appendChild(btn);
   return btn;
 }

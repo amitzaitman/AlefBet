@@ -95,9 +95,9 @@ test('a pending hint cannot unlock cards after a correct answer', async ({ page 
   await cards.nth(wrongIndex).dispatchEvent('click');
   await cards.nth(wrongIndex).dispatchEvent('click');
   await expect(page.locator('.option-card--hint')).toHaveCount(1);
-  await page.clock.runFor(800);
+  await page.clock.runFor(1200);
   await cards.nth(ids.indexOf(target)).dispatchEvent('click');
-  await page.clock.runFor(900);
+  await page.clock.runFor(500);
   expect(await cards.evaluateAll(elements => elements.every(el => el.disabled))).toBe(true);
   await page.clock.runFor(400);
   expect(await cards.evaluateAll(elements => elements.every(el => !el.disabled))).toBe(true);

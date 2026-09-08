@@ -156,6 +156,7 @@ test('editor loads on demand, preserves saved content, and reopens offline', asy
   await page.goto('/games/letter-match-animals/');
   await expect(page.locator('.letter-display')).toHaveText('א');
   expect(editorRequests).toEqual([]);
+  await page.getByText('למבוגרים', { exact: true }).click();
   await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
   await expect(page.locator('#game')).toHaveClass(/ab-editor-active/);
   expect(editorRequests.some(url => url.endsWith('editor.js'))).toBe(true);
@@ -168,6 +169,7 @@ test('editor loads on demand, preserves saved content, and reopens offline', asy
   await context.setOffline(true);
   await page.reload();
   await expect(page.locator('.letter-display')).toHaveText('א');
+  await page.getByText('למבוגרים', { exact: true }).click();
   await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
   await expect(page.locator('#game')).toHaveClass(/ab-editor-active/);
 });
@@ -259,6 +261,7 @@ test('phone choices fill the panel and remain inside the screen', async ({ page 
 test('failed editor save stays editable and permits export and retry', async ({ page }) => {
   await blockGoogleTTS(page);
   await page.goto(GAME_URL);
+  await page.getByText('למבוגרים', { exact: true }).click();
   await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
   await page.locator('.ab-editor-btn--add').click();
   await page.evaluate(() => {

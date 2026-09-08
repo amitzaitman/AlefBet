@@ -31,3 +31,12 @@
 .letter-match-options {
   width: 100%;
 }
+
+.round-panel--options > div:last-child { width: 100%; }
+@media (max-width: 639px) {
+  .game-body { flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; }
+  .round-panel--options { flex: 0 0 auto; width: 100%; }
+  .round-panel--letter { width: 100%; }
+  .round-panel { gap: 8px; }
+  .round-panel--letter .letter-display { font-size: clamp(64px, 18dvmin, 100px); }
+}

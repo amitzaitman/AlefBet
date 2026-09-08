@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "67ff1e99251c9f6b761848012be326ffdd724d417ccd37c57baef15eb9e0e5e2",
+  "version": "5e3e274dc86794aa9710daef1b7df21ef7f3209b60fb5e948a9d6faa3eb785ef",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -34,7 +34,7 @@ self.ALEFBET_RELEASE = {
     "./manifest.webmanifest"
   ],
   "assets": {
-    "./": "3fe84a2a54358274a633c6591fab48bfecdc56d67967daae96feacbd87b04943",
+    "./": "b668a66b2ea89550a80922464accc07400e68fe08ae908cd6816f591a5453337",
     "./assets/icons/apple-touch-icon.png": "efefd01ca2a1c1cdbbd7f89701cb8972f173048a3319434b284f8fddfe5cc2c1",
     "./assets/icons/icon-192.png": "13ceea9702342b307d2d6596d1fb0c46ad4d232a24732221a4b3325140190f29",
     "./assets/icons/icon-512.png": "91ab2f1968ff273a45d9f4e6e6ffaf52fc78807c76517c2a2a63d94b711f2283",
@@ -42,16 +42,16 @@ self.ALEFBET_RELEASE = {
     "./framework/dist/editor.css": "7688c131e8863b56609441bc8412eed9a51c0f11063fdcc77d1fc863aa758fb9",
     "./framework/dist/editor.js": "e56a831e5286714029cb0c2872786db252d4280b93f6736b673fb145f7640c17",
     "./framework/dist/runtime-assets.js": "ce5ffc41e2098dc94de986b9323e840d456e816f88aced95a01d41f855d9bd8e",
-    "./framework/dist/runtime.css": "2601084120581f04214c7e25af4701b3e1d17ced6394aa6196e8556a25720de3",
-    "./framework/dist/runtime.js": "35a8ac873469003ef552d5e0862852bf5b5b662cf6a94ced83b0185a222596d2",
+    "./framework/dist/runtime.css": "f5ccddd2f83583b3a4c353df92f2fbc74c5497eeb5aaef112944e6de8fa0d8d6",
+    "./framework/dist/runtime.js": "d33f0ae788b5bf2bb9e13f76ec1528584c34e2b60bd94c0bbc5d509ec98af0d9",
     "./games/catalog.js": "0b40fb5aebae8729b4f6440de684ad6e2540b45c02f535f5156a8a24730c9779",
     "./games/letter-match-animals/": "2664d7fe3510deb8f277d4f4b298bf91ef68f72c426429d10c589ee75c370487",
-    "./games/letter-match-animals/game.css": "044ee4c668db5bff688728131075e51f03895885d69c3b4a237815ceecc1614e",
-    "./games/letter-match-animals/game.js": "f6aa3a462433e3cac4996460b83f35759b566fb6887dcaf55442ff25167cf9ab",
+    "./games/letter-match-animals/game.css": "9edeea444a45473ec44c3bfc351ed998fc5053377baa39dd050869ea1fbdc13e",
+    "./games/letter-match-animals/game.js": "0ad48337e033f94a12ea3462c19d24e9706f06e22ddb32a2afe7499e6570865b",
     "./games/letter-match-animals/index.html": "2664d7fe3510deb8f277d4f4b298bf91ef68f72c426429d10c589ee75c370487",
     "./games/nikud-match/": "852b39b1923b30a3d3f9c1cd8ffd5f2acd3f85fcbb91e3725505856a49ffb147",
     "./games/nikud-match/game.css": "78db989fba4eeb2ec909ed90e10e7b68857f018d3c9eec40bb6cf6e9f8886cb4",
-    "./games/nikud-match/game.js": "4f321bebf16c9375947a27c29f90f63286265d64cb8a11a83aba13647168c676",
+    "./games/nikud-match/game.js": "1fced398c8809404450e40dc9d9a81170748b18c1bd21159b0dc89959be836fe",
     "./games/nikud-match/index.html": "852b39b1923b30a3d3f9c1cd8ffd5f2acd3f85fcbb91e3725505856a49ffb147",
     "./games/nikud-speak/": "e9240b1dc4121a42baf3b6e3d00b72635d984fba4c9d8cb3e068ff3bb9a1040b",
     "./games/nikud-speak/game.css": "334082e65a9777e4dd6a3fbf419b8a86da937f07e898d11370c5ca20f92d8a69",
@@ -62,10 +62,10 @@ self.ALEFBET_RELEASE = {
     "./games/sound-studio/game.js": "186931e0b3ec95e90aa98e4c1b4509ca714862969024eb54919023dc247d674c",
     "./games/sound-studio/index.html": "42c5e28c285ef24c0b230bca4ca5b906e5aa89224ff3209425c63efb0e5bd975",
     "./games/syllable-read/": "55246cea53f33d126031063d05e5674865f8aa1a12262cebfcadbd2b308c1b19",
-    "./games/syllable-read/game.css": "c78e53c64e0f40a762ac47b2cfe2f8272954145a9c8fb7817be6b70a04c0d242",
+    "./games/syllable-read/game.css": "1a5b023bd0b0e3078915db150a7382595d85dc8da03beac283f096e800259868",
     "./games/syllable-read/game.js": "76d3b4c37dd31889faf51d3d77e31894e9a6e3e8fb3f1e2669e530441517fd09",
     "./games/syllable-read/index.html": "55246cea53f33d126031063d05e5674865f8aa1a12262cebfcadbd2b308c1b19",
-    "./index.html": "3fe84a2a54358274a633c6591fab48bfecdc56d67967daae96feacbd87b04943",
+    "./index.html": "b668a66b2ea89550a80922464accc07400e68fe08ae908cd6816f591a5453337",
     "./manifest.webmanifest": "61199ec6fe79202159f986f7fd7fd2058697d890788a97993b4db5eafef9c9d4"
   }
 };

@@ -45,7 +45,7 @@ export async function startGame(container) {
     preloadTexts: STATIC_TEXTS,
     loadingMessage: 'טוֹעֵן נִיקּוּד...',
     defaultRounds: randomNikud(ROUNDS).map(n => ({ target: pickLetter(), correct: n.id, correctEmoji: '' })),
-    transitionMs: 1800,
+    transitionMs: 800,
     playCorrectSound: false,
     onReplay: () => startGame(container),
     onStart: () => injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame)),

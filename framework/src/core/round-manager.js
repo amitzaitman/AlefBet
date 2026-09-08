@@ -25,7 +25,7 @@ export function createRoundManager(shell, container, {
   buildRoundUI,
   onCorrect,
   onWrong,
-  transitionMs = 1200,
+  transitionMs = 800,
   playCorrectSound = true,
   onReplay = () => location.reload(),
 }) {

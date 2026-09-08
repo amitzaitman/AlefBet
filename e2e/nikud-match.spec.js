@@ -97,8 +97,11 @@ test.describe('nikud-match', () => {
     await page.goto(GAME_URL);
 
     await expect(page.locator('.nm-arena')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: '✏️ ערוך', exact: true })).toBeHidden();
+    await page.getByText('למבוגרים', { exact: true }).click();
     await expect(page.getByRole('button', { name: '✏️ ערוך', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'הגדרות', exact: true })).toBeVisible();
+    await page.getByText('למבוגרים', { exact: true }).click();
     const initialLabel = await page.locator('.progress-bar__label').textContent();
 
     await dragLetterToCorrectZone(page);

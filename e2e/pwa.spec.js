@@ -111,7 +111,8 @@ test.describe('editor download failure', () => {
     await page.route('**/framework/dist/editor.*', route => route.abort());
     await page.goto('/games/letter-match-animals/');
     await expect(page.locator('.option-card')).toHaveCount(4);
-    await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
+    await page.getByText('למבוגרים', { exact: true }).click();
+  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
     await expect(page.locator('.ab-lazy-editor [role="status"]')).toContainText('לֹא הִצְלַחְנוּ');
     await expect(page.locator('.option-card')).toHaveCount(4);
   });
