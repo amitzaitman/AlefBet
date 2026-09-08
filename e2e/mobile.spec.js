@@ -69,3 +69,34 @@ test('adult tools stay separate and feedback does not move the choices', async (
   expect(Math.abs(after.width - before.width)).toBeLessThan(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+test('nikud supports tap selection, retry, completion and returning home', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('alefbet.editor.nikud-match', JSON.stringify({
+      id: 'nikud-match', version: 1, meta: { type: 'drag-match' },
+      rounds: [{ id: 'a', target: 'ב', correct: 'kamatz', correctEmoji: '' }],
+    }));
+  });
+  await page.goto('/games/nikud-match/');
+  const letter = page.locator('.nm-arena .nm-letter');
+  const correct = page.locator('.nm-zone[data-nikud="kamatz"]');
+  const wrong = page.locator('.nm-zone:not([data-nikud="kamatz"])');
+  await expect(letter).toBeVisible();
+  await correct.tap();
+  await expect(letter).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('.completion-screen')).toHaveCount(0);
+  await letter.tap();
+  await expect(letter).toHaveAttribute('aria-pressed', 'true');
+  await wrong.tap();
+  await expect(letter).toBeEnabled();
+  await expect(letter).toHaveAttribute('aria-pressed', 'true');
+  await correct.tap();
+  await expect(page.locator('.completion-screen__score')).toHaveText('הִשְׁלַמְתֶּם מְשִׂימָה!');
+  await page.locator('.completion-screen__replay').tap();
+  await expect(page.locator('.nm-arena .nm-letter')).toHaveAttribute('aria-pressed', 'false');
+  await letter.tap();
+  await correct.tap();
+  await expect(page.locator('.completion-screen')).toBeVisible();
+  await page.locator('.completion-screen__home').tap();
+  await expect(page.locator('.games-grid').first()).toBeVisible();
+});

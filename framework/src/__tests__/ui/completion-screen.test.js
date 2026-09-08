@@ -71,3 +71,17 @@ describe('showCompletionScreen — replay', () => {
     expect(container.querySelector('.completion-screen')).toBeNull();
   });
 });
+
+it('offers the game library and a completed-task summary for retry games', () => {
+  const replay = vi.fn();
+  showCompletionScreen(container, 8, 8, replay, { completionOnly: true, homeUrl: '/games/' });
+  expect(container.querySelector('.completion-screen__score').textContent).toBe('הִשְׁלַמְתֶּם 8 מְשִׂימוֹת!');
+  expect(container.querySelector('.completion-screen__home').getAttribute('href')).toBe('/games/');
+  expect(replay).not.toHaveBeenCalled();
+});
+
+it('supports a single completed task and an embedded game without a home link', () => {
+  showCompletionScreen(container, 1, 1, () => {}, { completionOnly: true, homeUrl: null });
+  expect(container.querySelector('.completion-screen__score').textContent).toBe('הִשְׁלַמְתֶּם מְשִׂימָה!');
+  expect(container.querySelector('.completion-screen__home')).toBeNull();
+});

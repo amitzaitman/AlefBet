@@ -8,7 +8,7 @@
  * @param {number} score - ניקוד שהושג
  * @param {number} totalRounds - מספר הסיבובים הכולל
  * @param {function} onReplay - קולבק לחזרה על המשחק
- * @param {{ gameId?: string }} [opts] - gameId לרישום התקדמות
+ * @param {{ gameId?: string, completionOnly?: boolean, homeUrl?: string | null }} [opts] - gameId לרישום התקדמות
  */
 import { sounds } from '../audio/sounds.js';
 import { animate } from '../render/animations.js';
@@ -21,6 +21,9 @@ export function showCompletionScreen(container, score, totalRounds, onReplay, op
     recordGameResult(opts.gameId, { score, total: totalRounds });
   }
 
+  const summary = opts.completionOnly
+    ? (totalRounds === 1 ? 'הִשְׁלַמְתֶּם מְשִׂימָה!' : `הִשְׁלַמְתֶּם ${totalRounds} מְשִׂימוֹת!`)
+    : `נִיקּוּד: ${score} מִתּוֹךְ ${totalRounds}`;
   const stars = starsFor(score, totalRounds);
   const starDisplay = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
 
@@ -30,10 +33,21 @@ export function showCompletionScreen(container, score, totalRounds, onReplay, op
     <div class="completion-screen__content">
       <div class="completion-screen__stars" aria-label="${stars} כּוֹכָבִים">${starDisplay}</div>
       <h2 class="completion-screen__title">!כָּל הַכָּבוֹד</h2>
-      <p class="completion-screen__score">נִיקּוּד: ${score} מִתּוֹךְ ${totalRounds}</p>
-      <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
+      <p class="completion-screen__score">${summary}</p>
+      <div class="completion-screen__actions">
+        <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
+      </div>
     </div>
   `;
+
+  const homeUrl = opts.homeUrl === undefined ? '../../index.html' : opts.homeUrl;
+  if (homeUrl) {
+    const home = document.createElement('a');
+    home.className = 'completion-screen__home btn';
+    home.href = homeUrl;
+    home.textContent = 'בְּחִירַת מִשְׂחָק';
+    screen.querySelector('.completion-screen__actions').appendChild(home);
+  }
 
   screen.querySelector('.completion-screen__replay').addEventListener('click', () => {
     screen.remove();

@@ -128,3 +128,23 @@
     font-size: clamp(44px, 16dvmin, 78px);
   }
 }
+
+.nm-stage { width: 100%; display: flex; flex-direction: column; align-items: center; }
+.nm-stage .game-instruction { margin: 0; text-align: center; }
+.nm-help {
+  min-height: 64px; padding: 8px 16px; font: inherit; color: var(--ab-ink-soft);
+  border: 0; background: transparent; text-decoration: underline; cursor: pointer;
+}
+.nm-status { min-height: 3em; margin: 0; text-align: center; font-size: 18px; }
+.nm-zone { border: 0; font: inherit; min-width: 64px; min-height: 64px; }
+.nm-letter[aria-pressed="true"] { outline: 4px solid var(--ab-teal); outline-offset: 4px; }
+.nm-zone:focus-visible, .nm-letter:focus-visible, .nm-help:focus-visible { outline: 4px solid var(--ab-plum); outline-offset: 4px; }
+.nm-demo { pointer-events: none; z-index: 30; margin: 0; animation: none; }
+@media (max-width: 480px) {
+  .nm-arena { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nm-center { grid-row: 1; grid-column: 1 / -1; }
+  .nm-zone { grid-row: 2; width: 100%; padding: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nm-letter, .nm-zone { animation: none; transition: none; }
+}

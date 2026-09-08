@@ -1169,3 +1169,6 @@
 }
 .feedback-message:empty { padding: 8px 12px; }
 .option-card:disabled.option-card--correct { opacity: 1; }
+
+.completion-screen__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+.completion-screen__home { text-decoration: none; }

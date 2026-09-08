@@ -17,6 +17,7 @@ import { showCompletionScreen } from '../ui/completion-screen.js';
  * @param {function} [opts.onWrong] - קולבק אופציונלי לאחר תשובה שגויה
  * @param {number} [opts.transitionMs] - זמן לפני הסיבוב הבא
  * @param {boolean} [opts.playCorrectSound] - כבה אם המשחק כבר משמיע משוב
+ * @param {boolean} [opts.completionOnly] - הצג משימות שהושלמו במקום ציון
  * @param {function} [opts.onReplay] - התחלה מחדש ללא טעינת העמוד
  */
 export function createRoundManager(shell, container, {
@@ -27,6 +28,7 @@ export function createRoundManager(shell, container, {
   onWrong,
   transitionMs = 800,
   playCorrectSound = true,
+  completionOnly = false,
   onReplay = () => location.reload(),
 }) {
   let answered = false;
@@ -72,7 +74,7 @@ export function createRoundManager(shell, container, {
       setAnswered(false);
       buildRoundUI();
     } else {
-      showCompletionScreen(container, shell.state.score, totalRounds, onReplay, { gameId: shell.gameId });
+      showCompletionScreen(container, shell.state.score, totalRounds, onReplay, { gameId: shell.gameId, completionOnly, homeUrl: shell.config.homeUrl });
     }
   }
 

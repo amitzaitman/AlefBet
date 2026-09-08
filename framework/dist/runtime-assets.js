@@ -1,1 +1,1 @@
-self.ALEFBET_RUNTIME_ASSETS = ["drag-C4nvWSSp.js","runtime.css","runtime.js"];
+self.ALEFBET_RUNTIME_ASSETS = ["drag-BOhfQMOo.js","runtime.css","runtime.js"];

@@ -225,13 +225,13 @@ test('wrong answer keeps the same choices and allows a correct retry', async ({ 
   await expect(page.locator('.progress-bar__label')).not.toHaveText(progress);
 });
 
-test('all eight rounds complete with word instructions and full score', async ({ page }) => {
+test('all eight rounds complete with word instructions and a completion summary', async ({ page }) => {
   await blockGoogleTTS(page);
   await page.goto(GAME_URL);
   const letters = new Set();
   for (let round = 0; round < 8; round++) {
     const instruction = page.locator('.game-instruction');
-    await expect(instruction).toHaveText('מִצְאוּ אֶת הַמִּלָּה שֶׁמַּתְחִילָה בָּאוֹת:');
+    await expect(instruction).toHaveText('אֵיזוֹ מִלָּה מַתְחִילָה בָּאוֹת?');
     const letter = await page.locator('.letter-display').textContent();
     expect(letters.has(letter)).toBe(false);
     letters.add(letter);
@@ -239,7 +239,9 @@ test('all eight rounds complete with word instructions and full score', async ({
     if (round < 7) await expect(page.locator('.letter-display')).not.toHaveText(letter);
   }
   await expect(page.locator('.completion-screen')).toBeVisible();
-  await expect(page.locator('.completion-screen__score')).toContainText('8');
+  await expect(page.locator('.completion-screen__score')).toHaveText('הִשְׁלַמְתֶּם 8 מְשִׂימוֹת!');
+  await page.locator('.completion-screen__home').click();
+  await expect(page.locator('.games-grid').first()).toBeVisible();
 });
 
 test('phone choices fill the panel and remain inside the screen', async ({ page }) => {

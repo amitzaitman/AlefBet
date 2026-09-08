@@ -40,6 +40,8 @@ function _createClone(sourceEl, x, y) {
   _halfH = rect.height / 2;
 
   _clone = sourceEl.cloneNode(true);
+  _clone.setAttribute('aria-hidden', 'true');
+  _clone.setAttribute('tabindex', '-1');
   Object.assign(_clone.style, {
     position:      'fixed',
     left:          '0',
@@ -110,9 +112,10 @@ function _clearHighlight() {
  * הפוך אלמנט למקור גרירה
  * @param {HTMLElement} el - האלמנט הנגרר
  * @param {*} data - נתונים שיועברו ל-drop target
+ * @param {{ onTap?: () => void }} [options] - בחירה קצרה ללא גרירה
  * @returns {{ destroy() }}
  */
-export function createDragSource(el, data) {
+export function createDragSource(el, data, { onTap } = {}) {
   el.classList.add('drag-source');
 
   // Handlers are created per-drag so they can be removed cleanly
@@ -134,6 +137,7 @@ export function createDragSource(el, data) {
   }
 
   function onPointerDown(e) {
+    if (el.matches(':disabled') || el.getAttribute('aria-disabled') === 'true') return;
     if (e.button !== undefined && e.button !== 0) return; // left button only
     e.preventDefault();
 
@@ -141,8 +145,14 @@ export function createDragSource(el, data) {
     if (_activeSource) _endDrag();
 
     _activeSource = { el, data };
-    el.classList.add('drag-source--dragging');
-    _createClone(el, e.clientX, e.clientY);
+    let dragging = false;
+    const startDrag = () => {
+      dragging = true;
+      el.classList.add('drag-source--dragging');
+      _createClone(el, e.clientX, e.clientY);
+    };
+    const moved = ev => Math.hypot(ev.clientX - e.clientX, ev.clientY - e.clientY) >= 8;
+    if (!onTap) startDrag();
 
     // Explicit pointer capture ensures pointermove/pointerup always fire on
     // this element — for BOTH mouse and touch — even when the pointer moves
@@ -150,12 +160,15 @@ export function createDragSource(el, data) {
     el.setPointerCapture(e.pointerId);
 
     _moveHandler = (ev) => {
-      _scheduleMove(ev.clientX, ev.clientY);
+      if (!dragging && moved(ev)) startDrag();
+      if (dragging) _scheduleMove(ev.clientX, ev.clientY);
     };
 
     _upHandler = (ev) => {
-      const targetEl = _findTargetAt(ev.clientX, ev.clientY);
+      const tapped = !dragging && !moved(ev);
+      const targetEl = tapped && onTap ? null : _findTargetAt(ev.clientX, ev.clientY);
       _endDrag();
+      if (tapped && onTap) { onTap(); return; }
       // Finalize after cleanup so onDrop can safely call destroy()
       if (targetEl && _targets.has(targetEl)) {
         _targets.get(targetEl).onDrop({ data, sourceEl: el, targetEl });

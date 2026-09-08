@@ -177,3 +177,46 @@ describe('createDragSource - destroy', () => {
     expect(source.classList.contains('drag-source')).toBe(false);
   });
 });
+
+describe('tap selection alongside dragging', () => {
+  it('treats a short press as a tap without flashing a drag clone', () => {
+    const onTap = vi.fn();
+    const handle = createDragSource(source, {}, { onTap });
+    firePointer(source, 'pointerdown', { x: 40, y: 30 });
+    firePointer(source, 'pointermove', { x: 43, y: 32 });
+    expect(document.body.children).toHaveLength(1);
+    firePointer(source, 'pointerup', { x: 43, y: 32 });
+    expect(onTap).toHaveBeenCalledOnce();
+    expect(raf.pendingCount()).toBe(0);
+    handle.destroy();
+  });
+
+  it('drops after movement without also selecting the source', () => {
+    const onTap = vi.fn();
+    const onDrop = vi.fn();
+    const handle = createDragSource(source, {}, { onTap });
+    const drop = createDropTarget(target, onDrop);
+    document.elementFromPoint = vi.fn(() => target);
+    firePointer(source, 'pointerdown', { x: 0, y: 0 });
+    firePointer(source, 'pointermove', { x: 30, y: 30 });
+    expect(document.body.children).toHaveLength(2);
+    firePointer(source, 'pointerup', { x: 30, y: 30 });
+    expect(onDrop).toHaveBeenCalledOnce();
+    expect(onTap).not.toHaveBeenCalled();
+    handle.destroy(); drop.destroy();
+  });
+
+  it('does not select on cancellation or start from a disabled source', () => {
+    const onTap = vi.fn();
+    const handle = createDragSource(source, {}, { onTap });
+    firePointer(source, 'pointerdown', { x: 0, y: 0 });
+    firePointer(source, 'pointercancel', { x: 0, y: 0 });
+    expect(onTap).not.toHaveBeenCalled();
+    source.setAttribute('aria-disabled', 'true');
+    firePointer(source, 'pointerdown', { x: 0, y: 0 });
+    firePointer(source, 'pointerup', { x: 0, y: 0 });
+    expect(onTap).not.toHaveBeenCalled();
+    expect(document.body.children).toHaveLength(1);
+    handle.destroy();
+  });
+});

@@ -145,3 +145,23 @@ test.describe('nikud-match', () => {
     }).toPass({ timeout: 5_000 });
   });
 });
+
+test('keyboard selection works and the optional demonstration cleans up on input', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('alefbet.editor.nikud-match', JSON.stringify({
+      id: 'nikud-match', version: 1, meta: { type: 'drag-match' },
+      rounds: [{ id: 'a', target: 'ב', correct: 'kamatz', correctEmoji: '' }],
+    }));
+  });
+  await page.goto(GAME_URL);
+  await page.locator('.nm-help').click();
+  await expect(page.locator('.nm-demo')).toHaveCount(1);
+  const letter = page.locator('.nm-arena .nm-letter');
+  await letter.focus();
+  await page.keyboard.press('Space');
+  await expect(letter).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.nm-demo')).toHaveCount(0);
+  await page.locator('.nm-zone[data-nikud="kamatz"]').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.completion-screen')).toBeVisible();
+});

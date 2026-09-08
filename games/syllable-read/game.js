@@ -116,6 +116,10 @@ export async function startGame(container) {
 
       const stage = document.createElement('div');
       stage.className = 'sr-stage';
+      const instruction = document.createElement('p');
+      instruction.className = 'game-instruction';
+      instruction.textContent = 'הַקְשִׁיבוּ וּבַחֲרוּ אֶת הַהֲבָרָה';
+      stage.appendChild(instruction);
 
       // כפתור השמעה גדול - הילד תמיד יכול לשמוע שוב.
       const replay = document.createElement('button');

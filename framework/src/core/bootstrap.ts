@@ -151,6 +151,7 @@ export async function runGame(container: HTMLElement, opts: RunGameOptions): Pro
   const disposeRound = () => { scope?.dispose(); scope = undefined; };
   const manager = createRoundManager(shell, container, {
     totalRounds: activeRounds.length,
+    completionOnly: true,
     progressBar: progress,
     transitionMs: opts.transitionMs,
     playCorrectSound: opts.playCorrectSound,

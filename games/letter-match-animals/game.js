@@ -38,7 +38,7 @@ const ALL_REGULAR_WORDS = getLettersByGroup('regular').map(l => ({ text: l.examp
 
 // ── All texts that need nikud ──────────────────────────────────────────────
 
-const INSTRUCTION = 'מִצְאוּ אֶת הַמִּלָּה שֶׁמַּתְחִילָה בָּאוֹת:';
+const INSTRUCTION = 'אֵיזוֹ מִלָּה מַתְחִילָה בָּאוֹת?';
 
 const STATIC_TEXTS = [
   INSTRUCTION,

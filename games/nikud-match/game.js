@@ -60,101 +60,140 @@ export async function startGame(container) {
       title: 'לימוד ניקוד',
       restartGame: startGame,
     },
-    buildRound: ({ shell, round, onCorrect, isAnswered, schedule, scope }) => {
-      function buildRoundUI(targetNikud) {
-        shell.bodyEl.innerHTML = '';
+    buildRound: ({ shell, round, onCorrect, isAnswered, subscribeAnswered, scope }) => {
+      const targetNikud = nikudList.find(n => n.id === round.correct || n.name === round.correct) || randomNikud(1)[0];
+      const letter = round.target || pickLetter();
+      const distractor = pickDistractor(targetNikud, nikudList);
+      const choices = Math.random() < 0.5 ? [targetNikud, distractor] : [distractor, targetNikud];
+      let selected = false;
+      let cancelDemo = () => {};
 
-        const letter = round.target || pickLetter();
-        const distractor = pickDistractor(targetNikud, nikudList);
-        const correctOnRight = Math.random() < 0.5;
-        const leftNikud = correctOnRight ? distractor : targetNikud;
-        const rightNikud = correctOnRight ? targetNikud : distractor;
+      const stage = document.createElement('div');
+      stage.className = 'nm-stage';
+      const instruction = document.createElement('p');
+      instruction.className = 'game-instruction';
+      instruction.textContent = 'בַּחֲרוּ אֶת הָאוֹת וְאָז אֶת הַנִּיקּוּד';
+      stage.appendChild(instruction);
 
-        // ── Arena ──
-        const arena = document.createElement('div');
-        arena.className = 'nm-arena';
+      const help = document.createElement('button');
+      help.type = 'button';
+      help.className = 'nm-help';
+      help.textContent = 'אֶפְשָׁר גַּם לִגְרֹר — הַרְאוּ לִי';
+      stage.appendChild(help);
 
-        // Left zone
-        const leftZone = document.createElement('div');
-        leftZone.className = 'nm-zone nm-zone--left';
-        leftZone.style.setProperty('--zone-color', leftNikud.color);
-        leftZone.appendChild(createNikudBox(leftNikud));
-        arena.appendChild(leftZone);
+      const status = document.createElement('p');
+      status.className = 'nm-status';
+      status.setAttribute('role', 'status');
+      status.textContent = 'לַחֲצוּ עַל הָאוֹת';
+      stage.appendChild(status);
 
-        // Center: letter with target nikud
-        const centerArea = document.createElement('div');
-        centerArea.className = 'nm-center';
+      const arena = document.createElement('div');
+      arena.className = 'nm-arena';
+      stage.appendChild(arena);
+      shell.bodyEl.appendChild(stage);
 
-        const letterEl = document.createElement('div');
-        letterEl.className = 'nm-letter';
-        letterEl.textContent = letterWithNikud(letter, targetNikud.symbol);
+      const letterEl = document.createElement('button');
+      letterEl.type = 'button';
+      letterEl.className = 'nm-letter';
+      letterEl.textContent = letterWithNikud(letter, targetNikud.symbol);
+      letterEl.setAttribute('aria-label', `בְּחִירַת הָאוֹת ${letterEl.textContent}`);
+      letterEl.setAttribute('aria-pressed', 'false');
+      const center = document.createElement('div');
+      center.className = 'nm-center';
+      center.appendChild(letterEl);
 
-        centerArea.appendChild(letterEl);
-        arena.appendChild(centerArea);
+      const zones = choices.map((nikud, i) => {
+        const zone = document.createElement('button');
+        zone.type = 'button';
+        zone.className = `nm-zone nm-zone--${i === 0 ? 'left' : 'right'}`;
+        zone.dataset.nikud = nikud.id;
+        zone.setAttribute('aria-label', nikud.nameNikud || nikud.name);
+        zone.style.setProperty('--zone-color', nikud.color);
+        zone.appendChild(createNikudBox(nikud));
+        return zone;
+      });
+      arena.append(zones[0], center, zones[1]);
+      const correctZone = zones[choices.findIndex(n => n.id === targetNikud.id)];
 
-        // Right zone
-        const rightZone = document.createElement('div');
-        rightZone.className = 'nm-zone nm-zone--right';
-        rightZone.style.setProperty('--zone-color', rightNikud.color);
-        rightZone.appendChild(createNikudBox(rightNikud));
-        arena.appendChild(rightZone);
-
-        shell.bodyEl.appendChild(arena);
-
-        // גרירה היא אופן האינטראקציה העיקרי: הילד גורר את האות לאזור הניקוד הנכון.
-        const correctZone = leftNikud.id === targetNikud.id ? leftZone : rightZone;
-
-        scope.use(createDragSource(letterEl, { letter, targetNikud }));
-
-        scope.use(createDropTarget(leftZone, ({ data }) => {
-          handleAnswer(
-            leftNikud.id === data.targetNikud.id,
-            data.letter, data.targetNikud, letterEl, leftZone, correctZone,
-          );
-        }));
-
-        scope.use(createDropTarget(rightZone, ({ data }) => {
-          handleAnswer(
-            rightNikud.id === data.targetNikud.id,
-            data.letter, data.targetNikud, letterEl, rightZone, correctZone,
-          );
-        }));
+      function selectLetter() {
+        if (isAnswered()) return;
+        cancelDemo();
+        selected = !selected;
+        letterEl.setAttribute('aria-pressed', String(selected));
+        status.textContent = selected ? 'עַכְשָׁיו בַּחֲרוּ אֶת הַנִּיקּוּד' : 'לַחֲצוּ עַל הָאוֹת';
       }
 
-      async function handleAnswer(isCorrect, letter, targetNikud, letterEl, zone, correctZone) {
+      function answer(zone) {
         if (isAnswered()) return;
-
-        if (isCorrect) {
-          zone.classList.add('nm-zone--correct');
-          letterEl.classList.add('nm-letter--correct');
-
-          // Animate letter toward the zone
-          const zoneRect = zone.getBoundingClientRect();
-          const letterRect = letterEl.getBoundingClientRect();
-          const dx = zoneRect.left + zoneRect.width / 2 - (letterRect.left + letterRect.width / 2);
-          const dy = zoneRect.top + zoneRect.height / 2 - (letterRect.top + letterRect.height / 2);
-          letterEl.style.transition = 'transform 0.3s ease';
-          letterEl.style.transform = `translate(${dx}px, ${dy}px) scale(0.7)`;
-
-          animate(zone, 'bounce');
-          sounds.correct();
-          // שרשרת אופליין-תחילה: הקלטת מורה -> קול מערכת -> סינתזת פונמות.
-          // חשוב במיוחד באייפון/Safari, שלרוב אין בו קול עברי מותקן כברירת מחדל.
-          speakSyllable(letter, targetNikud.id, { signal: scope.signal });
-
-          await onCorrect();
+        cancelDemo();
+        if (zone === correctZone) {
+          void onCorrect(() => {
+            status.textContent = 'כָּל הַכָּבוֹד!';
+            zone.classList.add('nm-zone--correct');
+            letterEl.classList.add('nm-letter--correct');
+            if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+              const from = letterEl.getBoundingClientRect();
+              const to = zone.getBoundingClientRect();
+              letterEl.style.transition = 'transform 0.3s ease';
+              letterEl.style.transform = `translate(${to.left + to.width / 2 - from.left - from.width / 2}px, ${to.top + to.height / 2 - from.top - from.height / 2}px) scale(0.7)`;
+            }
+            animate(zone, 'bounce');
+            sounds.correct();
+            void speakSyllable(letter, targetNikud.id, { signal: scope.signal });
+          });
         } else {
-          // עידוד חיובי בלבד: פעימה עדינה של האות לאישור הלחיצה,
-          // ולאחריה רמז עדין על האזור הנכון. ללא סימון שלילי או צליל שגוי.
+          status.textContent = 'נַסּוּ אֶת הַנִּיקּוּד הָאַחֵר';
           animate(letterEl, 'pulse');
-          schedule(() => {
-            if (!isAnswered()) animate(correctZone, 'pulse');
-          }, 700);
+          scope.schedule(() => { if (!isAnswered()) animate(correctZone, 'pulse'); }, 700);
         }
       }
 
-      const targetNikud = nikudList.find(n => n.id === round.correct || n.name === round.correct) || randomNikud(1)[0];
-      buildRoundUI(targetNikud);
+      scope.use(createDragSource(letterEl, { letter, targetNikud }, { onTap: selectLetter }));
+      // Pointer taps are handled by the drag helper; native keyboard/AT clicks have detail=0.
+      scope.listen(letterEl, 'click', event => { if (event.detail === 0) selectLetter(); });
+      scope.listen(letterEl, 'pointerdown', () => cancelDemo());
+      zones.forEach(zone => {
+        scope.use(createDropTarget(zone, () => answer(zone)));
+        scope.listen(zone, 'click', () => {
+          if (isAnswered()) return;
+          if (selected) answer(zone);
+          else { status.textContent = 'קֹדֶם בַּחֲרוּ אֶת הָאוֹת'; animate(letterEl, 'pulse'); }
+        });
+      });
+      subscribeAnswered(locked => {
+        letterEl.disabled = locked;
+        help.disabled = locked;
+        zones.forEach(zone => { zone.disabled = locked; });
+      });
+
+      scope.listen(help, 'click', () => {
+        if (isAnswered()) return;
+        cancelDemo();
+        status.textContent = 'גִּרְרוּ אֶת הָאוֹת לַנִּיקּוּד הַמַּתְאִים';
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          correctZone.focus();
+          return;
+        }
+        const from = letterEl.getBoundingClientRect();
+        const to = correctZone.getBoundingClientRect();
+        const ghost = letterEl.cloneNode(true);
+        ghost.disabled = true;
+        ghost.setAttribute('aria-hidden', 'true');
+        ghost.removeAttribute('aria-pressed');
+        ghost.className = 'nm-letter nm-demo';
+        Object.assign(ghost.style, {
+          position: 'fixed', left: `${from.left}px`, top: `${from.top}px`,
+          width: `${from.width}px`, height: `${from.height}px`,
+        });
+        document.body.appendChild(ghost);
+        const animation = ghost.animate([
+          { transform: 'translate(0, 0)', opacity: 0.8 },
+          { transform: `translate(${to.left + to.width / 2 - from.left - from.width / 2}px, ${to.top + to.height / 2 - from.top - from.height / 2}px) scale(0.7)`, opacity: 0 },
+        ], { duration: 1200, easing: 'ease-in-out', fill: 'forwards' });
+        const cancelTimer = scope.schedule(() => cancelDemo(), 1250);
+        cancelDemo = () => { cancelTimer(); animation.cancel(); ghost.remove(); };
+      });
+      scope.use(() => cancelDemo());
     },
   });
 }
