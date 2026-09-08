@@ -98,10 +98,11 @@ function _blobBytes(blob) {
   });
 }
 
-export async function playBlob(blob) {
-  if (!blob) return false;
+/** @param {Blob} blob @param {{ signal?: AbortSignal }} [options] */
+export async function playBlob(blob, { signal } = {}) {
+  if (signal?.aborted || !blob) return false;
   const ctx = await ensureAudioRunning();
-  if (!ctx || typeof ctx.decodeAudioData !== 'function') return false;
+  if (signal?.aborted || !ctx || typeof ctx.decodeAudioData !== 'function') return false;
   let buffer;
   try {
     const bytes = await _blobBytes(blob);
@@ -113,17 +114,33 @@ export async function playBlob(blob) {
   } catch {
     return false;
   }
+  if (signal?.aborted) return false;
   return new Promise((resolve) => {
+    let source;
+    let timer;
+    let settled = false;
+    const done = ok => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', abort);
+      if (source) {
+        source.onended = null;
+        try { source.stop(); source.disconnect(); } catch { /* already stopped */ }
+      }
+      resolve(ok);
+    };
+    const abort = () => done(false);
     try {
-      const source = ctx.createBufferSource();
+      source = ctx.createBufferSource();
       source.buffer = buffer;
       source.connect(ctx.destination);
-      source.onended = () => resolve(true);
+      source.onended = () => done(true);
+      signal?.addEventListener('abort', abort, { once: true });
+      timer = setTimeout(() => done(true), (buffer.duration + 0.5) * 1000);
       source.start(0);
-      // רשת ביטחון אם onended לא יורה (דפדפנים ישנים).
-      setTimeout(() => resolve(true), (buffer.duration + 0.5) * 1000);
     } catch {
-      resolve(false);
+      done(false);
     }
   });
 }

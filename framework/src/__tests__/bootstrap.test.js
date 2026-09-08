@@ -165,3 +165,29 @@ describe('bootstrapGame', () => {
     expect(host.querySelector('.game-title')).toBeNull();
   });
 });
+
+it('round scope removes old timers and listeners on advance and after a synchronous exit', async () => {
+  vi.useFakeTimers();
+  const contexts = [];
+  const action = vi.fn();
+  const button = document.createElement('button');
+  const cleanup = vi.fn();
+  await runGame(mountContainer(), {
+    gameId: 'scopes', title: '', preloadTexts: [], audio: false,
+    defaultRounds: [{ target: 'א' }, { target: 'ב' }], transitionMs: 10,
+    buildRound: context => {
+      contexts.push(context);
+      context.scope.schedule(action, 1000);
+      context.scope.listen(button, 'click', action);
+      if (context.index === 1) context.shell.end();
+      return cleanup;
+    },
+  });
+  const pending = contexts[0].onCorrect();
+  await vi.runAllTimersAsync();
+  await pending;
+  button.click();
+  expect(action).not.toHaveBeenCalled();
+  expect(cleanup).toHaveBeenCalledTimes(2);
+  expect(contexts.every(context => context.scope.signal.aborted)).toBe(true);
+});

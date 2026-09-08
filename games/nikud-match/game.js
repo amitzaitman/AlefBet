@@ -60,8 +60,7 @@ export async function startGame(container) {
       title: 'לימוד ניקוד',
       restartGame: startGame,
     },
-    buildRound: ({ shell, round, onCorrect, isAnswered, schedule }) => {
-      const resources = [];
+    buildRound: ({ shell, round, onCorrect, isAnswered, schedule, scope }) => {
       function buildRoundUI(targetNikud) {
         shell.bodyEl.innerHTML = '';
 
@@ -105,16 +104,16 @@ export async function startGame(container) {
         // גרירה היא אופן האינטראקציה העיקרי: הילד גורר את האות לאזור הניקוד הנכון.
         const correctZone = leftNikud.id === targetNikud.id ? leftZone : rightZone;
 
-        resources.push(createDragSource(letterEl, { letter, targetNikud }));
+        scope.use(createDragSource(letterEl, { letter, targetNikud }));
 
-        resources.push(createDropTarget(leftZone, ({ data }) => {
+        scope.use(createDropTarget(leftZone, ({ data }) => {
           handleAnswer(
             leftNikud.id === data.targetNikud.id,
             data.letter, data.targetNikud, letterEl, leftZone, correctZone,
           );
         }));
 
-        resources.push(createDropTarget(rightZone, ({ data }) => {
+        scope.use(createDropTarget(rightZone, ({ data }) => {
           handleAnswer(
             rightNikud.id === data.targetNikud.id,
             data.letter, data.targetNikud, letterEl, rightZone, correctZone,
@@ -141,7 +140,7 @@ export async function startGame(container) {
           sounds.correct();
           // שרשרת אופליין-תחילה: הקלטת מורה -> קול מערכת -> סינתזת פונמות.
           // חשוב במיוחד באייפון/Safari, שלרוב אין בו קול עברי מותקן כברירת מחדל.
-          speakSyllable(letter, targetNikud.id);
+          speakSyllable(letter, targetNikud.id, { signal: scope.signal });
 
           await onCorrect();
         } else {
@@ -156,7 +155,6 @@ export async function startGame(container) {
 
       const targetNikud = nikudList.find(n => n.id === round.correct || n.name === round.correct) || randomNikud(1)[0];
       buildRoundUI(targetNikud);
-      return () => resources.forEach(resource => resource.destroy());
     },
   });
 }

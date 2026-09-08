@@ -18,7 +18,6 @@ import { showCompletionScreen } from '../ui/completion-screen.js';
  * @param {number} [opts.transitionMs] - זמן לפני הסיבוב הבא
  * @param {boolean} [opts.playCorrectSound] - כבה אם המשחק כבר משמיע משוב
  * @param {function} [opts.onReplay] - התחלה מחדש ללא טעינת העמוד
- * @returns {{ handleCorrect: function, handleWrong: function, isAnswered: function, reset: function }}
  */
 export function createRoundManager(shell, container, {
   totalRounds,
@@ -31,6 +30,17 @@ export function createRoundManager(shell, container, {
   onReplay = () => location.reload(),
 }) {
   let answered = false;
+  const listeners = new Set();
+  function setAnswered(value) {
+    answered = value || shell.ended;
+    listeners.forEach(listener => listener(answered));
+  }
+  function subscribe(listener) {
+    listeners.add(listener);
+    listener(answered || shell.ended);
+    return () => { listeners.delete(listener); };
+  }
+  shell.on('end', () => { setAnswered(true); listeners.clear(); });
 
   /**
    * טפל בתשובה נכונה
@@ -38,7 +48,7 @@ export function createRoundManager(shell, container, {
    */
   async function handleCorrect(extraAction) {
     if (answered || shell.ended) return;
-    answered = true;
+    setAnswered(true);
 
     if (playCorrectSound) sounds.correct();
 
@@ -47,7 +57,7 @@ export function createRoundManager(shell, container, {
       if (shell.ended) return;
       if (onCorrect) await onCorrect();
     } catch (error) {
-      answered = false;
+      setAnswered(false);
       throw error;
     }
 
@@ -59,7 +69,7 @@ export function createRoundManager(shell, container, {
 
     const hasMore = shell.nextRound();
     if (hasMore) {
-      answered = false;
+      setAnswered(false);
       buildRoundUI();
     } else {
       showCompletionScreen(container, shell.state.score, totalRounds, onReplay, { gameId: shell.gameId });
@@ -71,13 +81,13 @@ export function createRoundManager(shell, container, {
    */
   async function handleWrong(extraAction) {
     if (answered || shell.ended) return;
-    answered = true;
+    setAnswered(true);
 
     try {
       if (extraAction) await extraAction();
       if (!shell.ended && onWrong) await onWrong();
     } finally {
-      answered = false;
+      setAnswered(false);
     }
   }
 
@@ -88,8 +98,8 @@ export function createRoundManager(shell, container, {
 
   /** אפס את הנעילה לסיבוב חדש */
   function reset() {
-    answered = false;
+    setAnswered(false);
   }
 
-  return { handleCorrect, handleWrong, isAnswered, reset };
+  return { handleCorrect, handleWrong, isAnswered, reset, subscribe };
 }

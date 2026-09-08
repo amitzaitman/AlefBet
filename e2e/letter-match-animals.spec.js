@@ -215,8 +215,7 @@ test('wrong answer keeps the same choices and allows a correct retry', async ({ 
   const progress = await page.locator('.progress-bar__label').textContent();
   await page.locator('.option-card[data-id="wrong-0"]').click();
   await expect(page.locator('.feedback-message--hint')).toBeVisible();
-  await expect(cards.first()).toBeDisabled();
-  await expect(cards.first()).toBeEnabled();
+  expect(await cards.evaluateAll(elements => elements.every(el => !el.disabled))).toBe(true);
   expect(await cards.allTextContents()).toEqual(choices);
   await expect(page.locator('.letter-display')).toHaveText(letter);
   await expect(page.locator('.progress-bar__label')).toHaveText(progress);

@@ -53,7 +53,7 @@ if (typeof window !== 'undefined' && typeof window.AudioContext === 'undefined')
       };
     }
     createGain() {
-      return { connect() {}, gain: silentParam() };
+      return { connect() {}, disconnect() {}, gain: silentParam() };
     }
     // נדרשים ל-phoneme-synth (מסנני פורמנטים ורעש)
     createBiquadFilter() {

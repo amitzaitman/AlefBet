@@ -118,3 +118,18 @@ describe('playBlob', () => {
     expect(await mod.playBlob(null)).toBe(false);
   });
 });
+
+
+it('stops and disconnects a playing recording when aborted', async () => {
+  const { TestAudioContext } = makeCtxClass({ state: 'running', withDecode: true });
+  const source = { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn() };
+  TestAudioContext.prototype.createBufferSource = () => source;
+  const mod = await loadModule(TestAudioContext);
+  const controller = new AbortController();
+  const pending = mod.playBlob(new Blob(['bytes']), { signal: controller.signal });
+  await vi.waitFor(() => expect(source.start).toHaveBeenCalledOnce());
+  controller.abort();
+  expect(await pending).toBe(false);
+  expect(source.stop).toHaveBeenCalledOnce();
+  expect(source.disconnect).toHaveBeenCalledOnce();
+});

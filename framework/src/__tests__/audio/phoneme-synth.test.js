@@ -3,8 +3,8 @@
  * מפרטי הפורמנטים חייבים להיות עקביים עם תבניות הגלאי,
  * וכל עיצור של hebrew-letters חייב לקבל מפרט onset תקין.
  */
-import { describe, it, expect } from 'vitest';
-import { vowelFormantSpec, consonantOnsetSpec, isSynthSupported, synthesizeVowel } from '../../audio/phoneme-synth.js';
+import { describe, it, expect, vi } from 'vitest';
+import { vowelFormantSpec, consonantOnsetSpec, isSynthSupported, synthesizeVowel, synthesizeSyllable } from '../../audio/phoneme-synth.js';
 import { VOWEL_TEMPLATES } from '../../audio/vowel-detector.js';
 import { hebrewLetters } from '../../data/hebrew-letters.js';
 
@@ -67,4 +67,29 @@ describe('synthesizeVowel', () => {
     expect(isSynthSupported()).toBe(true);
     await expect(synthesizeVowel('a', { durationMs: 30 })).resolves.toBe(true);
   });
+});
+
+
+it('disconnects an active syllable and settles immediately when its round ends', async () => {
+  vi.useFakeTimers();
+  const controller = new AbortController();
+  const { getAudioContext } = await import('../../audio/audio-context.js');
+  const ctx = getAudioContext();
+  const createGain = ctx.createGain.bind(ctx);
+  const outputs = [];
+  const spy = vi.spyOn(ctx, 'createGain').mockImplementation(() => {
+    const gain = createGain();
+    gain.disconnect = vi.fn();
+    outputs.push(gain);
+    return gain;
+  });
+  try {
+    const pending = synthesizeSyllable('sh', 'a', { signal: controller.signal });
+    await Promise.resolve();
+    await Promise.resolve();
+    controller.abort();
+    expect(await pending).toBe(false);
+    expect(outputs[0].disconnect).toHaveBeenCalledOnce();
+    expect(vi.getTimerCount()).toBe(0);
+  } finally { spy.mockRestore(); }
 });

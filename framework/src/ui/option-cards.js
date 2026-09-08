@@ -4,9 +4,8 @@
  * [נוסף על ידי: letter-match game]
  *
  * @param {HTMLElement} container - אלמנט המיכל
- * @param {Array<{id, text, emoji}>} options - רשימת האפשרויות
+ * @param {Array<{id: string, text: string, emoji?: string}>} options - רשימת האפשרויות
  * @param {function} onSelect - קולבק שנקרא עם האפשרות שנבחרה
- * @returns {{ highlight(id, type), disable(), reset(), destroy() }}
  */
 export function createOptionCards(container, options, onSelect) {
   container.innerHTML = '';
@@ -39,6 +38,17 @@ export function createOptionCards(container, options, onSelect) {
           el.classList.add(`option-card--${type}`);
         }
       });
+    },
+
+    /** Visual hints never change the answer lock or other highlights. */
+    clearHighlight(id, type) {
+      cards.forEach(({ el, option }) => {
+        if (option.id === id) el.classList.remove(`option-card--${type}`);
+      });
+    },
+
+    setDisabled(disabled) {
+      cards.forEach(({ el }) => { el.disabled = disabled; });
     },
 
     /** נטרל את כל הכרטיסים */

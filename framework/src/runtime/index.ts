@@ -14,6 +14,7 @@ export { shuffle }           from '../utils/shuffle.js';
 export { createRoundManager } from '../core/round-manager.js';
 export { createLocalState }  from '../core/local-state.js';
 export { bootstrapGame }     from '../core/bootstrap.js';
+export { createChoiceRound } from '../core/choice-round.js';
 export { runGame }           from '../core/bootstrap.js';
 export { createHintTracker } from '../core/hints.js';
 export { starsFor, recordGameResult, getGameProgress, getAllProgress } from '../core/progress.js';

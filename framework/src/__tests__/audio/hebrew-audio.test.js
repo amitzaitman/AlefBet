@@ -15,6 +15,7 @@ vi.mock('../../audio/tts.js', () => {
   const state = { value: 'ready' };
   return {
     tts: {
+      cancel: vi.fn(),
       speak: vi.fn(async () => {}),
       speakVowel: vi.fn(async () => {}),
       speakNikud: vi.fn(async () => {}),
@@ -124,5 +125,48 @@ describe('סדר הספקים', () => {
     playVoice.mockRejectedValue(new Error('idb broken'));
     const source = await speakNikudSound('kamatz');
     expect(source).toBe('tts');
+  });
+});
+
+
+describe('round audio cancellation', () => {
+  it('never starts playback for an ended round', async () => {
+    const controller = new AbortController();
+    controller.abort();
+    expect(await speakSyllable('ב', 'kamatz', { signal: controller.signal })).toBe('none');
+    expect(playVoice).not.toHaveBeenCalled();
+    expect(tts.speakNikud).not.toHaveBeenCalled();
+  });
+
+  it('does not fall back to speech after an aborted recording lookup', async () => {
+    const controller = new AbortController();
+    let finish;
+    playVoice.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    const pending = speakSyllable('ב', 'kamatz', { signal: controller.signal });
+    controller.abort();
+    finish(false);
+    expect(await pending).toBe('none');
+    expect(tts.speakNikud).not.toHaveBeenCalled();
+    expect(synthesizeSyllable).not.toHaveBeenCalled();
+  });
+
+  it('cancels pending speech without starting synthesis', async () => {
+    const controller = new AbortController();
+    let finish;
+    tts.speakNikud.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    const pending = speakSyllable('ב', 'kamatz', { signal: controller.signal });
+    await vi.waitFor(() => expect(finish).toBeTypeOf('function'));
+    controller.abort();
+    finish();
+    expect(await pending).toBe('none');
+    expect(tts.cancel).toHaveBeenCalledOnce();
+    expect(synthesizeSyllable).not.toHaveBeenCalled();
+  });
+
+  it('removes completed speech cancellation before another round can play', async () => {
+    const controller = new AbortController();
+    await speakSyllable('ב', 'kamatz', { signal: controller.signal });
+    controller.abort();
+    expect(tts.cancel).not.toHaveBeenCalled();
   });
 });

@@ -100,21 +100,36 @@ export async function listVoiceKeys(gameId) {
  * מסלול גיבוי: אלמנט <audio> עם blob URL (דפדפנים ללא decode לפורמט).
  * @returns {Promise<boolean>} true אם ניגן בהצלחה, false אם אין הקלטה
  */
-export async function playVoice(gameId, voiceKey) {
+/** @param {string} gameId @param {string} voiceKey @param {{ signal?: AbortSignal }} [options] */
+export async function playVoice(gameId, voiceKey, { signal } = {}) {
+  if (signal?.aborted) return false;
   let blob;
   try {
     blob = await loadVoice(gameId, voiceKey);
   } catch {
     return false;
   }
-  if (!blob) return false;
+  if (!blob || signal?.aborted) return false;
 
-  if (await playBlob(blob)) return true;
+  if (await playBlob(blob, { signal })) return true;
+  if (signal?.aborted) return false;
 
   return new Promise(resolve => {
     const url   = URL.createObjectURL(blob);
     const audio = new Audio(url);
-    const done  = ok => { URL.revokeObjectURL(url); resolve(ok); };
+    let settled = false;
+    const done = ok => {
+      if (settled) return;
+      settled = true;
+      signal?.removeEventListener('abort', abort);
+      audio.onended = null;
+      audio.onerror = null;
+      audio.pause();
+      URL.revokeObjectURL(url);
+      resolve(ok);
+    };
+    const abort = () => done(false);
+    signal?.addEventListener('abort', abort, { once: true });
     audio.onended = () => done(true);
     audio.onerror = () => done(false);
     audio.play().catch(() => done(false));

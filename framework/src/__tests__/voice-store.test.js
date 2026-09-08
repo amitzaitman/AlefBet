@@ -184,6 +184,7 @@ describe('playVoice', () => {
         this.onerror = null;
         capturedAudio = this;
       }
+      pause() {}
       play() {
         // Simulate successful playback: fire onended on next tick
         Promise.resolve().then(() => this.onended?.());
@@ -212,6 +213,7 @@ describe('playVoice', () => {
 
     vi.stubGlobal('Audio', class MockAudio {
       constructor() { this.onended = null; this.onerror = null; }
+      pause() {}
       play() { return Promise.reject(new Error('not allowed')); }
     });
 
@@ -220,4 +222,24 @@ describe('playVoice', () => {
 
     expect(await playVoice('game-1', 'play-key')).toBe(false);
   });
+});
+
+
+it('pauses HTML audio and releases its URL when the round is aborted', async () => {
+  vi.stubGlobal('indexedDB', createIDBMock());
+  vi.stubGlobal('URL', {
+    createObjectURL: vi.fn(() => 'blob:round'), revokeObjectURL: vi.fn(),
+  });
+  const pause = vi.fn();
+  const play = vi.fn(() => Promise.resolve());
+  vi.stubGlobal('Audio', class { pause = pause; play = play; });
+  const { saveVoice, playVoice } = await import('../audio/voice-store.js');
+  await saveVoice('round', 'target', { size: 5 });
+  const controller = new AbortController();
+  const pending = playVoice('round', 'target', { signal: controller.signal });
+  await vi.waitFor(() => expect(play).toHaveBeenCalledOnce());
+  controller.abort();
+  expect(await pending).toBe(false);
+  expect(pause).toHaveBeenCalledOnce();
+  expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:round');
 });

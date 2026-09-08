@@ -20,8 +20,7 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await expect(cards).toHaveCount(4);
   const choices = await cards.allTextContents();
   await page.locator('[data-id="wrong-0"]').tap();
-  await expect(cards.first()).toBeDisabled();
-  await expect(cards.first()).toBeEnabled();
+  expect(await cards.evaluateAll(elements => elements.every(el => !el.disabled))).toBe(true);
   expect(await cards.allTextContents()).toEqual(choices);
   await page.evaluate(async () => {
     const { tts } = await import('/framework/dist/runtime.js');

@@ -122,10 +122,10 @@ export function isOffline() {
  * @param {string} key
  * @returns {Promise<boolean>}
  */
-async function _tryBank(key) {
+async function _tryBank(key, options = undefined) {
   try {
     if (typeof indexedDB === 'undefined') return false;
-    return await playVoice(SOUND_BANK_ID, key);
+    return await (options ? playVoice(SOUND_BANK_ID, key, options) : playVoice(SOUND_BANK_ID, key));
   } catch {
     return false;
   }
@@ -198,15 +198,28 @@ export async function speakNikudSound(nikudId) {
  * שרשרת: בנק -> TTS דו-שלבי (speakNikud) -> סינתזת עיצור+תנועה.
  * @param {string} letter - תו האות
  * @param {string} nikudId - מזהה ניקוד
+ * @param {{ signal?: AbortSignal }} [options]
  * @returns {Promise<'bank'|'tts'|'synth'|'none'>}
  */
-export async function speakSyllable(letter, nikudId) {
-  if (await _tryBank(syllableKey(letter, nikudId))) return 'bank';
+export async function speakSyllable(letter, nikudId, options = {}) {
+  const { signal } = options;
+  if (signal?.aborted) return 'none';
+  if (await _tryBank(syllableKey(letter, nikudId), signal ? options : undefined)) return 'bank';
+  if (signal?.aborted) return 'none';
   const nikud = nikudList.find(n => n.id === nikudId);
-  if (nikud && await _tryTTS(() => tts.speakNikud(letter, nikud.symbol))) return 'tts';
+  const cancel = () => tts.cancel();
+  signal?.addEventListener('abort', cancel, { once: true });
+  try {
+    if (nikud && await _tryTTS(() => tts.speakNikud(letter, nikud.symbol))) {
+      return signal?.aborted ? 'none' : 'tts';
+    }
+  } finally {
+    signal?.removeEventListener('abort', cancel);
+  }
+  if (signal?.aborted) return 'none';
   const data = getLetter(letter);
   const vowel = NIKUD_VOWEL[nikudId];
-  if (vowel && await synthesizeSyllable(data ? data.sound : '', vowel)) return 'synth';
+  if (vowel && await (signal ? synthesizeSyllable(data ? data.sound : '', vowel, options) : synthesizeSyllable(data ? data.sound : '', vowel))) return 'synth';
   return 'none';
 }
 

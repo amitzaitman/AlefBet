@@ -1,18 +1,7 @@
-/**
- * bootstrapGame - הרכבה אחידה של רצף הפתיחה של כל משחק AlefBet.
- *
- * מחליף את הבלוק החוזר של
- *   showLoadingScreen -> preloadNikud -> hideLoadingScreen ->
- *   loadGameData -> new GameShell -> GameData.fromRoundsArray -> new GameEditor
- * שהופיע זהה בשלושת המשחקים. המודול נכתב כך שיציית לכלל ה-CLAUDE.md:
- * "Grow the framework; don't hardcode in games." כל הרכיבים שהוא מרכיב כבר
- * קיימים ומיוצאים מ-framework/src/index.ts - אין כאן לוגיקה חדשה, רק הרכבה.
- *
- * המודול כתוב ב-TypeScript כי הוא ניגש ל-GameEditor/GameData/loadGameData
- * שחיים באי ה-TS של העורך.
- */
+/** Shared game startup and round lifecycle. */
 import { GameShell, endGame } from './game-shell.js';
 import { attachGameAudio } from '../audio/game-audio.js';
+import { createRoundScope } from './round-scope.js';
 import { createRoundManager } from './round-manager.js';
 import { createProgressBar } from '../ui/progress-bar.js';
 import { installGlobalErrorScreen } from '../ui/error-screen.js';
@@ -130,7 +119,10 @@ export interface RoundContext {
   onWrong: (action?: () => void | Promise<void>) => Promise<void>;
   isAnswered: () => boolean;
   isActive: () => boolean;
-  schedule: (action: () => void, delayMs: number) => void;
+  scope: ReturnType<typeof createRoundScope>;
+  subscribeAnswered: (listener: (answered: boolean) => void) => () => void;
+  /** Compatibility alias; new games may use scope.schedule. */
+  schedule: (action: () => void, delayMs: number) => () => void;
 }
 
 export interface RunGameOptions extends Omit<BootstrapOptions, 'totalRounds'> {
@@ -155,13 +147,8 @@ export async function runGame(container: HTMLElement, opts: RunGameOptions): Pro
     return result;
   }
   const progress = createProgressBar(shell.footerEl as HTMLElement, activeRounds.length);
-  let generation = 0;
-  let cleanup: (() => void) | void;
-  const disposeRound = () => {
-    generation++;
-    if (cleanup) cleanup();
-    cleanup = undefined;
-  };
+  let scope: ReturnType<typeof createRoundScope> | undefined;
+  const disposeRound = () => { scope?.dispose(); scope = undefined; };
   const manager = createRoundManager(shell, container, {
     totalRounds: activeRounds.length,
     progressBar: progress,
@@ -180,16 +167,27 @@ export async function runGame(container: HTMLElement, opts: RunGameOptions): Pro
   function buildRoundUI() {
     disposeRound();
     shell.bodyEl.innerHTML = '';
-    const current = generation;
-    const isActive = () => !shell.ended && generation === current;
+    const currentScope = createRoundScope();
+    scope = currentScope;
+    const isActive = () => !shell.ended && !currentScope.signal.aborted;
     const index = shell.state.currentRound - 1;
-    cleanup = opts.buildRound({
-      shell, index, round: activeRounds[index], isActive,
-      isAnswered: () => !isActive() || manager.isAnswered(),
-      onCorrect: async action => { if (isActive()) await manager.handleCorrect(action); },
-      onWrong: async action => { if (isActive()) await manager.handleWrong(action); },
-      schedule: (action, ms) => shell.schedule(() => { if (isActive()) action(); }, ms),
-    });
+    try {
+      const cleanup = opts.buildRound({
+        shell, index, round: activeRounds[index], isActive, scope: currentScope,
+        isAnswered: () => !isActive() || manager.isAnswered(),
+        subscribeAnswered: listener => {
+          if (!isActive()) { listener(true); return () => {}; }
+          return currentScope.use(manager.subscribe(listener));
+        },
+        onCorrect: async action => { if (isActive()) await manager.handleCorrect(action); },
+        onWrong: async action => { if (isActive()) await manager.handleWrong(action); },
+        schedule: currentScope.schedule,
+      });
+      if (cleanup) currentScope.use(cleanup);
+    } catch (error) {
+      currentScope.dispose();
+      throw error;
+    }
   }
   shell.start();
   return result;

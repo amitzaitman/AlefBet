@@ -135,9 +135,10 @@ function _getNoiseBuffer(ctx) {
  * @param {AudioContext} ctx
  * @param {{ formants: number[], bandwidths: number[], gains: number[] }} spec
  * @param {number} pitchHz
+ * @param {AudioNode} [output]
  * @returns {{ source: OscillatorNode, filters: BiquadFilterNode[], master: GainNode }}
  */
-function _buildVoicedChain(ctx, spec, pitchHz) {
+function _buildVoicedChain(ctx, spec, pitchHz, output = ctx.destination) {
   const source = ctx.createOscillator();
   source.type = 'sawtooth';
   source.frequency.value = pitchHz;
@@ -158,7 +159,7 @@ function _buildVoicedChain(ctx, spec, pitchHz) {
     return filter;
   });
 
-  master.connect(ctx.destination);
+  master.connect(output);
   return { source, filters, master };
 }
 
@@ -168,9 +169,10 @@ function _buildVoicedChain(ctx, spec, pitchHz) {
  * @param {number} startTime
  * @param {{ noiseHz?: number, noiseQ?: number, durationMs: number }} spec
  * @param {number} peakGain
+ * @param {AudioNode} [output]
  * @returns {number} זמן סיום הרעש (שניות, בציר הזמן של ה-context)
  */
-function _scheduleNoise(ctx, startTime, spec, peakGain) {
+function _scheduleNoise(ctx, startTime, spec, peakGain, output = ctx.destination) {
   const duration = spec.durationMs / 1000;
   const noise = ctx.createBufferSource();
   noise.buffer = _getNoiseBuffer(ctx);
@@ -188,7 +190,7 @@ function _scheduleNoise(ctx, startTime, spec, peakGain) {
 
   noise.connect(filter);
   filter.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(output);
   noise.start(startTime);
   noise.stop(startTime + duration + 0.02);
   return startTime + duration;
@@ -203,11 +205,12 @@ function _scheduleNoise(ctx, startTime, spec, peakGain) {
  * @param {number} durationMs
  * @param {number} pitchHz
  * @param {number[] | null} glideFromFormants - תדרי פורמנטים התחלתיים או null
+ * @param {AudioNode} [output]
  * @returns {number} זמן הסיום
  */
-function _scheduleVowel(ctx, startTime, spec, durationMs, pitchHz, glideFromFormants) {
+function _scheduleVowel(ctx, startTime, spec, durationMs, pitchHz, glideFromFormants, output = ctx.destination) {
   const duration = durationMs / 1000;
-  const { source, filters, master } = _buildVoicedChain(ctx, spec, pitchHz);
+  const { source, filters, master } = _buildVoicedChain(ctx, spec, pitchHz, output);
 
   // אינטונציה טבעית: ירידה קלה של תדר היסוד לאורך התנועה.
   source.frequency.setValueAtTime(pitchHz * 1.04, startTime);
@@ -241,12 +244,13 @@ function _scheduleVowel(ctx, startTime, spec, durationMs, pitchHz, glideFromForm
  * @param {number} startTime
  * @param {number} durationMs
  * @param {number} pitchHz
+ * @param {AudioNode} [output]
  * @returns {number} זמן הסיום
  */
-function _scheduleNasal(ctx, startTime, durationMs, pitchHz) {
+function _scheduleNasal(ctx, startTime, durationMs, pitchHz, output = ctx.destination) {
   const duration = durationMs / 1000;
   const spec = { formants: [250, 1100, 2200], bandwidths: [80, 200, 300], gains: [1.0, 0.12, 0.05] };
-  const { source, master } = _buildVoicedChain(ctx, spec, pitchHz);
+  const { source, master } = _buildVoicedChain(ctx, spec, pitchHz, output);
   master.gain.setValueAtTime(0, startTime);
   master.gain.linearRampToValueAtTime(0.35, startTime + 0.02);
   master.gain.setValueAtTime(0.35, startTime + duration - 0.02);
@@ -260,11 +264,23 @@ function _scheduleNasal(ctx, startTime, durationMs, pitchHz) {
  * ממתין (Promise) עד שזמן ה-context חולף את endTime.
  * @param {AudioContext} ctx
  * @param {number} endTime
- * @returns {Promise<void>}
+ * @param {GainNode} output
+ * @param {AbortSignal} [signal]
+ * @returns {Promise<boolean>}
  */
-function _waitUntil(ctx, endTime) {
+function _waitUntil(ctx, endTime, output, signal) {
   const ms = Math.max(0, (endTime - ctx.currentTime) * 1000) + 60;
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => {
+    const done = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', done);
+      output.disconnect();
+      resolve(!signal?.aborted);
+    };
+    const timer = setTimeout(done, ms);
+    signal?.addEventListener('abort', done, { once: true });
+    if (signal?.aborted) done();
+  });
 }
 
 /**
@@ -272,25 +288,28 @@ function _waitUntil(ctx, endTime) {
  * נפתר מיד (ללא שגיאה) אם אין תמיכת אודיו או שהתנועה לא מוכרת -
  * בהתאם לעקרון "הבטחות שמע לעולם לא תוקעות משחק".
  * @param {string} vowel - 'a'|'e'|'i'|'o'|'u'
- * @param {{ durationMs?: number, pitchHz?: number }} [opts]
+ * @param {{ durationMs?: number, pitchHz?: number, signal?: AbortSignal }} [opts]
  * @returns {Promise<boolean>} true אם הושמע בפועל
  */
 export async function synthesizeVowel(vowel, opts = {}) {
   const spec = vowelFormantSpec(vowel);
-  if (!spec) return false;
+  if (!spec || opts.signal?.aborted) return false;
   // ensureAudioRunning ולא getAudioContext: קונטקסט 'suspended' (iOS לפני
   // מחווה) היה "מנגן" לתוך שקט ומדווח הצלחה כוזבת.
   const ctx = await ensureAudioRunning();
-  if (!ctx) return false;
+  if (!ctx || opts.signal?.aborted) return false;
   let end;
+  let output;
   try {
+    output = ctx.createGain();
+    output.connect(ctx.destination);
     const start = ctx.currentTime + 0.03;
-    end = _scheduleVowel(ctx, start, spec, opts.durationMs ?? DEFAULT_VOWEL_MS, opts.pitchHz ?? DEFAULT_PITCH_HZ, null);
+    end = _scheduleVowel(ctx, start, spec, opts.durationMs ?? DEFAULT_VOWEL_MS, opts.pitchHz ?? DEFAULT_PITCH_HZ, null, output);
   } catch {
+    output?.disconnect();
     return false; // סביבת אודיו חלקית - נכשלים ברכות, לא מפילים משחק
   }
-  await _waitUntil(ctx, end);
-  return true;
+  return _waitUntil(ctx, end, output, opts.signal);
 }
 
 /**
@@ -298,26 +317,29 @@ export async function synthesizeVowel(vowel, opts = {}) {
  * העיצור מזוהה לפי מחרוזת ה-sound של hebrew-letters.
  * @param {string} consonantSound - למשל 'b', 'sh', 'ts', '' (אין עיצור)
  * @param {string} vowel - 'a'|'e'|'i'|'o'|'u'
- * @param {{ durationMs?: number, pitchHz?: number }} [opts]
+ * @param {{ durationMs?: number, pitchHz?: number, signal?: AbortSignal }} [opts]
  * @returns {Promise<boolean>} true אם הושמע בפועל
  */
 export async function synthesizeSyllable(consonantSound, vowel, opts = {}) {
   const spec = vowelFormantSpec(vowel);
-  if (!spec) return false;
+  if (!spec || opts.signal?.aborted) return false;
   const ctx = await ensureAudioRunning();
-  if (!ctx) return false;
+  if (!ctx || opts.signal?.aborted) return false;
 
   const onset = consonantOnsetSpec(consonantSound);
   const pitchHz = opts.pitchHz ?? DEFAULT_PITCH_HZ;
   const vowelMs = opts.durationMs ?? DEFAULT_VOWEL_MS;
   let end;
+  let output;
   try {
-    end = _scheduleSyllable(ctx, onset, consonantSound, spec, vowelMs, pitchHz);
+    output = ctx.createGain();
+    output.connect(ctx.destination);
+    end = _scheduleSyllable(ctx, onset, consonantSound, spec, vowelMs, pitchHz, output);
   } catch {
+    output?.disconnect();
     return false; // סביבת אודיו חלקית - נכשלים ברכות, לא מפילים משחק
   }
-  await _waitUntil(ctx, end);
-  return true;
+  return _waitUntil(ctx, end, output, opts.signal);
 }
 
 /**
@@ -329,31 +351,32 @@ export async function synthesizeSyllable(consonantSound, vowel, opts = {}) {
  * @param {NonNullable<ReturnType<typeof vowelFormantSpec>>} spec
  * @param {number} vowelMs
  * @param {number} pitchHz
+ * @param {AudioNode} [output]
  * @returns {number} זמן הסיום
  */
-function _scheduleSyllable(ctx, onset, consonantSound, spec, vowelMs, pitchHz) {
+function _scheduleSyllable(ctx, onset, consonantSound, spec, vowelMs, pitchHz, output = ctx.destination) {
   let t = ctx.currentTime + 0.03;
   /** @type {number[] | null} */
   let glideFrom = null;
 
   switch (onset.type) {
     case 'plosive': {
-      t = _scheduleNoise(ctx, t, onset, onset.voiced ? 0.25 : 0.35);
+      t = _scheduleNoise(ctx, t, onset, onset.voiced ? 0.25 : 0.35, output);
       t += 0.01; // הפסקה זעירה בין הפרץ לתנועה
       break;
     }
     case 'fricative': {
-      t = _scheduleNoise(ctx, t, onset, 0.22) - 0.03; // חפיפה קלה עם התנועה
+      t = _scheduleNoise(ctx, t, onset, 0.22, output) - 0.03; // חפיפה קלה עם התנועה
       break;
     }
     case 'affricate': {
       // סגר שקט קצרצר ואז חיכוך - "צ".
       t += 0.03;
-      t = _scheduleNoise(ctx, t, { ...onset, durationMs: onset.durationMs - 30 }, 0.3) - 0.02;
+      t = _scheduleNoise(ctx, t, { ...onset, durationMs: onset.durationMs - 30 }, 0.3, output) - 0.02;
       break;
     }
     case 'nasal': {
-      t = _scheduleNasal(ctx, t, onset.durationMs, pitchHz);
+      t = _scheduleNasal(ctx, t, onset.durationMs, pitchHz, output);
       glideFrom = [300, 1300, 2300];
       break;
     }
@@ -371,5 +394,5 @@ function _scheduleSyllable(ctx, onset, consonantSound, spec, vowelMs, pitchHz) {
       break; // 'none' - התנועה מתחילה ישר
   }
 
-  return _scheduleVowel(ctx, t, spec, vowelMs, pitchHz, glideFrom);
+  return _scheduleVowel(ctx, t, spec, vowelMs, pitchHz, glideFrom, output);
 }

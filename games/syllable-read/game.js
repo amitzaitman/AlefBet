@@ -19,7 +19,7 @@ import {
   letterWithNikud,
   randomNikud,
   speakSyllable,
-  createOptionCards,
+  createChoiceRound,
   createFeedback,
   createHintTracker,
   injectHeaderButton,
@@ -81,17 +81,20 @@ export async function startGame(container) {
       injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame));
       sounds.click();
     },
-    buildRound: ({ shell, round, onCorrect, onWrong, isAnswered, schedule }) => {
+    buildRound: context => {
+      const { shell, round, scope, isActive } = context;
+      let cancelHint = () => {};
       let feedback = null;
       let cards = null;
       const hints = createHintTracker({ hintAfter: 2, escalateAfter: 4 });
       function playTarget() {
-        return speakSyllable(round.target.letter, round.target.nikud.id);
+        return speakSyllable(round.target.letter, round.target.nikud.id, { signal: scope.signal });
       }
       function showHint() {
         // עידוד בלבד: משמיעים שוב את ההברה - זו העזרה, לא עונש.
         feedback?.hint(randomRetryHint());
         const level = hints.miss();
+        cancelHint();
         if (level >= 2) {
           // עזרה מוגברת: מעמעמים את המסיחים ומשאירים את התשובה בולטת.
           cards?.highlight(round.targetId, 'hint');
@@ -99,7 +102,7 @@ export async function startGame(container) {
         } else if (level === 1) {
           // רמז עדין: הבהוב קצר של התשובה הנכונה.
           cards?.highlight(round.targetId, 'hint');
-          schedule(() => cards?.reset(), 1600);
+          cancelHint = scope.schedule(() => cards?.clearHighlight(round.targetId, 'hint'), 1600);
         }
         // ללא await בכוונה: שמע לעולם לא חוסם את זרימת המשחק - גם כשקול
         // המערכת איטי או תקוע, הילד יכול להמשיך לנסות מיד.
@@ -111,57 +114,46 @@ export async function startGame(container) {
         });
       }
 
-      function buildRoundUI() {
-        hints.reset();
-        const stage = document.createElement('div');
-        stage.className = 'sr-stage';
+      const stage = document.createElement('div');
+      stage.className = 'sr-stage';
 
-        // כפתור השמעה גדול - הילד תמיד יכול לשמוע שוב.
-        const replay = document.createElement('button');
-        replay.type = 'button';
-        replay.className = 'sr-replay';
-        replay.setAttribute('aria-label', 'השמע שוב את ההברה');
-        replay.innerHTML = '<span class="sr-replay__icon">🔊</span><span class="sr-replay__label">הַקְשִׁיבוּ</span>';
-        replay.addEventListener('click', async () => {
-          replay.disabled = true;
-          animate(replay, 'pulse');
-          await playTarget();
-          replay.disabled = false;
-        });
-        stage.appendChild(replay);
+      // כפתור השמעה גדול - הילד תמיד יכול לשמוע שוב.
+      const replay = document.createElement('button');
+      replay.type = 'button';
+      replay.className = 'sr-replay';
+      replay.setAttribute('aria-label', 'השמע שוב את ההברה');
+      replay.innerHTML = '<span class="sr-replay__icon">🔊</span><span class="sr-replay__label">הַקְשִׁיבוּ</span>';
+      scope.listen(replay, 'click', async () => {
+        replay.disabled = true;
+        animate(replay, 'pulse');
+        try { await playTarget(); } finally { if (isActive()) replay.disabled = false; }
+      });
+      stage.appendChild(replay);
 
-        const optionsHost = document.createElement('div');
-        optionsHost.className = 'sr-options';
-        stage.appendChild(optionsHost);
+      const optionsHost = document.createElement('div');
+      optionsHost.className = 'sr-options';
+      stage.appendChild(optionsHost);
 
-        shell.bodyEl.appendChild(stage);
+      shell.bodyEl.appendChild(stage);
 
-        feedback?.destroy();
-        feedback = createFeedback(stage);
+      feedback = scope.use(createFeedback(stage));
 
-        cards = createOptionCards(optionsHost, round.options, async (option) => {
-          if (isAnswered()) return;
-          if (option.id === round.targetId) {
-            cards.highlight(option.id, 'correct');
-            cards.disable();
-            feedback.correct();
-            // ההברה מושמעת ברקע; אין await כדי שהמעבר לסיבוב הבא לא ייתקע
-            // אם ספק השמע איטי.
-            await onCorrect(() => { playTarget(); });
-          } else {
-            // ללא סימון שלילי - הכרטיס רק "נושם" לאישור הלחיצה.
-            const el = shell.bodyEl.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);
-            if (el) animate(el, 'pulse');
-            await onWrong(showHint);
-          }
-        });
+      cards = createChoiceRound(context, optionsHost, {
+        options: round.options,
+        isCorrect: option => option.id === round.targetId,
+        onCorrect: () => {
+          feedback.correct();
+          playTarget();
+        },
+        onWrong: option => {
+          const el = shell.bodyEl.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);
+          if (el) animate(el, 'pulse');
+          showHint();
+        },
+      });
 
-        // השמעה אוטומטית של ההברה בפתיחת הסיבוב (אחרי אינטראקציה ראשונה).
-        playTarget();
-      }
-
-      buildRoundUI();
-      return () => feedback?.destroy();
+      // השמעה אוטומטית של ההברה בפתיחת הסיבוב (אחרי אינטראקציה ראשונה).
+      playTarget();
     },
   });
 }
