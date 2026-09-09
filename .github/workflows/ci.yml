@@ -35,6 +35,16 @@ jobs:
       - name: Lint + typecheck + unit tests
         run: npm run check
 
+      # Playwright downloads its own browsers. The runner's unrelated Chrome
+      # APT mirror can be inconsistent during a release and break apt-get update.
+      - name: Disable unrelated Google Chrome APT source
+        run: |
+          for source in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+            if [ -f "$source" ] && grep -q 'dl.google.com/linux/chrome' "$source"; then
+              sudo mv "$source" "$source.disabled"
+            fi
+          done
+
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium webkit
 
