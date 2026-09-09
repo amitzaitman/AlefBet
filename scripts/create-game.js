@@ -48,7 +48,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
     const [, , id, ...words] = process.argv;
     createGame(root, id, words.join(' ') || id);
-    console.log(`Created games/${id}/ and registered it in the catalog.\nRun node start.js, then open /games/${id}/.\nBefore pushing: npm run check && npm run build && npm run e2e`);
+    console.log(`Created games/${id}/ and registered it in the catalog.\nRun node start.js, then open /games/${id}/.\nBefore pushing: npm run verify`);
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

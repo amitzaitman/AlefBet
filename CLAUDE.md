@@ -11,7 +11,7 @@ Keep game-specific rules and rendering in the game. Extract a shared named-expor
 Read [`MIGRATION.md`](./MIGRATION.md) before touching build, `sw.js`, `framework/src/index.ts`, or more than one `games/*/game.js` in the same PR.
 
 - Games import `framework/dist/runtime.js`. The combined `alefbet.js`/UMD entry remains for compatibility. Runtime must not statically import editor UI or zod; saved content belongs to core. Game-owned `editor.content` contracts define round creation, validation, and optional version migrations.
-- One step per branch. `npm run check` + the touched game's e2e must pass. Merge to `main` so Pages stays shippable.
+- One step per branch. `npm run verify` must pass. Merge to `main` so Pages stays shippable.
 - Do **not** start with a Vite multi-page rewrite of the site. That is step 5, last on purpose.
 - Do **not** convert runtime JS to TypeScript "while the file is open". Separate PR, never required.
 - Do **not** land a BACKLOG feature (puzzle, student tracking, ZIP export) inside a migration PR.
@@ -53,12 +53,16 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 
 ## Commands
 
-- `npm run check` — lint + typecheck + tests. CI runs this; make it pass before pushing.
+- `npm run verify` — the full pre-push gate: checks, clean build, browser tests and WebKit upgrade stability. CI and deploy share `.github/actions/verify`.
+- `npm run setup:browsers` — install Chromium/WebKit once and after Playwright updates.
+- `npm run check` — fast lint + typecheck + unit tests during development.
 - `npm run lint` — ESLint over the whole repo (config: `eslint.config.js`).
 - `npm run typecheck` — `tsc --noEmit` over `framework/src/`. `checkJs` is on, so JSDoc types are checked.
 - `npm test` — vitest suites in `framework/src/__tests__/`.
-- `npm run build` — rebuild `framework/dist/`.
-- `npx playwright test` — e2e. In managed environments: `PW_CHROMIUM_PATH=/opt/pw-browsers/chromium`.
+- `npm run build` — clean and rebuild both bundles in `framework/dist/`; removes obsolete chunks.
+- `npm run e2e -- e2e/math.spec.js` — rebuild and run a focused browser test.
+- `npm run verify:ci` — full verification plus a check for modified, staged or untracked dist files. Commit regenerated artifacts before running this CI-only check.
+- Browser traces are separate under `test-results/games/` and `test-results/stability/`.
 
 ## Conventions
 

@@ -1,0 +1,34 @@
+name: Verify release
+description: Install the toolchain and run the same full verification used locally.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: npm
+    - shell: bash
+      run: npm ci
+    # Playwright downloads its own browsers; this unrelated mirror has caused
+    # checksum failures while Google publishes updates. Keep all APT hash checks.
+    - name: Disable unrelated Google Chrome APT source
+      shell: bash
+      run: |
+        for source in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+          if [ -f "$source" ] && grep -q 'dl.google.com/linux/chrome' "$source"; then
+            sudo mv "$source" "$source.disabled"
+          fi
+        done
+    - name: Install browsers
+      shell: bash
+      run: npm run setup:browsers
+    - name: Verify release
+      shell: bash
+      run: npm run verify:ci
+    - name: Upload browser traces on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-traces
+        path: test-results/
+        retention-days: 7

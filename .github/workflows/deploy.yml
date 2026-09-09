@@ -20,43 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build framework
-        run: npm run build
-
-      - name: Lint + typecheck + test
-        run: npm run check
-
-      # Playwright downloads its own browsers. The runner's unrelated Chrome
-      # APT mirror can be inconsistent during a release and break apt-get update.
-      - name: Disable unrelated Google Chrome APT source
-        run: |
-          for source in /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
-            if [ -f "$source" ] && grep -q 'dl.google.com/linux/chrome' "$source"; then
-              sudo mv "$source" "$source.disabled"
-            fi
-          done
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium webkit
-
-      - name: End-to-end release gate
-        run: npx playwright test
-
-      - name: Upload e2e traces on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: deploy-playwright-traces
-          path: test-results/
-          retention-days: 7
+      - uses: ./.github/actions/verify
 
       - name: Assemble site
         run: |

@@ -17,8 +17,13 @@
     "typecheck": "npm run typecheck --workspace=framework",
     "check": "npm run lint && npm run typecheck && npm test",
     "dev:framework": "npm run dev --workspace=framework",
-    "e2e": "playwright test",
-    "new:game": "node scripts/create-game.js"
+    "e2e": "npm run build && playwright test --output=test-results/games",
+    "new:game": "node scripts/create-game.js",
+    "setup:browsers": "playwright install --with-deps chromium webkit",
+    "verify": "npm run check && npm run e2e && npm run test:stability",
+    "verify:ci": "npm run verify && npm run check:dist",
+    "check:dist": "node scripts/check-dist.js",
+    "test:stability": "playwright test e2e/pwa-upgrade.spec.js --project=mobile-webkit --repeat-each=3 --retries=0 --output=test-results/stability"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
