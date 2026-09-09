@@ -2411,6 +2411,9 @@ function gi(e, t, n) {
     opacity: "0.85",
     cursor: "grabbing",
     margin: "0",
+    // אנימציות המקור גוברות על transform; מעברים גורמים לפיגור אחרי המצביע.
+    animation: "none",
+    transition: "none",
     willChange: "transform"
     // מקדם שכבת compositor מראש - בלי זה הפריים הראשון של תזוזה עלול לגמגם
   }), or(t, n), document.body.appendChild(X);

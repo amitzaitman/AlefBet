@@ -22,8 +22,8 @@ async function yt() {
   } catch {
   }
   try {
-    const r = t.createBuffer(1, 1, t.sampleRate || 44100), e = t.createBufferSource();
-    e.buffer = r, e.connect(t.destination), e.start(0);
+    const n = t.createBuffer(1, 1, t.sampleRate || 44100), e = t.createBufferSource();
+    e.buffer = n, e.connect(t.destination), e.start(0);
   } catch {
   }
   return t.state === "running";
@@ -38,34 +38,34 @@ async function et() {
     }
   return t.state === "running" ? t : null;
 }
-function rt(t) {
-  return typeof t.arrayBuffer == "function" ? t.arrayBuffer() : new Promise((r, e) => {
-    const n = new FileReader();
-    n.onload = () => r(
+function nt(t) {
+  return typeof t.arrayBuffer == "function" ? t.arrayBuffer() : new Promise((n, e) => {
+    const r = new FileReader();
+    r.onload = () => n(
       /** @type {ArrayBuffer} */
-      n.result
-    ), n.onerror = () => e(n.error), n.readAsArrayBuffer(t);
+      r.result
+    ), r.onerror = () => e(r.error), r.readAsArrayBuffer(t);
   });
 }
-async function nt(t, { signal: r } = {}) {
-  if (r != null && r.aborted || !t) return !1;
+async function rt(t, { signal: n } = {}) {
+  if (n != null && n.aborted || !t) return !1;
   const e = await et();
-  if (r != null && r.aborted || !e || typeof e.decodeAudioData != "function") return !1;
-  let n;
+  if (n != null && n.aborted || !e || typeof e.decodeAudioData != "function") return !1;
+  let r;
   try {
-    const a = await rt(t);
-    n = await new Promise((o, s) => {
+    const a = await nt(t);
+    r = await new Promise((o, s) => {
       const i = e.decodeAudioData(a, o, s);
       i && typeof i.then == "function" && i.then(o, s);
     });
   } catch {
     return !1;
   }
-  return r != null && r.aborted ? !1 : new Promise((a) => {
+  return n != null && n.aborted ? !1 : new Promise((a) => {
     let o, s, i = !1;
     const c = (l) => {
       if (!i) {
-        if (i = !0, clearTimeout(s), r == null || r.removeEventListener("abort", u), o) {
+        if (i = !0, clearTimeout(s), n == null || n.removeEventListener("abort", u), o) {
           o.onended = null;
           try {
             o.stop(), o.disconnect();
@@ -76,20 +76,20 @@ async function nt(t, { signal: r } = {}) {
       }
     }, u = () => c(!1);
     try {
-      o = e.createBufferSource(), o.buffer = n, o.connect(e.destination), o.onended = () => c(!0), r == null || r.addEventListener("abort", u, { once: !0 }), s = setTimeout(() => c(!0), (n.duration + 0.5) * 1e3), o.start(0);
+      o = e.createBufferSource(), o.buffer = r, o.connect(e.destination), o.onended = () => c(!0), n == null || n.addEventListener("abort", u, { once: !0 }), s = setTimeout(() => c(!0), (r.duration + 0.5) * 1e3), o.start(0);
     } catch {
       c(!1);
     }
   });
 }
-function ot(t, r) {
+function ot(t, n) {
   const e = [];
-  function n() {
+  function r() {
     try {
       const i = localStorage.getItem(t);
-      return i === null ? r : JSON.parse(i);
+      return i === null ? n : JSON.parse(i);
     } catch {
-      return r;
+      return n;
     }
   }
   function a(i) {
@@ -101,7 +101,7 @@ function ot(t, r) {
     return e.forEach((c) => c(i)), !0;
   }
   function o(i) {
-    return a(i(n()));
+    return a(i(r()));
   }
   function s(i) {
     return e.push(i), function() {
@@ -109,7 +109,7 @@ function ot(t, r) {
       u !== -1 && e.splice(u, 1);
     };
   }
-  return { get: n, set: a, update: o, subscribe: s };
+  return { get: r, set: a, update: o, subscribe: s };
 }
 function $(t) {
   return t !== null && typeof t == "object" && !Array.isArray(t);
@@ -117,15 +117,15 @@ function $(t) {
 function J(t) {
   if (!$(t) || typeof t.id != "string" || !t.id || !Array.isArray(t.rounds) || !t.rounds.every($) || t.meta !== void 0 && !$(t.meta) || t.distractors !== void 0 && !Array.isArray(t.distractors))
     throw new Error("Invalid game content");
-  const r = t.version ?? 1;
-  if (!Number.isInteger(r) || Number(r) < 1) throw new Error("Invalid content version");
+  const n = t.version ?? 1;
+  if (!Number.isInteger(n) || Number(n) < 1) throw new Error("Invalid content version");
   const e = /* @__PURE__ */ new Set();
-  for (const n of t.rounds)
-    if (n.id !== void 0) {
-      if (typeof n.id != "string" || !n.id || e.has(n.id)) throw new Error("Invalid round id");
-      e.add(n.id);
+  for (const r of t.rounds)
+    if (r.id !== void 0) {
+      if (typeof r.id != "string" || !r.id || e.has(r.id)) throw new Error("Invalid round id");
+      e.add(r.id);
     }
-  return { ...t, version: r };
+  return { ...t, version: n };
 }
 let it = 0;
 function B() {
@@ -133,8 +133,8 @@ function B() {
 }
 class S {
   // redo stack
-  constructor(r, e) {
-    this._contract = e, this._id = r.id ?? "game", this._version = r.version ?? 1, this._meta = { title: "", type: "multiple-choice", ...r.meta ?? {} }, this._rounds = (r.rounds ?? []).map((n) => ({ ...n, id: n.id || B() })), this._distractors = r.distractors ?? [], this._handlers = [], this._past = [], this._future = [];
+  constructor(n, e) {
+    this._contract = e, this._id = n.id ?? "game", this._version = n.version ?? 1, this._meta = { title: "", type: "multiple-choice", ...n.meta ?? {} }, this._rounds = (n.rounds ?? []).map((r) => ({ ...r, id: r.id || B() })), this._distractors = n.distractors ?? [], this._handlers = [], this._past = [], this._future = [];
   }
   // ── Identity ──────────────────────────────────────────────────────────────
   get id() {
@@ -150,45 +150,45 @@ class S {
   get rounds() {
     return [...this._rounds];
   }
-  getRound(r) {
-    return this._rounds.find((e) => e.id === r) ?? null;
+  getRound(n) {
+    return this._rounds.find((e) => e.id === n) ?? null;
   }
-  getRoundIndex(r) {
-    return this._rounds.findIndex((e) => e.id === r);
+  getRoundIndex(n) {
+    return this._rounds.findIndex((e) => e.id === n);
   }
   // ── Rounds (write) ────────────────────────────────────────────────────────
-  updateRound(r, e) {
-    const n = this.getRoundIndex(r);
-    n !== -1 && (this._saveHistory(), this._rounds[n] = { ...this._rounds[n], ...e }, this._emit());
+  updateRound(n, e) {
+    const r = this.getRoundIndex(n);
+    r !== -1 && (this._saveHistory(), this._rounds[r] = { ...this._rounds[r], ...e }, this._emit());
   }
-  addRound(r = null) {
-    var n;
+  addRound(n = null) {
+    var r;
     this._saveHistory();
-    const e = { ...(n = this._contract) == null ? void 0 : n.createRound(), id: B() };
-    if (r === null)
+    const e = { ...(r = this._contract) == null ? void 0 : r.createRound(), id: B() };
+    if (n === null)
       this._rounds.push(e);
     else {
-      const a = this.getRoundIndex(r);
+      const a = this.getRoundIndex(n);
       this._rounds.splice(a + 1, 0, e);
     }
     return this._emit(), e.id;
   }
-  duplicateRound(r) {
-    const e = this.getRound(r);
+  duplicateRound(n) {
+    const e = this.getRound(n);
     if (!e) return null;
     this._saveHistory();
-    const n = { ...e, id: B() };
-    return this._rounds.splice(this.getRoundIndex(r) + 1, 0, n), this._emit(), n.id;
+    const r = { ...e, id: B() };
+    return this._rounds.splice(this.getRoundIndex(n) + 1, 0, r), this._emit(), r.id;
   }
-  removeRound(r) {
-    const e = this.getRoundIndex(r);
+  removeRound(n) {
+    const e = this.getRoundIndex(n);
     e === -1 || this._rounds.length <= 1 || (this._saveHistory(), this._rounds.splice(e, 1), this._emit());
   }
-  moveRound(r, e) {
-    const n = this.getRoundIndex(r);
-    if (n === -1) return;
+  moveRound(n, e) {
+    const r = this.getRoundIndex(n);
+    if (r === -1) return;
     this._saveHistory();
-    const [a] = this._rounds.splice(n, 1);
+    const [a] = this._rounds.splice(r, 1);
     this._rounds.splice(Math.max(0, Math.min(e, this._rounds.length)), 0, a), this._emit();
   }
   // ── Undo / Redo ───────────────────────────────────────────────────────────
@@ -208,18 +208,18 @@ class S {
     this._past.push(this._snapshot()), this._future = [], this._past.length > 50 && this._past.shift();
   }
   _snapshot() {
-    return this._rounds.map((r) => ({ ...r }));
+    return this._rounds.map((n) => ({ ...n }));
   }
   // ── Change events ─────────────────────────────────────────────────────────
-  onChange(r) {
-    return this._handlers.push(r), () => this.offChange(r);
+  onChange(n) {
+    return this._handlers.push(n), () => this.offChange(n);
   }
-  offChange(r) {
-    const e = this._handlers.indexOf(r);
+  offChange(n) {
+    const e = this._handlers.indexOf(n);
     e !== -1 && this._handlers.splice(e, 1);
   }
   _emit() {
-    this._handlers.forEach((r) => r(this));
+    this._handlers.forEach((n) => n(this));
   }
   // ── Serialisation ─────────────────────────────────────────────────────────
   toJSON() {
@@ -232,22 +232,22 @@ class S {
     };
   }
   validate() {
-    return !this._contract || this._rounds.every((r) => this._contract.validateRound(r));
+    return !this._contract || this._rounds.every((n) => this._contract.validateRound(n));
   }
-  static fromJSON(r, e) {
-    let n = J(r);
+  static fromJSON(n, e) {
+    let r = J(n);
     const a = (e == null ? void 0 : e.version) ?? 1;
-    if (n.version < a && (e != null && e.migrate)) {
-      const s = n.id;
-      if (n = J(e.migrate(n)), n.id !== s) throw new Error("Migration changed game identity");
+    if (r.version < a && (e != null && e.migrate)) {
+      const s = r.id;
+      if (r = J(e.migrate(r)), r.id !== s) throw new Error("Migration changed game identity");
     }
-    if (n.version !== a) throw new Error("Unsupported content version");
-    const o = new S(n, e);
+    if (r.version !== a) throw new Error("Unsupported content version");
+    const o = new S(r, e);
     if (!o.validate()) throw new Error("Invalid round content");
     return o;
   }
-  static fromRoundsArray(r, e, n = {}, a = [], o) {
-    return new S({ id: r, meta: n, rounds: e, distractors: a, version: (o == null ? void 0 : o.version) ?? 1 }, o);
+  static fromRoundsArray(n, e, r = {}, a = [], o) {
+    return new S({ id: n, meta: r, rounds: e, distractors: a, version: (o == null ? void 0 : o.version) ?? 1 }, o);
   }
 }
 const T = "alefbet.editor.";
@@ -257,12 +257,12 @@ function X(t) {
 function wt(t) {
   return X(t.id).set(t.toJSON());
 }
-function gt(t, r) {
+function gt(t, n) {
   const e = X(t).get();
   if (!e) return null;
   try {
-    const n = S.fromJSON(e, r);
-    return n.id === t ? n : null;
+    const r = S.fromJSON(e, n);
+    return r.id === t ? r : null;
   } catch {
     return null;
   }
@@ -274,23 +274,23 @@ function xt(t) {
   }
 }
 function Rt(t) {
-  const r = JSON.stringify(t.toJSON(), null, 2), e = new Blob([r], { type: "application/json;charset=utf-8" }), n = URL.createObjectURL(e), a = document.createElement("a");
-  a.href = n, a.download = `${t.id}-rounds.json`, a.click(), URL.revokeObjectURL(n);
+  const n = JSON.stringify(t.toJSON(), null, 2), e = new Blob([n], { type: "application/json;charset=utf-8" }), r = URL.createObjectURL(e), a = document.createElement("a");
+  a.href = r, a.download = `${t.id}-rounds.json`, a.click(), URL.revokeObjectURL(r);
 }
 function st() {
-  return ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/ogg"].find((r) => MediaRecorder.isTypeSupported(r)) || "";
+  return ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/ogg"].find((n) => MediaRecorder.isTypeSupported(n)) || "";
 }
 function at() {
   var t;
   return typeof navigator < "u" && typeof ((t = navigator.mediaDevices) == null ? void 0 : t.getUserMedia) == "function" && typeof MediaRecorder < "u";
 }
 function ct() {
-  let t = null, r = null, e = [];
-  async function n() {
+  let t = null, n = null, e = [];
+  async function r() {
     if (t && t.state === "recording") return;
-    r = await navigator.mediaDevices.getUserMedia({ audio: !0, video: !1 }), e = [];
+    n = await navigator.mediaDevices.getUserMedia({ audio: !0, video: !1 }), e = [];
     const c = {}, u = st();
-    u && (c.mimeType = u), t = new MediaRecorder(r, c), t.ondataavailable = (l) => {
+    u && (c.mimeType = u), t = new MediaRecorder(n, c), t.ondataavailable = (l) => {
       var f;
       ((f = l.data) == null ? void 0 : f.size) > 0 && e.push(l.data);
     }, t.start(100);
@@ -313,71 +313,71 @@ function ct() {
     t && t.state !== "inactive" && (t.ondataavailable = null, t.onstop = null, t.stop()), s();
   }
   function s() {
-    r == null || r.getTracks().forEach((c) => c.stop()), r = null, t = null, e = [];
+    n == null || n.getTracks().forEach((c) => c.stop()), n = null, t = null, e = [];
   }
   function i() {
     return (t == null ? void 0 : t.state) === "recording";
   }
-  return { start: n, stop: a, cancel: o, isActive: i };
+  return { start: r, stop: a, cancel: o, isActive: i };
 }
 const ut = "alefbet-voices", b = "recordings", dt = 1;
 let L = null;
 function O() {
-  return L || (L = new Promise((t, r) => {
+  return L || (L = new Promise((t, n) => {
     const e = indexedDB.open(ut, dt);
     e.onupgradeneeded = () => {
       e.result.createObjectStore(b);
     }, e.onsuccess = () => t(e.result), e.onerror = () => {
-      L = null, r(e.error);
+      L = null, n(e.error);
     };
   }), L);
 }
-function j(t, r) {
-  return `${t}/${r}`;
+function j(t, n) {
+  return `${t}/${n}`;
 }
-async function lt(t, r, e) {
-  const n = await O();
+async function lt(t, n, e) {
+  const r = await O();
   return new Promise((a, o) => {
-    const s = n.transaction(b, "readwrite");
-    s.objectStore(b).put(e, j(t, r)), s.oncomplete = a, s.onerror = (i) => o(i.target.error);
+    const s = r.transaction(b, "readwrite");
+    s.objectStore(b).put(e, j(t, n)), s.oncomplete = a, s.onerror = (i) => o(i.target.error);
   });
 }
-async function D(t, r) {
+async function D(t, n) {
   const e = await O();
-  return new Promise((n, a) => {
-    const s = e.transaction(b, "readonly").objectStore(b).get(j(t, r));
-    s.onsuccess = () => n(s.result ?? null), s.onerror = (i) => a(i.target.error);
+  return new Promise((r, a) => {
+    const s = e.transaction(b, "readonly").objectStore(b).get(j(t, n));
+    s.onsuccess = () => r(s.result ?? null), s.onerror = (i) => a(i.target.error);
   });
 }
-async function ft(t, r) {
+async function ft(t, n) {
   const e = await O();
-  return new Promise((n, a) => {
+  return new Promise((r, a) => {
     const o = e.transaction(b, "readwrite");
-    o.objectStore(b).delete(j(t, r)), o.oncomplete = n, o.onerror = (s) => a(s.target.error);
+    o.objectStore(b).delete(j(t, n)), o.oncomplete = r, o.onerror = (s) => a(s.target.error);
   });
 }
 async function Et(t) {
-  const r = await O();
-  return new Promise((e, n) => {
-    const o = r.transaction(b, "readonly").objectStore(b).getAllKeys();
+  const n = await O();
+  return new Promise((e, r) => {
+    const o = n.transaction(b, "readonly").objectStore(b).getAllKeys();
     o.onsuccess = () => {
       const s = `${t}/`;
       e(
         (o.result || []).filter((i) => i.startsWith(s)).map((i) => i.slice(s.length))
       );
-    }, o.onerror = (s) => n(s.target.error);
+    }, o.onerror = (s) => r(s.target.error);
   });
 }
-async function ht(t, r, { signal: e } = {}) {
+async function ht(t, n, { signal: e } = {}) {
   if (e != null && e.aborted) return !1;
-  let n;
+  let r;
   try {
-    n = await D(t, r);
+    r = await D(t, n);
   } catch {
     return !1;
   }
-  return !n || e != null && e.aborted ? !1 : await nt(n, { signal: e }) ? !0 : e != null && e.aborted ? !1 : new Promise((a) => {
-    const o = URL.createObjectURL(n), s = new Audio(o);
+  return !r || e != null && e.aborted ? !1 : await rt(r, { signal: e }) ? !0 : e != null && e.aborted ? !1 : new Promise((a) => {
+    const o = URL.createObjectURL(r), s = new Audio(o);
     let i = !1;
     const c = (l) => {
       i || (i = !0, e == null || e.removeEventListener("abort", u), s.onended = null, s.onerror = null, s.pause(), URL.revokeObjectURL(o), a(l));
@@ -385,13 +385,13 @@ async function ht(t, r, { signal: e } = {}) {
     e == null || e.addEventListener("abort", u, { once: !0 }), s.onended = () => c(!0), s.onerror = () => c(!1), s.play().catch(() => c(!1));
   });
 }
-async function At(t, r) {
-  return await D(t, r).catch(() => null) !== null;
+async function At(t, n) {
+  return await D(t, n).catch(() => null) !== null;
 }
 function Lt(t, {
-  gameId: r,
+  gameId: n,
   voiceKey: e,
-  label: n = "הקלטת קול",
+  label: r = "הקלטת קול",
   onSaved: a,
   onDeleted: o
 }) {
@@ -401,7 +401,7 @@ function Lt(t, {
     }, destroy: () => d.remove() };
   }
   const s = ct(), i = document.createElement("div");
-  i.className = "ab-voice-btn-wrap", i.setAttribute("aria-label", n), t.appendChild(i);
+  i.className = "ab-voice-btn-wrap", i.setAttribute("aria-label", r), t.appendChild(i);
   let c = "idle", u = null, l = null, f = null, h = null, w = null, _ = null, R = 0;
   function E() {
     if (i.innerHTML = "", c === "idle")
@@ -431,16 +431,16 @@ function Lt(t, {
     clearInterval(_);
     try {
       const d = await s.stop();
-      await lt(r, e, d), c = "has-voice", E(), a == null || a(d);
+      await lt(n, e, d), c = "has-voice", E(), a == null || a(d);
     } catch (d) {
       console.warn("[voice-record-button] stop error:", d), c = "idle", E();
     }
   }
   async function z() {
-    f == null || f.setAttribute("disabled", "true"), await ht(r, e), f == null || f.removeAttribute("disabled");
+    f == null || f.setAttribute("disabled", "true"), await ht(n, e), f == null || f.removeAttribute("disabled");
   }
   async function W() {
-    confirm("למחוק את ההקלטה?") && (await ft(r, e), c = "idle", E(), o == null || o());
+    confirm("למחוק את ההקלטה?") && (await ft(n, e), c = "idle", E(), o == null || o());
   }
   function Q(d) {
     const v = document.createElement("span");
@@ -448,7 +448,7 @@ function Lt(t, {
   }
   async function k() {
     if (s.isActive()) return;
-    c = await D(r, e).catch(() => null) ? "has-voice" : "idle", E();
+    c = await D(n, e).catch(() => null) ? "has-voice" : "idle", E();
   }
   function Z() {
     clearInterval(_), s.isActive() && s.cancel(), i.remove();
@@ -457,33 +457,36 @@ function Lt(t, {
 }
 let g = null, p = null, Y = 0, F = 0, x = null, M = 0, P = 0;
 const N = /* @__PURE__ */ new Map();
-function q(t, r) {
+function q(t, n) {
   var e;
-  return ((e = document.elementFromPoint(t, r)) == null ? void 0 : e.closest('[data-drop-target="true"]')) || null;
+  return ((e = document.elementFromPoint(t, n)) == null ? void 0 : e.closest('[data-drop-target="true"]')) || null;
 }
-function pt(t, r, e) {
-  const n = t.getBoundingClientRect();
-  Y = n.width / 2, F = n.height / 2, p = t.cloneNode(!0), p.setAttribute("aria-hidden", "true"), p.setAttribute("tabindex", "-1"), Object.assign(p.style, {
+function pt(t, n, e) {
+  const r = t.getBoundingClientRect();
+  Y = r.width / 2, F = r.height / 2, p = t.cloneNode(!0), p.setAttribute("aria-hidden", "true"), p.setAttribute("tabindex", "-1"), Object.assign(p.style, {
     position: "fixed",
     left: "0",
     top: "0",
-    width: `${n.width}px`,
-    height: `${n.height}px`,
+    width: `${r.width}px`,
+    height: `${r.height}px`,
     pointerEvents: "none",
     // keeps it out of elementFromPoint + hit-testing
     zIndex: "9999",
     opacity: "0.85",
     cursor: "grabbing",
     margin: "0",
+    // אנימציות המקור גוברות על transform; מעברים גורמים לפיגור אחרי המצביע.
+    animation: "none",
+    transition: "none",
     willChange: "transform"
     // מקדם שכבת compositor מראש - בלי זה הפריים הראשון של תזוזה עלול לגמגם
-  }), G(r, e), document.body.appendChild(p);
+  }), G(n, e), document.body.appendChild(p);
 }
-function G(t, r) {
-  p && (p.style.transform = `translate3d(${t - Y}px, ${r - F}px, 0) scale(1.12)`);
+function G(t, n) {
+  p && (p.style.transform = `translate3d(${t - Y}px, ${n - F}px, 0) scale(1.12)`);
 }
-function mt(t, r) {
-  M = t, P = r, x === null && (x = requestAnimationFrame(() => {
+function mt(t, n) {
+  M = t, P = n, x === null && (x = requestAnimationFrame(() => {
     x = null, G(M, P), _t(q(M, P));
   }));
 }
@@ -497,20 +500,20 @@ function _t(t) {
 function vt() {
   m == null || m.classList.remove("drop-target--hover"), m = null;
 }
-function Ct(t, r, { onTap: e } = {}) {
+function Ct(t, n, { onTap: e } = {}) {
   t.classList.add("drag-source");
-  let n = null, a = null, o = null;
+  let r = null, a = null, o = null;
   function s() {
-    n && (t.removeEventListener("pointermove", n), t.removeEventListener("pointerup", a), t.removeEventListener("pointercancel", o), n = a = o = null), vt(), bt(), t.classList.remove("drag-source--dragging"), g = null;
+    r && (t.removeEventListener("pointermove", r), t.removeEventListener("pointerup", a), t.removeEventListener("pointercancel", o), r = a = o = null), vt(), bt(), t.classList.remove("drag-source--dragging"), g = null;
   }
   function i(c) {
     if (t.matches(":disabled") || t.getAttribute("aria-disabled") === "true" || c.button !== void 0 && c.button !== 0) return;
-    c.preventDefault(), g && s(), g = { el: t, data: r };
+    c.preventDefault(), g && s(), g = { el: t, data: n };
     let u = !1;
     const l = () => {
       u = !0, t.classList.add("drag-source--dragging"), pt(t, c.clientX, c.clientY);
     }, f = (h) => Math.hypot(h.clientX - c.clientX, h.clientY - c.clientY) >= 8;
-    e || l(), t.setPointerCapture(c.pointerId), n = (h) => {
+    e || l(), t.setPointerCapture(c.pointerId), r = (h) => {
       !u && f(h) && l(), u && mt(h.clientX, h.clientY);
     }, a = (h) => {
       const w = !u && !f(h), _ = w && e ? null : q(h.clientX, h.clientY);
@@ -518,8 +521,8 @@ function Ct(t, r, { onTap: e } = {}) {
         e();
         return;
       }
-      _ && N.has(_) && N.get(_).onDrop({ data: r, sourceEl: t, targetEl: _ });
-    }, o = () => s(), t.addEventListener("pointermove", n), t.addEventListener("pointerup", a), t.addEventListener("pointercancel", o);
+      _ && N.has(_) && N.get(_).onDrop({ data: n, sourceEl: t, targetEl: _ });
+    }, o = () => s(), t.addEventListener("pointermove", r), t.addEventListener("pointerup", a), t.addEventListener("pointercancel", o);
   }
   return t.addEventListener("pointerdown", i), {
     destroy() {
@@ -527,8 +530,8 @@ function Ct(t, r, { onTap: e } = {}) {
     }
   };
 }
-function St(t, r) {
-  return t.setAttribute("data-drop-target", "true"), t.classList.add("drop-target--active"), N.set(t, { onDrop: r }), {
+function St(t, n) {
+  return t.setAttribute("data-drop-target", "true"), t.classList.add("drop-target--active"), N.set(t, { onDrop: n }), {
     destroy() {
       t.removeAttribute("data-drop-target"), t.classList.remove("drop-target--active", "drop-target--hover"), N.delete(t);
     }
@@ -549,7 +552,7 @@ export {
   at as k,
   gt as l,
   D as m,
-  nt as n,
+  rt as n,
   Rt as o,
   ht as p,
   wt as q,
