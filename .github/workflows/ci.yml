@@ -2,12 +2,19 @@ name: CI
 
 on:
   pull_request:
-  push:
-    branches-ignore: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
   workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -15,5 +22,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 0
+      - id: scope
+        name: Select offline stability checks
+        run: node scripts/ci-scope.js
       - uses: ./.github/actions/verify
+        with:
+          stability: ${{ steps.scope.outputs.stability }}

@@ -53,7 +53,7 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 
 ## Commands
 
-- `npm run verify` — the full pre-push gate: checks, clean build, browser tests and WebKit upgrade stability. CI and deploy share `.github/actions/verify`.
+- `npm run verify` — the full pre-push gate: checks, clean build and all browser tests (including one offline upgrade run). CI and deploy share `.github/actions/verify`.
 - `npm run setup:browsers` — install Chromium/WebKit once and after Playwright updates.
 - `npm run check` — fast lint + typecheck + unit tests during development.
 - `npm run lint` — ESLint over the whole repo (config: `eslint.config.js`).
@@ -99,3 +99,11 @@ Pushing to `main` triggers `.github/workflows/deploy.yml`, gated by unit/type/li
 - `preloadTexts` is optional; omit for arithmetic.
 - Examples: `make-ten` (choice), `number-line` (custom interaction); guide: `docs/adding-games.md`.
 - Avoid putting arithmetic rules or Hebrew content in common.ts.
+
+## Lightweight CI
+
+- PRs trigger CI; branch pushes do not. Use workflow_dispatch for a branch without a PR.
+- Main pushes keep the full pre-deploy gate. Documentation-only changes skip both workflows.
+- Repeated WebKit upgrade checks run weekly, manually, and for sensitive source paths selected by `scripts/ci-scope.js`.
+- `npm run test:stability` remains available after a build; ordinary `verify` does not repeat it.
+- Missing comparison history conservatively enables stability checks. Never use `pull_request_target` to run untrusted code.
