@@ -78,8 +78,9 @@ describe('bootstrapGame', () => {
     const host = mountContainer();
     let release;
     preloadNikud.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
-    const older = bootstrapGame(host, { gameId: 'old', title: 'ישן', preloadTexts: [] });
+    const older = bootstrapGame(host, { gameId: 'old', title: 'ישן', preloadTexts: ['שלום'] });
     const newer = await bootstrapGame(host, { gameId: 'new', title: 'חדש', preloadTexts: [] });
+    await vi.waitFor(() => expect(release).toBeTypeOf('function'));
     release();
     expect((await older).aborted).toBe(true);
     expect(host.querySelector('.game-title').textContent).toBe('חדש');
@@ -190,4 +191,13 @@ it('round scope removes old timers and listeners on advance and after a synchron
   expect(action).not.toHaveBeenCalled();
   expect(cleanup).toHaveBeenCalledTimes(2);
   expect(contexts.every(context => context.scope.signal.aborted)).toBe(true);
+});
+
+it('starts a generic game without invoking Hebrew preprocessing', async () => {
+  const result = await bootstrapGame(mountContainer(), {
+    gameId: 'math', title: 'חשבון', audio: false,
+  });
+  expect(result.aborted).toBe(false);
+  expect(preloadNikud).not.toHaveBeenCalled();
+  result.shell.end();
 });

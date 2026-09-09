@@ -1,12 +1,10 @@
 /** Shared game startup and round lifecycle. */
 import { GameShell, endGame } from './game-shell.js';
-import { attachGameAudio } from '../audio/game-audio.js';
 import { createRoundScope } from './round-scope.js';
 import { createRoundManager } from './round-manager.js';
 import { createProgressBar } from '../ui/progress-bar.js';
 import { installGlobalErrorScreen } from '../ui/error-screen.js';
 import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
-import { preloadNikud } from '../utils/nakdan.js';
 import { loadGameData } from './editor-storage.js';
 import { GameData } from './game-data.js';
 import type { ContentContract } from './game-data.js';
@@ -33,7 +31,7 @@ export interface BootstrapOptions {
   /** כותרת ה-shell - המתקשר אחראי לניקוד אם נדרש */
   title:           string;
   /** טקסטים שיועברו ל-preloadNikud */
-  preloadTexts:    string[];
+  preloadTexts?:   string[];
   /** ברירת מחדל: 'טוֹעֵן...' */
   loadingMessage?: string;
   /** סיבובים שיוחלו כאשר אין נתונים שמורים */
@@ -74,7 +72,12 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
 
   showLoadingScreen(container, opts.loadingMessage ?? 'טוֹעֵן...');
 
-  await preloadNikud(opts.preloadTexts ?? []);
+  // יכולת עברית נטענת רק אם המשחק מבקש ניקוד לטקסטים.
+  if (opts.preloadTexts?.length) {
+    const { preloadNikud } = await import('../utils/nakdan.js');
+    await preloadNikud(opts.preloadTexts);
+  }
+  const audioModule = opts.audio !== false ? await import('../audio/game-audio.js') : null;
   if (starts.get(container) !== start) {
     return { shell: null, activeRounds: [], gameData: null, aborted: true };
   }
@@ -96,7 +99,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
     title:       opts.title,
     gameId:      opts.gameId,
   });
-  if (opts.audio !== false) attachGameAudio(shell);
+  audioModule?.attachGameAudio(shell);
 
   let gameData: GameData | null = null;
   if (opts.editor) {

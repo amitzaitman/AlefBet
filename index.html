@@ -290,7 +290,7 @@
       <div class="hub-logo__badge">א</div>
       <div>
         <p class="hub-logo__title">AlefBet</p>
-        <p class="hub-logo__sub">סִפְרִיַּית מִשְׂחָקִים חִינּוּכִיִּים לְעִבְרִית</p>
+        <p class="hub-logo__sub">סִפְרִיַּית מִשְׂחָקֵי קְרִיאָה וְחֶשְׁבּוֹן</p>
       </div>
     </div>
   </header>
@@ -339,7 +339,8 @@
 
         var icon = document.createElement('div');
         icon.className = 'game-card__icon game-card__icon--' + game.icon;
-        icon.innerHTML = ICONS[game.icon] || '';
+        if (ICONS[game.icon]) icon.innerHTML = ICONS[game.icon];
+        else { icon.textContent = game.icon || '🎲'; icon.style.fontSize = '64px'; }
         card.appendChild(icon);
 
         var info = document.createElement('div');

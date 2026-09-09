@@ -1,5 +1,6 @@
-import { b as Vt, d as Ht, f as lt, c as Yt, o as Gt, q as Xt } from "./drag-BVpjy2vl.js";
-import { G as aa, r as ca, l as ua } from "./drag-BVpjy2vl.js";
+import { c as Vt, a as Ht, b as Yt, d as Gt, s as Xt } from "./drag-NEBgUr1u.js";
+import { G as ca, f as ua, l as la } from "./drag-NEBgUr1u.js";
+import { c as lt } from "./voice-record-button-CVRCvvTy.js";
 function Kt(e, { onClick: t } = {}) {
   const n = document.createElement("div");
   n.className = "ab-editor-overlay", t && n.addEventListener("pointerdown", t);
@@ -3011,7 +3012,7 @@ const Ps = de({
 }), js = de({
   title: U().default(""),
   type: U().default("multiple-choice")
-}).passthrough(), oa = de({
+}).passthrough(), ra = de({
   id: U(),
   version: ee().default(1),
   meta: js.default({ title: "", type: "multiple-choice" }),
@@ -3658,7 +3659,7 @@ function ta(e) {
     l.key === "Escape" && (a(), document.removeEventListener("keydown", u));
   });
 }
-class ra {
+class ia {
   constructor(t, n, o = {}) {
     this._mode = "play", this._overlay = null, this._navigator = null, this._inspector = null, this._toolbar = null, this._selectedId = null, this._undoBtn = null, this._redoBtn = null, this._shortcutHandler = null, this._zoneEditor = null, this._zoneModal = null, this._toolbarObserver = null, this._dirty = !1, this._saveStatus = null, this._unsubscribe = n.onChange(() => {
       this._dirty = !0, this._saveStatus && (this._saveStatus.textContent = "שינויים שלא נשמרו");
@@ -3871,19 +3872,19 @@ export {
   ct as BUILTIN_ROUND_SCHEMAS,
   Me as BaseRoundSchema,
   Ls as DragMatchRoundSchema,
-  aa as GameData,
-  oa as GameDataSchema,
-  ra as GameEditor,
+  ca as GameData,
+  ra as GameDataSchema,
+  ia as GameEditor,
   js as GameMetaSchema,
   Rs as MultipleChoiceRoundSchema,
   Ps as PointSchema,
   As as ZoneSchema,
   Ds as ZoneTapRoundSchema,
-  ca as clearGameData,
+  ua as clearGameData,
   Ks as createZoneEditor,
   Gt as exportGameDataAsJSON,
   ea as generateZonesFromTemplate,
-  ua as loadGameData,
+  la as loadGameData,
   Xt as saveGameData,
   xs as schemaToFields,
   Js as showAudioManager,

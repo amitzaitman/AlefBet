@@ -86,3 +86,12 @@ Pushing to `main` triggers `.github/workflows/deploy.yml`, gated by unit/type/li
 - Custom games use `bootstrapGame` and `shell.nextRound()` (never bypass the shell with `shell.state.nextRound()`). Use `shell.schedule` for delayed work, check `shell.ended` after awaits, and dispose resources on `end`.
 - nikud-speak keeps its three-attempt policy locally. sound-studio remains outside the round runner.
 - Do not delete `createRoundManager`: runGame still uses it internally and it remains a compatibility export.
+
+## General games (2026-09-09)
+
+- New games: `npm run new:game -- my-game "Title"`; edits template + catalog automatically.
+- General gameplay API: `framework/dist/common.js`, with existing `runtime.css`.
+- Hebrew API and backward compatibility: `framework/dist/runtime.js`.
+- `preloadTexts` is optional; omit for arithmetic.
+- Examples: `make-ten` (choice), `number-line` (custom interaction); guide: `docs/adding-games.md`.
+- Avoid putting arithmetic rules or Hebrew content in common.ts.

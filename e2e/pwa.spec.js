@@ -72,7 +72,7 @@ test.describe('PWA', () => {
   test('home cards come from the catalog and catalog is precached', async ({ page }) => {
     await page.goto('/');
     const cards = page.locator('.game-card');
-    await expect(cards).toHaveCount(5);
+    await expect(cards).toHaveCount(await page.evaluate(() => self.ALEFBET_CATALOG.length));
     await expect(page.locator('.game-card[data-game-id="letter-match-animals"]')).toBeVisible();
     await expect(page.locator('.game-card[href$="games/sound-studio/"]')).toBeHidden();
     await page.getByText('להורים ולמורים', { exact: true }).click();

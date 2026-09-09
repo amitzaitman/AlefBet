@@ -17,7 +17,8 @@
     "typecheck": "npm run typecheck --workspace=framework",
     "check": "npm run lint && npm run typecheck && npm test",
     "dev:framework": "npm run dev --workspace=framework",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "new:game": "node scripts/create-game.js"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -12,7 +12,8 @@
     "./dist/alefbet.css": "./dist/alefbet.css",
     "./runtime": "./dist/runtime.js",
     "./editor": "./dist/editor.js",
-    "./dist/runtime.css": "./dist/runtime.css"
+    "./dist/runtime.css": "./dist/runtime.css",
+    "./common": "./dist/common.js"
   },
   "scripts": {
     "build": "vite build && vite build --config vite.runtime.config.js",
