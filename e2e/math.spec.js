@@ -45,9 +45,10 @@ for (const game of ['make-ten', 'number-line']) {
     await expect(page.locator('.game-title')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-    await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
     await context.setOffline(true);
+    // The worker intentionally does not claim the first loaded page.
     await page.reload();
+    await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
     await expect(page.locator(game === 'make-ten' ? '.ten-frame' : '.number-line')).toBeVisible();
     expect(errors).toEqual([]);
   });
