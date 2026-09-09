@@ -1,6 +1,6 @@
-import { u as Ye, g as Fe, c as Ze, l as Je, G as et, e as Me, a as Ce, p as $, s as tt } from "./drag-ccvh1cxI.js";
-import { b as Bn, d as Un, f as Vn, h as Hn, i as Wn, j as Dn, k as jn, m as On, n as Gn } from "./drag-ccvh1cxI.js";
-class nt {
+import { u as Ze, g as Me, c as Je, l as et, G as tt, e as Ce, a as ze, p as V, s as nt } from "./drag-BVpjy2vl.js";
+import { b as Bn, d as Un, f as Vn, h as Wn, i as Hn, j as jn, k as Dn, m as On, n as Gn } from "./drag-BVpjy2vl.js";
+class rt {
   constructor() {
     this._handlers = {};
   }
@@ -17,7 +17,7 @@ class nt {
     return (this._handlers[e] || []).slice().forEach((r) => r(n)), this;
   }
 }
-class rt {
+class at {
   constructor(e) {
     this._totalRounds = e, this._currentRound = 0, this._score = 0;
   }
@@ -50,23 +50,23 @@ class rt {
     return this._currentRound >= this._totalRounds;
   }
 }
-const Q = /* @__PURE__ */ new WeakMap();
-function ze(t) {
+const Z = /* @__PURE__ */ new WeakMap();
+function Pe(t) {
   var e;
-  (e = Q.get(t)) == null || e.end();
+  (e = Z.get(t)) == null || e.end();
 }
-class at {
+class it {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
    */
   constructor(e, n = {}) {
-    ze(e), Q.set(e, this), this.ended = !1, this._timers = /* @__PURE__ */ new Set(), this.container = e, this.config = {
+    Pe(e), Z.set(e, this), this.ended = !1, this._timers = /* @__PURE__ */ new Set(), this.container = e, this.config = {
       totalRounds: 8,
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
       ...n
-    }, this.events = new nt(), this.state = new rt(this.config.totalRounds), this.gameId = typeof n.gameId == "string" ? n.gameId : "", this._buildShell();
+    }, this.events = new rt(), this.state = new at(this.config.totalRounds), this.gameId = typeof n.gameId == "string" ? n.gameId : "", this._buildShell();
   }
   _buildShell() {
     this.container.classList.add("alefbet-game");
@@ -100,7 +100,7 @@ class at {
     if (!this.ended) {
       this.ended = !0;
       for (const n of this._timers) clearTimeout(n);
-      this._timers.clear(), Q.get(this.container) === this && Q.delete(this.container), this.events.emit("end", { score: e, state: this.state });
+      this._timers.clear(), Z.get(this.container) === this && Z.delete(this.container), this.events.emit("end", { score: e, state: this.state });
     }
   }
   /** פעולה מושהית מתבטלת אוטומטית בסיום או בהפעלה מחדש. */
@@ -133,37 +133,37 @@ class at {
     return this.events.on(e, n), this;
   }
 }
-const ge = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api";
-let ve = !1;
-const it = 4e3, Pe = "alefbet.nikudCache.v1", ot = 300, F = /* @__PURE__ */ new Map();
+const ve = "https://nakdan-u1-0.loadbalancer.dicta.org.il/api";
+let ke = !1;
+const ot = 4e3, Ie = "alefbet.nikudCache.v1", st = 300, M = /* @__PURE__ */ new Map();
 (function() {
   if (!(typeof localStorage > "u"))
     try {
-      const e = localStorage.getItem(Pe);
+      const e = localStorage.getItem(Ie);
       if (!e) return;
       const n = JSON.parse(e);
       if (Array.isArray(n))
         for (const [r, a] of n)
-          typeof r == "string" && typeof a == "string" && F.set(r, a);
+          typeof r == "string" && typeof a == "string" && M.set(r, a);
     } catch {
     }
 })();
-function st() {
+function lt() {
   if (!(typeof localStorage > "u"))
     try {
-      const t = [...F.entries()].filter(([e, n]) => n !== e).slice(-ot);
-      localStorage.setItem(Pe, JSON.stringify(t));
+      const t = [...M.entries()].filter(([e, n]) => n !== e).slice(-st);
+      localStorage.setItem(Ie, JSON.stringify(t));
     } catch {
     }
 }
-function lt(t) {
+function ct(t) {
   if (!t) return !1;
   const e = t.split(/\s+/).filter((r) => /[א-ת]/.test(r));
   return e.length === 0 ? !0 : e.filter((r) => /[\u05B0-\u05BC\u05C1\u05C2\u05C7]/.test(r)).length / e.length >= 0.8;
 }
-function ct() {
+function dt() {
   var a;
-  if (typeof window > "u") return ge;
+  if (typeof window > "u") return ve;
   const t = new URLSearchParams(window.location.search).get("nakdanProxy"), e = window.ALEFBET_NAKDAN_PROXY_URL;
   if (t && window.localStorage)
     try {
@@ -171,9 +171,9 @@ function ct() {
     } catch {
     }
   const n = (a = window.localStorage) == null ? void 0 : a.getItem("alefbet.nakdanProxyUrl"), r = t || e || n;
-  return r || (window.location.hostname.endsWith("github.io") ? null : ge);
+  return r || (window.location.hostname.endsWith("github.io") ? null : ve);
 }
-function dt(t) {
+function ut(t) {
   var n;
   let e = "";
   for (const r of t)
@@ -185,11 +185,11 @@ function dt(t) {
     }
   return e;
 }
-async function ut(t) {
-  const e = ct();
+async function ft(t) {
+  const e = dt();
   if (!e)
-    throw ve || (ve = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
-  const n = typeof AbortController < "u" ? new AbortController() : null, r = n ? setTimeout(() => n.abort(), it) : null;
+    throw ke || (ke = !0, console.warn("[nakdan] Dicta API blocked by CORS on GitHub Pages. Configure a proxy URL via ?nakdanProxy=..., window.ALEFBET_NAKDAN_PROXY_URL, or localStorage key alefbet.nakdanProxyUrl.")), new Error("Nakdan unavailable without proxy on this host");
+  const n = typeof AbortController < "u" ? new AbortController() : null, r = n ? setTimeout(() => n.abort(), ot) : null;
   let a;
   try {
     a = await fetch(e, {
@@ -214,30 +214,30 @@ async function ut(t) {
   if (!a.ok) throw new Error(`Nakdan ${a.status}`);
   const i = await a.json(), o = i == null ? void 0 : i.data;
   if (!Array.isArray(o)) throw new Error("Nakdan: invalid response");
-  return dt(o);
+  return ut(o);
 }
-async function ft(t) {
+async function mt(t) {
   if (!(t != null && t.trim())) return t ?? "";
-  if (F.has(t)) return F.get(t);
-  if (lt(t))
-    return F.set(t, t), t;
+  if (M.has(t)) return M.get(t);
+  if (ct(t))
+    return M.set(t, t), t;
   if (typeof navigator < "u" && navigator.onLine === !1)
     return t;
   try {
-    const e = await ut(t);
-    return F.set(t, e), st(), e;
+    const e = await ft(t);
+    return M.set(t, e), lt(), e;
   } catch {
-    return F.set(t, t), t;
+    return M.set(t, t), t;
   }
 }
-function mt(t) {
-  return F.get(t) ?? t ?? "";
+function ht(t) {
+  return M.get(t) ?? t ?? "";
 }
-async function ht(t) {
+async function pt(t) {
   const e = [...new Set(t.filter((n) => n == null ? void 0 : n.trim()))];
-  await Promise.all(e.map((n) => ft(n)));
+  await Promise.all(e.map((n) => mt(n)));
 }
-const B = [
+const H = [
   { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
   { letter: "ב", name: "בַּיִת", nameNikud: "בֵּית", sound: "b", exampleWord: "בַּיִת", emoji: "🏠", isFinal: !1 },
   { letter: "ג", name: "גִּימֶל", nameNikud: "גִּימֶל", sound: "g", exampleWord: "גָּמָל", emoji: "🐪", isFinal: !1 },
@@ -266,17 +266,17 @@ const B = [
   { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
   { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
 ];
-function he(t) {
-  return B.find((e) => e.letter === t) || null;
+function be(t) {
+  return H.find((e) => e.letter === t) || null;
 }
-function pt(t = "regular") {
-  return t === "regular" ? B.filter((e) => !e.isFinal) : t === "final" ? B.filter((e) => e.isFinal) : B;
+function yt(t = "regular") {
+  return t === "regular" ? H.filter((e) => !e.isFinal) : t === "final" ? H.filter((e) => e.isFinal) : H;
 }
 function fn(t, e = "regular") {
-  const n = pt(e);
+  const n = yt(e);
   return [...n].sort(() => Math.random() - 0.5).slice(0, Math.min(t, n.length));
 }
-const E = [
+const N = [
   { id: "kamatz", name: "קָמָץ", nameNikud: "קָמָץ", symbol: "ָ", sound: "אָה", color: "#C9442C", textColor: "#fff" },
   { id: "patah", name: "פָּתַח", nameNikud: "פָּתַח", symbol: "ַ", sound: "אָה", color: "#C58119", textColor: "#fff" },
   { id: "hiriq", name: "חִירִיק", nameNikud: "חִירִיק", symbol: "ִ", sound: "אִי", color: "#2A7B71", textColor: "#fff" },
@@ -284,12 +284,12 @@ const E = [
   { id: "segol", name: "סְגוֹל", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶה", color: "#783952", textColor: "#fff" },
   { id: "holam", name: "חוֹלָם", nameNikud: "חוֹלָם", symbol: "ֹ", sound: "אוֹ", color: "#5F7A42", textColor: "#fff" },
   { id: "kubbutz", name: "קֻבּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אוּ", color: "#6B4A8A", textColor: "#fff" }
-], yt = B.filter((t) => !t.isFinal).map((t) => t.letter);
-function Ie(t, e) {
+], bt = H.filter((t) => !t.isFinal).map((t) => t.letter);
+function $e(t, e) {
   return t + e;
 }
 function mn(t) {
-  let e = [...E];
+  let e = [...N];
   if (typeof window < "u" && window.location && window.location.search) {
     const r = new URLSearchParams(window.location.search), a = r.get("allowedNikud");
     if (a) {
@@ -306,84 +306,84 @@ function mn(t) {
       );
     }
   }
-  e.length === 0 && (e = [...E]);
+  e.length === 0 && (e = [...N]);
   let n = [...e];
   for (; n.length < t; )
     n.push(...e);
   return n.sort(() => Math.random() - 0.5).slice(0, t);
 }
-const bt = 2e3;
-let T = [], D = !1, q = 0.9, ie = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, X = !1, V = null, P = null, R = null, $e = null, j = !1, N = "idle";
-function Z() {
+const gt = 2e3;
+let F = [], K = !1, W = 0.9, le = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, J = !1, D = null, $ = null, T = null, qe = null, Q = !1, L = "idle";
+function ne() {
   return typeof speechSynthesis < "u";
 }
-function L(t, e, n = !1) {
-  if (N === t && !n) return;
-  const r = N;
-  if (N = t, typeof window < "u" && typeof window.dispatchEvent == "function") {
+function x(t, e, n = !1) {
+  if (L === t && !n) return;
+  const r = L;
+  if (L = t, typeof window < "u" && typeof window.dispatchEvent == "function") {
     const a = { state: t, previousState: r };
     e && (a.reason = e), window.dispatchEvent(new CustomEvent("alefbet:tts-state", { detail: a }));
   }
 }
 function wt() {
-  Z() ? N = "idle" : L("unsupported", "no-speech-synthesis");
+  ne() ? L = "idle" : x("unsupported", "no-speech-synthesis");
 }
 wt();
-function ue(t, e) {
-  $e = String(e || "unknown"), console.warn("[tts] browser TTS failed", { text: t, reason: e }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
+function he(t, e) {
+  qe = String(e || "unknown"), console.warn("[tts] browser TTS failed", { text: t, reason: e }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
     detail: { provider: "browser", text: t, sentText: t, reason: e }
   }));
 }
-function gt(t) {
+function vt(t) {
   const e = String(t).toLowerCase();
   return e.includes("not-allowed") || e.includes("notallowed") || e.includes("didn't interact") || e.includes("user gesture");
 }
-function vt() {
+function kt() {
   var t;
-  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : X || (t = document.userActivation) != null && t.hasBeenActive ? (X = !0, Promise.resolve()) : V || (V = new Promise((e) => {
+  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : J || (t = document.userActivation) != null && t.hasBeenActive ? (J = !0, Promise.resolve()) : D || (D = new Promise((e) => {
     const n = () => {
-      X = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), e();
+      J = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), e();
     };
     window.addEventListener("pointerdown", n, { once: !0, capture: !0 }), window.addEventListener("keydown", n, { once: !0, capture: !0 }), window.addEventListener("touchstart", n, { once: !0, capture: !0 });
   }).finally(() => {
-    V = null;
-  }), V);
+    D = null;
+  }), D);
 }
-let z = null, H = null, oe = !1, ke = !1;
-const kt = ["carmit", "hila", "female"];
-function _t(t) {
+let I = null, O = null, ce = !1, _e = !1;
+const _t = ["carmit", "hila", "female"];
+function St(t) {
   const e = (t.name || "").toLowerCase();
-  return kt.some((n) => e.includes(n));
+  return _t.some((n) => e.includes(n));
 }
-function se() {
+function de() {
   if (typeof speechSynthesis > "u") return null;
   const e = speechSynthesis.getVoices().filter(
     (i) => i.lang === "he-IL" || i.lang === "iw-IL" || (i.lang || "").startsWith("he")
   );
   if (e.length === 0) return null;
   const r = typeof navigator < "u" && navigator.onLine === !1 && e.filter((i) => i.localService !== !1) || e, a = r.length > 0 ? r : e;
-  return a.find(_t) || a[0];
+  return a.find(St) || a[0];
 }
-function St() {
-  return typeof speechSynthesis > "u" ? Promise.resolve() : (z = se(), z ? (oe = !0, Promise.resolve()) : oe ? Promise.resolve() : H || (H = new Promise((t) => {
+function Et() {
+  return typeof speechSynthesis > "u" ? Promise.resolve() : (I = de(), I ? (ce = !0, Promise.resolve()) : ce ? Promise.resolve() : O || (O = new Promise((t) => {
     let e = !1;
     const n = () => {
-      e || (e = !0, oe = !0, z = se(), typeof speechSynthesis < "u" && typeof speechSynthesis.removeEventListener == "function" && speechSynthesis.removeEventListener("voiceschanged", r), clearTimeout(a), t());
+      e || (e = !0, ce = !0, I = de(), typeof speechSynthesis < "u" && typeof speechSynthesis.removeEventListener == "function" && speechSynthesis.removeEventListener("voiceschanged", r), clearTimeout(a), t());
     }, r = () => {
-      z = se(), z && n();
+      I = de(), I && n();
     };
     typeof speechSynthesis.addEventListener == "function" && speechSynthesis.addEventListener("voiceschanged", r);
     const a = setTimeout(() => {
-      ke || (ke = !0, ue("", "voice-load-timeout")), n();
-    }, bt);
+      _e || (_e = !0, he("", "voice-load-timeout")), n();
+    }, gt);
   }).finally(() => {
-    H = null;
-  }), H));
+    O = null;
+  }), O));
 }
-function Et(t) {
+function Nt(t) {
   return 5e3 + ((t == null ? void 0 : t.length) ?? 0) * 200;
 }
-function _e(t) {
+function Se(t) {
   return new Promise((e, n) => {
     if (typeof SpeechSynthesisUtterance > "u") {
       n(new Error("SpeechSynthesisUtterance unavailable"));
@@ -391,75 +391,75 @@ function _e(t) {
     }
     try {
       const r = new SpeechSynthesisUtterance(t);
-      r.lang = "he-IL", r.rate = q, z && (r.voice = z), R = r;
+      r.lang = "he-IL", r.rate = W, I && (r.voice = I), T = r;
       let a = !1;
       const i = setTimeout(() => {
         if (!a) {
-          a = !0, R === r && (R = null);
+          a = !0, T === r && (T = null);
           try {
             speechSynthesis.cancel();
           } catch {
           }
           n(new Error("utterance-timeout"));
         }
-      }, Et(t));
+      }, Nt(t));
       r.onend = () => {
-        a || (a = !0, clearTimeout(i), R === r && (R = null), e());
+        a || (a = !0, clearTimeout(i), T === r && (T = null), e());
       }, r.onerror = (o) => {
-        a || (a = !0, clearTimeout(i), R === r && (R = null), n(new Error(String(o && o.error || "speech-error"))));
+        a || (a = !0, clearTimeout(i), T === r && (T = null), n(new Error(String(o && o.error || "speech-error"))));
       }, speechSynthesis.speak(r);
     } catch (r) {
       n(r instanceof Error ? r : new Error(String(r)));
     }
   });
 }
-async function Nt(t) {
+async function Lt(t) {
   if (typeof speechSynthesis > "u")
     return { ok: !1, reason: "speechSynthesis unavailable" };
-  await St();
+  await Et();
   try {
-    return await _e(t), j = !1, { ok: !0 };
+    return await Se(t), Q = !1, { ok: !0 };
   } catch (e) {
     const n = (e == null ? void 0 : e.message) || "speech-error";
-    if (gt(n)) {
-      j || (j = !0, L("awaiting-interaction", "autoplay-blocked")), await vt(), j = !1;
+    if (vt(n)) {
+      Q || (Q = !0, x("awaiting-interaction", "autoplay-blocked")), await kt(), Q = !1;
       try {
-        return await _e(t), { ok: !0 };
+        return await Se(t), { ok: !0 };
       } catch (r) {
         const a = (r == null ? void 0 : r.message) || "speech-error";
-        return ue(t, a), { ok: !1, reason: a };
+        return he(t, a), { ok: !1, reason: a };
       }
     }
-    return ue(t, n), { ok: !1, reason: n };
+    return he(t, n), { ok: !1, reason: n };
   }
 }
-function U() {
-  if (D || T.length === 0) return;
-  const t = T.shift();
-  D = !0, P = t;
-  const e = q, n = typeof t.rate == "number";
-  n && (q = t.rate), Nt(t.text).then((r) => {
-    n && (q = e), D = !1;
-    const a = P === t;
-    if (P = null, !a) {
-      U();
+function j() {
+  if (K || F.length === 0) return;
+  const t = F.shift();
+  K = !0, $ = t;
+  const e = W, n = typeof t.rate == "number";
+  n && (W = t.rate), Lt(t.text).then((r) => {
+    n && (W = e), K = !1;
+    const a = $ === t;
+    if ($ = null, !a) {
+      j();
       return;
     }
-    r.ok ? N !== "unsupported" && L("ready") : Z() ? L("failed", r.reason, !0) : L("unsupported", r.reason || "no-provider", !0), t.resolve(), U();
+    r.ok ? L !== "unsupported" && x("ready") : ne() ? x("failed", r.reason, !0) : x("unsupported", r.reason || "no-provider", !0), t.resolve(), j();
   }).catch((r) => {
-    n && (q = e), D = !1, P = null, L("failed", (r == null ? void 0 : r.message) || "unknown"), t.resolve(), U();
+    n && (W = e), K = !1, $ = null, x("failed", (r == null ? void 0 : r.message) || "unknown"), t.resolve(), j();
   });
 }
-const x = {
+const A = {
   /**
    * הקרא טקסט עברי. ה-promise תמיד נפתר (גם בכשל) כדי שמשחקים לא יתקעו.
    * @param {string} text
    * @returns {Promise<void>}
    */
   speak(t) {
-    const e = mt(t);
+    const e = ht(t);
     return new Promise((n) => {
-      T.push({ text: e, resolve: n }), U();
+      F.push({ text: e, resolve: n }), j();
     });
   },
   /**
@@ -470,42 +470,42 @@ const x = {
    * - המצב חוזר ל-idle.
    */
   cancel() {
-    if (P) {
+    if ($) {
       try {
-        P.resolve();
+        $.resolve();
       } catch {
       }
-      P = null;
+      $ = null;
     }
-    if (T.forEach((t) => {
+    if (F.forEach((t) => {
       try {
         t.resolve();
       } catch {
       }
-    }), T = [], D = !1, R && (R = null), typeof speechSynthesis < "u" && typeof speechSynthesis.cancel == "function")
+    }), F = [], K = !1, T && (T = null), typeof speechSynthesis < "u" && typeof speechSynthesis.cancel == "function")
       try {
         speechSynthesis.cancel();
       } catch {
       }
-    L("idle", "cancelled");
+    x("idle", "cancelled");
   },
   /**
    * האם יש יכולת קול מקומית במכשיר.
    */
   get available() {
-    return N !== "unsupported" && Z();
+    return L !== "unsupported" && ne();
   },
   /** המצב הנוכחי של מנוע ה-TTS. */
   get audioState() {
-    return N;
+    return L;
   },
   /** Alias for audioState — some callers use `state`. */
   get state() {
-    return N;
+    return L;
   },
   /** השגיאה האחרונה שדווחה או null אם לא הייתה. */
   get lastError() {
-    return $e;
+    return qe;
   },
   /**
    * משחרר ידנית את מנוע הקול אחרי gesture ידוע (כפתור התחל וכו').
@@ -513,14 +513,14 @@ const x = {
    * @returns {Promise<void>}
    */
   unlock() {
-    if (X = !0, j = !1, Ye().catch(() => {
+    if (J = !0, Q = !1, Ze().catch(() => {
     }), typeof speechSynthesis < "u" && typeof SpeechSynthesisUtterance < "u")
       try {
         const t = new SpeechSynthesisUtterance("");
         t.volume = 0, speechSynthesis.speak(t), speechSynthesis.cancel();
       } catch {
       }
-    return N === "awaiting-interaction" && L("ready", "unlocked"), Promise.resolve();
+    return L === "awaiting-interaction" && x("ready", "unlocked"), Promise.resolve();
   },
   /**
    * רושם handler לאירועי `alefbet:tts-state`. מחזיר פונקציית unsubscribe.
@@ -554,21 +554,21 @@ const x = {
    * סריקת יכולת מחודשת. מחזירה את הערך של `tts.available`. שימושית לבדיקות.
    */
   probe() {
-    return Z() ? N === "unsupported" && L("idle", "recovered") : L("unsupported", "no-speech-synthesis"), this.available;
+    return ne() ? L === "unsupported" && x("idle", "recovered") : x("unsupported", "no-speech-synthesis"), this.available;
   },
   /**
    * הגדר מהירות דיבור (0.5-2.0).
    * @param {number} rate
    */
   setRate(t) {
-    q = Math.max(0.5, Math.min(2, t));
+    W = Math.max(0.5, Math.min(2, t));
   },
   /**
    * הגדר מהירות דיבור להדגשת ניקוד.
    * @param {{ rate?: number }} opts - rate: מהירות הדגשה (ברירת מחדל 0.5).
    */
   setNikudEmphasis({ rate: t } = {}) {
-    t != null && (ie = Math.max(0.3, Math.min(1.5, t)));
+    t != null && (le = Math.max(0.3, Math.min(1.5, t)));
   },
   /**
    * הקרא אות עם ניקוד בשני שלבים: קודם את ההברה בקצב טבעי כדי שהעיצור יהיה קצר,
@@ -578,14 +578,14 @@ const x = {
    * @param {string} nikudSymbol - סמל הניקוד (למשל U+05B7).
    */
   speakNikud(t, e) {
-    const n = t + e, r = E.find((a) => a.symbol === e);
+    const n = t + e, r = N.find((a) => a.symbol === e);
     return new Promise((a) => {
-      r && r.sound ? (T.push({ text: n, resolve: () => {
-      } }), T.push({
+      r && r.sound ? (F.push({ text: n, resolve: () => {
+      } }), F.push({
         text: r.sound,
-        rate: ie,
+        rate: le,
         resolve: () => a(void 0)
-      })) : T.push({ text: n, resolve: () => a(void 0) }), U();
+      })) : F.push({ text: n, resolve: () => a(void 0) }), j();
     });
   },
   /**
@@ -594,17 +594,17 @@ const x = {
    * @param {string} nikudId - מזהה ניקוד מתוך nikudList (למשל 'kamatz').
    */
   speakVowel(t) {
-    const e = E.find((n) => n.id === t);
+    const e = N.find((n) => n.id === t);
     return !e || !e.sound ? Promise.resolve() : new Promise((n) => {
-      T.push({
+      F.push({
         text: e.sound,
-        rate: ie,
+        rate: le,
         resolve: () => n(void 0)
-      }), U();
+      }), j();
     });
   }
-}, Se = "alefbet-audio-status-banner";
-function Lt(t) {
+}, Ee = "alefbet-audio-status-banner";
+function xt(t) {
   switch (t) {
     case "awaiting-interaction":
       return { message: "הַקֵּשׁ כְּדֵי לְהַפְעִיל קוֹל", kind: "await" };
@@ -616,15 +616,15 @@ function Lt(t) {
       return null;
   }
 }
-function xt(t = typeof document < "u" ? document.body : null, e = {}) {
+function At(t = typeof document < "u" ? document.body : null, e = {}) {
   const n = e.window || (typeof window < "u" ? window : null);
   if (!t || !n)
     return { destroy() {
     } };
-  const r = t.querySelector("#" + Se);
+  const r = t.querySelector("#" + Ee);
   r && r.parentNode && r.parentNode.removeChild(r);
   const a = t.ownerDocument.createElement("div");
-  a.id = Se, a.className = "alefbet-audio-banner", a.setAttribute("role", "status"), a.setAttribute("aria-live", "polite"), a.dir = "rtl", a.hidden = !0;
+  a.id = Ee, a.className = "alefbet-audio-banner", a.setAttribute("role", "status"), a.setAttribute("aria-live", "polite"), a.dir = "rtl", a.hidden = !0;
   const i = t.ownerDocument.createElement("span");
   i.className = "alefbet-audio-banner__msg", a.appendChild(i);
   const o = t.ownerDocument.createElement("button");
@@ -637,7 +637,7 @@ function xt(t = typeof document < "u" ? document.body : null, e = {}) {
     l(), a.hidden = !0, a.classList.remove("is-visible", "is-await", "is-unsupported", "is-failed"), a.onclick = null, o.hidden = !0;
   }
   function d(h) {
-    const m = Lt(h);
+    const m = xt(h);
     if (!m) {
       c();
       return;
@@ -666,12 +666,12 @@ function xt(t = typeof document < "u" ? document.body : null, e = {}) {
     }
   };
 }
-function At(t, { banner: e = !0 } = {}) {
-  const n = e ? xt(t.container) : null, r = () => {
-    t.container.removeEventListener("pointerdown", r, !0), t.container.removeEventListener("keydown", r, !0), x.unlock();
+function Rt(t, { banner: e = !0 } = {}) {
+  const n = e ? At(t.container) : null, r = () => {
+    t.container.removeEventListener("pointerdown", r, !0), t.container.removeEventListener("keydown", r, !0), A.unlock();
   };
   t.container.addEventListener("pointerdown", r, { once: !0, capture: !0 }), t.container.addEventListener("keydown", r, { once: !0, capture: !0 }), t.on("end", () => {
-    t.container.removeEventListener("pointerdown", r, !0), t.container.removeEventListener("keydown", r, !0), n == null || n.destroy(), x.cancel();
+    t.container.removeEventListener("pointerdown", r, !0), t.container.removeEventListener("keydown", r, !0), n == null || n.destroy(), A.cancel();
   });
 }
 function hn(t) {
@@ -682,12 +682,12 @@ function hn(t) {
   }
   return e;
 }
-function Tt() {
-  const t = Fe();
+function Ft() {
+  const t = Me();
   return t ? (t.state === "suspended" && t.resume(), t) : null;
 }
-function I(t, e, n = "sine", r = 0.3) {
-  const a = Tt();
+function U(t, e, n = "sine", r = 0.3) {
+  const a = Ft();
   if (a)
     try {
       const i = a.createOscillator(), o = a.createGain();
@@ -695,24 +695,24 @@ function I(t, e, n = "sine", r = 0.3) {
     } catch {
     }
 }
-const J = {
+const re = {
   /** צליל תשובה נכונה */
   correct() {
-    I(523.25, 0.15), setTimeout(() => I(659.25, 0.2), 120), setTimeout(() => I(783.99, 0.3), 240);
+    U(523.25, 0.15), setTimeout(() => U(659.25, 0.2), 120), setTimeout(() => U(783.99, 0.3), 240);
   },
   /** צליל עידוד עדין — נסה שוב */
   wrong() {
-    I(350, 0.15, "triangle", 0.12);
+    U(350, 0.15, "triangle", 0.12);
   },
   /** צליל עידוד - סיום מוצלח */
   cheer() {
-    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((e, n) => setTimeout(() => I(e, 0.2), n * 90));
+    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((e, n) => setTimeout(() => U(e, 0.2), n * 90));
   },
   /** קליק עדין */
   click() {
-    I(900, 0.04, "sine", 0.12);
+    U(900, 0.04, "sine", 0.12);
   }
-}, Ee = {
+}, Ne = {
   shake: [
     { transform: "translateX(0)" },
     { transform: "translateX(-8px)" },
@@ -743,31 +743,31 @@ const J = {
     { transform: "scale(1.3) rotate(180deg)", opacity: "1" },
     { transform: "scale(1) rotate(360deg)", opacity: "1" }
   ]
-}, Rt = {
+}, Tt = {
   shake: 420,
   bounce: 480,
   pulse: 600,
   fadeIn: 320,
   confetti: 700
 };
-function Y(t, e) {
-  !t || !Ee[e] || t.animate(Ee[e], {
-    duration: Rt[e] || 400,
+function ee(t, e) {
+  !t || !Ne[e] || t.animate(Ne[e], {
+    duration: Tt[e] || 400,
     easing: "ease-in-out",
     fill: "none"
   });
 }
-const Ft = "alefbet.progress.v1", pe = Ze(Ft, {});
-function qe(t, e) {
+const Mt = "alefbet.progress.v1", ge = Je(Mt, {});
+function Be(t, e) {
   if (!Number.isFinite(t) || !Number.isFinite(e) || e <= 0) return 1;
   const n = t / e;
   return n >= 0.8 ? 3 : n >= 0.5 ? 2 : 1;
 }
-function Mt(t, { score: e, total: n }) {
+function Ct(t, { score: e, total: n }) {
   if (!t || !Number.isFinite(e) || !Number.isFinite(n) || n <= 0) return null;
-  const r = qe(e, n);
+  const r = Be(e, n);
   let a = null;
-  return pe.update((i) => {
+  return ge.update((i) => {
     const o = i[t];
     return a = {
       plays: ((o == null ? void 0 : o.plays) ?? 0) + 1,
@@ -779,14 +779,14 @@ function Mt(t, { score: e, total: n }) {
   }), a;
 }
 function pn(t) {
-  return pe.get()[t] ?? null;
+  return ge.get()[t] ?? null;
 }
 function yn() {
-  return pe.get();
+  return ge.get();
 }
-function Ct(t, e, n, r, a = {}) {
-  J.cheer(), a.gameId && Mt(a.gameId, { score: e, total: n });
-  const i = a.completionOnly ? n === 1 ? "הִשְׁלַמְתֶּם מְשִׂימָה!" : `הִשְׁלַמְתֶּם ${n} מְשִׂימוֹת!` : `נִיקּוּד: ${e} מִתּוֹךְ ${n}`, o = qe(e, n), s = "⭐".repeat(o) + "☆".repeat(3 - o), l = document.createElement("div");
+function zt(t, e, n, r, a = {}) {
+  re.cheer(), a.gameId && Ct(a.gameId, { score: e, total: n });
+  const i = a.completionOnly ? n === 1 ? "הִשְׁלַמְתֶּם מְשִׂימָה!" : `הִשְׁלַמְתֶּם ${n} מְשִׂימוֹת!` : `נִיקּוּד: ${e} מִתּוֹךְ ${n}`, o = Be(e, n), s = "⭐".repeat(o) + "☆".repeat(3 - o), l = document.createElement("div");
   l.className = "completion-screen", l.innerHTML = `
     <div class="completion-screen__content">
       <div class="completion-screen__stars" aria-label="${o} כּוֹכָבִים">${s}</div>
@@ -804,9 +804,9 @@ function Ct(t, e, n, r, a = {}) {
   }
   l.querySelector(".completion-screen__replay").addEventListener("click", () => {
     l.remove(), r();
-  }), t.innerHTML = "", t.appendChild(l), Y(l.querySelector(".completion-screen__content"), "fadeIn");
+  }), t.innerHTML = "", t.appendChild(l), ee(l.querySelector(".completion-screen__content"), "fadeIn");
 }
-function zt(t, e, {
+function Pt(t, e, {
   totalRounds: n,
   progressBar: r = null,
   buildRoundUI: a,
@@ -830,9 +830,9 @@ function zt(t, e, {
   t.on("end", () => {
     m(!0), h.clear();
   });
-  async function v(g) {
+  async function b(g) {
     if (u || t.ended) return;
-    m(!0), l && J.correct();
+    m(!0), l && re.correct();
     try {
       if (g && await g(), t.ended) return;
       i && await i();
@@ -840,7 +840,7 @@ function zt(t, e, {
       throw m(!1), S;
     }
     if (t.ended || (t.state.addScore(1), r == null || r.update(t.state.currentRound), !await t.delay(s))) return;
-    t.nextRound() ? (m(!1), a()) : Ct(e, t.state.score, n, d, { gameId: t.gameId, completionOnly: c, homeUrl: t.config.homeUrl });
+    t.nextRound() ? (m(!1), a()) : zt(e, t.state.score, n, d, { gameId: t.gameId, completionOnly: c, homeUrl: t.config.homeUrl });
   }
   async function k(g) {
     if (!(u || t.ended)) {
@@ -855,12 +855,12 @@ function zt(t, e, {
   function w() {
     return u;
   }
-  function A() {
+  function R() {
     m(!1);
   }
-  return { handleCorrect: v, handleWrong: k, isAnswered: w, reset: A, subscribe: y };
+  return { handleCorrect: b, handleWrong: k, isAnswered: w, reset: R, subscribe: y };
 }
-function Pt() {
+function te() {
   const t = new AbortController(), e = /* @__PURE__ */ new Set();
   function n(r) {
     t.signal.aborted ? r() : e.add(r);
@@ -923,21 +923,21 @@ function It(t, e) {
     }
   };
 }
-let le = !1, fe = !1, W = null;
+let ue = !1, pe = !1, G = null;
 const $t = [
   "ResizeObserver loop",
   // אזהרת דפדפן שפירה
   "Script error."
   // שגיאת cross-origin אטומה, לרוב תוסף דפדפן
 ];
-function Ne(t) {
+function Le(t) {
   const e = String(t || "");
   return $t.some((n) => e.includes(n));
 }
-function Le() {
+function xe() {
   var e;
-  if (fe || typeof document > "u" || !document.body) return;
-  fe = !0;
+  if (pe || typeof document > "u" || !document.body) return;
+  pe = !0;
   const t = document.createElement("div");
   t.className = "ab-error-screen", t.setAttribute("role", "alert"), t.dir = "rtl", t.innerHTML = `
     <div class="ab-error-screen__card">
@@ -956,22 +956,22 @@ function Le() {
 function qt() {
   if (typeof window > "u") return { destroy() {
   } };
-  if (le) return { destroy() {
+  if (ue) return { destroy() {
   } };
-  le = !0;
+  ue = !0;
   const t = (n) => {
-    Ne(n == null ? void 0 : n.message) || (console.error("[alefbet] uncaught error:", (n == null ? void 0 : n.error) ?? (n == null ? void 0 : n.message)), Le());
+    Le(n == null ? void 0 : n.message) || (console.error("[alefbet] uncaught error:", (n == null ? void 0 : n.error) ?? (n == null ? void 0 : n.message)), xe());
   }, e = (n) => {
     const r = (
       /** @type {any} */
       n == null ? void 0 : n.reason
     );
-    Ne((r == null ? void 0 : r.message) ?? r) || (console.error("[alefbet] unhandled rejection:", r), Le());
+    Le((r == null ? void 0 : r.message) ?? r) || (console.error("[alefbet] unhandled rejection:", r), xe());
   };
-  return window.addEventListener("error", t), window.addEventListener("unhandledrejection", e), W = () => {
-    window.removeEventListener("error", t), window.removeEventListener("unhandledrejection", e), le = !1, fe = !1;
+  return window.addEventListener("error", t), window.addEventListener("unhandledrejection", e), G = () => {
+    window.removeEventListener("error", t), window.removeEventListener("unhandledrejection", e), ue = !1, pe = !1;
   }, { destroy: () => {
-    W == null || W(), W = null;
+    G == null || G(), G = null;
   } };
 }
 function Bt(t, e = "טוֹעֵן...") {
@@ -980,7 +980,7 @@ function Bt(t, e = "טוֹעֵן...") {
 function Ut(t) {
   t.innerHTML = "";
 }
-function Be(t) {
+function Ue(t) {
   let e = t.querySelector(".adult-tools__panel");
   if (e) return e;
   const n = t.querySelector(".game-header");
@@ -991,7 +991,7 @@ function Be(t) {
   }), n.appendChild(r), r.querySelector(".adult-tools__panel");
 }
 function Vt(t, e, n) {
-  const r = Be(t.container);
+  const r = Ue(t.container);
   if (!r) return;
   const a = document.createElement("div");
   a.className = "ab-lazy-editor";
@@ -1037,33 +1037,33 @@ function Vt(t, e, n) {
     s == null || s.destroy(), a.remove();
   });
 }
-const ce = /* @__PURE__ */ new WeakMap();
-async function Ht(t, e) {
-  ze(t);
+const fe = /* @__PURE__ */ new WeakMap();
+async function Wt(t, e) {
+  Pe(t);
   const n = {};
-  if (ce.set(t, n), qt(), Bt(t, e.loadingMessage ?? "טוֹעֵן..."), await ht(e.preloadTexts ?? []), ce.get(t) !== n)
+  if (fe.set(t, n), qt(), Bt(t, e.loadingMessage ?? "טוֹעֵן..."), await pt(e.preloadTexts ?? []), fe.get(t) !== n)
     return { shell: null, activeRounds: [], gameData: null, aborted: !0 };
-  if (e.onBeforeHide && (await e.onBeforeHide() === !1 || ce.get(t) !== n))
+  if (e.onBeforeHide && (await e.onBeforeHide() === !1 || fe.get(t) !== n))
     return { shell: null, activeRounds: [], gameData: null, aborted: !0 };
   Ut(t);
-  const r = e.editor ? Je(e.gameId, e.editor.content) : null, a = r != null && r.rounds.length ? r.rounds : e.defaultRounds ?? [], i = new at(t, {
+  const r = e.editor ? et(e.gameId, e.editor.content) : null, a = r != null && r.rounds.length ? r.rounds : e.defaultRounds ?? [], i = new it(t, {
     totalRounds: e.totalRounds ?? a.length,
     title: e.title,
     gameId: e.gameId
   });
-  e.audio !== !1 && At(i);
+  e.audio !== !1 && Rt(i);
   let o = null;
   if (e.editor) {
     const s = {
       title: e.editor.title ?? e.title,
       type: e.editor.type ?? "multiple-choice"
     };
-    o = et.fromRoundsArray(e.gameId, a, s, e.editor.distractors ?? [], e.editor.content), Vt(i, o, { restartGame: e.editor.restartGame });
+    o = tt.fromRoundsArray(e.gameId, a, s, e.editor.distractors ?? [], e.editor.content), Vt(i, o, { restartGame: e.editor.restartGame });
   }
   return { shell: i, activeRounds: a, gameData: o, aborted: !1 };
 }
-async function Wt(t, e) {
-  const n = await Ht(t, e);
+async function Ht(t, e) {
+  const n = await Wt(t, e);
   if (n.aborted) return n;
   const { shell: r, activeRounds: a } = n;
   if (!a.length)
@@ -1072,14 +1072,14 @@ async function Wt(t, e) {
   let o;
   const s = () => {
     o == null || o.dispose(), o = void 0;
-  }, l = zt(r, t, {
+  }, l = Pt(r, t, {
     totalRounds: a.length,
     completionOnly: !0,
     progressBar: i,
     transitionMs: e.transitionMs,
     playCorrectSound: e.playCorrectSound,
     onReplay: e.onReplay ?? (() => {
-      Wt(t, e);
+      Ht(t, e);
     }),
     buildRoundUI: c
   });
@@ -1089,7 +1089,7 @@ async function Wt(t, e) {
   }), r.on("start", c);
   function c() {
     s(), r.bodyEl.innerHTML = "";
-    const d = Pt();
+    const d = te();
     o = d;
     const u = () => !r.ended && !d.signal.aborted, h = r.state.currentRound - 1;
     try {
@@ -1117,16 +1117,17 @@ async function Wt(t, e) {
   }
   return r.start(), n;
 }
-function Dt(t, e, n) {
+function jt(t, e, n) {
   t.innerHTML = "";
   const r = document.createElement("div");
   r.className = "option-cards-grid";
   const a = e.map((i) => {
     const o = document.createElement("button");
-    return o.className = "option-card", o.dataset.id = i.id, o.innerHTML = `
-      <span class="option-card__emoji">${i.emoji || ""}</span>
-      <span class="option-card__text">${i.text}</span>
-    `, o.addEventListener("click", () => {
+    o.className = "option-card", o.dataset.id = i.id, o.type = "button";
+    const s = document.createElement("span");
+    s.className = "option-card__emoji", s.textContent = i.emoji || "";
+    const l = document.createElement("span");
+    return l.className = "option-card__text", l.textContent = i.text, o.append(s, l), o.addEventListener("click", () => {
       o.disabled || n(i);
     }), r.appendChild(o), { el: o, option: i };
   });
@@ -1167,7 +1168,7 @@ function Dt(t, e, n) {
   };
 }
 function bn(t, e, n) {
-  const r = t.scope.use(Dt(e, n.options, (a) => {
+  const r = t.scope.use(jt(e, n.options, (a) => {
     t.isAnswered() || (n.isCorrect(a) ? t.onCorrect(() => {
       var i;
       return r.highlight(a.id, "correct"), (i = n.onCorrect) == null ? void 0 : i.call(n, a);
@@ -1178,7 +1179,7 @@ function bn(t, e, n) {
   }));
   return t.subscribeAnswered((a) => r.setDisabled(a)), { highlight: r.highlight, clearHighlight: r.clearHighlight };
 }
-function wn({ hintAfter: t = 2, escalateAfter: e = 4, onHint: n, onEscalate: r } = {}) {
+function gn({ hintAfter: t = 2, escalateAfter: e = 4, onHint: n, onEscalate: r } = {}) {
   let a = 0;
   function i(o) {
     return o >= e ? 2 : o >= t ? 1 : 0;
@@ -1204,13 +1205,13 @@ function wn({ hintAfter: t = 2, escalateAfter: e = 4, onHint: n, onEscalate: r }
     }
   };
 }
-const Ue = {
+const Ve = {
   a: { F1: 850, F2: 1400 },
   e: { F1: 550, F2: 2100 },
   i: { F1: 350, F2: 2700 },
   o: { F1: 550, F2: 1e3 },
   u: { F1: 350, F2: 850 }
-}, ye = {
+}, we = {
   kamatz: "a",
   patah: "a",
   tzere: "e",
@@ -1219,11 +1220,11 @@ const Ue = {
   holam: "o",
   kubbutz: "u"
 };
-function jt(t, e) {
+function Dt(t, e) {
   if (!Number.isFinite(t) || !Number.isFinite(e) || t <= 0 || e <= 0 || e <= t)
     return { vowel: "", confidence: 0 };
   const n = Math.log2(t), r = Math.log2(e), a = [];
-  for (const [l, c] of Object.entries(Ue)) {
+  for (const [l, c] of Object.entries(Ve)) {
     const d = n - Math.log2(c.F1), u = r - Math.log2(c.F2);
     a.push({ vowel: l, dist: Math.sqrt(d * d + u * u) });
   }
@@ -1231,8 +1232,8 @@ function jt(t, e) {
   const i = a[0], o = a[1], s = o.dist === 0 ? 1 : Math.max(0, Math.min(1, 1 - i.dist / o.dist));
   return { vowel: i.vowel, confidence: s };
 }
-function gn(t, e) {
-  return !t || !e ? !1 : ye[e] === t;
+function wn(t, e) {
+  return !t || !e ? !1 : we[e] === t;
 }
 function Ot(t, e) {
   const n = t.length, r = Math.max(1, Math.min(e, n)), a = new Float32Array(r);
@@ -1277,7 +1278,7 @@ function vn() {
     listen(s = 3e3) {
       return a == null || a(), r ? new Promise((l) => {
         let c = !1, d = null, u = null, h = null;
-        const m = (v) => {
+        const m = (b) => {
           var k;
           if (!c) {
             c = !0, h !== null && cancelAnimationFrame(h), d == null || d.getTracks().forEach((w) => {
@@ -1291,44 +1292,44 @@ function vn() {
               });
             } catch {
             }
-            a === y && (a = null), l(v);
+            a === y && (a = null), l(b);
           }
         }, y = () => m(i());
-        a = y, Promise.resolve().then(() => navigator.mediaDevices.getUserMedia({ audio: !0 })).then((v) => {
+        a = y, Promise.resolve().then(() => navigator.mediaDevices.getUserMedia({ audio: !0 })).then((b) => {
           if (c) {
-            v.getTracks().forEach((f) => {
+            b.getTracks().forEach((B) => {
               try {
-                f.stop();
+                B.stop();
               } catch {
               }
             });
             return;
           }
-          d = v, u = new n();
+          d = b, u = new n();
           const k = u.createMediaStreamSource(d), w = u.createAnalyser();
           w.fftSize = 4096, w.smoothingTimeConstant = 0.2, k.connect(w);
-          const A = u.sampleRate / w.fftSize, g = new Float32Array(w.frequencyBinCount), _ = new Float32Array(w.fftSize), S = [], re = performance.now(), G = () => {
+          const R = u.sampleRate / w.fftSize, g = new Float32Array(w.frequencyBinCount), _ = new Float32Array(w.fftSize), S = [], q = performance.now(), C = () => {
             if (c) return;
-            if (performance.now() - re > s) {
+            if (performance.now() - q > s) {
               if (S.length < 3) {
                 m(i());
                 return;
               }
-              const p = S.map((C) => C.F1).sort((C, ae) => C - ae), b = S.map((C) => C.F2).sort((C, ae) => C - ae), M = Math.floor(S.length / 2), be = p[M], we = b[M];
-              m({ ...jt(be, we), F1: be, F2: we });
+              const E = S.map((P) => P.F1).sort((P, se) => P - se), f = S.map((P) => P.F2).sort((P, se) => P - se), p = Math.floor(S.length / 2), v = E[p], z = f[p];
+              m({ ...Dt(v, z), F1: v, F2: z });
               return;
             }
             w.getFloatTimeDomainData(_);
-            let f = 0;
-            for (let p = 0; p < _.length; p++) f += _[p] * _[p];
-            if (Math.sqrt(f / _.length) > 0.015) {
+            let B = 0;
+            for (let E = 0; E < _.length; E++) B += _[E] * _[E];
+            if (Math.sqrt(B / _.length) > 0.015) {
               w.getFloatFrequencyData(g);
-              const { F1: p, F2: b } = Gt(g, A);
-              p > 0 && b > 0 && b > p && S.push({ F1: p, F2: b });
+              const { F1: E, F2: f } = Gt(g, R);
+              E > 0 && f > 0 && f > E && S.push({ F1: E, F2: f });
             }
-            h = requestAnimationFrame(G);
+            h = requestAnimationFrame(C);
           };
-          h = requestAnimationFrame(G);
+          h = requestAnimationFrame(C);
         }).catch(() => m(i()));
       }) : Promise.resolve(i());
     },
@@ -1337,22 +1338,22 @@ function vn() {
     }
   };
 }
-const Ve = 210, He = 550, Kt = {
+const We = 210, He = 550, Kt = {
   a: { F3: 2700, bandwidths: [90, 110, 170], gains: [1, 0.5, 0.15] },
   e: { F3: 2900, bandwidths: [80, 100, 160], gains: [1, 0.55, 0.2] },
   i: { F3: 3300, bandwidths: [60, 100, 160], gains: [1, 0.6, 0.25] },
   o: { F3: 2600, bandwidths: [80, 90, 150], gains: [1, 0.5, 0.1] },
   u: { F3: 2400, bandwidths: [60, 80, 140], gains: [1, 0.45, 0.1] }
 };
-function ee(t) {
-  const e = Ue[t], n = Kt[t];
+function ae(t) {
+  const e = Ve[t], n = Kt[t];
   return !e || !n ? null : {
     formants: [e.F1, e.F2, n.F3],
     bandwidths: [...n.bandwidths],
     gains: [...n.gains]
   };
 }
-const xe = {
+const Ae = {
   "": { type: "none", voiced: !0, durationMs: 0 },
   b: { type: "plosive", voiced: !0, noiseHz: 500, noiseQ: 1.2, durationMs: 25 },
   g: { type: "plosive", voiced: !0, noiseHz: 1800, noiseQ: 1.5, durationMs: 30 },
@@ -1374,19 +1375,19 @@ const xe = {
   sh: { type: "fricative", voiced: !1, noiseHz: 3e3, noiseQ: 1.8, durationMs: 140 }
 };
 function Qt(t) {
-  return xe[t] ?? xe[""];
+  return Ae[t] ?? Ae[""];
 }
 function kn() {
-  return Fe() !== null;
+  return Me() !== null;
 }
-let K = null;
+let Y = null;
 function Xt(t) {
-  if (K && K.sampleRate === t.sampleRate) return K;
+  if (Y && Y.sampleRate === t.sampleRate) return Y;
   const e = t.sampleRate, n = t.createBuffer(1, e, t.sampleRate), r = n.getChannelData(0);
   for (let a = 0; a < e; a++) r[a] = Math.random() * 2 - 1;
-  return K = n, n;
+  return Y = n, n;
 }
-function We(t, e, n, r = t.destination) {
+function je(t, e, n, r = t.destination) {
   const a = t.createOscillator();
   a.type = "sawtooth", a.frequency.value = n;
   const i = t.createGain();
@@ -1399,7 +1400,7 @@ function We(t, e, n, r = t.destination) {
   });
   return i.connect(r), { source: a, filters: o, master: i };
 }
-function de(t, e, n, r, a = t.destination) {
+function me(t, e, n, r, a = t.destination) {
   const i = n.durationMs / 1e3, o = t.createBufferSource();
   o.buffer = Xt(t), o.loop = !0;
   const s = t.createBiquadFilter();
@@ -1408,22 +1409,22 @@ function de(t, e, n, r, a = t.destination) {
   return l.gain.setValueAtTime(0, e), l.gain.linearRampToValueAtTime(r, e + Math.min(0.01, i / 3)), l.gain.linearRampToValueAtTime(1e-4, e + i), o.connect(s), s.connect(l), l.connect(a), o.start(e), o.stop(e + i + 0.02), e + i;
 }
 function De(t, e, n, r, a, i, o = t.destination) {
-  const s = r / 1e3, { source: l, filters: c, master: d } = We(t, n, a, o);
+  const s = r / 1e3, { source: l, filters: c, master: d } = je(t, n, a, o);
   if (l.frequency.setValueAtTime(a * 1.04, e), l.frequency.linearRampToValueAtTime(a * 0.92, e + s), i) {
     const m = Math.min(0.09, s / 3);
-    c.forEach((y, v) => {
-      const k = i[v];
-      k && (y.frequency.setValueAtTime(k, e), y.frequency.exponentialRampToValueAtTime(n.formants[v], e + m));
+    c.forEach((y, b) => {
+      const k = i[b];
+      k && (y.frequency.setValueAtTime(k, e), y.frequency.exponentialRampToValueAtTime(n.formants[b], e + m));
     });
   }
   const u = 0.04, h = 0.12;
   return d.gain.setValueAtTime(0, e), d.gain.linearRampToValueAtTime(0.5, e + u), d.gain.setValueAtTime(0.5, e + s - h), d.gain.linearRampToValueAtTime(1e-4, e + s), l.start(e), l.stop(e + s + 0.05), e + s;
 }
 function Yt(t, e, n, r, a = t.destination) {
-  const i = n / 1e3, o = { formants: [250, 1100, 2200], bandwidths: [80, 200, 300], gains: [1, 0.12, 0.05] }, { source: s, master: l } = We(t, o, r, a);
+  const i = n / 1e3, o = { formants: [250, 1100, 2200], bandwidths: [80, 200, 300], gains: [1, 0.12, 0.05] }, { source: s, master: l } = je(t, o, r, a);
   return l.gain.setValueAtTime(0, e), l.gain.linearRampToValueAtTime(0.35, e + 0.02), l.gain.setValueAtTime(0.35, e + i - 0.02), l.gain.linearRampToValueAtTime(1e-4, e + i), s.start(e), s.stop(e + i + 0.05), e + i;
 }
-function je(t, e, n, r) {
+function Oe(t, e, n, r) {
   const a = Math.max(0, (e - t.currentTime) * 1e3) + 60;
   return new Promise((i) => {
     const o = () => {
@@ -1434,48 +1435,48 @@ function je(t, e, n, r) {
 }
 async function Zt(t, e = {}) {
   var o, s;
-  const n = ee(t);
+  const n = ae(t);
   if (!n || (o = e.signal) != null && o.aborted) return !1;
-  const r = await Me();
+  const r = await Ce();
   if (!r || (s = e.signal) != null && s.aborted) return !1;
   let a, i;
   try {
     i = r.createGain(), i.connect(r.destination);
     const l = r.currentTime + 0.03;
-    a = De(r, l, n, e.durationMs ?? He, e.pitchHz ?? Ve, null, i);
+    a = De(r, l, n, e.durationMs ?? He, e.pitchHz ?? We, null, i);
   } catch {
     return i == null || i.disconnect(), !1;
   }
-  return je(r, a, i, e.signal);
+  return Oe(r, a, i, e.signal);
 }
-async function me(t, e, n = {}) {
+async function ye(t, e, n = {}) {
   var d, u;
-  const r = ee(e);
+  const r = ae(e);
   if (!r || (d = n.signal) != null && d.aborted) return !1;
-  const a = await Me();
+  const a = await Ce();
   if (!a || (u = n.signal) != null && u.aborted) return !1;
-  const i = Qt(t), o = n.pitchHz ?? Ve, s = n.durationMs ?? He;
+  const i = Qt(t), o = n.pitchHz ?? We, s = n.durationMs ?? He;
   let l, c;
   try {
     c = a.createGain(), c.connect(a.destination), l = Jt(a, i, t, r, s, o, c);
   } catch {
     return c == null || c.disconnect(), !1;
   }
-  return je(a, l, c, n.signal);
+  return Oe(a, l, c, n.signal);
 }
 function Jt(t, e, n, r, a, i, o = t.destination) {
   let s = t.currentTime + 0.03, l = null;
   switch (e.type) {
     case "plosive": {
-      s = de(t, s, e, e.voiced ? 0.25 : 0.35, o), s += 0.01;
+      s = me(t, s, e, e.voiced ? 0.25 : 0.35, o), s += 0.01;
       break;
     }
     case "fricative": {
-      s = de(t, s, e, 0.22, o) - 0.03;
+      s = me(t, s, e, 0.22, o) - 0.03;
       break;
     }
     case "affricate": {
-      s += 0.03, s = de(t, s, { ...e, durationMs: e.durationMs - 30 }, 0.3, o) - 0.02;
+      s += 0.03, s = me(t, s, { ...e, durationMs: e.durationMs - 30 }, 0.3, o) - 0.02;
       break;
     }
     case "nasal": {
@@ -1487,43 +1488,43 @@ function Jt(t, e, n, r, a, i, o = t.destination) {
       break;
     }
     case "glide": {
-      const c = ee(n === "y" ? "i" : "u");
+      const c = ae(n === "y" ? "i" : "u");
       l = c ? c.formants : null;
       break;
     }
   }
   return De(t, s, r, a, i, l, o);
 }
-const O = "sound-bank";
-function Oe(t) {
+const X = "sound-bank";
+function Ge(t) {
   return `letter:${t}`;
 }
-function Ge(t) {
+function Ke(t) {
   return `nikud:${t}`;
 }
-function Ke(t, e) {
+function Qe(t, e) {
   return `syllable:${t}:${e}`;
 }
 function en(t) {
   return `word:${t}`;
 }
-function Qe() {
+function Xe() {
   const t = [];
-  for (const e of B)
-    t.push({ key: Oe(e.letter), label: e.nameNikud, group: "letters" });
-  for (const e of E)
-    t.push({ key: Ge(e.id), label: `${e.nameNikud} (${e.sound})`, group: "nikud" });
-  for (const e of yt)
-    for (const n of E)
+  for (const e of H)
+    t.push({ key: Ge(e.letter), label: e.nameNikud, group: "letters" });
+  for (const e of N)
+    t.push({ key: Ke(e.id), label: `${e.nameNikud} (${e.sound})`, group: "nikud" });
+  for (const e of bt)
+    for (const n of N)
       t.push({
-        key: Ke(e, n.id),
-        label: Ie(e, n.symbol),
+        key: Qe(e, n.id),
+        label: $e(e, n.symbol),
         group: "syllables"
       });
   return t;
 }
 function _n(t) {
-  const e = Qe().find((r) => r.key === t);
+  const e = Xe().find((r) => r.key === t);
   if (e) return e.label;
   const [, ...n] = t.split(":");
   return n.join(":");
@@ -1531,17 +1532,17 @@ function _n(t) {
 function tn() {
   return typeof navigator < "u" && navigator.onLine === !1;
 }
-async function te(t, e = void 0) {
+async function ie(t, e = void 0) {
   try {
-    return typeof indexedDB > "u" ? !1 : await (e ? $(O, t, e) : $(O, t));
+    return typeof indexedDB > "u" ? !1 : await (e ? V(X, t, e) : V(X, t));
   } catch {
     return !1;
   }
 }
-async function ne(t) {
+async function oe(t) {
   if (tn() && !nn()) return !1;
   try {
-    return await t(), x.audioState !== "failed" && x.audioState !== "unsupported";
+    return await t(), A.audioState !== "failed" && A.audioState !== "unsupported";
   } catch {
     return !1;
   }
@@ -1551,71 +1552,71 @@ function nn() {
 }
 async function Sn() {
   try {
-    return typeof indexedDB > "u" ? [] : await Ce(O);
+    return typeof indexedDB > "u" ? [] : await ze(X);
   } catch {
     return [];
   }
 }
 async function En(t) {
-  if (await te(Oe(t))) return "bank";
-  const e = he(t), n = e ? e.nameNikud : t;
-  return await ne(() => x.speak(n)) ? "tts" : e && await me(e.sound, "a", { durationMs: 400 }) ? "synth" : "none";
+  if (await ie(Ge(t))) return "bank";
+  const e = be(t), n = e ? e.nameNikud : t;
+  return await oe(() => A.speak(n)) ? "tts" : e && await ye(e.sound, "a", { durationMs: 400 }) ? "synth" : "none";
 }
 async function Nn(t) {
-  if (await te(Ge(t))) return "bank";
-  if (await ne(() => x.speakVowel(t))) return "tts";
-  const e = ye[t];
+  if (await ie(Ke(t))) return "bank";
+  if (await oe(() => A.speakVowel(t))) return "tts";
+  const e = we[t];
   return e && await Zt(e) ? "synth" : "none";
 }
 async function Ln(t, e, n = {}) {
   const { signal: r } = n;
   if (r != null && r.aborted) return "none";
-  if (await te(Ke(t, e), r ? n : void 0)) return "bank";
+  if (await ie(Qe(t, e), r ? n : void 0)) return "bank";
   if (r != null && r.aborted) return "none";
-  const a = E.find((l) => l.id === e), i = () => x.cancel();
+  const a = N.find((l) => l.id === e), i = () => A.cancel();
   r == null || r.addEventListener("abort", i, { once: !0 });
   try {
-    if (a && await ne(() => x.speakNikud(t, a.symbol)))
+    if (a && await oe(() => A.speakNikud(t, a.symbol)))
       return r != null && r.aborted ? "none" : "tts";
   } finally {
     r == null || r.removeEventListener("abort", i);
   }
   if (r != null && r.aborted) return "none";
-  const o = he(t), s = ye[e];
-  return s && await (r ? me(o ? o.sound : "", s, n) : me(o ? o.sound : "", s)) ? "synth" : "none";
+  const o = be(t), s = we[e];
+  return s && await (r ? ye(o ? o.sound : "", s, n) : ye(o ? o.sound : "", s)) ? "synth" : "none";
 }
 async function xn(t) {
-  return await te(en(t)) ? "bank" : await ne(() => x.speak(t)) ? "tts" : "none";
+  return await ie(en(t)) ? "bank" : await oe(() => A.speak(t)) ? "tts" : "none";
 }
-const Ae = "alefbet.ttsProxyUrl";
+const Re = "alefbet.ttsProxyUrl";
 function rn() {
   var i, o;
   if (typeof window > "u") return null;
   const t = new URLSearchParams(window.location.search).get("ttsProxy");
   if (t && window.localStorage)
     try {
-      window.localStorage.setItem(Ae, t);
+      window.localStorage.setItem(Re, t);
     } catch {
     }
   const e = (
     /** @type {any} */
     window.ALEFBET_TTS_PROXY_URL
-  ), n = (i = window.localStorage) == null ? void 0 : i.getItem(Ae), r = (o = window.localStorage) == null ? void 0 : o.getItem("alefbet.nakdanProxyUrl"), a = t || e || n || r;
+  ), n = (i = window.localStorage) == null ? void 0 : i.getItem(Re), r = (o = window.localStorage) == null ? void 0 : o.getItem("alefbet.nakdanProxyUrl"), a = t || e || n || r;
   return a ? String(a).replace(/\/+$/, "") : null;
 }
 function an(t) {
   const [e, n, r] = t.split(":");
   if (e === "letter") {
-    const a = he(n);
+    const a = be(n);
     return a ? a.nameNikud : null;
   }
   if (e === "nikud") {
-    const a = E.find((i) => i.id === n);
+    const a = N.find((i) => i.id === n);
     return a ? a.sound : null;
   }
   if (e === "syllable") {
-    const a = E.find((i) => i.id === r);
-    return a ? Ie(n, a.symbol) : null;
+    const a = N.find((i) => i.id === r);
+    return a ? $e(n, a.symbol) : null;
   }
   return e === "word" && t.slice(5) || null;
 }
@@ -1633,9 +1634,9 @@ async function An({ force: t = !1, extraTexts: e = [], onProgress: n } = {}) {
   if (typeof indexedDB > "u")
     throw new Error("indexeddb-unavailable: אין אחסון מקומי לשמירת הצלילים");
   const a = [
-    ...Qe().map((l) => l.key),
+    ...Xe().map((l) => l.key),
     ...e.filter((l) => l == null ? void 0 : l.trim()).map((l) => `word:${l}`)
-  ], i = new Set(t ? [] : await Ce(O).catch(() => [])), o = { total: a.length, compiled: 0, skipped: 0, failures: [] };
+  ], i = new Set(t ? [] : await ze(X).catch(() => [])), o = { total: a.length, compiled: 0, skipped: 0, failures: [] };
   let s = 0;
   for (const l of a) {
     if (s++, i.has(l)) {
@@ -1649,7 +1650,7 @@ async function An({ force: t = !1, extraTexts: e = [], onProgress: n } = {}) {
     }
     try {
       const d = await on(r, c);
-      await tt(O, l, d), o.compiled++;
+      await nt(X, l, d), o.compiled++;
     } catch (d) {
       o.failures.push({ key: l, reason: (d == null ? void 0 : d.message) || "fetch-failed" });
     }
@@ -1657,26 +1658,26 @@ async function An({ force: t = !1, extraTexts: e = [], onProgress: n } = {}) {
   }
   return o;
 }
-const Te = [
+const Fe = [
   "כָּל הַכָּבוֹד",
   "מְצֻיָּן",
   "יֹפִי",
   "נֶהְדָּר",
   "וָאוּ",
   "אֵיזֶה כֵּיף"
-], Re = [
+], Te = [
   "נַסּוּ שׁוּב, אַתֶּם יְכוֹלִים",
   "כִּמְעַט! הַקְשִׁיבוּ שׁוּב",
   "עוֹד נִסָּיוֹן קָטָן",
   "קְרוֹבִים מְאֹד"
 ];
 function sn() {
+  return Fe[Math.floor(Math.random() * Fe.length)];
+}
+function Rn() {
   return Te[Math.floor(Math.random() * Te.length)];
 }
-function Tn() {
-  return Re[Math.floor(Math.random() * Re.length)];
-}
-function Rn(t) {
+function Fn(t) {
   const e = document.createElement("div");
   e.className = "feedback-message", e.setAttribute("aria-live", "polite"), e.setAttribute("role", "status"), t.appendChild(e);
   let n = null;
@@ -1688,15 +1689,15 @@ function Rn(t) {
   return {
     /** הצג משוב חיובי - טקסט מפורש, או ביטוי שבח אקראי אם לא סופק */
     correct(a) {
-      J.correct(), r(a ?? `!${sn()}`, "correct"), Y(e, "bounce");
+      re.correct(), r(a ?? `!${sn()}`, "correct"), ee(e, "bounce");
     },
     /** הצג עידוד — נסה שוב */
     wrong(a = "נַסֵּה שׁוּב") {
-      J.wrong(), r(a, "wrong"), Y(e, "pulse");
+      re.wrong(), r(a, "wrong"), ee(e, "pulse");
     },
     /** הצג רמז */
     hint(a) {
-      r(a, "hint"), Y(e, "pulse");
+      r(a, "hint"), ee(e, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -1704,7 +1705,7 @@ function Rn(t) {
     }
   };
 }
-function Fn(t, e) {
+function Tn(t, e) {
   let n = document.getElementById("nikud-settings");
   n || (n = document.createElement("div"), n.id = "nikud-settings", Object.assign(n.style, {
     position: "fixed",
@@ -1724,7 +1725,7 @@ function Fn(t, e) {
       <h2 style="margin-top:0">בחר ניקוד</h2>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:1rem 0; text-align:right;">
   `;
-  E.forEach((c) => {
+  N.forEach((c) => {
     const d = a.length === 0 || a.includes(c.id) || a.includes(c.name);
     i += `
       <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
@@ -1756,7 +1757,7 @@ function Fn(t, e) {
     l.textContent = s.value;
   }, document.getElementById("save-settings-btn").onclick = () => {
     const c = parseFloat(s.value);
-    localStorage.setItem("alefbet.nikudRate", String(c)), x.setNikudEmphasis({ rate: c });
+    localStorage.setItem("alefbet.nikudRate", String(c)), A.setNikudEmphasis({ rate: c });
     const d = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((h) => (
       /** @type {HTMLInputElement} */
       h.checked
@@ -1764,7 +1765,7 @@ function Fn(t, e) {
       /** @type {HTMLInputElement} */
       h.value
     )), u = new URL(window.location.href);
-    d.length > 0 && d.length < E.length ? u.searchParams.set("allowedNikud", d.join(",")) : u.searchParams.delete("allowedNikud"), u.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", u), e && e(t);
+    d.length > 0 && d.length < N.length ? u.searchParams.set("allowedNikud", d.join(",")) : u.searchParams.delete("allowedNikud"), u.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", u), e && e(t);
   }, document.getElementById("close-settings-btn").onclick = () => {
     n.style.display = "none";
   };
@@ -1811,79 +1812,82 @@ function Cn(t, e) {
     showZones: u = !1,
     autoPlayInstruction: h = !0,
     hintAfter: m = 3
-  } = e, y = a === "soundboard", v = document.createElement("div");
-  v.className = "ab-zp-wrap";
-  const k = document.createElement("img");
-  k.className = "ab-zp-image", k.src = n, k.alt = "", k.draggable = !1, v.appendChild(k);
-  const w = document.createElement("div");
-  w.className = "ab-zp-layer", v.appendChild(w), t.appendChild(v);
-  const A = /* @__PURE__ */ new Set();
-  let g = 0, _ = !1, S = !1;
-  async function re(f) {
-    if (!(!i || _)) {
-      _ = !0;
-      try {
-        await $(i, `zone-${f}`);
-      } catch {
-      }
-      _ = !1;
+  } = e, y = te();
+  let b = te();
+  y.use(() => b.dispose());
+  const k = a === "soundboard", w = document.createElement("div");
+  w.className = "ab-zp-wrap";
+  const R = document.createElement("img");
+  R.className = "ab-zp-image", R.src = n, R.alt = "", R.draggable = !1, w.appendChild(R);
+  const g = document.createElement("div");
+  g.className = "ab-zp-layer", w.appendChild(g), t.appendChild(w);
+  const _ = /* @__PURE__ */ new Set();
+  let S = 0, q = !1, C = !1;
+  async function B(f) {
+    if (!i || q) return;
+    q = !0;
+    const p = b.signal;
+    try {
+      await V(i, `zone-${f}`, { signal: p });
+    } catch {
     }
+    p.aborted || (q = !1);
   }
-  function G() {
-    if (S || m <= 0 || y || g < m) return;
-    S = !0;
-    const f = w.querySelectorAll(".ab-zp-zone");
-    f.forEach((p, b) => {
-      var M;
-      (M = r[b]) != null && M.correct && !A.has(r[b].id) && p.classList.add("ab-zp-zone--hint");
-    }), setTimeout(() => {
-      f.forEach((p) => p.classList.remove("ab-zp-zone--hint")), S = !1, g = 0;
+  function E() {
+    if (C || m <= 0 || k || S < m) return;
+    C = !0;
+    const f = g.querySelectorAll(".ab-zp-zone");
+    f.forEach((p, v) => {
+      var z;
+      (z = r[v]) != null && z.correct && !_.has(r[v].id) && p.classList.add("ab-zp-zone--hint");
+    }), b.schedule(() => {
+      f.forEach((p) => p.classList.remove("ab-zp-zone--hint")), C = !1, S = 0;
     }, 1500);
   }
   return r.forEach((f) => {
     const p = document.createElement("button");
-    if (p.className = "ab-zp-zone", (u || y) && p.classList.add("ab-zp-zone--visible"), y && p.classList.add("ab-zp-zone--soundboard"), p.style.left = `${f.x}%`, p.style.top = `${f.y}%`, p.style.width = `${f.width}%`, p.style.height = `${f.height}%`, p.setAttribute("aria-label", f.label || (f.correct ? "correct zone" : "zone")), f.shape === "polygon" && f.points && f.points.length >= 3) {
-      const b = `zp-clip-${f.id}`;
+    if (p.className = "ab-zp-zone", (u || k) && p.classList.add("ab-zp-zone--visible"), k && p.classList.add("ab-zp-zone--soundboard"), p.style.left = `${f.x}%`, p.style.top = `${f.y}%`, p.style.width = `${f.width}%`, p.style.height = `${f.height}%`, p.setAttribute("aria-label", f.label || (f.correct ? "correct zone" : "zone")), f.shape === "polygon" && f.points && f.points.length >= 3) {
+      const v = `zp-clip-${f.id}`;
       p.innerHTML = `<svg class="ab-zp-zone__poly-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <defs><clipPath id="${b}"><polygon points="${ln(f.points, f.x, f.y, f.width, f.height)}"/></clipPath></defs>
-        <rect x="0" y="0" width="100" height="100" clip-path="url(#${b})" fill="transparent"/>
+        <defs><clipPath id="${v}"><polygon points="${ln(f.points, f.x, f.y, f.width, f.height)}"/></clipPath></defs>
+        <rect x="0" y="0" width="100" height="100" clip-path="url(#${v})" fill="transparent"/>
       </svg>`, p.classList.add("ab-zp-zone--poly");
     }
-    if (y && f.label) {
-      const b = document.createElement("span");
-      b.className = "ab-zp-zone__label", b.textContent = f.label, p.appendChild(b);
+    if (k && f.label) {
+      const v = document.createElement("span");
+      v.className = "ab-zp-zone__label", v.textContent = f.label, p.appendChild(v);
     }
-    p.addEventListener("click", () => {
-      if (d && d(f), re(f.id), y) {
-        p.classList.add("ab-zp-zone--tapped"), setTimeout(() => p.classList.remove("ab-zp-zone--tapped"), 400);
+    y.listen(p, "click", () => {
+      if (d && d(f), B(f.id), k) {
+        p.classList.add("ab-zp-zone--tapped"), b.schedule(() => p.classList.remove("ab-zp-zone--tapped"), 400);
         return;
       }
-      if (!A.has(f.id))
+      if (!_.has(f.id))
         if (f.correct) {
-          A.add(f.id), p.classList.add("ab-zp-zone--correct"), s && s(f);
-          const b = r.filter((M) => M.correct).length;
-          A.size >= b && c && c();
+          _.add(f.id), p.classList.add("ab-zp-zone--correct"), s && s(f);
+          const v = r.filter((z) => z.correct).length;
+          _.size >= v && c && c();
         } else
-          p.classList.add("ab-zp-zone--wrong"), g++, l && l(f), setTimeout(() => p.classList.remove("ab-zp-zone--wrong"), 600), G();
-    }), w.appendChild(p);
-  }), h && i && o && setTimeout(() => {
-    $(i, o).catch(() => {
+          p.classList.add("ab-zp-zone--wrong"), S++, l && l(f), b.schedule(() => p.classList.remove("ab-zp-zone--wrong"), 600), E();
+    }), g.appendChild(p);
+  }), h && i && o && b.schedule(() => {
+    V(i, o, { signal: b.signal }).catch(() => {
     });
   }, 400), {
     async playInstruction() {
-      return i && o ? $(i, o) : !1;
+      return i && o ? V(i, o, { signal: b.signal }) : !1;
     },
     async playZoneAudio(f) {
-      return i ? $(i, `zone-${f}`) : !1;
+      return i ? V(i, `zone-${f}`, { signal: b.signal }) : !1;
     },
     revealCorrect() {
-      w.querySelectorAll(".ab-zp-zone").forEach((f, p) => {
-        var b;
-        (b = r[p]) != null && b.correct && f.classList.add("ab-zp-zone--revealed");
+      g.querySelectorAll(".ab-zp-zone").forEach((f, p) => {
+        var v;
+        (v = r[p]) != null && v.correct && f.classList.add("ab-zp-zone--revealed");
       });
     },
     reset() {
-      A.clear(), g = 0, S = !1, w.querySelectorAll(".ab-zp-zone").forEach((f) => {
+      y.signal.aborted || (b.dispose(), b = te(), q = !1, _.clear(), S = 0, C = !1, g.querySelectorAll(".ab-zp-zone").forEach((f) => {
         f.classList.remove(
           "ab-zp-zone--correct",
           "ab-zp-zone--wrong",
@@ -1891,15 +1895,15 @@ function Cn(t, e) {
           "ab-zp-zone--tapped",
           "ab-zp-zone--hint"
         );
-      });
+      }));
     },
     destroy() {
-      v.remove();
+      y.dispose(), w.remove();
     }
   };
 }
 function zn(t, e, n, r) {
-  const a = Be(t);
+  const a = Ue(t);
   if (!a) return null;
   const i = document.createElement("button");
   return i.className = "btn", i.setAttribute("aria-label", n), i.textContent = `${e} ${n}`, i.onclick = (o) => {
@@ -1907,7 +1911,7 @@ function zn(t, e, n, r) {
     s && (s.open = !1), r(o);
   }, a.appendChild(i), i;
 }
-const cn = "0 0 32 16", Xe = {
+const cn = "0 0 32 16", Ye = {
   // קו אופקי עבה
   patah: '<rect x="3" y="5" width="26" height="4" rx="1.6"/>',
   // קו אופקי + זנב קצר היורד מהמרכז (T הפוך)
@@ -1924,10 +1928,10 @@ const cn = "0 0 32 16", Xe = {
   kubbutz: '<circle cx="6"  cy="3"  r="2.5"/><circle cx="16" cy="8"  r="2.5"/><circle cx="26" cy="13" r="2.5"/>'
 };
 function dn(t) {
-  const e = Xe[t];
+  const e = Ye[t];
   return e ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${cn}" aria-hidden="true" focusable="false">${e}</svg>` : null;
 }
-const Pn = Object.freeze(Object.keys(Xe));
+const Pn = Object.freeze(Object.keys(Ye));
 function In(t, { size: e = "md" } = {}) {
   const n = document.createElement("div");
   n.className = `ab-nikud-box ab-nikud-box--${e} ab-nikud-box--${t.id}`;
@@ -1937,96 +1941,96 @@ function In(t, { size: e = "md" } = {}) {
   return a.className = "ab-nikud-box__mark", a.innerHTML = dn(t.id) ?? "", n.appendChild(r), n.appendChild(a), n;
 }
 export {
-  nt as EventBus,
-  at as GameShell,
-  rt as GameState,
+  rt as EventBus,
+  it as GameShell,
+  at as GameState,
   Pn as NIKUD_GLYPH_IDS,
-  ye as NIKUD_VOWEL,
-  Te as PRAISE_PHRASES,
-  Re as RETRY_HINTS,
-  O as SOUND_BANK_ID,
-  Ue as VOWEL_TEMPLATES,
-  ft as addNikud,
-  Y as animate,
-  At as attachGameAudio,
-  Ht as bootstrapGame,
-  jt as classifyFormants,
+  we as NIKUD_VOWEL,
+  Fe as PRAISE_PHRASES,
+  Te as RETRY_HINTS,
+  X as SOUND_BANK_ID,
+  Ve as VOWEL_TEMPLATES,
+  mt as addNikud,
+  ee as animate,
+  Rt as attachGameAudio,
+  Wt as bootstrapGame,
+  Dt as classifyFormants,
   An as compileSoundBank,
   an as compileTextForKey,
   Qt as consonantOnsetSpec,
   bn as createChoiceRound,
   Bn as createDragSource,
   Un as createDropTarget,
-  Rn as createFeedback,
-  wn as createHintTracker,
-  Ze as createLocalState,
+  Fn as createFeedback,
+  gn as createHintTracker,
+  Je as createLocalState,
   In as createNikudBox,
-  Dt as createOptionCards,
+  jt as createOptionCards,
   It as createProgressBar,
-  zt as createRoundManager,
+  Pt as createRoundManager,
   Vn as createVoiceRecordButton,
-  Hn as createVoiceRecorder,
+  Wn as createVoiceRecorder,
   vn as createVowelDetector,
   Mn as createZone,
   Cn as createZonePlayer,
-  Wn as deleteVoice,
-  ze as endGame,
-  Me as ensureAudioRunning,
+  Hn as deleteVoice,
+  Pe as endGame,
+  Ce as ensureAudioRunning,
   Gt as extractFormantsFromSpectrum,
   yn as getAllProgress,
-  Fe as getAudioContext,
+  Me as getAudioContext,
   pn as getGameProgress,
-  he as getLetter,
-  pt as getLettersByGroup,
-  mt as getNikud,
-  Dn as hasVoice,
-  B as hebrewLetters,
+  be as getLetter,
+  yt as getLettersByGroup,
+  ht as getNikud,
+  jn as hasVoice,
+  H as hebrewLetters,
   Ut as hideLoadingScreen,
   zn as injectHeaderButton,
   qt as installGlobalErrorScreen,
   tn as isOffline,
   kn as isSynthSupported,
-  jn as isVoiceRecordingSupported,
-  lt as isVowelized,
+  Dn as isVoiceRecordingSupported,
+  ct as isVowelized,
   _n as keyLabel,
-  Oe as letterKey,
-  Ie as letterWithNikud,
-  Ce as listVoiceKeys,
+  Ge as letterKey,
+  $e as letterWithNikud,
+  ze as listVoiceKeys,
   On as loadVoice,
-  gn as matchNikudVowel,
-  xt as mountAudioStatusBanner,
-  yt as nikudBaseLetters,
+  wn as matchNikudVowel,
+  At as mountAudioStatusBanner,
+  bt as nikudBaseLetters,
   dn as nikudGlyphSvg,
-  Ge as nikudKey,
-  E as nikudList,
+  Ke as nikudKey,
+  N as nikudList,
   Gn as playBlob,
-  $ as playVoice,
-  ht as preloadNikud,
+  V as playVoice,
+  pt as preloadNikud,
   fn as randomLetters,
   mn as randomNikud,
   sn as randomPraise,
-  Tn as randomRetryHint,
-  Mt as recordGameResult,
+  Rn as randomRetryHint,
+  Ct as recordGameResult,
   Sn as recordedKeys,
   rn as resolveTtsProxyUrl,
-  Wt as runGame,
-  tt as saveVoice,
-  Ct as showCompletionScreen,
+  Ht as runGame,
+  nt as saveVoice,
+  zt as showCompletionScreen,
   Bt as showLoadingScreen,
-  Fn as showNikudSettingsDialog,
+  Tn as showNikudSettingsDialog,
   hn as shuffle,
-  J as sounds,
+  re as sounds,
   En as speakLetter,
   Nn as speakNikudSound,
   Ln as speakSyllable,
   xn as speakWord,
-  Qe as standardSoundKeys,
-  qe as starsFor,
-  Ke as syllableKey,
-  me as synthesizeSyllable,
+  Xe as standardSoundKeys,
+  Be as starsFor,
+  Qe as syllableKey,
+  ye as synthesizeSyllable,
   Zt as synthesizeVowel,
-  x as tts,
-  Ye as unlockAudioOutput,
-  ee as vowelFormantSpec,
+  A as tts,
+  Ze as unlockAudioOutput,
+  ae as vowelFormantSpec,
   en as wordKey
 };

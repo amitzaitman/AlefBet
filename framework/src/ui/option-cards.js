@@ -16,10 +16,14 @@ export function createOptionCards(container, options, onSelect) {
     const card = document.createElement('button');
     card.className = 'option-card';
     card.dataset.id = option.id;
-    card.innerHTML = `
-      <span class="option-card__emoji">${option.emoji || ''}</span>
-      <span class="option-card__text">${option.text}</span>
-    `;
+    card.type = 'button';
+    const emoji = document.createElement('span');
+    emoji.className = 'option-card__emoji';
+    emoji.textContent = option.emoji || '';
+    const text = document.createElement('span');
+    text.className = 'option-card__text';
+    text.textContent = option.text;
+    card.append(emoji, text);
     card.addEventListener('click', () => {
       if (card.disabled) return;
       onSelect(option);

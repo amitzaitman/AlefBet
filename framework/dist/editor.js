@@ -1,5 +1,5 @@
-import { b as Vt, d as Ht, f as lt, c as Yt, o as Gt, q as Xt } from "./drag-ccvh1cxI.js";
-import { G as aa, r as ca, l as ua } from "./drag-ccvh1cxI.js";
+import { b as Vt, d as Ht, f as lt, c as Yt, o as Gt, q as Xt } from "./drag-BVpjy2vl.js";
+import { G as aa, r as ca, l as ua } from "./drag-BVpjy2vl.js";
 function Kt(e, { onClick: t } = {}) {
   const n = document.createElement("div");
   n.className = "ab-editor-overlay", t && n.addEventListener("pointerdown", t);

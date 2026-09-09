@@ -46,6 +46,8 @@ export function createVoiceRecordButton(container, {
   // 'has-voice'  — recording saved in store
 
   let state = 'idle';
+  let destroyed = false;
+  let starting = false;
   let _recordBtn = null;
   let _stopBtn   = null;
   let _playBtn   = null;
@@ -55,6 +57,7 @@ export function createVoiceRecordButton(container, {
   let _elapsed   = 0;
 
   function _render() {
+    if (destroyed) return;
     wrap.innerHTML = '';
 
     if (state === 'idle') {
@@ -109,13 +112,19 @@ export function createVoiceRecordButton(container, {
   // ── Actions ───────────────────────────────────────────────────────────────
 
   async function _startRecording() {
+    if (destroyed || starting) return;
+    starting = true;
     try {
       await recorder.start();
+      if (destroyed) return;
       state = 'recording';
       _render();
     } catch (err) {
+      if (destroyed || err?.name === 'AbortError') return;
       console.warn('[voice-record-button] microphone access denied:', err);
       _showError('לא ניתן לגשת למיקרופון');
+    } finally {
+      starting = false;
     }
   }
 
@@ -123,7 +132,9 @@ export function createVoiceRecordButton(container, {
     clearInterval(_timer);
     try {
       const blob = await recorder.stop();
+      if (destroyed) return;
       await saveVoice(gameId, voiceKey, blob);
+      if (destroyed) return;
       state = 'has-voice';
       _render();
       onSaved?.(blob);
@@ -160,15 +171,17 @@ export function createVoiceRecordButton(container, {
 
   /** Sync UI state with what's actually in the store */
   async function refresh() {
-    if (recorder.isActive()) return; // don't interrupt an active recording
+    if (destroyed || starting || recorder.isActive()) return; // don't interrupt an active recording
     const blob = await loadVoice(gameId, voiceKey).catch(() => null);
+    if (destroyed || starting || recorder.isActive()) return;
     state = blob ? 'has-voice' : 'idle';
     _render();
   }
 
   function destroy() {
+    destroyed = true;
     clearInterval(_timer);
-    if (recorder.isActive()) recorder.cancel();
+    recorder.cancel();
     wrap.remove();
   }
 

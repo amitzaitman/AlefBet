@@ -29,7 +29,9 @@ const _targets = new Map(); // el → { onDrop }
 // The clone always has pointer-events:none so elementFromPoint skips it —
 // no need to hide/show it.
 function _findTargetAt(x, y) {
-  return document.elementFromPoint(x, y)?.closest('[data-drop-target="true"]') || null;
+  const el = document.elementFromPoint(x, y)?.closest('[data-drop-target="true"]');
+  return el && _targets.has(el) && !el.matches(':disabled')
+    && el.getAttribute('aria-disabled') !== 'true' ? el : null;
 }
 
 // ── Floating Clone ────────────────────────────────────────────────────────
@@ -126,28 +128,36 @@ export function createDragSource(el, data, { onTap } = {}) {
   let _upHandler      = null;
   let _cancelHandler  = null;
 
+  let pointerId = null;
+
   function _endDrag() {
     if (_moveHandler) {
       el.removeEventListener('pointermove',   _moveHandler);
       el.removeEventListener('pointerup',     _upHandler);
       el.removeEventListener('pointercancel', _cancelHandler);
+      el.removeEventListener('lostpointercapture', _cancelHandler);
       _moveHandler = _upHandler = _cancelHandler = null;
     }
     _clearHighlight();
     _destroyClone();
     el.classList.remove('drag-source--dragging');
     _activeSource = null;
+    const captured = pointerId;
+    pointerId = null;
+    if (captured !== null && el.hasPointerCapture?.(captured)) el.releasePointerCapture(captured);
   }
 
   function onPointerDown(e) {
     if (el.matches(':disabled') || el.getAttribute('aria-disabled') === 'true') return;
     if (e.button !== undefined && e.button !== 0) return; // left button only
+    if (pointerId !== null) return;
     e.preventDefault();
 
     // End any existing drag (shouldn't happen, but be safe)
-    if (_activeSource) _endDrag();
+    if (_activeSource) _activeSource.cancel();
 
-    _activeSource = { el, data };
+    _activeSource = { el, data, cancel: _endDrag };
+    pointerId = e.pointerId;
     let dragging = false;
     const startDrag = () => {
       dragging = true;
@@ -163,11 +173,13 @@ export function createDragSource(el, data, { onTap } = {}) {
     el.setPointerCapture(e.pointerId);
 
     _moveHandler = (ev) => {
+      if (ev.pointerId !== pointerId) return;
       if (!dragging && moved(ev)) startDrag();
       if (dragging) _scheduleMove(ev.clientX, ev.clientY);
     };
 
     _upHandler = (ev) => {
+      if (ev.pointerId !== pointerId) return;
       const tapped = !dragging && !moved(ev);
       const targetEl = tapped && onTap ? null : _findTargetAt(ev.clientX, ev.clientY);
       _endDrag();
@@ -178,11 +190,12 @@ export function createDragSource(el, data, { onTap } = {}) {
       }
     };
 
-    _cancelHandler = () => _endDrag();
+    _cancelHandler = ev => { if (ev.pointerId === pointerId) _endDrag(); };
 
     el.addEventListener('pointermove',   _moveHandler);
     el.addEventListener('pointerup',     _upHandler);
     el.addEventListener('pointercancel', _cancelHandler);
+    el.addEventListener('lostpointercapture', _cancelHandler);
   }
 
   el.addEventListener('pointerdown', onPointerDown);

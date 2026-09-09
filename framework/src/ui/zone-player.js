@@ -14,6 +14,8 @@
  * Instruction audio: if gameId + roundId, auto-plays on load.
  */
 
+import { createRoundScope } from '../core/round-scope.js';
+
 import { playVoice } from '../audio/voice-store.js';
 
 /**
@@ -64,6 +66,9 @@ export function createZonePlayer(container, config) {
     hintAfter = 3,
   } = config;
 
+  const lifetime = createRoundScope();
+  let effects = createRoundScope();
+  lifetime.use(() => effects.dispose());
   const isSoundboard = mode === 'soundboard';
 
   const wrap = document.createElement('div');
@@ -92,8 +97,9 @@ export function createZonePlayer(container, config) {
   async function _playZoneAudio(zoneId) {
     if (!gameId || _playing) return;
     _playing = true;
-    try { await playVoice(gameId, `zone-${zoneId}`); } catch { /* ok */ }
-    _playing = false;
+    const signal = effects.signal;
+    try { await playVoice(gameId, `zone-${zoneId}`, { signal }); } catch { /* ok */ }
+    if (!signal.aborted) _playing = false;
   }
 
   // ── Auto-hint ──────────────────────────────────────────────────────────
@@ -110,7 +116,7 @@ export function createZonePlayer(container, config) {
         el.classList.add('ab-zp-zone--hint');
       }
     });
-    setTimeout(() => {
+    effects.schedule(() => {
       els.forEach(el => el.classList.remove('ab-zp-zone--hint'));
       // Allow another hint after more wrong attempts
       _hintShown = false;
@@ -149,13 +155,13 @@ export function createZonePlayer(container, config) {
       el.appendChild(labelEl);
     }
 
-    el.addEventListener('click', () => {
+    lifetime.listen(el, 'click', () => {
       if (onZoneTap) onZoneTap(zone);
       _playZoneAudio(zone.id);
 
       if (isSoundboard) {
         el.classList.add('ab-zp-zone--tapped');
-        setTimeout(() => el.classList.remove('ab-zp-zone--tapped'), 400);
+        effects.schedule(() => el.classList.remove('ab-zp-zone--tapped'), 400);
         return;
       }
 
@@ -174,7 +180,7 @@ export function createZonePlayer(container, config) {
         el.classList.add('ab-zp-zone--wrong');
         wrongCount++;
         if (onWrong) onWrong(zone);
-        setTimeout(() => el.classList.remove('ab-zp-zone--wrong'), 600);
+        effects.schedule(() => el.classList.remove('ab-zp-zone--wrong'), 600);
         _maybeShowHint();
       }
     });
@@ -185,19 +191,19 @@ export function createZonePlayer(container, config) {
   // ── Auto-play instruction audio ────────────────────────────────────────
 
   if (autoPlayInstruction && gameId && roundId) {
-    setTimeout(() => { playVoice(gameId, roundId).catch(() => {}); }, 400);
+    effects.schedule(() => { playVoice(gameId, roundId, { signal: effects.signal }).catch(() => {}); }, 400);
   }
 
   // ── Public API ─────────────────────────────────────────────────────────
 
   return {
     async playInstruction() {
-      if (gameId && roundId) return playVoice(gameId, roundId);
+      if (gameId && roundId) return playVoice(gameId, roundId, { signal: effects.signal });
       return false;
     },
 
     async playZoneAudio(zoneId) {
-      if (gameId) return playVoice(gameId, `zone-${zoneId}`);
+      if (gameId) return playVoice(gameId, `zone-${zoneId}`, { signal: effects.signal });
       return false;
     },
 
@@ -208,6 +214,10 @@ export function createZonePlayer(container, config) {
     },
 
     reset() {
+      if (lifetime.signal.aborted) return;
+      effects.dispose();
+      effects = createRoundScope();
+      _playing = false;
       found.clear();
       wrongCount = 0;
       _hintShown = false;
@@ -219,6 +229,6 @@ export function createZonePlayer(container, config) {
       });
     },
 
-    destroy() { wrap.remove(); },
+    destroy() { lifetime.dispose(); wrap.remove(); },
   };
 }

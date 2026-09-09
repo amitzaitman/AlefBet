@@ -34,24 +34,37 @@ export function createVoiceRecorder() {
   let _recorder = null;
   let _stream   = null;
   let _chunks   = [];
+  let generation = 0;
+  let pendingStart = null;
 
   /**
    * בקש גישה למיקרופון והתחל הקלטה.
    * זורק שגיאה אם המשתמש סירב לגישה.
    */
-  async function start() {
-    if (_recorder && _recorder.state === 'recording') return;
-
-    _stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    _chunks = [];
-
-    const opts = {};
-    const mime = _preferredMimeType();
-    if (mime) opts.mimeType = mime;
-
-    _recorder = new MediaRecorder(_stream, opts);
-    _recorder.ondataavailable = e => { if (e.data?.size > 0) _chunks.push(e.data); };
-    _recorder.start(100); // collect chunks every 100ms
+  function start() {
+    if (_recorder?.state === 'recording') return Promise.resolve();
+    if (pendingStart) return pendingStart;
+    const request = ++generation;
+    const pending = (async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      if (request !== generation) {
+        stream.getTracks().forEach(track => track.stop());
+        throw new DOMException('Recording cancelled', 'AbortError');
+      }
+      _stream = stream;
+      _chunks = [];
+      try {
+        const mime = _preferredMimeType();
+        _recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : {});
+        _recorder.ondataavailable = e => { if (e.data?.size > 0) _chunks.push(e.data); };
+        _recorder.start(100);
+      } catch (error) {
+        _cleanup();
+        throw error;
+      }
+    })();
+    pendingStart = pending;
+    return pending.finally(() => { if (pendingStart === pending) pendingStart = null; });
   }
 
   /**
@@ -76,6 +89,8 @@ export function createVoiceRecorder() {
 
   /** בטל הקלטה ללא שמירה */
   function cancel() {
+    generation++;
+    pendingStart = null;
     if (_recorder && _recorder.state !== 'inactive') {
       _recorder.ondataavailable = null;
       _recorder.onstop = null;
