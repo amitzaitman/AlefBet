@@ -287,6 +287,11 @@
     .hub-adult-tools summary { cursor: pointer; padding: 20px; min-height: 64px; font-weight: 700; }
     .hub-adult-tools[open] summary { margin-bottom: 12px; }
 
+    .hub-refresh { margin-top: 24px; padding: 20px; background: var(--surface); border-radius: 16px; }
+    .hub-refresh button { min-height: 64px; padding: 12px 18px; border: 2px solid #4f67ff; border-radius: 12px; background: #eef1ff; color: #293f96; font: inherit; font-weight: 700; cursor: pointer; }
+    .hub-refresh button:focus-visible { outline: 3px solid #293f96; outline-offset: 3px; }
+    .hub-refresh p { line-height: 1.6; }
+
     /* ── Footer ── */
     .hub-footer {
       text-align: center;
@@ -315,6 +320,11 @@
     <details class="hub-adult-tools">
       <summary>להורים ולמורים</summary>
       <div class="teacher-tools-grid games-grid"></div>
+      <div class="hub-refresh">
+        <button type="button" id="hard-refresh">↻ רענון מלא של האפליקציה</button>
+        <p>מוריד מחדש את קובצי האפליקציה. ההתקדמות, התוכן השמור וההקלטות נשמרים. נדרש חיבור לאינטרנט.</p>
+        <p id="refresh-status" role="status" aria-live="polite"></p>
+      </div>
     </details>
   </main>
 
@@ -430,6 +440,24 @@
         badge.textContent = '\u2b50'.repeat(entry.bestStars);
         badge.setAttribute('aria-label', entry.bestStars + ' כוכבים');
         card.appendChild(badge);
+      });
+
+      document.getElementById('hard-refresh').addEventListener('click', async function () {
+        var button = this;
+        var status = document.getElementById('refresh-status');
+        button.disabled = true;
+        status.textContent = 'בודקים חיבור לרשת…';
+        var controller = new AbortController();
+        var timer = setTimeout(function () { controller.abort(); }, 8000);
+        try {
+          // This recovery page is deliberately outside the offline asset list.
+          var response = await fetch('refresh.html?probe=' + Date.now(), { cache: 'no-store', signal: controller.signal });
+          if (!response.ok || !(await response.text()).includes('alefbet-recovery-page')) throw new Error('Unavailable');
+          location.assign('refresh.html');
+        } catch (error) {
+          status.textContent = 'לא ניתן להתחבר לשרת. בדקו את החיבור ונסו שוב. המטמון לא נוקה.';
+          button.disabled = false;
+        } finally { clearTimeout(timer); }
       });
 
       if ('serviceWorker' in navigator) {

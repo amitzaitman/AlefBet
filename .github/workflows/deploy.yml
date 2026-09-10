@@ -37,7 +37,7 @@ jobs:
         run: |
           mkdir -p _site/framework
           touch _site/.nojekyll
-          cp index.html sw.js manifest.webmanifest _site/
+          cp index.html refresh.html sw.js manifest.webmanifest _site/
           cp -r assets _site/assets
           cp -r framework/dist _site/framework/dist
           cp -r games _site/games
