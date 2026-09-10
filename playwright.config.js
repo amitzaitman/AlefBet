@@ -27,14 +27,14 @@ export default defineConfig({
     },
     {
       name: 'mobile-chromium',
-      testMatch: /mobile\.spec\.js|math\.spec\.js|network\.spec\.js/,
+      testMatch: /mobile\.spec\.js|math\.spec\.js|network\.spec\.js|home\.spec\.js/,
       use: { ...devices['Pixel 7'],
         ...(process.env.PW_CHROMIUM_PATH ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } } : {}),
       },
     },
     {
       name: 'mobile-webkit',
-      testMatch: /mobile\.spec\.js|math\.spec\.js|network\.spec\.js|pwa-upgrade\.spec\.js/,
+      testMatch: /mobile\.spec\.js|math\.spec\.js|network\.spec\.js|home\.spec\.js|pwa-upgrade\.spec\.js/,
       use: { ...devices['iPhone 13'] },
     },
   ],

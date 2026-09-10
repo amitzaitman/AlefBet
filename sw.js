@@ -47,6 +47,8 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   url.search = '';
+  // Section anchors identify a position within an asset, not a separate file.
+  url.hash = '';
   if (!assets.has(url.href)) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_VERSION);
