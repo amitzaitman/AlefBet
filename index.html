@@ -95,6 +95,19 @@
       margin: 0 0 clamp(12px, 3dvh, 24px) 0;
     }
 
+    .subject-nav { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 32px; }
+    .subject-link { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-height: 72px; padding: 14px 20px; border: 2px solid #c9d3ff; border-radius: 16px; background: #eef1ff; color: #293f96; text-decoration: none; font-size: 1.2rem; font-weight: 700; flex: 1 1 230px; }
+    .subject-link--math { background: #e8f7f1; border-color: #a6d8c6; color: #175d48; }
+    .subject-link--other { background: #fff6df; border-color: #ead39c; color: #725215; }
+    .subject-link small { font-size: .85rem; font-weight: 400; margin-inline-start: auto; }
+    .subject-link:focus-visible, .game-card:focus-visible { outline: 3px solid #293f96; outline-offset: 4px; }
+    .subject-section { margin-bottom: 40px; scroll-margin-top: 20px; }
+    .subject-title { margin: 0; font-size: clamp(24px, 5dvmin, 30px); color: #293f96; }
+    .subject-section--math .subject-title { color: #175d48; }
+    .subject-description { color: var(--muted); margin: 6px 0 18px; }
+    .subject-section--math .game-card__icon { background: #e8f7f1; }
+    .game-card__topic { display: inline-block; align-self: flex-start; margin-bottom: 8px; padding: 4px 10px; border-radius: 999px; background: #e8f7f1; color: #175d48; font-size: .85rem; font-weight: 600; }
+
     /* ── Games Grid ── */
     .games-grid {
       display: grid;
@@ -296,9 +309,9 @@
   </header>
 
   <main class="hub-main">
-    <h2 class="hub-subtitle">בַּחֲרוּ מִשְׂחָק:</h2>
-
-    <div class="games-grid"></div>
+    <h1 class="hub-subtitle">בְּמָה נְשַׂחֵק הַיּוֹם?</h1>
+    <nav class="subject-nav" aria-label="תחומי לימוד"></nav>
+    <div class="subject-sections"></div>
     <details class="hub-adult-tools">
       <summary>להורים ולמורים</summary>
       <div class="teacher-tools-grid games-grid"></div>
@@ -329,8 +342,44 @@
         studio: '<span class="icon--studio-mic">🎙️</span>',
       };
 
-      var grid = document.querySelector('.games-grid');
       var catalog = self.ALEFBET_CATALOG || [];
+      var categories = self.ALEFBET_CATEGORIES || [];
+      var destinations = {};
+      var categoryFor = function (game) {
+        return categories.some(function (category) { return category.id === game.category; }) ? game.category : 'other';
+      };
+      categories.forEach(function (category) {
+        var games = catalog.filter(function (game) { return game.kind !== 'teacher-tool' && categoryFor(game) === category.id; });
+        if (!games.length) return;
+        var section = document.createElement('section');
+        section.className = 'subject-section subject-section--' + category.id;
+        section.id = 'subject-' + category.id;
+        section.setAttribute('aria-labelledby', section.id + '-title');
+        var heading = document.createElement('h2');
+        heading.id = section.id + '-title';
+        heading.className = 'subject-title';
+        heading.textContent = category.title;
+        var description = document.createElement('p');
+        description.className = 'subject-description';
+        description.textContent = category.desc;
+        var grid = document.createElement('div');
+        grid.className = 'games-grid';
+        section.append(heading, description, grid);
+        document.querySelector('.subject-sections').appendChild(section);
+        destinations[category.id] = grid;
+        var link = document.createElement('a');
+        link.href = '#' + section.id;
+        link.className = 'subject-link subject-link--' + category.id;
+        var symbol = document.createElement('span');
+        symbol.setAttribute('aria-hidden', 'true');
+        symbol.textContent = category.icon;
+        var label = document.createElement('span');
+        label.textContent = category.title;
+        var count = document.createElement('small');
+        count.textContent = games.length + ' משחקים';
+        link.append(symbol, label, count);
+        document.querySelector('.subject-nav').appendChild(link);
+      });
       catalog.forEach(function (game) {
         var card = document.createElement('a');
         card.href = 'games/' + game.id + '/';
@@ -351,6 +400,12 @@
         var desc = document.createElement('p');
         desc.className = 'game-card__desc';
         desc.textContent = game.desc;
+        if (game.topic) {
+          var topic = document.createElement('span');
+          topic.className = 'game-card__topic';
+          topic.textContent = game.topic;
+          info.appendChild(topic);
+        }
         info.appendChild(name);
         info.appendChild(desc);
         card.appendChild(info);
@@ -360,7 +415,7 @@
         play.textContent = game.play;
         card.appendChild(play);
 
-        (game.kind === 'teacher-tool' ? document.querySelector('.teacher-tools-grid') : grid).appendChild(card);
+        (game.kind === 'teacher-tool' ? document.querySelector('.teacher-tools-grid') : destinations[categoryFor(game)]).appendChild(card);
       });
 
       // כוכבי התקדמות: core/progress.js שומר שיאים ב-localStorage.

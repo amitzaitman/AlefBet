@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "e48b421cd14f38705be5df0b7e3d6825d54b22f91a2170195214033f970b608b",
+  "version": "d19adfaa6e5685c1132c19d09e5540ee7f78642fd2b2825772c571db1fc1d3f1",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -58,7 +58,7 @@ self.ALEFBET_RELEASE = {
     "./manifest.webmanifest"
   ],
   "assets": {
-    "./": "d7e17da4af1a4222b76742448bfc7c185ef6c8de845dc230440c3af41fe3eb1e",
+    "./": "619caec7e2b523ce930a8e9963e2929472b517dc66adc9b746e2204805e41bc6",
     "./assets/icons/apple-touch-icon.png": "efefd01ca2a1c1cdbbd7f89701cb8972f173048a3319434b284f8fddfe5cc2c1",
     "./assets/icons/icon-192.png": "13ceea9702342b307d2d6596d1fb0c46ad4d232a24732221a4b3325140190f29",
     "./assets/icons/icon-512.png": "91ab2f1968ff273a45d9f4e6e6ffaf52fc78807c76517c2a2a63d94b711f2283",
@@ -72,7 +72,7 @@ self.ALEFBET_RELEASE = {
     "./framework/dist/runtime.css": "221cec10aed03809ed7a1ecaadad1a0aa58d9e06fd0a8a520fec049a638c225a",
     "./framework/dist/runtime.js": "c38552293d168b021cdf0d5194aff2d575def768c0dbf803f3cd6ed4903c23fe",
     "./framework/dist/voice-record-button-CVRCvvTy.js": "47a084a8e4aa8eaf1f45abc36469d45ee360f54f454898be6324c073d98448a3",
-    "./games/catalog.js": "82c998a880eeef1e76283f4421fbda38e30dee847c05f2f121152cc729cee651",
+    "./games/catalog.js": "dcea04b3d5e4cfb7e67e3e5c2c773f59e8d96323164e9e0cb9fbf6b3ae29a664",
     "./games/fraction-compare/": "67639803f111b0ca149d9266ad33b914926c2686ac5c0abf1cf7ed1307abab0d",
     "./games/fraction-compare/game.css": "55887d37b2c0c711580d0cf4fd45adb1671268082059d377b3fead320adc9e69",
     "./games/fraction-compare/game.js": "6a9b63b338200c46f400083891dc3300124cf1998095439918de5c2f60a6f4ba",
@@ -113,7 +113,7 @@ self.ALEFBET_RELEASE = {
     "./games/syllable-read/game.css": "1a5b023bd0b0e3078915db150a7382595d85dc8da03beac283f096e800259868",
     "./games/syllable-read/game.js": "462049da60cb28c82b72116d23c15d199c93294b4541090f5092504c6d14795d",
     "./games/syllable-read/index.html": "55246cea53f33d126031063d05e5674865f8aa1a12262cebfcadbd2b308c1b19",
-    "./index.html": "d7e17da4af1a4222b76742448bfc7c185ef6c8de845dc230440c3af41fe3eb1e",
+    "./index.html": "619caec7e2b523ce930a8e9963e2929472b517dc66adc9b746e2204805e41bc6",
     "./manifest.webmanifest": "61199ec6fe79202159f986f7fd7fd2058697d890788a97993b4db5eafef9c9d4"
   }
 };

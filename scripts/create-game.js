@@ -27,7 +27,7 @@ export function createGame(root, id, title = id) {
     if (file === 'index.html') content = content.replace('<title>מִשְׂחָק</title>', `<title>${escapeHtml(title)}</title>`);
     return [file, content];
   }));
-  const entry = { id, title, desc: 'משחק חדש', kind: 'game', icon: '🎲', play: 'שחקו עכשיו ▶' };
+  const entry = { id, title, desc: 'משחק חדש', kind: 'game', category: 'other', icon: '🎲', play: 'שחקו עכשיו ▶' };
   // Preserve the existing comments and formatting instead of rewriting the catalog.
   const marker = 'root.ALEFBET_CATALOG = [';
   if (!original.includes(marker)) throw new Error('Catalog assignment not found. No files changed.');
