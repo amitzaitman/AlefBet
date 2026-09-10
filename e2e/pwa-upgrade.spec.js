@@ -11,6 +11,13 @@ test('an interrupted update preserves offline play; a complete update waits for 
   let disconnected = false;
   const server = createServer((req, res) => {
     if (disconnected) { req.socket.destroy(); return; }
+    // Each outage should break requests, not leave reusable half-closed sockets.
+    res.setHeader('Connection', 'close');
+    if (req.url.startsWith('/network-probe?')) {
+      res.writeHead(200, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
+      res.end(req.url);
+      return;
+    }
     const html = '<!doctype html><script src="/app.js"></script>';
     const app = `document.documentElement.dataset.version = '${version}';`;
     const assets = { './': html, './index.html': html, './app.js': app };
@@ -59,8 +66,25 @@ test('an interrupted update preserves offline play; a complete update waits for 
     if (browserName !== 'webkit') await context.setOffline(false);
     disconnected = false;
     interrupted = false;
-    // Confirm the origin is reachable again before requesting a new worker update.
-    expect(await page.evaluate(() => fetch('/network-probe', { cache: 'no-store' }).then(response => response.status))).toBe(503);
+    // WebKit can keep a failed request pending while its network process recovers.
+    // Use a fresh URL for each attempt, abort stalled probes and require a real
+    // response from this origin. A timeout must never count as restored connectivity.
+    let probe = 0;
+    await expect.poll(() => page.evaluate(async path => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 1500);
+      try {
+        const response = await fetch(path, { cache: 'no-store', signal: controller.signal });
+        return response.ok && await response.text() === path;
+      } catch {
+        return false;
+      } finally {
+        clearTimeout(timer);
+      }
+    }, `/network-probe?reconnect=${++probe}`), {
+      message: 'The browser must receive a fresh response after the origin reconnects',
+      timeout: 10_000,
+    }).toBe(true);
     await page.evaluate(async () => {
       const registration = await navigator.serviceWorker.getRegistration();
       await registration.update();
