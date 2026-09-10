@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מַשְׁלִימִים לְשָׁלֵם</title>
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <meta name="theme-color" content="#C9442C">
+  <link rel="icon" type="image/png" href="../../assets/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="stylesheet" href="../../framework/dist/runtime.css">
+  <link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <div id="game"></div>
+  <script type="module">
+    import { startGame } from './game.js';
+    startGame(document.getElementById('game'));
+  </script>
+  <script>
+    // Service Worker בשורש האתר - האתר כולו עובד אופליין אחרי ביקור ראשון.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../../sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
