@@ -10,7 +10,7 @@ export function needsStability(paths) {
     /^scripts\/(build|ci-scope|check-dist).*\.js$/.test(path) ||
     /^framework\/vite.*\.js$/.test(path) ||
     /^framework\/src\/core\/(bootstrap|editor-storage|game-data|lazy-editor)\./.test(path) ||
-    /^e2e\/(pwa.*|network-server)\.js$/.test(path) ||
+    /^e2e\/(pwa.*|network.*)\.js$/.test(path) ||
     /(^|\/)package(-lock)?\.json$/.test(path) ||
     path === 'playwright.config.js' || path.startsWith('.github/')
   ));

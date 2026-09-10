@@ -1,5 +1,6 @@
 // @ts-check
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from './network-server.js';
 
 test.describe('PWA', () => {
   test('service worker registers and precaches the site core', async ({ page }) => {
@@ -39,9 +40,9 @@ test.describe('PWA', () => {
     }
   });
 
-  test('after one visit anywhere, a game works with the network gone', async ({ page, context }) => {
+  test('after one visit anywhere, a game works with the network gone', async ({ page, network }) => {
     // ביקור יחיד: ההתקנה שומרת מראש את כל האתר, כולל משחקים שלא בוקרו.
-    await page.goto('/games/syllable-read/');
+    await page.goto(`${network.url}/games/syllable-read/`);
     await page.waitForSelector('.option-card', { timeout: 15_000 });
     await page.evaluate(() => navigator.serviceWorker.ready);
 
@@ -62,11 +63,11 @@ test.describe('PWA', () => {
     }).toPass({ timeout: 10_000 });
 
     // ניתוק רשת מלא ורענון: העמוד חייב לעלות מהמטמון.
-    await context.setOffline(true);
+    await network.offline(page);
     await page.reload();
     await expect(page.locator('.sr-replay')).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('.option-card')).toHaveCount(3);
-    await context.setOffline(false);
+    await network.online(page);
   });
 
   test('home cards come from the catalog and catalog is precached', async ({ page }) => {
@@ -93,15 +94,15 @@ test.describe('PWA', () => {
   });
 });
 
-test('an unvisited editable game plays offline without downloading the editor', async ({ page, context }) => {
+test('an unvisited editable game plays offline without downloading the editor', async ({ page, network }) => {
   const scripts = [];
   page.on('request', request => scripts.push(request.url()));
-  await page.goto('/games/syllable-read/');
+  await page.goto(`${network.url}/games/syllable-read/`);
   await expect(page.locator('.option-card')).toHaveCount(3);
   await page.evaluate(() => navigator.serviceWorker.ready);
   expect(scripts.some(url => /\/editor\.(js|css)/.test(url))).toBe(false);
-  await context.setOffline(true);
-  await page.goto('/games/letter-match-animals/');
+  await network.offline(page);
+  await page.goto(`${network.url}/games/letter-match-animals/`);
   await expect(page.locator('.option-card')).toHaveCount(4);
   expect(scripts.some(url => /\/editor\.(js|css)/.test(url))).toBe(false);
 });

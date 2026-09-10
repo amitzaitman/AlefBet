@@ -70,3 +70,21 @@ export async function startGame(container) {
 התקנת דפדפנים ראשונית: `npm run setup:browsers`.
 הבנייה שומרת את שתי כניסות ה-runtime ואת תלויותיהן במטמון המשותף; זו אינה
 התקנה נפרדת לכל משחק. בדיקת דפדפן אוטומטית אינה מחליפה בדיקת שמע בטלפון אמיתי.
+
+### בדיקות אופליין
+
+ייבאו `test` מתוך `e2e/network-server.js` והשתמשו בשרת המבודד של הבדיקה:
+
+```js
+await page.goto(`${network.url}/games/my-game/`);
+await page.evaluate(() => navigator.serviceWorker.ready);
+await network.offline(page);
+await page.reload(); // כאן בודקים שהמשחק עובד מהמטמון
+await network.online(page);
+```
+
+העזר מנהל ניתוק שרת אמיתי, התאמה ל-WebKit, אימות החיבור וניקוי אוטומטי.
+אין להעתיק `setOffline`, בדיקות חיבור או ניהול sockets לתוך spec.
+בקשה תקועה אינה הוכחה לניתוק: העזר דורש שגיאת רשת מפורשת בניתוק,
+ותשובה חדשה ומאומתת בחיבור. לכל ניסיון יש מגבלת זמן, כולל קריאת גוף התשובה.
+בדיקות עם תוכן שרת ייעודי יכולות להגדיר `network.respondWith((req, res) => ...)`.
