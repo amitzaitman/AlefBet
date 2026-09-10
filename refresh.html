@@ -27,75 +27,60 @@
 <script>
 (async function refreshApp() {
   const status = document.getElementById('status');
-  const retry = document.getElementById('retry');
-  retry.addEventListener('click', () => location.reload());
+  document.getElementById('retry').addEventListener('click', () => location.reload());
   const root = new URL('./', location.href);
-  const attempt = Number(new URL(location.href).searchParams.get('attempt') || 0);
-  const download = async url => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
+  async function bounded(promise) {
+    let timer;
     try {
-      const response = await fetch(url, { cache: 'reload', signal: controller.signal });
-      if (!response.ok) throw new Error('Download failed');
-      return await response.arrayBuffer();
+      return await Promise.race([promise, new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Update timed out')), 20000);
+      })]);
     } finally { clearTimeout(timer); }
-  };
+  }
+  function waitForState(worker, states) {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => finish(new Error('Worker timed out')), 20000);
+      function finish(error) {
+        clearTimeout(timer);
+        worker.removeEventListener('statechange', check);
+        if (error) reject(error); else resolve();
+      }
+      function check() {
+        if (worker.state === 'redundant') finish(new Error('Update failed'));
+        else if (states.includes(worker.state)) finish();
+      }
+      worker.addEventListener('statechange', check);
+      check();
+    });
+  }
   try {
-    // The manifest and this recovery page are never served from the worker cache.
-    const bytes = await download(new URL('framework/dist/release-manifest.js', root));
-    const source = new TextDecoder().decode(bytes);
-    const match = source.match(/^self\.ALEFBET_RELEASE = ([\s\S]+);\s*$/);
-    if (!match) throw new Error('Invalid release');
-    const release = JSON.parse(match[1]);
-    if (!release.assets || !Array.isArray(release.core)) throw new Error('Invalid release');
-    if ('serviceWorker' in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      for (const registration of registrations) {
-        if (registration.scope === root.href && !await registration.unregister()) throw new Error('Cannot unregister');
+    if (!('serviceWorker' in navigator)) throw new Error('Service worker unavailable');
+    status.textContent = 'בודקים את הגרסה העדכנית…';
+    const registration = await bounded(navigator.serviceWorker.register(new URL('sw.js', root), { updateViaCache: 'none' }));
+    if (registration.installing) await waitForState(registration.installing, ['installed', 'activated']);
+    await bounded(registration.update());
+    if (registration.installing) await waitForState(registration.installing, ['installed', 'activated']);
+    const worker = registration.waiting || registration.active;
+    if (!worker) throw new Error('No worker');
+    status.textContent = 'מורידים מחדש את קובצי האפליקציה…';
+    await new Promise((resolve, reject) => {
+      const channel = new MessageChannel();
+      const timer = setTimeout(() => finish(new Error('Refresh timed out')), 30000);
+      function finish(error) {
+        clearTimeout(timer);
+        channel.port1.close();
+        channel.port2.close();
+        if (error) reject(error); else resolve();
       }
-      // Unregistering does not detach the worker from the current document.
-      // Navigate to this uncached page again before downloading canonical URLs.
-      if (navigator.serviceWorker.controller) {
-        if (attempt >= 2) throw new Error('Other tabs are registering a worker');
-        location.replace(new URL('refresh.html?attempt=' + (attempt + 1), root));
-        return;
-      }
-    }
-    const entries = Object.entries(release.assets);
-    let downloaded = 0;
-    const downloadAsset = async ([path, expectedHash]) => {
-      const url = new URL(path, root);
-      if (url.origin !== root.origin || !url.pathname.startsWith(root.pathname)) throw new Error('Invalid asset path');
-      const body = await download(url);
-      const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', body))]
-        .map(byte => byte.toString(16).padStart(2, '0')).join('');
-      if (hash !== expectedHash) throw new Error('Release changed during refresh');
-      status.textContent = `מורידים קבצים מחדש… ${++downloaded} מתוך ${entries.length}`;
-    };
-    // Bound concurrency; every HTTP-cache entry is revalidated, including lazy editor files.
-    let cursor = 0;
-    let failed = false;
-    const results = await Promise.allSettled(Array.from({ length: 4 }, async () => {
-      try {
-        while (!failed && cursor < entries.length) await downloadAsset(entries[cursor++]);
-      } catch (error) { failed = true; throw error; }
-    }));
-    if (results.some(result => result.status === 'rejected')) throw new Error('Download incomplete');
-    if ('caches' in window) {
-      for (const name of await caches.keys()) {
-        if (!name.startsWith('alefbet-')) continue;
-        const cache = await caches.open(name);
-        const requests = await cache.keys();
-        // Other applications on the same origin retain their caches.
-        if (requests.length && requests.every(request => request.url.startsWith(root.href))) await caches.delete(name);
-      }
-    }
-    // Never clear localStorage or IndexedDB: they hold progress, content and recordings.
+      channel.port1.onmessage = event => finish(event.data?.ok ? null : new Error('Download failed'));
+      worker.postMessage({ type: 'refresh-assets' }, [channel.port2]);
+    });
+    await waitForState(worker, ['activated']);
     status.textContent = 'הרענון הושלם. חוזרים למשחקים…';
     location.replace(new URL('./?refreshed=' + Date.now(), root));
   } catch (error) {
-    status.textContent = 'הרענון לא הושלם. בדקו חיבור לאינטרנט, סגרו לשוניות נוספות של האפליקציה ונסו שוב. הנתונים האישיים נשמרו.';
-    retry.hidden = false;
+    status.textContent = 'הרענון לא הושלם. בדקו חיבור לאינטרנט ונסו שוב. הנתונים האישיים נשמרו.';
+    document.getElementById('retry').hidden = false;
   }
 })();
 </script>

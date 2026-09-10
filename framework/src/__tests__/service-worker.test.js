@@ -20,6 +20,8 @@ function storage() {
       return {
         put: async (url, response) => entries.set(url, response.clone()),
         match: async url => entries.get(url)?.clone(),
+        keys: async () => [...entries.keys()].map(url => new Request(url)),
+        delete: async request => entries.delete(request.url),
       };
     },
   };
@@ -37,7 +39,7 @@ function worker(caches, version, network) {
     skipWaiting: vi.fn(), clients: { claim: vi.fn() },
   };
   runInNewContext(source, {
-    self, caches, crypto: webcrypto, URL, Request, Response,
+    self, caches, crypto: webcrypto, URL, Request, Response, AbortController, setTimeout, clearTimeout,
     importScripts: () => {}, fetch: async req => {
       const body = network.get(req.url);
       if (body === undefined) throw new Error('offline');
@@ -46,6 +48,11 @@ function worker(caches, version, network) {
   });
   return {
     self,
+    refresh: () => new Promise((resolve, reject) => handlers.message({
+      data: { type: 'refresh-assets' },
+      ports: [{ postMessage: resolve, close() {} }],
+      waitUntil: promise => promise.catch(reject),
+    })),
     lifecycle: name => new Promise((resolve, reject) => handlers[name]({
       waitUntil: promise => promise.then(resolve, reject),
     })),
@@ -58,6 +65,33 @@ function worker(caches, version, network) {
 }
 
 describe('release updates', () => {
+  it('refreshes poisoned assets and removes stale entries without touching unrelated caches', async () => {
+    const caches = storage();
+    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1'], [`${origin}editor.js`, 'editor-v1']]);
+    const active = worker(caches, 'v1', network);
+    await active.lifecycle('install');
+    const cache = await caches.open('alefbet-release-v1');
+    await cache.put(`${origin}app.js`, new Response('poisoned'));
+    await cache.put(`${origin}stale`, new Response('old'));
+    await (await caches.open('unrelated')).put('https://example.test/other', new Response('keep'));
+    expect(await active.refresh()).toEqual({ ok: true });
+    expect(await (await active.request('app.js')).text()).toBe('v1');
+    expect(await cache.match(`${origin}stale`)).toBeUndefined();
+    expect(await caches.keys()).toContain('unrelated');
+    expect(active.self.skipWaiting).toHaveBeenCalledOnce();
+  });
+
+  it('keeps working offline assets when a full refresh fails integrity checks', async () => {
+    const caches = storage();
+    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1'], [`${origin}editor.js`, 'wrong-release']]);
+    const active = worker(caches, 'v1', network);
+    await active.lifecycle('install');
+    expect(await active.refresh()).toEqual({ ok: false });
+    network.clear();
+    expect(await (await active.request('app.js')).text()).toBe('v1');
+    expect(active.self.skipWaiting).not.toHaveBeenCalled();
+  });
+
   it('serves anchored home links offline without changing the cached asset identity', async () => {
     const caches = storage();
     const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1']]);
