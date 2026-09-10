@@ -58,6 +58,20 @@ function worker(caches, version, network) {
 }
 
 describe('release updates', () => {
+  it('serves anchored home links offline without changing the cached asset identity', async () => {
+    const caches = storage();
+    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1']]);
+    const active = worker(caches, 'v1', network);
+    await active.lifecycle('install');
+    network.clear();
+    for (const path of ['#subject-math', '?source=home#subject-reading']) {
+      const response = await active.request(path);
+      expect(response).toBeDefined();
+      expect(await response.text()).toBe('home');
+    }
+    expect(await active.request('not-cached#subject-math')).toBeUndefined();
+  });
+
   it('retains the working cache after an interrupted upgrade, then activates a complete release', async () => {
     const caches = storage();
     const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1']]);

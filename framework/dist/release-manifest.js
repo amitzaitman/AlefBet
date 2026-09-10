@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "d19adfaa6e5685c1132c19d09e5540ee7f78642fd2b2825772c571db1fc1d3f1",
+  "version": "486d6249d7b298d2fcd4758612eaa78285b2a9f28817edb2b89524f9092a7300",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
