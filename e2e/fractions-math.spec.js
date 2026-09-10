@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { test } from './network-server.js';
 
 for (const game of ['fraction-picture', 'fraction-whole', 'fraction-compare']) {
-  test(`${game}: visual answers, retry, completion, replay and offline`, async ({ page, context, isMobile, browserName, network }) => {
+  test(`${game}: visual answers, retry, completion, replay and offline`, async ({ page, isMobile, network }) => {
     const activate = locator => isMobile ? locator.tap() : locator.click();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -38,8 +38,7 @@ for (const game of ['fraction-picture', 'fraction-whole', 'fraction-compare']) {
     await activate(page.locator('.completion-screen__replay'));
     await expect(page.locator('.fraction-bar').first()).toBeVisible();
     await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-    network.disconnect();
-    if (browserName !== 'webkit') await context.setOffline(true);
+    await network.offline(page);
     await page.reload();
     await expect(page.locator('.fraction-bar').first()).toBeVisible();
     await expect(page.locator('.option-card').first()).toBeEnabled();

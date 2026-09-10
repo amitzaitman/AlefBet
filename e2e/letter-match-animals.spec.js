@@ -1,5 +1,6 @@
 // @ts-check
-import { test, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import { test } from './network-server.js';
 
 const GAME_URL = '/games/letter-match-animals/';
 const BANNER_SELECTOR = '#alefbet-audio-status-banner';
@@ -142,7 +143,7 @@ test.describe('letter-match-animals', () => {
   });
 });
 
-test('editor loads on demand, preserves saved content, and reopens offline', async ({ page, context }) => {
+test('editor loads on demand, preserves saved content, and reopens offline', async ({ page, network }) => {
   const editorRequests = [];
   page.on('request', request => {
     if (/\/editor\.(js|css)/.test(request.url())) editorRequests.push(request.url());
@@ -153,7 +154,7 @@ test('editor loads on demand, preserves saved content, and reopens offline', asy
       rounds: [{ id: 'saved', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }],
     }));
   });
-  await page.goto('/games/letter-match-animals/');
+  await page.goto(`${network.url}/games/letter-match-animals/`);
   await expect(page.locator('.letter-display')).toHaveText('א');
   expect(editorRequests).toEqual([]);
   await page.getByText('למבוגרים', { exact: true }).click();
@@ -166,7 +167,7 @@ test('editor loads on demand, preserves saved content, and reopens offline', asy
     const css = await page.evaluate(async () => !!await caches.match('/framework/dist/editor.css'));
     expect(css).toBe(true);
   }).toPass();
-  await context.setOffline(true);
+  await network.offline(page);
   await page.reload();
   await expect(page.locator('.letter-display')).toHaveText('א');
   await page.getByText('למבוגרים', { exact: true }).click();

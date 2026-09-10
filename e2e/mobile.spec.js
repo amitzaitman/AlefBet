@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { test } from './network-server.js';
 
-test('touch retry, audio failure, completion, replay and offline reload', async ({ page, context, browserName, network }) => {
+test('touch retry, audio failure, completion, replay and offline reload', async ({ page, network }) => {
   await page.route('**/translate.google.com/**', route => route.abort());
   await page.route('**/translate_tts**', route => route.abort());
   await page.addInitScript(() => {
@@ -35,11 +35,7 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await expect(cards).toHaveCount(4);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.evaluate(() => navigator.serviceWorker.ready);
-  network.disconnect();
-  // WebKit's setOffline navigation fails inside the automation backend (playwright#34402).
-  // The origin is physically disconnected for both engines; Chromium also toggles navigator.onLine.
-  if (browserName !== 'webkit') await context.setOffline(true);
-  expect(await page.evaluate(() => fetch('/network-probe', { cache: 'no-store' }).then(() => false, () => true))).toBe(true);
+  await network.offline(page);
   await page.reload();
   await expect(cards).toHaveCount(4);
   await page.locator('[data-id="correct"]').tap();

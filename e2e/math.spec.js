@@ -2,7 +2,7 @@ import { expect } from '@playwright/test';
 import { test } from './network-server.js';
 
 for (const game of ['make-ten', 'number-line']) {
-  test(`${game}: retry, completion, replay and offline`, async ({ page, context, isMobile, browserName, network }) => {
+  test(`${game}: retry, completion, replay and offline`, async ({ page, isMobile, network }) => {
     const activate = locator => isMobile ? locator.tap() : locator.click();
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -46,12 +46,7 @@ for (const game of ['make-ten', 'number-line']) {
     await expect(page.locator('.game-title')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-    network.disconnect();
-    // As in mobile.spec.js, disconnect the origin for WebKit; its automation
-    // backend cannot navigate with setOffline (playwright#34402).
-    if (browserName !== 'webkit') await context.setOffline(true);
-    expect(await page.evaluate(() => fetch('/network-probe', { cache: 'no-store' }).then(() => false, () => true))).toBe(true);
-    // The worker intentionally does not claim the first loaded page.
+    await network.offline(page);
     await page.reload();
     await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
     await expect(page.locator(game === 'make-ten' ? '.ten-frame' : '.number-line')).toBeVisible();
