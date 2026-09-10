@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "3827f456b9ecc7c4a6b3b2182721dcb41ffa20022d241ced095e7f48bc6e1c62",
+  "version": "ac78a5f77e3e21ad13091339f6e938df9039411e92e1f40f518ea89805aeb93a",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -58,7 +58,7 @@ self.ALEFBET_RELEASE = {
     "./manifest.webmanifest"
   ],
   "assets": {
-    "./": "619caec7e2b523ce930a8e9963e2929472b517dc66adc9b746e2204805e41bc6",
+    "./": "521b45bbf087918bd8eb52b8e7aea7a0c7845336683bddb77e854a644713700d",
     "./assets/icons/apple-touch-icon.png": "efefd01ca2a1c1cdbbd7f89701cb8972f173048a3319434b284f8fddfe5cc2c1",
     "./assets/icons/icon-192.png": "13ceea9702342b307d2d6596d1fb0c46ad4d232a24732221a4b3325140190f29",
     "./assets/icons/icon-512.png": "91ab2f1968ff273a45d9f4e6e6ffaf52fc78807c76517c2a2a63d94b711f2283",
@@ -113,7 +113,7 @@ self.ALEFBET_RELEASE = {
     "./games/syllable-read/game.css": "1a5b023bd0b0e3078915db150a7382595d85dc8da03beac283f096e800259868",
     "./games/syllable-read/game.js": "462049da60cb28c82b72116d23c15d199c93294b4541090f5092504c6d14795d",
     "./games/syllable-read/index.html": "55246cea53f33d126031063d05e5674865f8aa1a12262cebfcadbd2b308c1b19",
-    "./index.html": "619caec7e2b523ce930a8e9963e2929472b517dc66adc9b746e2204805e41bc6",
+    "./index.html": "521b45bbf087918bd8eb52b8e7aea7a0c7845336683bddb77e854a644713700d",
     "./manifest.webmanifest": "61199ec6fe79202159f986f7fd7fd2058697d890788a97993b4db5eafef9c9d4"
   }
 };
