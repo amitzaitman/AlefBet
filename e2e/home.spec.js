@@ -7,9 +7,9 @@ test('home groups games by subject, supports navigation and keeps groups offline
   const math = page.locator('#subject-math');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(reading.locator('.game-card')).toHaveCount(4);
-  await expect(math.locator('.game-card')).toHaveCount(5);
+  await expect(math.locator('.game-card')).toHaveCount(6);
   await expect(page.locator('#subject-other')).toHaveCount(0);
-  await expect(math.locator('.game-card__topic')).toHaveCount(5);
+  await expect(math.locator('.game-card__topic')).toHaveCount(6);
   await expect(reading.locator('[data-game-id="letter-match-animals"]')).toBeVisible();
   await expect(math.locator('[data-game-id="fraction-picture"]')).toBeVisible();
   const mathLink = page.locator('.subject-nav a[href="#subject-math"]');
@@ -25,5 +25,5 @@ test('home groups games by subject, supports navigation and keeps groups offline
   await network.offline(page);
   await page.reload();
   await expect(reading.locator('.game-card')).toHaveCount(4);
-  await expect(math.locator('.game-card')).toHaveCount(5);
+  await expect(math.locator('.game-card')).toHaveCount(6);
 });

@@ -1,0 +1,38 @@
+.chain-game { width: min(100%, 680px); margin-inline: auto; text-align: center; }
+/* The shared stylesheet forces RTL on every element; math rows must read left to right. */
+.chain-game [dir="ltr"], .chain-game [dir="ltr"] * { direction: ltr; }
+.chain-game h2 { font-size: clamp(1.2rem, 4vw, 1.6rem); margin: 8px 0 12px; }
+.chain-original, .chain-current { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; font-weight: 700; margin: 8px 0; }
+.chain-original { gap: 4px; font-size: clamp(16px, 4.2vw, 26px); color: #52647c; padding: 8px; border: 2px dashed #c7cfdb; border-radius: 14px; background: #fff; }
+.chain-current { gap: 6px; min-height: 72px; font-size: clamp(26px, 7vw, 44px); color: #1b140c; }
+.chain-term { display: inline-grid; place-items: center; min-width: 1.1em; padding: 0 3px; border-radius: 10px; }
+.chain-op { color: #52647c; }
+.chain-original .chain-term--done { color: #2a7b71; background: #dcefe9; }
+.chain-original .chain-term--next { color: #783952; background: #f0e4eb; }
+.chain-term--total { color: #fff; background: #2a7b71; }
+.chain-term--next { color: #783952; }
+.chain-answer { min-width: 1.2em; color: #783952; }
+.chain-answer--solved { color: #fff; background: #2a7b71; border-radius: 10px; padding: 0 6px; }
+.chain-part { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border: 3px solid #783952; border-radius: 18px; background: #f0e4eb; }
+.chain-question { min-height: 1.6em; font-size: clamp(1.05rem, 3.6vw, 1.3rem); font-weight: 700; margin: 8px 0; }
+.chain-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2.5vw, 12px); min-height: 72px; margin: 8px 0 12px; }
+.chain-choice { min-width: 64px; min-height: 72px; padding: 0 8px; border: 3px solid #2868a6; border-radius: 18px; background: #fff; color: #174774; font: inherit; font-size: clamp(26px, 7vw, 34px); font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.chain-choice:disabled { cursor: default; }
+.chain-choice--tried { opacity: .35; border-style: dashed; }
+.chain-choice--hint { background: #f0e4eb; border-color: #783952; box-shadow: 0 0 0 4px rgba(120, 57, 82, .25); }
+.chain-choice:focus-visible, .chain-help:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
+.chain-help { min-width: 96px; min-height: 64px; padding: 8px 24px; border: 2px solid #783952; border-radius: 16px; background: #fff; color: #783952; font: inherit; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+.chain-help:disabled { opacity: .45; cursor: default; }
+.chain-dots { display: grid; justify-content: center; gap: 8px; margin: 14px auto 4px; }
+.chain-dots[hidden] { display: none; }
+.chain-dots__row { display: flex; gap: clamp(8px, 3vw, 16px); }
+.chain-dots__group { display: flex; gap: 5px; }
+.chain-dot { width: clamp(16px, 5vw, 24px); aspect-ratio: 1; border-radius: 50%; background: #2a7b71; }
+.chain-dot--added { background: #d99221; }
+.chain-dot--removed { background: #fff; box-shadow: inset 0 0 0 2px #c7cfdb; position: relative; }
+.chain-dot--removed::after { content: ''; position: absolute; inset: 45% -10%; background: #c9442c; transform: rotate(-45deg); border-radius: 2px; }
+.chain-trail { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; list-style: none; padding: 0; margin: 12px 0 0; }
+.chain-trail li { padding: 4px 12px; border-radius: 12px; background: #dcefe9; color: #1e5a52; font-size: 1.05rem; font-weight: 700; }
+.chain-trail:empty { display: none; }
+.chain-equation { white-space: nowrap; }
+.chain-game .feedback-message { min-height: 2.4em; }
