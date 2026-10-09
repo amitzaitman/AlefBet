@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  # Diagnostic branch only: run the WebKit probe on push.
+  push:
+    branches: [diag-webkit-refresh]
   pull_request:
     paths-ignore:
       - '**/*.md'
