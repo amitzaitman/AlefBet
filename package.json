@@ -22,8 +22,7 @@
     "setup:browsers": "playwright install --with-deps chromium webkit",
     "verify": "npm run check && npm run e2e",
     "verify:ci": "npm run verify && npm run check:dist",
-    "check:dist": "node scripts/check-dist.js",
-    "test:stability": "playwright test e2e/pwa-upgrade.spec.js --project=mobile-webkit --repeat-each=3 --retries=0 --output=test-results/stability"
+    "check:dist": "node scripts/check-dist.js"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

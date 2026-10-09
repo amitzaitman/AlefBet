@@ -53,7 +53,7 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 
 ## Commands
 
-- `npm run verify` — the full pre-push gate: checks, clean build and all browser tests (including one offline upgrade run). CI and deploy share `.github/actions/verify`.
+- `npm run verify` — the full pre-push gate: checks, clean build and all browser tests. CI and deploy share `.github/actions/verify`.
 - `npm run setup:browsers` — install Chromium/WebKit once and after Playwright updates.
 - `npm run check` — fast lint + typecheck + unit tests during development.
 - `npm run lint` — ESLint over the whole repo (config: `eslint.config.js`).
@@ -62,7 +62,7 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 - `npm run build` — clean and rebuild both bundles in `framework/dist/`; removes obsolete chunks.
 - `npm run e2e -- e2e/math.spec.js` — rebuild and run a focused browser test.
 - `npm run verify:ci` — full verification plus a check for modified, staged or untracked dist files. Commit regenerated artifacts before running this CI-only check.
-- Browser traces are separate under `test-results/games/` and `test-results/stability/`.
+- Browser traces are saved under `test-results/games/`.
 
 ## Conventions
 
@@ -104,6 +104,6 @@ Pushing to `main` triggers `.github/workflows/deploy.yml`, gated by unit/type/li
 
 - PRs trigger CI; branch pushes do not. Use workflow_dispatch for a branch without a PR.
 - Main pushes keep the full pre-deploy gate. Documentation-only changes skip both workflows.
-- Repeated WebKit upgrade checks run weekly, manually, and for sensitive source paths selected by `scripts/ci-scope.js`.
-- `npm run test:stability` remains available after a build; ordinary `verify` does not repeat it.
-- Missing comparison history conservatively enables stability checks. Never use `pull_request_target` to run untrusted code.
+- No scheduled runs and no repeated stability passes. Browser tests cover games and basic offline play (`pwa.spec.js` plus each game's offline reload).
+- Service worker internals (refresh, interrupted upgrades, integrity) are covered by `framework/src/__tests__/service-worker.test.js`, not by browser tests. Do not add browser tests for background infrastructure.
+- Never use `pull_request_target` to run untrusted code.

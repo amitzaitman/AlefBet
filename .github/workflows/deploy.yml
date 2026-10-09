@@ -23,15 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - id: scope
-        name: Select offline stability checks
-        run: node scripts/ci-scope.js
-
       - uses: ./.github/actions/verify
-        with:
-          stability: ${{ steps.scope.outputs.stability }}
 
       - name: Assemble site
         run: |

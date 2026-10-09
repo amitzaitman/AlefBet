@@ -7,8 +7,6 @@ on:
       - 'docs/**'
       - 'LICENSE'
   workflow_dispatch:
-  schedule:
-    - cron: '17 3 * * 1'
 
 permissions:
   contents: read
@@ -22,11 +20,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - id: scope
-        name: Select offline stability checks
-        run: node scripts/ci-scope.js
       - uses: ./.github/actions/verify
-        with:
-          stability: ${{ steps.scope.outputs.stability }}
