@@ -89,6 +89,19 @@ test('equations and the number line read left to right inside the RTL page', asy
   await activate(atEnd ? left : right);
   if (atEnd) await expect.poll(() => x(current)).toBeLessThan(before);
   else await expect.poll(() => x(current)).toBeGreaterThan(before);
+  // A wrapped Hebrew instruction stays centered like the short lines around it.
+  await page.setViewportSize({ width: 320, height: 640 });
+  const lastLineGaps = await page.locator('.game-body h2').evaluate(el => {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const rects = [...range.getClientRects()];
+    const top = Math.max(...rects.map(r => r.top));
+    const line = rects.filter(r => Math.abs(r.top - top) < 4);
+    const box = el.getBoundingClientRect();
+    return { lines: new Set(rects.map(r => Math.round(r.top))).size, left: Math.min(...line.map(r => r.left)) - box.left, right: box.right - Math.max(...line.map(r => r.right)) };
+  });
+  expect(lastLineGaps.lines).toBeGreaterThan(1);
+  expect(Math.abs(lastLineGaps.left - lastLineGaps.right)).toBeLessThan(6);
 });
 
 test('long-exercise: solve part by part, hints, keyboard, completion, replay and offline', async ({ page, isMobile, network }) => {
