@@ -114,7 +114,13 @@
   unicode-bidi: embed;
 }
 
-/* ── Game Container ──────────────────────────────────────────────────────── */
+/* תרגילים וצירי מספרים מסומנים dir="ltr"; בלי זה הכלל למעלה הופך אותם. */
+.alefbet-game [dir="ltr"],
+.alefbet-game [dir="ltr"] * {
+  direction: ltr;
+}
+
+/* ── Game Container──────────────────────────────────────────────────────── */
 .alefbet-game {
   position: relative;
   font-family: var(--ab-font-body);

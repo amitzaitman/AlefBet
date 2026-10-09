@@ -53,3 +53,40 @@ for (const game of ['make-ten', 'number-line']) {
     expect(errors).toEqual([]);
   });
 }
+
+test('equations and the number line read left to right inside the RTL page', async ({ page, isMobile, network }) => {
+  const activate = locator => isMobile ? locator.tap() : locator.click();
+  // Compares where the first and last visible characters are drawn, not the DOM order.
+  const readsLeftToRight = locator => locator.evaluate(el => {
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) if (walker.currentNode.data.trim()) nodes.push(walker.currentNode);
+    const edge = (node, index) => {
+      const range = document.createRange();
+      range.setStart(node, index);
+      range.setEnd(node, index + 1);
+      return range.getBoundingClientRect();
+    };
+    const first = nodes[0], last = nodes[nodes.length - 1];
+    return edge(first, first.data.search(/\S/)).left < edge(last, last.data.trimEnd().length - 1).left;
+  });
+  for (const [game, selector] of [['make-ten', '.ten-equation'], ['number-line', '.line-equation'], ['fraction-whole', '.fraction-equation']]) {
+    await page.goto(`${network.url}/games/${game}/`);
+    await expect(page.locator(selector)).toBeVisible();
+    expect(await readsLeftToRight(page.locator(selector)), `${game} ${selector}`).toBe(true);
+  }
+  // The number line grows to the right, and the right arrow moves the marker right.
+  await page.goto(`${network.url}/games/number-line/`);
+  const x = async locator => (await locator.boundingBox()).x;
+  const marks = page.locator('.number-line__mark');
+  expect(await x(marks.first())).toBeLessThan(await x(marks.last()));
+  const left = page.getByRole('button', { name: 'צעד שמאלה', exact: true });
+  const right = page.getByRole('button', { name: 'צעד ימינה', exact: true });
+  expect(await x(left)).toBeLessThan(await x(right));
+  const current = page.locator('.number-line__mark--current');
+  const before = await x(current);
+  const atEnd = await right.isDisabled();
+  await activate(atEnd ? left : right);
+  if (atEnd) await expect.poll(() => x(current)).toBeLessThan(before);
+  else await expect.poll(() => x(current)).toBeGreaterThan(before);
+});

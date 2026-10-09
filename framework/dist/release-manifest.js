@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "4ae02c935280e40c4c5780f30bc004715f17ce10f7549e0022d3d3ed6bd60a9e",
+  "version": "9275f0ab75b86f4cbd917d28b63ab58fbc3dde6e1d1aabcb553a7f7883e98949",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -69,7 +69,7 @@ self.ALEFBET_RELEASE = {
     "./framework/dist/game-audio-CIXXhVEq.js": "e1a64764774975817174628f74eba555c7be8ab2e3a9e77236c7452ba6ce27b0",
     "./framework/dist/nakdan-DFzp_6d3.js": "ed9cc205964da7914546809a22fb8fb1fe2ecbfaff5663d333f42b24af05de84",
     "./framework/dist/runtime-assets.js": "85a433e16444615e2e9d28167db0fec0516651ce8722a59e3c91cbdc88d8b48d",
-    "./framework/dist/runtime.css": "221cec10aed03809ed7a1ecaadad1a0aa58d9e06fd0a8a520fec049a638c225a",
+    "./framework/dist/runtime.css": "63f79afd49de002d4057e32f0d1edefe2ef759abee500553f90d1ac19ef96cd0",
     "./framework/dist/runtime.js": "c38552293d168b021cdf0d5194aff2d575def768c0dbf803f3cd6ed4903c23fe",
     "./framework/dist/voice-record-button-CVRCvvTy.js": "47a084a8e4aa8eaf1f45abc36469d45ee360f54f454898be6324c073d98448a3",
     "./games/catalog.js": "25c1383e791d0759ef9f2c12554da757e81487f1042de2e6a35b4013ac0e523f",
