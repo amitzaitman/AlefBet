@@ -911,7 +911,7 @@ function Oo(e, t, n, r, o = {}) {
   c.className = "completion-screen", c.innerHTML = `
     <div class="completion-screen__content">
       <div class="completion-screen__stars" aria-label="${s} כּוֹכָבִים">${a}</div>
-      <h2 class="completion-screen__title">!כָּל הַכָּבוֹד</h2>
+      <h2 class="completion-screen__title">כָּל הַכָּבוֹד!</h2>
       <p class="completion-screen__score">${i}</p>
       <div class="completion-screen__actions">
         <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>

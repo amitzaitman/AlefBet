@@ -29,6 +29,11 @@ describe('showCompletionScreen — rendering', () => {
       .toBe('נִיקּוּד: 3 מִתּוֹךְ 5');
   });
 
+  it('ends the title with its exclamation mark so RTL draws it on the left', () => {
+    showCompletionScreen(container, 3, 5, () => {});
+    expect(container.querySelector('.completion-screen__title').textContent).toMatch(/^[^!]+!$/);
+  });
+
   it('replaces any pre-existing contents of the container', () => {
     container.innerHTML = '<div class="previous">round UI</div>';
     showCompletionScreen(container, 1, 1, () => {});

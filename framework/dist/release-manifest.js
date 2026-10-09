@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "ac10876ebb6eabee876898ada352c2c571442b15e34f121a162f4095d32c0053",
+  "version": "0b773d5527ad690ee64392bcdfd255bd1cd01900c439871efd1d4bdaff6c8117",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -66,7 +66,7 @@ self.ALEFBET_RELEASE = {
     "./assets/icons/apple-touch-icon.png": "efefd01ca2a1c1cdbbd7f89701cb8972f173048a3319434b284f8fddfe5cc2c1",
     "./assets/icons/icon-192.png": "13ceea9702342b307d2d6596d1fb0c46ad4d232a24732221a4b3325140190f29",
     "./assets/icons/icon-512.png": "91ab2f1968ff273a45d9f4e6e6ffaf52fc78807c76517c2a2a63d94b711f2283",
-    "./framework/dist/common.js": "d8bc3340af273cd3b800f8cf6078bf512bdd655400b3daab2f3ac4104c02146b",
+    "./framework/dist/common.js": "839e8fbe92ccb2ddf16eae4bbbf32a519c3c19ba3581e6d23a9f75b9e36c7d9c",
     "./framework/dist/drag-NEBgUr1u.js": "ab2d83742d8de283b483bf46b94b91a8667750fd190029edc48d025dcc136d1a",
     "./framework/dist/editor.css": "7688c131e8863b56609441bc8412eed9a51c0f11063fdcc77d1fc863aa758fb9",
     "./framework/dist/editor.js": "9999f66e3d7a9c2e1b64bfc86781c2652220cf70a38a500f2b09925af06d8253",

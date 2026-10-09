@@ -32,7 +32,7 @@ export function showCompletionScreen(container, score, totalRounds, onReplay, op
   screen.innerHTML = `
     <div class="completion-screen__content">
       <div class="completion-screen__stars" aria-label="${stars} כּוֹכָבִים">${starDisplay}</div>
-      <h2 class="completion-screen__title">!כָּל הַכָּבוֹד</h2>
+      <h2 class="completion-screen__title">כָּל הַכָּבוֹד!</h2>
       <p class="completion-screen__score">${summary}</p>
       <div class="completion-screen__actions">
         <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
