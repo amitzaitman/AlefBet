@@ -70,7 +70,7 @@ test('equations and the number line read left to right inside the RTL page', asy
     const first = nodes[0], last = nodes[nodes.length - 1];
     return edge(first, first.data.search(/\S/)).left < edge(last, last.data.trimEnd().length - 1).left;
   });
-  for (const [game, selector] of [['make-ten', '.ten-equation'], ['number-line', '.line-equation'], ['fraction-whole', '.fraction-equation']]) {
+  for (const [game, selector] of [['make-ten', '.ten-equation'], ['number-line', '.line-equation'], ['fraction-whole', '.fraction-equation'], ['long-exercise', '.chain-current']]) {
     await page.goto(`${network.url}/games/${game}/`);
     await expect(page.locator(selector)).toBeVisible();
     expect(await readsLeftToRight(page.locator(selector)), `${game} ${selector}`).toBe(true);

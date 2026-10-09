@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "d8ee58060fbbb960e37854e67c5360e069e3918d19856066fce58b8add34bbff",
+  "version": "2b83a97be7bac0c377dc182c7854790198de0ea71a7d92baf628ebad7db9d090",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -94,7 +94,7 @@ self.ALEFBET_RELEASE = {
     "./games/letter-match-animals/game.js": "20ea9f12ffd1c0178bb7c8600e6da272c82a5dcd938bd7369b22e66a542e043e",
     "./games/letter-match-animals/index.html": "2664d7fe3510deb8f277d4f4b298bf91ef68f72c426429d10c589ee75c370487",
     "./games/long-exercise/": "9a036516db9ae3f2c759a4906103f680ebb94ea5bf43997957da467c112022eb",
-    "./games/long-exercise/game.css": "e7016c18e2a6f0d9d70c4eaf4533155ed2d8dd89588972bd0e2d4495a0a1c5f3",
+    "./games/long-exercise/game.css": "a147de28b52e1721590ecb3f9da6672bafd9771a49a7967feda28f85ec33f561",
     "./games/long-exercise/game.js": "0c37b5d4e3d6cda2da89c1a1a4d5e28b459dad0104fe6de1d61c4cffa7b5f19b",
     "./games/long-exercise/index.html": "9a036516db9ae3f2c759a4906103f680ebb94ea5bf43997957da467c112022eb",
     "./games/make-ten/": "d69e2107396c1f1a1910edc0c550129747ef1697ca04169fc183016a26b742b3",

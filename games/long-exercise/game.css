@@ -1,6 +1,4 @@
 .chain-game { width: min(100%, 680px); margin-inline: auto; text-align: center; }
-/* The shared stylesheet forces RTL on every element; math rows must read left to right. */
-.chain-game [dir="ltr"], .chain-game [dir="ltr"] * { direction: ltr; }
 .chain-game h2 { font-size: clamp(1.2rem, 4vw, 1.6rem); margin: 8px 0 12px; }
 .chain-original, .chain-current { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; font-weight: 700; margin: 8px 0; }
 .chain-original { gap: 4px; font-size: clamp(16px, 4.2vw, 26px); color: #52647c; padding: 8px; border: 2px dashed #c7cfdb; border-radius: 14px; background: #fff; }
