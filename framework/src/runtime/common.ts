@@ -25,4 +25,5 @@ export { mountAudioStatusBanner } from '../ui/audio-status-banner.js';
 export { installGlobalErrorScreen } from '../ui/error-screen.js';
 export { animate } from '../render/animations.js';
 export { createDragSource, createDropTarget } from '../input/drag.js';
+export { lockPageZoom } from '../input/zoom-lock.js';
 export { createRoundScope } from '../core/round-scope.js';

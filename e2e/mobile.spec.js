@@ -96,3 +96,32 @@ test('nikud supports tap selection, retry, completion and returning home', async
   await page.locator('.completion-screen__home').tap();
   await expect(page.locator('.games-grid').first()).toBeVisible();
 });
+
+test('two fingers do not zoom a game and one finger still scrolls', async ({ page, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Multi-touch input is sent through the Chromium protocol');
+  await page.setViewportSize({ width: 412, height: 420 });
+  await page.goto('/games/make-ten/');
+  await expect(page.locator('.ten-frame')).toBeVisible();
+  const cdp = await page.context().newCDPSession(page);
+  const touch = (type, touchPoints) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints });
+  const frames = () => page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
+  /** @param {number} y @param {number[]} xs */
+  const fingers = (y, xs) => xs.map((x, id) => ({ x, y, id }));
+  // A child's accidental spread of two fingers.
+  await touch('touchStart', fingers(80, [186, 226]));
+  for (let d = 25; d <= 150; d += 5) {
+    await touch('touchMove', fingers(80, [206 - d, 206 + d]));
+    await frames();
+  }
+  await touch('touchEnd', []);
+  await frames();
+  expect(await page.evaluate(() => visualViewport.scale)).toBe(1);
+  // Scrolling a screen taller than the phone still works.
+  await touch('touchStart', fingers(380, [206]));
+  for (let y = 370; y >= 120; y -= 10) {
+    await touch('touchMove', fingers(y, [206]));
+    await frames();
+  }
+  await touch('touchEnd', []);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
+});

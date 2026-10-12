@@ -57,6 +57,9 @@ export async function startGame(container) {
 ב-`isAnswered()` וב-`subscribeAnswered` כדי למנוע תשובות כפולות. אל תנהלו
 מונה ניקוד נוסף במשחק. אתחול באותו מיכל מסיים את המשחק הקודם.
 
+מסך משחק לא מתקרב בהקשה כפולה או בשתי אצבעות: `GameShell` נועל זום, וגלילה
+באצבע אחת נשארת. דף בלי `GameShell` קורא ל-`lockPageZoom()`.
+
 גרירה משתמשת ב-`createDragSource` וב-`createDropTarget`, הרשומים ב-scope.
 המשחק קובע אם ההנחה נכונה. ספקו גם חלופת לחיצה/מקלדת; ראו `nikud-match`.
 כפתורים בגודל 64 פיקסלים לפחות. במשוואות ובציר מספרים הגדירו `dir="ltr"`

@@ -120,6 +120,17 @@
   direction: ltr;
 }
 
+/* ── Zoom lock (input/zoom-lock.js) ──────────────────────────────────────
+   מסכי משחק: גלילה כן, הגדלה לא. manipulation חוסם הקשה כפולה גם ב-Safari;
+   pan-x pan-y חוסם גם צביטה בדפדפנים שמכירים אותו. .alefbet-game מופיע
+   כאן כי overflow-x שלו עלול לעצור את touch-action של <html>.            */
+.alefbet-zoom-lock,
+.alefbet-zoom-lock body,
+.alefbet-zoom-lock .alefbet-game {
+  touch-action: manipulation;
+  touch-action: pan-x pan-y;
+}
+
 /* ── Game Container──────────────────────────────────────────────────────── */
 .alefbet-game {
   position: relative;

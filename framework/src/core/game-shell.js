@@ -4,6 +4,7 @@
  */
 import { EventBus } from './events.js';
 import { GameState } from './state.js';
+import { lockPageZoom } from '../input/zoom-lock.js';
 
 const activeShells = new WeakMap();
 
@@ -42,6 +43,8 @@ export class GameShell {
 
   _buildShell() {
     this.container.classList.add('alefbet-game');
+    // הקשה כפולה או שתי אצבעות לא מגדילות את מסך המשחק.
+    lockPageZoom(this.container.ownerDocument);
 
     const backBtn = this.config.homeUrl
       ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>`
