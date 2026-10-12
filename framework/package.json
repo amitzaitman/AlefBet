@@ -2,18 +2,14 @@
   "name": "@alefbet/framework",
   "version": "1.0.0",
   "type": "module",
-  "main": "./dist/alefbet.umd.cjs",
-  "module": "./dist/alefbet.js",
+  "main": "./dist/runtime.js",
+  "module": "./dist/runtime.js",
   "exports": {
-    ".": {
-      "import": "./dist/alefbet.js",
-      "require": "./dist/alefbet.umd.cjs"
-    },
-    "./dist/alefbet.css": "./dist/alefbet.css",
+    ".": "./dist/runtime.js",
     "./runtime": "./dist/runtime.js",
+    "./common": "./dist/common.js",
     "./editor": "./dist/editor.js",
-    "./dist/runtime.css": "./dist/runtime.css",
-    "./common": "./dist/common.js"
+    "./dist/runtime.css": "./dist/runtime.css"
   },
   "scripts": {
     "build": "node ../scripts/build.js",

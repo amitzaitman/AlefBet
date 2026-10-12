@@ -1,11 +1,6 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
+// Test settings only. The release is built by vite.runtime.config.js.
 export default defineConfig({
   resolve: {
     // Allow imports with .js extension to resolve .ts files (enables
@@ -24,23 +19,7 @@ export default defineConfig({
         'src/**/*.test.*',
         'src/__tests__/**',
         'src/editor/**/*.ts',
-        'src/index.ts',
       ],
     },
-  },
-  build: {
-    lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'AlefBet',
-      fileName: 'alefbet',
-      formats: ['es', 'umd'],
-    },
-    rollupOptions: {
-      output: {
-        assetFileNames: 'alefbet.[ext]',
-      },
-    },
-    outDir: 'dist',
-    emptyOutDir: true,
   },
 });

@@ -8,9 +8,9 @@ Keep game-specific rules and rendering in the game. Extract a shared named-expor
 
 ## Infra changes
 
-Read [`MIGRATION.md`](./MIGRATION.md) before touching build, `sw.js`, `framework/src/index.ts`, or more than one `games/*/game.js` in the same PR.
+Read [`MIGRATION.md`](./MIGRATION.md) before touching build, `sw.js`, the framework entries in `framework/src/runtime/`, or more than one `games/*/game.js` in the same PR.
 
-- Games import `framework/dist/runtime.js`. The combined `alefbet.js`/UMD entry remains for compatibility. Runtime must not statically import editor UI or zod; saved content belongs to core. Game-owned `editor.content` contracts define round creation, validation, and optional version migrations.
+- Games import `framework/dist/runtime.js` (or `common.js`). There is no combined `alefbet.js`/UMD bundle any more. Runtime must not statically import editor UI or zod; saved content belongs to core. Game-owned `editor.content` contracts define round creation, validation, and optional version migrations.
 - One step per branch. `npm run verify` must pass. Merge to `main` so Pages stays shippable.
 - Do **not** start with a Vite multi-page rewrite of the site. That is step 5, last on purpose.
 - Do **not** convert runtime JS to TypeScript "while the file is open". Separate PR, never required.
@@ -33,7 +33,6 @@ framework/src/
   styles/    alefbet.css
   runtime/index.ts  public gameplay API
   editor/index.ts   optional editor API
-  index.ts         compatibility re-exports
   __tests__/ vitest suites
 
 games/<name>/     index.html + game.js + game.css  (single-screen games)
@@ -45,7 +44,7 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 
 ## Build contract
 
-- Games load `../../framework/dist/runtime.js` and `runtime.css` (committed artifacts). The legacy bundle is still built for compatibility.
+- Games load `../../framework/dist/runtime.js` and `runtime.css` (committed artifacts).
 - The runtime build generates `runtime-assets.js` from static dependencies and `release-manifest.js` with content hashes for deployed assets. Editor JS/CSS load only on request; every cached asset must match the active release. Updates activate after old tabs close.
 - Saved content loads independently of editor UI. Preserve the existing `alefbet.editor.*` keys.
 - **After editing site code or assets, run `npm run build`** to rebuild the framework and release manifest. `framework/dist/` is committed on purpose so games open without a build step. Un-committing it is migration step 5, not a drive-by.
@@ -59,14 +58,14 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 - `npm run lint` — ESLint over the whole repo (config: `eslint.config.js`).
 - `npm run typecheck` — `tsc --noEmit` over `framework/src/`. `checkJs` is on, so JSDoc types are checked.
 - `npm test` — vitest suites in `framework/src/__tests__/`.
-- `npm run build` — clean and rebuild both bundles in `framework/dist/`; removes obsolete chunks.
+- `npm run build` — clean and rebuild `framework/dist/` (runtime, common, editor) and the release manifest; removes obsolete chunks.
 - `npm run e2e -- e2e/math.spec.js` — rebuild and run a focused browser test.
 - `npm run verify:ci` — full verification plus a check for modified, staged or untracked dist files. Commit regenerated artifacts before running this CI-only check.
 - Browser traces are saved under `test-results/games/`.
 
 ## Conventions
 
-- **JavaScript by default.** The small number of TypeScript files in `framework/src/editor/` + `framework/src/index.ts` exist because the editor uses zod schemas that emit types; don't spread TS elsewhere without reason.
+- **JavaScript by default.** The small number of TypeScript files in `framework/src/editor/` and a few `core`/`runtime` files exist because the editor uses zod schemas that emit types; don't spread TS elsewhere without reason.
 - **JSDoc types** on framework JS files — `tsc --noEmit` type-checks them via `checkJs: true`. Add `@param`, `@returns`, and `@template` where it helps the type-check.
 - Vite's resolver maps `.js` imports to `.ts` files, so importers always write `./foo.js` regardless of the target's extension.
 - **Named exports only** — no default exports anywhere.
