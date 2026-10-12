@@ -1,8 +1,90 @@
-import { g as U, b as j, l as F, G as W } from "./drag-NEBgUr1u.js";
-import { c as Ae, a as xe, e as Me, p as Ne, u as $e } from "./drag-NEBgUr1u.js";
-const C = "alefbet-audio-status-banner";
-function B(t) {
-  switch (t) {
+let C = null;
+function ie() {
+  return typeof window > "u" ? null : window.AudioContext || /** @type {any} */
+  window.webkitAudioContext || null;
+}
+function P() {
+  const e = ie();
+  if (!e) return null;
+  if (!C)
+    try {
+      C = new e();
+    } catch {
+      return null;
+    }
+  return C;
+}
+async function Fe() {
+  const e = P();
+  if (!e) return !1;
+  try {
+    e.state === "suspended" && await e.resume();
+  } catch {
+  }
+  try {
+    const t = e.createBuffer(1, 1, e.sampleRate || 44100), n = e.createBufferSource();
+    n.buffer = t, n.connect(e.destination), n.start(0);
+  } catch {
+  }
+  return e.state === "running";
+}
+async function oe() {
+  const e = P();
+  if (!e) return null;
+  if (e.state === "suspended")
+    try {
+      await e.resume();
+    } catch {
+    }
+  return e.state === "running" ? e : null;
+}
+function ae(e) {
+  return typeof e.arrayBuffer == "function" ? e.arrayBuffer() : new Promise((t, n) => {
+    const r = new FileReader();
+    r.onload = () => t(
+      /** @type {ArrayBuffer} */
+      r.result
+    ), r.onerror = () => n(r.error), r.readAsArrayBuffer(e);
+  });
+}
+async function Xe(e, { signal: t } = {}) {
+  if (t != null && t.aborted || !e) return !1;
+  const n = await oe();
+  if (t != null && t.aborted || !n || typeof n.decodeAudioData != "function") return !1;
+  let r;
+  try {
+    const s = await ae(e);
+    r = await new Promise((i, o) => {
+      const a = n.decodeAudioData(s, i, o);
+      a && typeof a.then == "function" && a.then(i, o);
+    });
+  } catch {
+    return !1;
+  }
+  return t != null && t.aborted ? !1 : new Promise((s) => {
+    let i, o, a = !1;
+    const d = (l) => {
+      if (!a) {
+        if (a = !0, clearTimeout(o), t == null || t.removeEventListener("abort", c), i) {
+          i.onended = null;
+          try {
+            i.stop(), i.disconnect();
+          } catch {
+          }
+        }
+        s(l);
+      }
+    }, c = () => d(!1);
+    try {
+      i = n.createBufferSource(), i.buffer = r, i.connect(n.destination), i.onended = () => d(!0), t == null || t.addEventListener("abort", c, { once: !0 }), o = setTimeout(() => d(!0), (r.duration + 0.5) * 1e3), i.start(0);
+    } catch {
+      d(!1);
+    }
+  });
+}
+const B = "alefbet-audio-status-banner";
+function de(e) {
+  switch (e) {
     case "awaiting-interaction":
       return { message: "הַקֵּשׁ כְּדֵי לְהַפְעִיל קוֹל", kind: "await" };
     case "unsupported":
@@ -13,76 +95,76 @@ function B(t) {
       return null;
   }
 }
-function pe(t = typeof document < "u" ? document.body : null, e = {}) {
-  const n = e.window || (typeof window < "u" ? window : null);
-  if (!t || !n)
+function Ue(e = typeof document < "u" ? document.body : null, t = {}) {
+  const n = t.window || (typeof window < "u" ? window : null);
+  if (!e || !n)
     return { destroy() {
     } };
-  const s = t.querySelector("#" + C);
-  s && s.parentNode && s.parentNode.removeChild(s);
-  const r = t.ownerDocument.createElement("div");
-  r.id = C, r.className = "alefbet-audio-banner", r.setAttribute("role", "status"), r.setAttribute("aria-live", "polite"), r.dir = "rtl", r.hidden = !0;
-  const o = t.ownerDocument.createElement("span");
-  o.className = "alefbet-audio-banner__msg", r.appendChild(o);
-  const a = t.ownerDocument.createElement("button");
-  a.type = "button", a.className = "alefbet-audio-banner__dismiss", a.setAttribute("aria-label", "סְגוֹר הוֹדָעָה"), a.textContent = "×", a.hidden = !0, r.appendChild(a), t.appendChild(r);
-  let i = null;
+  const r = e.querySelector("#" + B);
+  r && r.parentNode && r.parentNode.removeChild(r);
+  const s = e.ownerDocument.createElement("div");
+  s.id = B, s.className = "alefbet-audio-banner", s.setAttribute("role", "status"), s.setAttribute("aria-live", "polite"), s.dir = "rtl", s.hidden = !0;
+  const i = e.ownerDocument.createElement("span");
+  i.className = "alefbet-audio-banner__msg", s.appendChild(i);
+  const o = e.ownerDocument.createElement("button");
+  o.type = "button", o.className = "alefbet-audio-banner__dismiss", o.setAttribute("aria-label", "סְגוֹר הוֹדָעָה"), o.textContent = "×", o.hidden = !0, s.appendChild(o), e.appendChild(s);
+  let a = null;
+  function d() {
+    a && (clearTimeout(a), a = null);
+  }
   function c() {
-    i && (clearTimeout(i), i = null);
+    d(), s.hidden = !0, s.classList.remove("is-visible", "is-await", "is-unsupported", "is-failed"), s.onclick = null, o.hidden = !0;
   }
-  function u() {
-    c(), r.hidden = !0, r.classList.remove("is-visible", "is-await", "is-unsupported", "is-failed"), r.onclick = null, a.hidden = !0;
-  }
-  function l(f) {
-    const d = B(f);
-    if (!d) {
-      u();
+  function l(m) {
+    const u = de(m);
+    if (!u) {
+      c();
       return;
     }
-    c(), o.textContent = d.message, r.hidden = !1, r.classList.add("is-visible"), r.classList.toggle("is-await", d.kind === "await"), r.classList.toggle("is-unsupported", d.kind === "unsupported"), r.classList.toggle("is-failed", d.kind === "failed"), d.kind, d.kind === "await" ? (r.onclick = () => {
+    d(), i.textContent = u.message, s.hidden = !1, s.classList.add("is-visible"), s.classList.toggle("is-await", u.kind === "await"), s.classList.toggle("is-unsupported", u.kind === "unsupported"), s.classList.toggle("is-failed", u.kind === "failed"), u.kind, u.kind === "await" ? (s.onclick = () => {
       try {
-        t.ownerDocument.body.dispatchEvent(new MouseEvent("pointerdown", { bubbles: !0 }));
+        e.ownerDocument.body.dispatchEvent(new MouseEvent("pointerdown", { bubbles: !0 }));
       } catch {
       }
-      u();
-    }, a.hidden = !0) : d.kind === "unsupported" ? (r.onclick = null, a.hidden = !1, a.onclick = (h) => {
-      h.stopPropagation(), u();
-    }) : d.kind === "failed" && (r.onclick = null, a.hidden = !0, i = setTimeout(() => u(), 6e3));
+      c();
+    }, o.hidden = !0) : u.kind === "unsupported" ? (s.onclick = null, o.hidden = !1, o.onclick = (h) => {
+      h.stopPropagation(), c();
+    }) : u.kind === "failed" && (s.onclick = null, o.hidden = !0, a = setTimeout(() => c(), 6e3));
   }
-  function m(f) {
-    const h = /** @type {CustomEvent} */ (f.detail || {}).state;
+  function f(m) {
+    const h = /** @type {CustomEvent} */ (m.detail || {}).state;
     if (h === "ready" || h === "idle") {
-      u();
+      c();
       return;
     }
     l(h);
   }
-  return n.addEventListener("alefbet:tts-state", m), {
+  return n.addEventListener("alefbet:tts-state", f), {
     destroy() {
-      n.removeEventListener("alefbet:tts-state", m), c(), r.parentNode && r.parentNode.removeChild(r);
+      n.removeEventListener("alefbet:tts-state", f), d(), s.parentNode && s.parentNode.removeChild(s);
     }
   };
 }
-class X {
+class ue {
   constructor() {
     this._handlers = {};
   }
   /** הירשם לאירוע */
-  on(e, n) {
-    return this._handlers[e] || (this._handlers[e] = []), this._handlers[e].push(n), this;
+  on(t, n) {
+    return this._handlers[t] || (this._handlers[t] = []), this._handlers[t].push(n), this;
   }
   /** בטל הרשמה לאירוע */
-  off(e, n) {
-    return this._handlers[e] ? (this._handlers[e] = this._handlers[e].filter((s) => s !== n), this) : this;
+  off(t, n) {
+    return this._handlers[t] ? (this._handlers[t] = this._handlers[t].filter((r) => r !== n), this) : this;
   }
   /** שלח אירוע */
-  emit(e, n) {
-    return (this._handlers[e] || []).slice().forEach((s) => s(n)), this;
+  emit(t, n) {
+    return (this._handlers[t] || []).slice().forEach((r) => r(n)), this;
   }
 }
-class Y {
-  constructor(e) {
-    this._totalRounds = e, this._currentRound = 0, this._score = 0;
+class ce {
+  constructor(t) {
+    this._totalRounds = t, this._currentRound = 0, this._score = 0;
   }
   get currentRound() {
     return this._currentRound;
@@ -94,8 +176,8 @@ class Y {
     return this._totalRounds;
   }
   /** הוסף ניקוד */
-  addScore(e) {
-    this._score += e;
+  addScore(t) {
+    this._score += t;
   }
   /** עבור לסיבוב הבא. מחזיר false אם המשחק הסתיים */
   nextRound() {
@@ -113,57 +195,57 @@ class Y {
     return this._currentRound >= this._totalRounds;
   }
 }
-const K = "alefbet-zoom-lock", L = /* @__PURE__ */ new WeakSet();
-function S(t) {
-  t.cancelable && t.preventDefault();
+const le = "alefbet-zoom-lock", F = /* @__PURE__ */ new WeakSet();
+function $(e) {
+  e.cancelable && e.preventDefault();
 }
-function V(t) {
-  const e = (
+function fe(e) {
+  const t = (
     /** @type {TouchEvent} */
-    t.touches
+    e.touches
   );
-  e && e.length > 1 && S(t);
+  t && t.length > 1 && $(e);
 }
-function Z(t = typeof document < "u" ? document : null) {
-  if (!t || L.has(t)) return !1;
-  L.add(t), t.documentElement.classList.add(K);
-  const e = { passive: !1 };
-  return t.addEventListener("gesturestart", S, e), t.addEventListener("gesturechange", S, e), t.addEventListener("touchmove", V, e), !0;
+function he(e = typeof document < "u" ? document : null) {
+  if (!e || F.has(e)) return !1;
+  F.add(e), e.documentElement.classList.add(le);
+  const t = { passive: !1 };
+  return e.addEventListener("gesturestart", $, t), e.addEventListener("gesturechange", $, t), e.addEventListener("touchmove", fe, t), !0;
 }
-const y = /* @__PURE__ */ new WeakMap();
-function H(t) {
-  var e;
-  (e = y.get(t)) == null || e.end();
+const S = /* @__PURE__ */ new WeakMap();
+function J(e) {
+  var t;
+  (t = S.get(e)) == null || t.end();
 }
-class J {
+class me {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
    */
-  constructor(e, n = {}) {
-    H(e), y.set(e, this), this.ended = !1, this._timers = /* @__PURE__ */ new Set(), this.container = e, this.config = {
+  constructor(t, n = {}) {
+    J(t), S.set(t, this), this.ended = !1, this._timers = /* @__PURE__ */ new Set(), this.container = t, this.config = {
       totalRounds: 8,
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
       ...n
-    }, this.events = new X(), this.state = new Y(this.config.totalRounds), this.gameId = typeof n.gameId == "string" ? n.gameId : "", this._buildShell();
+    }, this.events = new ue(), this.state = new ce(this.config.totalRounds), this.gameId = typeof n.gameId == "string" ? n.gameId : "", this._buildShell();
   }
   _buildShell() {
-    this.container.classList.add("alefbet-game"), Z(this.container.ownerDocument);
-    const e = this.config.homeUrl ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>` : '<div class="game-header__spacer"></div>';
+    this.container.classList.add("alefbet-game"), he(this.container.ownerDocument);
+    const t = this.config.homeUrl ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>` : '<div class="game-header__spacer"></div>';
     this.container.innerHTML = `
       <div class="game-header">
         <div class="game-header__spacer"></div>
         <h1 class="game-title"></h1>
-        ${e}
+        ${t}
       </div>
       <div class="game-body"></div>
       <div class="game-footer"></div>
     `, this.titleEl = this.container.querySelector(".game-title"), this.bodyEl = this.container.querySelector(".game-body"), this.footerEl = this.container.querySelector(".game-footer"), this.setTitle(this.config.title);
   }
   /** עדכן את כותרת המשחק */
-  setTitle(e) {
-    this.titleEl.textContent = e;
+  setTitle(t) {
+    this.titleEl.textContent = t;
   }
   /** התחל את המשחק */
   start() {
@@ -172,36 +254,36 @@ class J {
   /** עבור לסיבוב הבא */
   nextRound() {
     if (this.ended) return !1;
-    const e = this.state.nextRound();
-    return e ? this.events.emit("round", { state: this.state }) : this.end(this.state.score), e;
+    const t = this.state.nextRound();
+    return t ? this.events.emit("round", { state: this.state }) : this.end(this.state.score), t;
   }
   /** סיים את המשחק */
-  end(e = this.state.score) {
+  end(t = this.state.score) {
     if (!this.ended) {
       this.ended = !0;
       for (const n of this._timers) clearTimeout(n);
-      this._timers.clear(), y.get(this.container) === this && y.delete(this.container), this.events.emit("end", { score: e, state: this.state });
+      this._timers.clear(), S.get(this.container) === this && S.delete(this.container), this.events.emit("end", { score: t, state: this.state });
     }
   }
   /** פעולה מושהית מתבטלת אוטומטית בסיום או בהפעלה מחדש. */
-  schedule(e, n) {
+  schedule(t, n) {
     if (this.ended) return;
-    const s = setTimeout(() => {
-      this._timers.delete(s), this.ended || e();
+    const r = setTimeout(() => {
+      this._timers.delete(r), this.ended || t();
     }, n);
-    this._timers.add(s);
+    this._timers.add(r);
   }
   /** המתנה מתבטלת בסיום; false אומר שאין להמשיך בפעולה. */
-  delay(e) {
+  delay(t) {
     return new Promise((n) => {
       if (this.ended) {
         n(!1);
         return;
       }
-      const s = () => n(!1);
-      this.events.on("end", s), this.schedule(() => {
-        this.events.off("end", s), n(!0);
-      }, e);
+      const r = () => n(!1);
+      this.events.on("end", r), this.schedule(() => {
+        this.events.off("end", r), n(!0);
+      }, t);
     });
   }
   /** קבל את מצב המשחק הנוכחי */
@@ -209,49 +291,49 @@ class J {
     return this.state;
   }
   /** הירשם לאירועי מחזור החיים: start, round, end */
-  on(e, n) {
-    return this.events.on(e, n), this;
+  on(t, n) {
+    return this.events.on(t, n), this;
   }
 }
-function ye(t) {
-  const e = [...t];
-  for (let n = e.length - 1; n > 0; n--) {
-    const s = Math.floor(Math.random() * (n + 1));
-    [e[n], e[s]] = [e[s], e[n]];
+function je(e) {
+  const t = [...e];
+  for (let n = t.length - 1; n > 0; n--) {
+    const r = Math.floor(Math.random() * (n + 1));
+    [t[n], t[r]] = [t[r], t[n]];
   }
-  return e;
+  return t;
 }
-function Q() {
-  const t = U();
-  return t ? (t.state === "suspended" && t.resume(), t) : null;
+function pe() {
+  const e = P();
+  return e ? (e.state === "suspended" && e.resume(), e) : null;
 }
-function g(t, e, n = "sine", s = 0.3) {
-  const r = Q();
-  if (r)
+function w(e, t, n = "sine", r = 0.3) {
+  const s = pe();
+  if (s)
     try {
-      const o = r.createOscillator(), a = r.createGain();
-      o.connect(a), a.connect(r.destination), o.type = n, o.frequency.setValueAtTime(t, r.currentTime), a.gain.setValueAtTime(s, r.currentTime), a.gain.exponentialRampToValueAtTime(1e-3, r.currentTime + e), o.start(r.currentTime), o.stop(r.currentTime + e + 0.05);
+      const i = s.createOscillator(), o = s.createGain();
+      i.connect(o), o.connect(s.destination), i.type = n, i.frequency.setValueAtTime(e, s.currentTime), o.gain.setValueAtTime(r, s.currentTime), o.gain.exponentialRampToValueAtTime(1e-3, s.currentTime + t), i.start(s.currentTime), i.stop(s.currentTime + t + 0.05);
     } catch {
     }
 }
-const v = {
+const L = {
   /** צליל תשובה נכונה */
   correct() {
-    g(523.25, 0.15), setTimeout(() => g(659.25, 0.2), 120), setTimeout(() => g(783.99, 0.3), 240);
+    w(523.25, 0.15), setTimeout(() => w(659.25, 0.2), 120), setTimeout(() => w(783.99, 0.3), 240);
   },
   /** צליל עידוד עדין — נסה שוב */
   wrong() {
-    g(350, 0.15, "triangle", 0.12);
+    w(350, 0.15, "triangle", 0.12);
   },
   /** צליל עידוד - סיום מוצלח */
   cheer() {
-    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((e, n) => setTimeout(() => g(e, 0.2), n * 90));
+    [523.25, 587.33, 659.25, 698.46, 783.99, 1046.5].forEach((t, n) => setTimeout(() => w(t, 0.2), n * 90));
   },
   /** קליק עדין */
   click() {
-    g(900, 0.04, "sine", 0.12);
+    w(900, 0.04, "sine", 0.12);
   }
-}, A = {
+}, X = {
   shake: [
     { transform: "translateX(0)" },
     { transform: "translateX(-8px)" },
@@ -282,179 +364,208 @@ const v = {
     { transform: "scale(1.3) rotate(180deg)", opacity: "1" },
     { transform: "scale(1) rotate(360deg)", opacity: "1" }
   ]
-}, ee = {
+}, ge = {
   shake: 420,
   bounce: 480,
   pulse: 600,
   fadeIn: 320,
   confetti: 700
 };
-function _(t, e) {
-  !t || !A[e] || t.animate(A[e], {
-    duration: ee[e] || 400,
+function x(e, t) {
+  !e || !X[t] || e.animate(X[t], {
+    duration: ge[t] || 400,
     easing: "ease-in-out",
     fill: "none"
   });
 }
-const te = "alefbet.progress.v1", k = j(te, {});
-function D(t, e) {
-  if (!Number.isFinite(t) || !Number.isFinite(e) || e <= 0) return 1;
-  const n = t / e;
+function z(e, t) {
+  const n = [];
+  function r() {
+    try {
+      const a = localStorage.getItem(e);
+      return a === null ? t : JSON.parse(a);
+    } catch {
+      return t;
+    }
+  }
+  function s(a) {
+    try {
+      localStorage.setItem(e, JSON.stringify(a));
+    } catch (d) {
+      return console.warn(`[createLocalState] שגיאה בשמירת "${e}":`, d), !1;
+    }
+    return n.forEach((d) => d(a)), !0;
+  }
+  function i(a) {
+    return s(a(r()));
+  }
+  function o(a) {
+    return n.push(a), function() {
+      const c = n.indexOf(a);
+      c !== -1 && n.splice(c, 1);
+    };
+  }
+  return { get: r, set: s, update: i, subscribe: o };
+}
+const _e = "alefbet.progress.v1", O = z(_e, {});
+function K(e, t) {
+  if (!Number.isFinite(e) || !Number.isFinite(t) || t <= 0) return 1;
+  const n = e / t;
   return n >= 0.8 ? 3 : n >= 0.5 ? 2 : 1;
 }
-function ne(t, { score: e, total: n }) {
-  if (!t || !Number.isFinite(e) || !Number.isFinite(n) || n <= 0) return null;
-  const s = D(e, n);
-  let r = null;
-  return k.update((o) => {
-    const a = o[t];
-    return r = {
-      plays: ((a == null ? void 0 : a.plays) ?? 0) + 1,
-      bestScore: Math.max((a == null ? void 0 : a.bestScore) ?? 0, e),
-      bestStars: Math.max((a == null ? void 0 : a.bestStars) ?? 0, s),
-      total: a && (a.bestScore ?? 0) > e ? a.total : n,
+function be(e, { score: t, total: n }) {
+  if (!e || !Number.isFinite(t) || !Number.isFinite(n) || n <= 0) return null;
+  const r = K(t, n);
+  let s = null;
+  return O.update((i) => {
+    const o = i[e];
+    return s = {
+      plays: ((o == null ? void 0 : o.plays) ?? 0) + 1,
+      bestScore: Math.max((o == null ? void 0 : o.bestScore) ?? 0, t),
+      bestStars: Math.max((o == null ? void 0 : o.bestStars) ?? 0, r),
+      total: o && (o.bestScore ?? 0) > t ? o.total : n,
       lastPlayed: Date.now()
-    }, { ...o, [t]: r };
-  }), r;
+    }, { ...i, [e]: s };
+  }), s;
 }
-function _e(t) {
-  return k.get()[t] ?? null;
+function Ge(e) {
+  return O.get()[e] ?? null;
 }
-function ve() {
-  return k.get();
+function Ye() {
+  return O.get();
 }
-function re(t, e, n, s, r = {}) {
-  v.cheer(), r.gameId && ne(r.gameId, { score: e, total: n });
-  const o = r.completionOnly ? n === 1 ? "הִשְׁלַמְתֶּם מְשִׂימָה!" : `הִשְׁלַמְתֶּם ${n} מְשִׂימוֹת!` : `נִיקּוּד: ${e} מִתּוֹךְ ${n}`, a = D(e, n), i = "⭐".repeat(a) + "☆".repeat(3 - a), c = document.createElement("div");
-  c.className = "completion-screen", c.innerHTML = `
+function ye(e, t, n, r, s = {}) {
+  L.cheer(), s.gameId && be(s.gameId, { score: t, total: n });
+  const i = s.completionOnly ? n === 1 ? "הִשְׁלַמְתֶּם מְשִׂימָה!" : `הִשְׁלַמְתֶּם ${n} מְשִׂימוֹת!` : `נִיקּוּד: ${t} מִתּוֹךְ ${n}`, o = K(t, n), a = "⭐".repeat(o) + "☆".repeat(3 - o), d = document.createElement("div");
+  d.className = "completion-screen", d.innerHTML = `
     <div class="completion-screen__content">
-      <div class="completion-screen__stars" aria-label="${a} כּוֹכָבִים">${i}</div>
+      <div class="completion-screen__stars" aria-label="${o} כּוֹכָבִים">${a}</div>
       <h2 class="completion-screen__title">כָּל הַכָּבוֹד!</h2>
-      <p class="completion-screen__score">${o}</p>
+      <p class="completion-screen__score">${i}</p>
       <div class="completion-screen__actions">
         <button class="completion-screen__replay btn btn--primary">שַׂחֵק שׁוּב</button>
       </div>
     </div>
   `;
-  const u = r.homeUrl === void 0 ? "../../index.html" : r.homeUrl;
-  if (u) {
+  const c = s.homeUrl === void 0 ? "../../index.html" : s.homeUrl;
+  if (c) {
     const l = document.createElement("a");
-    l.className = "completion-screen__home btn", l.href = u, l.textContent = "בְּחִירַת מִשְׂחָק", c.querySelector(".completion-screen__actions").appendChild(l);
+    l.className = "completion-screen__home btn", l.href = c, l.textContent = "בְּחִירַת מִשְׂחָק", d.querySelector(".completion-screen__actions").appendChild(l);
   }
-  c.querySelector(".completion-screen__replay").addEventListener("click", () => {
-    c.remove(), s();
-  }), t.innerHTML = "", t.appendChild(c), _(c.querySelector(".completion-screen__content"), "fadeIn");
+  d.querySelector(".completion-screen__replay").addEventListener("click", () => {
+    d.remove(), r();
+  }), e.innerHTML = "", e.appendChild(d), x(d.querySelector(".completion-screen__content"), "fadeIn");
 }
-function se(t, e, {
+function we(e, t, {
   totalRounds: n,
-  progressBar: s = null,
-  buildRoundUI: r,
-  onCorrect: o,
-  onWrong: a,
-  transitionMs: i = 800,
-  playCorrectSound: c = !0,
-  completionOnly: u = !1,
+  progressBar: r = null,
+  buildRoundUI: s,
+  onCorrect: i,
+  onWrong: o,
+  transitionMs: a = 800,
+  playCorrectSound: d = !0,
+  completionOnly: c = !1,
   onReplay: l = () => location.reload()
 }) {
-  let m = !1;
-  const f = /* @__PURE__ */ new Set();
-  function d(b) {
-    m = b || t.ended, f.forEach((T) => T(m));
+  let f = !1;
+  const m = /* @__PURE__ */ new Set();
+  function u(p) {
+    f = p || e.ended, m.forEach((q) => q(f));
   }
-  function h(b) {
-    return f.add(b), b(m || t.ended), () => {
-      f.delete(b);
+  function h(p) {
+    return m.add(p), p(f || e.ended), () => {
+      m.delete(p);
     };
   }
-  t.on("end", () => {
-    d(!0), f.clear();
+  e.on("end", () => {
+    u(!0), m.clear();
   });
-  async function q(b) {
-    if (m || t.ended) return;
-    d(!0), c && v.correct();
+  async function y(p) {
+    if (f || e.ended) return;
+    u(!0), d && L.correct();
     try {
-      if (b && await b(), t.ended) return;
-      o && await o();
-    } catch (O) {
-      throw d(!1), O;
+      if (p && await p(), e.ended) return;
+      i && await i();
+    } catch (se) {
+      throw u(!1), se;
     }
-    if (t.ended || (t.state.addScore(1), s == null || s.update(t.state.currentRound), !await t.delay(i))) return;
-    t.nextRound() ? (d(!1), r()) : re(e, t.state.score, n, l, { gameId: t.gameId, completionOnly: u, homeUrl: t.config.homeUrl });
+    if (e.ended || (e.state.addScore(1), r == null || r.update(e.state.currentRound), !await e.delay(a))) return;
+    e.nextRound() ? (u(!1), s()) : ye(t, e.state.score, n, l, { gameId: e.gameId, completionOnly: c, homeUrl: e.config.homeUrl });
   }
-  async function G(b) {
-    if (!(m || t.ended)) {
-      d(!0);
+  async function te(p) {
+    if (!(f || e.ended)) {
+      u(!0);
       try {
-        b && await b(), !t.ended && a && await a();
+        p && await p(), !e.ended && o && await o();
       } finally {
-        d(!1);
+        u(!1);
       }
     }
   }
-  function P() {
-    return m;
+  function ne() {
+    return f;
   }
-  function z() {
-    d(!1);
+  function re() {
+    u(!1);
   }
-  return { handleCorrect: q, handleWrong: G, isAnswered: P, reset: z, subscribe: h };
+  return { handleCorrect: y, handleWrong: te, isAnswered: ne, reset: re, subscribe: h };
 }
-function ae() {
-  const t = new AbortController(), e = /* @__PURE__ */ new Set();
-  function n(s) {
-    t.signal.aborted ? s() : e.add(s);
+function ve() {
+  const e = new AbortController(), t = /* @__PURE__ */ new Set();
+  function n(r) {
+    e.signal.aborted ? r() : t.add(r);
   }
   return {
-    signal: t.signal,
+    signal: e.signal,
     /** @template {(() => void) | { destroy: () => void }} T @param {T} resource @returns {T} */
-    use(s) {
-      return n(typeof s == "function" ? s : () => s.destroy()), s;
+    use(r) {
+      return n(typeof r == "function" ? r : () => r.destroy()), r;
     },
     /** @param {EventTarget} target @param {string} event @param {EventListener} handler @param {AddEventListenerOptions | boolean} [options] */
-    listen(s, r, o, a) {
-      t.signal.aborted || (s.addEventListener(r, o, a), n(() => s.removeEventListener(r, o, a)));
+    listen(r, s, i, o) {
+      e.signal.aborted || (r.addEventListener(s, i, o), n(() => r.removeEventListener(s, i, o)));
     },
-    schedule(s, r) {
-      if (t.signal.aborted) return () => {
+    schedule(r, s) {
+      if (e.signal.aborted) return () => {
       };
-      const o = () => {
-        clearTimeout(a), e.delete(o);
-      }, a = setTimeout(() => {
-        e.delete(o), t.signal.aborted || s();
-      }, r);
-      return n(o), o;
+      const i = () => {
+        clearTimeout(o), t.delete(i);
+      }, o = setTimeout(() => {
+        t.delete(i), e.signal.aborted || r();
+      }, s);
+      return n(i), i;
     },
     dispose() {
-      if (t.signal.aborted) return;
-      t.abort();
-      const s = [...e].reverse();
-      e.clear();
-      for (const r of s)
+      if (e.signal.aborted) return;
+      e.abort();
+      const r = [...t].reverse();
+      t.clear();
+      for (const s of r)
         try {
-          r();
-        } catch (o) {
-          console.warn("Round cleanup failed", o);
+          s();
+        } catch (i) {
+          console.warn("Round cleanup failed", i);
         }
     }
   };
 }
-function oe(t, e) {
+function Ee(e, t) {
   const n = document.createElement("div");
-  n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(e)), n.innerHTML = `
+  n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(t)), n.innerHTML = `
     <div class="progress-bar__track">
       <div class="progress-bar__fill" style="width: 0%"></div>
     </div>
-    <span class="progress-bar__label">0 / ${e}</span>
-  `, t.appendChild(n);
-  const s = (
+    <span class="progress-bar__label">0 / ${t}</span>
+  `, e.appendChild(n);
+  const r = (
     /** @type {HTMLElement} */
     n.querySelector(".progress-bar__fill")
-  ), r = n.querySelector(".progress-bar__label");
+  ), s = n.querySelector(".progress-bar__label");
   return {
     /** עדכן את ההתקדמות */
-    update(o) {
-      const a = Math.round(o / e * 100);
-      s.style.width = `${a}%`, r.textContent = `${o} / ${e}`, n.setAttribute("aria-valuenow", String(o));
+    update(i) {
+      const o = Math.round(i / t * 100);
+      r.style.width = `${o}%`, s.textContent = `${i} / ${t}`, n.setAttribute("aria-valuenow", String(i));
     },
     /** הסר את הרכיב */
     destroy() {
@@ -462,410 +573,573 @@ function oe(t, e) {
     }
   };
 }
-let w = !1, R = !1, p = null;
-const ie = [
+let T = !1, D = !1, E = null;
+const Re = [
   "ResizeObserver loop",
   // אזהרת דפדפן שפירה
   "Script error."
   // שגיאת cross-origin אטומה, לרוב תוסף דפדפן
 ];
-function x(t) {
-  const e = String(t || "");
-  return ie.some((n) => e.includes(n));
+function U(e) {
+  const t = String(e || "");
+  return Re.some((n) => t.includes(n));
 }
-function M() {
-  var e;
-  if (R || typeof document > "u" || !document.body) return;
-  R = !0;
-  const t = document.createElement("div");
-  t.className = "ab-error-screen", t.setAttribute("role", "alert"), t.dir = "rtl", t.innerHTML = `
+function j() {
+  var t;
+  if (D || typeof document > "u" || !document.body) return;
+  D = !0;
+  const e = document.createElement("div");
+  e.className = "ab-error-screen", e.setAttribute("role", "alert"), e.dir = "rtl", e.innerHTML = `
     <div class="ab-error-screen__card">
       <div class="ab-error-screen__emoji">🙈</div>
       <h2 class="ab-error-screen__title">אוֹפְּס! מַשֶּׁהוּ הִשְׁתַּבֵּשׁ</h2>
       <p class="ab-error-screen__text">זֶה לֹא בִּגְלַלְכֶם! לְחִיצָה עַל הַכַּפְתּוֹר תַּחְזִיר אֶת הַמִּשְׂחָק.</p>
       <button type="button" class="btn btn--primary ab-error-screen__reload">לְהַתְחִיל מֵחָדָשׁ</button>
     </div>
-  `, (e = t.querySelector(".ab-error-screen__reload")) == null || e.addEventListener("click", () => {
+  `, (t = e.querySelector(".ab-error-screen__reload")) == null || t.addEventListener("click", () => {
     try {
       location.reload();
     } catch {
     }
-  }), document.body.appendChild(t);
+  }), document.body.appendChild(e);
 }
-function ce() {
+function Se() {
   if (typeof window > "u") return { destroy() {
   } };
-  if (w) return { destroy() {
+  if (T) return { destroy() {
   } };
-  w = !0;
-  const t = (n) => {
-    x(n == null ? void 0 : n.message) || (console.error("[alefbet] uncaught error:", (n == null ? void 0 : n.error) ?? (n == null ? void 0 : n.message)), M());
-  }, e = (n) => {
-    const s = (
+  T = !0;
+  const e = (n) => {
+    U(n == null ? void 0 : n.message) || (console.error("[alefbet] uncaught error:", (n == null ? void 0 : n.error) ?? (n == null ? void 0 : n.message)), j());
+  }, t = (n) => {
+    const r = (
       /** @type {any} */
       n == null ? void 0 : n.reason
     );
-    x((s == null ? void 0 : s.message) ?? s) || (console.error("[alefbet] unhandled rejection:", s), M());
+    U((r == null ? void 0 : r.message) ?? r) || (console.error("[alefbet] unhandled rejection:", r), j());
   };
-  return window.addEventListener("error", t), window.addEventListener("unhandledrejection", e), p = () => {
-    window.removeEventListener("error", t), window.removeEventListener("unhandledrejection", e), w = !1, R = !1;
+  return window.addEventListener("error", e), window.addEventListener("unhandledrejection", t), E = () => {
+    window.removeEventListener("error", e), window.removeEventListener("unhandledrejection", t), T = !1, D = !1;
   }, { destroy: () => {
-    p == null || p(), p = null;
+    E == null || E(), E = null;
   } };
 }
-function le(t, e = "טוֹעֵן...") {
-  t.innerHTML = `<div class="ab-loading">${e}</div>`;
+function xe(e, t = "טוֹעֵן...") {
+  e.innerHTML = `<div class="ab-loading">${t}</div>`;
 }
-function de(t) {
-  t.innerHTML = "";
+function Le(e) {
+  e.innerHTML = "";
 }
-function I(t) {
-  let e = t.querySelector(".adult-tools__panel");
-  if (e) return e;
-  const n = t.querySelector(".game-header");
-  if (!n) return null;
-  const s = document.createElement("details");
-  return s.className = "adult-tools", s.innerHTML = '<summary aria-label="להורים ולמורים">☰<span>למבוגרים</span></summary><div class="adult-tools__panel"><p>להורים ולמורים</p></div>', s.addEventListener("keydown", (r) => {
-    r.key === "Escape" && (s.open = !1, s.querySelector("summary").focus(), r.stopPropagation());
-  }), n.appendChild(s), s.querySelector(".adult-tools__panel");
+function k(e) {
+  return e !== null && typeof e == "object" && !Array.isArray(e);
 }
-function ue(t, e, n) {
-  const s = I(t.container);
-  if (!s) return;
-  const r = document.createElement("div");
-  r.className = "ab-lazy-editor";
-  const o = document.createElement("span");
-  o.setAttribute("role", "status");
-  let a = !1, i = null;
-  async function c() {
-    if (!document.querySelector('link[href$="/runtime.css"]') || document.querySelector("link[data-alefbet-editor]")) return;
-    const l = document.createElement("link");
-    l.rel = "stylesheet";
-    const m = new URL(".", import.meta.url);
-    l.href = new URL("editor.css", m).href, l.dataset.alefbetEditor = "", await new Promise((f, d) => {
-      l.onload = () => f(), l.onerror = () => {
-        l.remove(), d(new Error("Editor styles unavailable"));
-      }, document.head.appendChild(l);
-    });
-  }
-  async function u(l) {
-    if (!(a || t.ended)) {
-      a = !0, o.textContent = "טוֹעֵן...";
-      try {
-        const [m] = await Promise.all([import("./editor.js"), c()]);
-        if (t.ended) return;
-        "serviceWorker" in navigator && navigator.serviceWorker.ready.then((f) => {
-          var d;
-          (d = f.active) == null || d.postMessage({ type: "cache-editor" });
-        }).catch(() => {
-        }), l === "audio" ? m.showAudioManager(e.id, e) : (i = new m.GameEditor(t.container, e, n), await new Promise((f) => requestAnimationFrame(f)), t.ended || (i.enterEditMode(), r.remove())), o.textContent = "";
-      } catch {
-        t.ended || (o.textContent = "לֹא הִצְלַחְנוּ לִטְעֹן אֶת הָעוֹרֵךְ. הִתְחַבְּרוּ לָרֶשֶׁת וְנַסּוּ שׁוּב.");
-      } finally {
-        a = !1;
-      }
+function G(e) {
+  if (!k(e) || typeof e.id != "string" || !e.id || !Array.isArray(e.rounds) || !e.rounds.every(k) || e.meta !== void 0 && !k(e.meta) || e.distractors !== void 0 && !Array.isArray(e.distractors))
+    throw new Error("Invalid game content");
+  const t = e.version ?? 1;
+  if (!Number.isInteger(t) || Number(t) < 1) throw new Error("Invalid content version");
+  const n = /* @__PURE__ */ new Set();
+  for (const r of e.rounds)
+    if (r.id !== void 0) {
+      if (typeof r.id != "string" || !r.id || n.has(r.id)) throw new Error("Invalid round id");
+      n.add(r.id);
     }
-  }
-  for (const [l, m] of [["✏️ ערוך", "edit"], ["🎤 קול", "audio"]]) {
-    const f = document.createElement("button");
-    f.className = "btn", f.textContent = l, f.addEventListener("click", () => {
-      u(m);
-    }), r.appendChild(f);
-  }
-  r.appendChild(o), s.appendChild(r), t.on("end", () => {
-    i == null || i.destroy(), r.remove();
-  });
+  return { ...e, version: t };
 }
-const E = /* @__PURE__ */ new WeakMap();
-async function me(t, e) {
-  var c;
-  H(t);
-  const n = {};
-  if (E.set(t, n), ce(), le(t, e.loadingMessage ?? "טוֹעֵן..."), (c = e.preloadTexts) != null && c.length) {
-    const { preloadNikud: u } = await import("./nakdan-DFzp_6d3.js");
-    await u(e.preloadTexts);
+let Ae = 0;
+function I() {
+  return `round-${Date.now()}-${Ae++}`;
+}
+class A {
+  // redo stack
+  constructor(t, n) {
+    this._contract = n, this._id = t.id ?? "game", this._version = t.version ?? 1, this._meta = { title: "", type: "multiple-choice", ...t.meta ?? {} }, this._rounds = (t.rounds ?? []).map((r) => ({ ...r, id: r.id || I() })), this._distractors = t.distractors ?? [], this._handlers = [], this._past = [], this._future = [];
   }
-  const s = e.audio !== !1 ? await import("./game-audio-CIXXhVEq.js").then((u) => u.e) : null;
-  if (E.get(t) !== n)
-    return { shell: null, activeRounds: [], gameData: null, aborted: !0 };
-  if (e.onBeforeHide && (await e.onBeforeHide() === !1 || E.get(t) !== n))
-    return { shell: null, activeRounds: [], gameData: null, aborted: !0 };
-  de(t);
-  const r = e.editor ? F(e.gameId, e.editor.content) : null, o = r != null && r.rounds.length ? r.rounds : e.defaultRounds ?? [], a = new J(t, {
-    totalRounds: e.totalRounds ?? o.length,
-    title: e.title,
-    gameId: e.gameId
-  });
-  s == null || s.attachGameAudio(a);
-  let i = null;
-  if (e.editor) {
-    const u = {
-      title: e.editor.title ?? e.title,
-      type: e.editor.type ?? "multiple-choice"
+  // ── Identity ──────────────────────────────────────────────────────────────
+  get id() {
+    return this._id;
+  }
+  get meta() {
+    return { ...this._meta };
+  }
+  get distractors() {
+    return [...this._distractors];
+  }
+  // ── Rounds (read) ─────────────────────────────────────────────────────────
+  get rounds() {
+    return [...this._rounds];
+  }
+  getRound(t) {
+    return this._rounds.find((n) => n.id === t) ?? null;
+  }
+  getRoundIndex(t) {
+    return this._rounds.findIndex((n) => n.id === t);
+  }
+  // ── Rounds (write) ────────────────────────────────────────────────────────
+  updateRound(t, n) {
+    const r = this.getRoundIndex(t);
+    r !== -1 && (this._saveHistory(), this._rounds[r] = { ...this._rounds[r], ...n }, this._emit());
+  }
+  addRound(t = null) {
+    var r;
+    this._saveHistory();
+    const n = { ...(r = this._contract) == null ? void 0 : r.createRound(), id: I() };
+    if (t === null)
+      this._rounds.push(n);
+    else {
+      const s = this.getRoundIndex(t);
+      this._rounds.splice(s + 1, 0, n);
+    }
+    return this._emit(), n.id;
+  }
+  duplicateRound(t) {
+    const n = this.getRound(t);
+    if (!n) return null;
+    this._saveHistory();
+    const r = { ...n, id: I() };
+    return this._rounds.splice(this.getRoundIndex(t) + 1, 0, r), this._emit(), r.id;
+  }
+  removeRound(t) {
+    const n = this.getRoundIndex(t);
+    n === -1 || this._rounds.length <= 1 || (this._saveHistory(), this._rounds.splice(n, 1), this._emit());
+  }
+  moveRound(t, n) {
+    const r = this.getRoundIndex(t);
+    if (r === -1) return;
+    this._saveHistory();
+    const [s] = this._rounds.splice(r, 1);
+    this._rounds.splice(Math.max(0, Math.min(n, this._rounds.length)), 0, s), this._emit();
+  }
+  // ── Undo / Redo ───────────────────────────────────────────────────────────
+  get canUndo() {
+    return this._past.length > 0;
+  }
+  get canRedo() {
+    return this._future.length > 0;
+  }
+  undo() {
+    this.canUndo && (this._future.push(this._snapshot()), this._rounds = this._past.pop(), this._emit());
+  }
+  redo() {
+    this.canRedo && (this._past.push(this._snapshot()), this._rounds = this._future.pop(), this._emit());
+  }
+  _saveHistory() {
+    this._past.push(this._snapshot()), this._future = [], this._past.length > 50 && this._past.shift();
+  }
+  _snapshot() {
+    return this._rounds.map((t) => ({ ...t }));
+  }
+  // ── Change events ─────────────────────────────────────────────────────────
+  onChange(t) {
+    return this._handlers.push(t), () => this.offChange(t);
+  }
+  offChange(t) {
+    const n = this._handlers.indexOf(t);
+    n !== -1 && this._handlers.splice(n, 1);
+  }
+  _emit() {
+    this._handlers.forEach((t) => t(this));
+  }
+  // ── Serialisation ─────────────────────────────────────────────────────────
+  toJSON() {
+    return {
+      id: this._id,
+      version: this._version,
+      meta: { ...this._meta },
+      rounds: this._snapshot(),
+      distractors: [...this._distractors]
     };
-    i = W.fromRoundsArray(e.gameId, o, u, e.editor.distractors ?? [], e.editor.content), ue(a, i, { restartGame: e.editor.restartGame });
   }
-  return { shell: a, activeRounds: o, gameData: i, aborted: !1 };
+  validate() {
+    return !this._contract || this._rounds.every((t) => this._contract.validateRound(t));
+  }
+  static fromJSON(t, n) {
+    let r = G(t);
+    const s = (n == null ? void 0 : n.version) ?? 1;
+    if (r.version < s && (n != null && n.migrate)) {
+      const o = r.id;
+      if (r = G(n.migrate(r)), r.id !== o) throw new Error("Migration changed game identity");
+    }
+    if (r.version !== s) throw new Error("Unsupported content version");
+    const i = new A(r, n);
+    if (!i.validate()) throw new Error("Invalid round content");
+    return i;
+  }
+  static fromRoundsArray(t, n, r = {}, s = [], i) {
+    return new A({ id: t, meta: r, rounds: n, distractors: s, version: (i == null ? void 0 : i.version) ?? 1 }, i);
+  }
 }
-async function fe(t, e) {
-  const n = await me(t, e);
-  if (n.aborted) return n;
-  const { shell: s, activeRounds: r } = n;
-  if (!r.length)
-    return s.bodyEl.textContent = "אֵין סִבּוּבִים לַמִּשְׂחָק.", s.end(), n;
-  const o = oe(s.footerEl, r.length);
-  let a;
-  const i = () => {
-    a == null || a.dispose(), a = void 0;
-  }, c = se(s, t, {
-    totalRounds: r.length,
-    completionOnly: !0,
-    progressBar: o,
-    transitionMs: e.transitionMs,
-    playCorrectSound: e.playCorrectSound,
-    onReplay: e.onReplay ?? (() => {
-      fe(t, e);
-    }),
-    buildRoundUI: u
+const Ce = "alefbet.editor.";
+function Te(e) {
+  return z(`${Ce}${e}`, null);
+}
+function ke(e, t) {
+  const n = Te(e).get();
+  if (!n) return null;
+  try {
+    const r = A.fromJSON(n, t);
+    return r.id === e ? r : null;
+  } catch {
+    return null;
+  }
+}
+const N = /* @__PURE__ */ new WeakMap();
+async function Ie(e, t) {
+  var a;
+  J(e);
+  const n = {};
+  if (N.set(e, n), Se(), xe(e, t.loadingMessage ?? "טוֹעֵן..."), (a = t.preloadTexts) != null && a.length) {
+    const { preloadNikud: d } = await import("./nakdan-DFzp_6d3.js");
+    await d(t.preloadTexts);
+  }
+  const r = t.audio !== !1 ? await import("./game-audio-DWDnzTwh.js").then((d) => d.e) : null;
+  if (N.get(e) !== n)
+    return { shell: null, activeRounds: [], aborted: !0 };
+  if (t.onBeforeHide && (await t.onBeforeHide() === !1 || N.get(e) !== n))
+    return { shell: null, activeRounds: [], aborted: !0 };
+  Le(e);
+  const s = t.editor ? ke(t.gameId, t.editor.content) : null, i = s != null && s.rounds.length ? s.rounds : t.defaultRounds ?? [], o = new me(e, {
+    totalRounds: t.totalRounds ?? i.length,
+    title: t.title,
+    gameId: t.gameId
   });
-  s.on("end", i), s.on("start", () => {
+  return r == null || r.attachGameAudio(o), { shell: o, activeRounds: i, aborted: !1 };
+}
+async function Ne(e, t) {
+  const n = await Ie(e, t);
+  if (n.aborted) return n;
+  const { shell: r, activeRounds: s } = n;
+  if (!s.length)
+    return r.bodyEl.textContent = "אֵין סִבּוּבִים לַמִּשְׂחָק.", r.end(), n;
+  const i = Ee(r.footerEl, s.length);
+  let o;
+  const a = () => {
+    o == null || o.dispose(), o = void 0;
+  }, d = we(r, e, {
+    totalRounds: s.length,
+    completionOnly: !0,
+    progressBar: i,
+    transitionMs: t.transitionMs,
+    playCorrectSound: t.playCorrectSound,
+    onReplay: t.onReplay ?? (() => {
+      Ne(e, t);
+    }),
+    buildRoundUI: c
+  });
+  r.on("end", a), r.on("start", () => {
     var l;
-    o.update(0), (l = e.onStart) == null || l.call(e, s), c.reset();
-  }), s.on("start", u);
-  function u() {
-    i(), s.bodyEl.innerHTML = "";
-    const l = ae();
-    a = l;
-    const m = () => !s.ended && !l.signal.aborted, f = s.state.currentRound - 1;
+    i.update(0), (l = t.onStart) == null || l.call(t, r), d.reset();
+  }), r.on("start", c);
+  function c() {
+    a(), r.bodyEl.innerHTML = "";
+    const l = ve();
+    o = l;
+    const f = () => !r.ended && !l.signal.aborted, m = r.state.currentRound - 1;
     try {
-      const d = e.buildRound({
-        shell: s,
-        index: f,
-        round: r[f],
-        isActive: m,
+      const u = t.buildRound({
+        shell: r,
+        index: m,
+        round: s[m],
+        isActive: f,
         scope: l,
-        isAnswered: () => !m() || c.isAnswered(),
-        subscribeAnswered: (h) => m() ? l.use(c.subscribe(h)) : (h(!0), () => {
+        isAnswered: () => !f() || d.isAnswered(),
+        subscribeAnswered: (h) => f() ? l.use(d.subscribe(h)) : (h(!0), () => {
         }),
         onCorrect: async (h) => {
-          m() && await c.handleCorrect(h);
+          f() && await d.handleCorrect(h);
         },
         onWrong: async (h) => {
-          m() && await c.handleWrong(h);
+          f() && await d.handleWrong(h);
         },
         schedule: l.schedule
       });
-      d && l.use(d);
-    } catch (d) {
-      throw l.dispose(), d;
+      u && l.use(u);
+    } catch (u) {
+      throw l.dispose(), u;
     }
   }
-  return s.start(), n;
+  return r.start(), n;
 }
-function he(t, e, n) {
-  t.innerHTML = "";
-  const s = document.createElement("div");
-  s.className = "option-cards-grid";
-  const r = e.map((o) => {
-    const a = document.createElement("button");
-    a.className = "option-card", a.dataset.id = o.id, a.type = "button";
-    const i = document.createElement("span");
-    i.className = "option-card__emoji", i.textContent = o.emoji || "";
-    const c = document.createElement("span");
-    return c.className = "option-card__text", c.textContent = o.text, a.append(i, c), a.addEventListener("click", () => {
-      a.disabled || n(o);
-    }), s.appendChild(a), { el: a, option: o };
+function Me(e, t, n) {
+  e.innerHTML = "";
+  const r = document.createElement("div");
+  r.className = "option-cards-grid";
+  const s = t.map((i) => {
+    const o = document.createElement("button");
+    o.className = "option-card", o.dataset.id = i.id, o.type = "button";
+    const a = document.createElement("span");
+    a.className = "option-card__emoji", a.textContent = i.emoji || "";
+    const d = document.createElement("span");
+    return d.className = "option-card__text", d.textContent = i.text, o.append(a, d), o.addEventListener("click", () => {
+      o.disabled || n(i);
+    }), r.appendChild(o), { el: o, option: i };
   });
-  return t.appendChild(s), {
+  return e.appendChild(r), {
     /** הַדָּגֵשׁ כַּרְטִיס לְפִי סוּג: 'correct' | 'wrong' | 'hint' */
-    highlight(o, a) {
-      r.forEach(({ el: i, option: c }) => {
-        c.id === o && i.classList.add(`option-card--${a}`);
+    highlight(i, o) {
+      s.forEach(({ el: a, option: d }) => {
+        d.id === i && a.classList.add(`option-card--${o}`);
       });
     },
     /** Visual hints never change the answer lock or other highlights. */
-    clearHighlight(o, a) {
-      r.forEach(({ el: i, option: c }) => {
-        c.id === o && i.classList.remove(`option-card--${a}`);
+    clearHighlight(i, o) {
+      s.forEach(({ el: a, option: d }) => {
+        d.id === i && a.classList.remove(`option-card--${o}`);
       });
     },
-    setDisabled(o) {
-      r.forEach(({ el: a }) => {
-        a.disabled = o;
+    setDisabled(i) {
+      s.forEach(({ el: o }) => {
+        o.disabled = i;
       });
     },
     /** נטרל את כל הכרטיסים */
     disable() {
-      r.forEach(({ el: o }) => {
-        o.disabled = !0;
+      s.forEach(({ el: i }) => {
+        i.disabled = !0;
       });
     },
     /** אפס את מצב הכרטיסים */
     reset() {
-      r.forEach(({ el: o }) => {
-        o.className = "option-card", o.disabled = !1;
+      s.forEach(({ el: i }) => {
+        i.className = "option-card", i.disabled = !1;
       });
     },
     /** הסר את הרכיב */
     destroy() {
-      t.innerHTML = "";
+      e.innerHTML = "";
     }
   };
 }
-function we(t, e, n) {
-  const s = t.scope.use(he(e, n.options, (r) => {
-    t.isAnswered() || (n.isCorrect(r) ? t.onCorrect(() => {
-      var o;
-      return s.highlight(r.id, "correct"), (o = n.onCorrect) == null ? void 0 : o.call(n, r);
-    }) : t.onWrong(() => {
-      var o;
-      return (o = n.onWrong) == null ? void 0 : o.call(n, r);
+function We(e, t, n) {
+  const r = e.scope.use(Me(t, n.options, (s) => {
+    e.isAnswered() || (n.isCorrect(s) ? e.onCorrect(() => {
+      var i;
+      return r.highlight(s.id, "correct"), (i = n.onCorrect) == null ? void 0 : i.call(n, s);
+    }) : e.onWrong(() => {
+      var i;
+      return (i = n.onWrong) == null ? void 0 : i.call(n, s);
     }));
   }));
-  return t.subscribeAnswered((r) => s.setDisabled(r)), { highlight: s.highlight, clearHighlight: s.clearHighlight };
+  return e.subscribeAnswered((s) => r.setDisabled(s)), { highlight: r.highlight, clearHighlight: r.clearHighlight };
 }
-function Ee({ hintAfter: t = 2, escalateAfter: e = 4, onHint: n, onEscalate: s } = {}) {
-  let r = 0;
-  function o(a) {
-    return a >= e ? 2 : a >= t ? 1 : 0;
+function Je({ hintAfter: e = 2, escalateAfter: t = 4, onHint: n, onEscalate: r } = {}) {
+  let s = 0;
+  function i(o) {
+    return o >= t ? 2 : o >= e ? 1 : 0;
   }
   return {
     /** דיווח על ניסיון שגוי. מפעיל את הקולבק המתאים ומחזיר את הרמה. */
     miss() {
-      r++;
-      const a = o(r);
-      return a === 2 && s ? s(r) : a === 1 && n && n(r), a;
+      s++;
+      const o = i(s);
+      return o === 2 && r ? r(s) : o === 1 && n && n(s), o;
     },
     /** איפוס לקראת סיבוב חדש. */
     reset() {
-      r = 0;
+      s = 0;
     },
     /** רמת העזרה הנוכחית: 0 ללא, 1 רמז עדין, 2 עזרה מוגברת. */
     get level() {
-      return o(r);
+      return i(s);
     },
     /** מספר הניסיונות השגויים בסיבוב הנוכחי. */
     get misses() {
-      return r;
+      return s;
     }
   };
 }
-const N = [
+const Y = [
   "כָּל הַכָּבוֹד",
   "מְצֻיָּן",
   "יֹפִי",
   "נֶהְדָּר",
   "וָאוּ",
   "אֵיזֶה כֵּיף"
-], $ = [
+], W = [
   "נַסּוּ שׁוּב, אַתֶּם יְכוֹלִים",
   "כִּמְעַט! הַקְשִׁיבוּ שׁוּב",
   "עוֹד נִסָּיוֹן קָטָן",
   "קְרוֹבִים מְאֹד"
 ];
-function be() {
-  return N[Math.floor(Math.random() * N.length)];
+function He() {
+  return Y[Math.floor(Math.random() * Y.length)];
 }
-function Se() {
-  return $[Math.floor(Math.random() * $.length)];
+function ze() {
+  return W[Math.floor(Math.random() * W.length)];
 }
-function Re(t) {
-  const e = document.createElement("div");
-  e.className = "feedback-message", e.setAttribute("aria-live", "polite"), e.setAttribute("role", "status"), t.appendChild(e);
+function Ke(e) {
+  const t = document.createElement("div");
+  t.className = "feedback-message", t.setAttribute("aria-live", "polite"), t.setAttribute("role", "status"), e.appendChild(t);
   let n = null;
-  function s(r, o, a = 1800) {
-    clearTimeout(n), e.textContent = r, e.className = `feedback-message feedback-message--${o}`, n = setTimeout(() => {
-      e.textContent = "", e.className = "feedback-message";
-    }, a);
+  function r(s, i, o = 1800) {
+    clearTimeout(n), t.textContent = s, t.className = `feedback-message feedback-message--${i}`, n = setTimeout(() => {
+      t.textContent = "", t.className = "feedback-message";
+    }, o);
   }
   return {
     /** הצג משוב חיובי - טקסט מפורש, או ביטוי שבח אקראי אם לא סופק */
-    correct(r) {
-      v.correct(), s(r ?? `!${be()}`, "correct"), _(e, "bounce");
+    correct(s) {
+      L.correct(), r(s ?? `!${He()}`, "correct"), x(t, "bounce");
     },
     /** הצג עידוד — נסה שוב */
-    wrong(r = "נַסֵּה שׁוּב") {
-      v.wrong(), s(r, "wrong"), _(e, "pulse");
+    wrong(s = "נַסֵּה שׁוּב") {
+      L.wrong(), r(s, "wrong"), x(t, "pulse");
     },
     /** הצג רמז */
-    hint(r) {
-      s(r, "hint"), _(e, "pulse");
+    hint(s) {
+      r(s, "hint"), x(t, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
-      clearTimeout(n), e.remove();
+      clearTimeout(n), t.remove();
     }
   };
 }
-function ke(t) {
-  const e = document.createElement("div");
-  e.className = "ab-zone", e.style.setProperty("--zone-color", t.color || "#4f67ff"), e.innerHTML = `
-    <div class="ab-zone__symbol">${t.symbol || ""}</div>
-    <div class="ab-zone__label">${t.label || ""}</div>
-  `;
-  const n = () => {
-    t.onTap && t.onTap();
-  };
-  return e.addEventListener("click", n), {
-    el: e,
-    highlight(s) {
-      e.classList.remove("ab-zone--correct", "ab-zone--hover"), s && e.classList.add(`ab-zone--${s}`);
-    },
-    reset() {
-      e.classList.remove("ab-zone--correct", "ab-zone--hover");
-    },
+function $e(e) {
+  let t = e.querySelector(".adult-tools__panel");
+  if (t) return t;
+  const n = e.querySelector(".game-header");
+  if (!n) return null;
+  const r = document.createElement("details");
+  return r.className = "adult-tools", r.innerHTML = '<summary aria-label="להורים ולמורים">☰<span>למבוגרים</span></summary><div class="adult-tools__panel"><p>להורים ולמורים</p></div>', r.addEventListener("keydown", (s) => {
+    s.key === "Escape" && (r.open = !1, r.querySelector("summary").focus(), s.stopPropagation());
+  }), n.appendChild(r), r.querySelector(".adult-tools__panel");
+}
+function Ze(e, t, n, r) {
+  const s = $e(e);
+  if (!s) return null;
+  const i = document.createElement("button");
+  return i.className = "btn", i.setAttribute("aria-label", n), i.textContent = `${t} ${n}`, i.onclick = (o) => {
+    const a = i.closest("details");
+    a && (a.open = !1), r(o);
+  }, s.appendChild(i), i;
+}
+let b = null, g = null, Z = 0, V = 0, v = null, M = 0, H = 0;
+const R = /* @__PURE__ */ new Map();
+function Q(e, t) {
+  var r;
+  const n = (r = document.elementFromPoint(e, t)) == null ? void 0 : r.closest('[data-drop-target="true"]');
+  return n && R.has(n) && !n.matches(":disabled") && n.getAttribute("aria-disabled") !== "true" ? n : null;
+}
+function De(e, t, n) {
+  const r = e.getBoundingClientRect();
+  Z = r.width / 2, V = r.height / 2, g = e.cloneNode(!0), g.setAttribute("aria-hidden", "true"), g.setAttribute("tabindex", "-1"), Object.assign(g.style, {
+    position: "fixed",
+    left: "0",
+    top: "0",
+    width: `${r.width}px`,
+    height: `${r.height}px`,
+    pointerEvents: "none",
+    // keeps it out of elementFromPoint + hit-testing
+    zIndex: "9999",
+    opacity: "0.85",
+    cursor: "grabbing",
+    margin: "0",
+    // אנימציות המקור גוברות על transform; מעברים גורמים לפיגור אחרי המצביע.
+    animation: "none",
+    transition: "none",
+    willChange: "transform"
+    // מקדם שכבת compositor מראש - בלי זה הפריים הראשון של תזוזה עלול לגמגם
+  }), ee(t, n), document.body.appendChild(g);
+}
+function ee(e, t) {
+  g && (g.style.transform = `translate3d(${e - Z}px, ${t - V}px, 0) scale(1.12)`);
+}
+function Pe(e, t) {
+  M = e, H = t, v === null && (v = requestAnimationFrame(() => {
+    v = null, ee(M, H), qe(Q(M, H));
+  }));
+}
+function Oe() {
+  v !== null && (cancelAnimationFrame(v), v = null), g == null || g.remove(), g = null;
+}
+let _ = null;
+function qe(e) {
+  _ !== e && (_ == null || _.classList.remove("drop-target--hover"), _ = e, e == null || e.classList.add("drop-target--hover"));
+}
+function Be() {
+  _ == null || _.classList.remove("drop-target--hover"), _ = null;
+}
+function Ve(e, t, { onTap: n } = {}) {
+  e.classList.add("drag-source");
+  let r = null, s = null, i = null, o = null;
+  function a() {
+    var l;
+    r && (e.removeEventListener("pointermove", r), e.removeEventListener("pointerup", s), e.removeEventListener("pointercancel", i), e.removeEventListener("lostpointercapture", i), r = s = i = null), Be(), Oe(), e.classList.remove("drag-source--dragging"), b = null;
+    const c = o;
+    o = null, c !== null && ((l = e.hasPointerCapture) != null && l.call(e, c)) && e.releasePointerCapture(c);
+  }
+  function d(c) {
+    if (e.matches(":disabled") || e.getAttribute("aria-disabled") === "true" || c.button !== void 0 && c.button !== 0 || o !== null) return;
+    c.preventDefault(), b && b.cancel(), b = { el: e, data: t, cancel: a }, o = c.pointerId;
+    let l = !1;
+    const f = () => {
+      l = !0, e.classList.add("drag-source--dragging"), De(e, c.clientX, c.clientY);
+    }, m = (u) => Math.hypot(u.clientX - c.clientX, u.clientY - c.clientY) >= 8;
+    n || f(), e.setPointerCapture(c.pointerId), r = (u) => {
+      u.pointerId === o && (!l && m(u) && f(), l && Pe(u.clientX, u.clientY));
+    }, s = (u) => {
+      if (u.pointerId !== o) return;
+      const h = !l && !m(u), y = h && n ? null : Q(u.clientX, u.clientY);
+      if (a(), h && n) {
+        n();
+        return;
+      }
+      y && R.has(y) && R.get(y).onDrop({ data: t, sourceEl: e, targetEl: y });
+    }, i = (u) => {
+      u.pointerId === o && a();
+    }, e.addEventListener("pointermove", r), e.addEventListener("pointerup", s), e.addEventListener("pointercancel", i), e.addEventListener("lostpointercapture", i);
+  }
+  return e.addEventListener("pointerdown", d), {
     destroy() {
-      e.removeEventListener("click", n);
+      e.removeEventListener("pointerdown", d), (b == null ? void 0 : b.el) === e && a(), e.classList.remove("drag-source");
     }
   };
 }
-function Te(t, e, n, s) {
-  const r = I(t);
-  if (!r) return null;
-  const o = document.createElement("button");
-  return o.className = "btn", o.setAttribute("aria-label", n), o.textContent = `${e} ${n}`, o.onclick = (a) => {
-    const i = o.closest("details");
-    i && (i.open = !1), s(a);
-  }, r.appendChild(o), o;
+function Qe(e, t) {
+  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), R.set(e, { onDrop: t }), {
+    destroy() {
+      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), R.delete(e);
+    }
+  };
 }
 export {
-  X as EventBus,
-  J as GameShell,
-  Y as GameState,
-  N as PRAISE_PHRASES,
-  $ as RETRY_HINTS,
-  _ as animate,
-  me as bootstrapGame,
-  we as createChoiceRound,
-  Ae as createDragSource,
-  xe as createDropTarget,
-  Re as createFeedback,
-  Ee as createHintTracker,
-  j as createLocalState,
-  he as createOptionCards,
-  oe as createProgressBar,
-  se as createRoundManager,
-  ae as createRoundScope,
-  ke as createZone,
-  H as endGame,
-  Me as ensureAudioRunning,
-  ve as getAllProgress,
-  U as getAudioContext,
-  _e as getGameProgress,
-  de as hideLoadingScreen,
-  Te as injectHeaderButton,
-  ce as installGlobalErrorScreen,
-  Z as lockPageZoom,
-  pe as mountAudioStatusBanner,
-  Ne as playBlob,
-  be as randomPraise,
-  Se as randomRetryHint,
-  ne as recordGameResult,
-  fe as runGame,
-  re as showCompletionScreen,
-  le as showLoadingScreen,
-  ye as shuffle,
-  v as sounds,
-  D as starsFor,
-  $e as unlockAudioOutput
+  ue as EventBus,
+  me as GameShell,
+  ce as GameState,
+  Y as PRAISE_PHRASES,
+  W as RETRY_HINTS,
+  x as animate,
+  Ie as bootstrapGame,
+  We as createChoiceRound,
+  Ve as createDragSource,
+  Qe as createDropTarget,
+  Ke as createFeedback,
+  Je as createHintTracker,
+  z as createLocalState,
+  Me as createOptionCards,
+  Ee as createProgressBar,
+  we as createRoundManager,
+  ve as createRoundScope,
+  J as endGame,
+  oe as ensureAudioRunning,
+  Ye as getAllProgress,
+  P as getAudioContext,
+  Ge as getGameProgress,
+  Le as hideLoadingScreen,
+  Ze as injectHeaderButton,
+  Se as installGlobalErrorScreen,
+  he as lockPageZoom,
+  Ue as mountAudioStatusBanner,
+  Xe as playBlob,
+  He as randomPraise,
+  ze as randomRetryHint,
+  be as recordGameResult,
+  Ne as runGame,
+  ye as showCompletionScreen,
+  xe as showLoadingScreen,
+  je as shuffle,
+  L as sounds,
+  K as starsFor,
+  Fe as unlockAudioOutput
 };

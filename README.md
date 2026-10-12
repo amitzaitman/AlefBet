@@ -119,9 +119,7 @@ Run workflow. כך push לענף עם PR אינו מפעיל חבילה שניי
 כולם מתנקים אוטומטית במעבר, בהתחלה מחדש וביציאה. להשמעת הברות מעבירים
 `{ signal: scope.signal }`. החזרת פונקציית ניקוי עדיין נתמכת. משחק הדיבור והאולפן שומרים על הזרימה הייעודית שלהם.
 
-המשחקים טוענים `framework/dist/runtime.js` ו-`runtime.css`. העורך וה-CSS שלו
-נטענים רק בלחיצה על **ערוך** או **קול**, ונשמרים במטמון לשימוש חוזר ללא רשת.
-פתיחת העורך לראשונה דורשת חיבור, אך המשחק עצמו והתוכן השמור אינם תלויים בו.
+המשחקים טוענים `framework/dist/runtime.js` ו-`runtime.css`.
 אחרי שינוי בתשתית מריצים `npm run build`.
 
 ### מבנה הפרויקט
@@ -130,17 +128,16 @@ Run workflow. כך push לענף עם PR אינו מפעיל חבילה שניי
 framework/src/
   core/      GameShell, GameState, round-manager, hints, bootstrap/runGame, content storage
   audio/     hebrew-audio (שרשרת ההשמעה), tts, phoneme-synth,
-             sound-bank-compiler, audio-context (שחרור iOS),
+             audio-context (שחרור iOS),
              voice-recorder, voice-store, vowel-detector, sounds
   data/      hebrew-letters, nikud
-  ui/        option-cards, progress-bar, feedback, zones, nikud-box,
+  ui/        option-cards, progress-bar, feedback, adult-tools,
              audio-status-banner, completion-screen, ...
   utils/     nakdan (ניקוד אוטומטי, עם מטמון מתמיד)
   runtime/   API לרכיבי המשחק
-  editor/    עורך משחקים בדפדפן (TypeScript + zod), נטען לפי בקשה
   styles/    alefbet.css + גופנים מקומיים
 framework/dist/   תוצר בנוי ומחויב — המשחקים טוענים ממנו ישירות
-games/<name>/     index.html + game.js + game.css למשחק
+games/<name>/     index.html + game.js + game.css, ומודולים ונכסים של המשחק
 e2e/              בדיקות Playwright
 deploy/           Cloudflare Worker: proxy לנקדן + מסלול /tts לקימפול
 ```
@@ -189,19 +186,16 @@ MIT
 
 ### תוכן שמור ועדכוני אופליין
 
-משחק עם עורך יכול להעביר `editor.content` עם `createRound`, `validateRound`,
+אין יותר עורך בדפדפן, אבל סיבובים שנשמרו בו ממשיכים להיטען. משחק כזה מעביר
+`editor.content` עם `createRound`, `validateRound`,
 `version` (ברירת מחדל 1) ו-`migrate` אופציונלי. ה-runtime בודק תוכן שמור לפני
 הפעלתו. מיגרציה מקבלת את המסמך הישן ומחזירה מסמך בגרסה הנוכחית, באותו מזהה משחק.
 תוכן לא תקין או גרסה לא נתמכת נשארים באחסון; המשחק משתמש בתוכן ברירת המחדל.
-הוולידציה אינה טוענת את העורך או את zod. כללי המשחק נשארים בתיקיית המשחק.
-
-שגיאת שמירה מוצגת בעורך, עם אפשרות לייצא עותק ולנסות שוב. חזרה למשחק שומרת
-שינויים תחילה ונשארת בעורך אם השמירה נכשלה.
+כללי המשחק נשארים בתיקיית המשחק.
 
 אחרי שינוי בקוד האתר או בנכסים מריצים `npm run build` ומחייבים את `framework/dist`.
 הבנייה מייצרת מזהה אופליין דטרמיניסטי. גרסה חדשה מתקינה את כל קובצי הליבה לפני
-הפעלה, וממתינה לסגירת הלשוניות הישנות. קובצי עורך נטענים רק לפי דרישה ונבדקים
-מול אותה גרסה. עדכון שנקטע משאיר את הגרסה הקודמת זמינה.
+הפעלה, וממתינה לסגירת הלשוניות הישנות. עדכון שנקטע משאיר את הגרסה הקודמת זמינה.
 
 `npm run verify` כולל בדיקות מגע ו-WebKit. חזרות יציבות נוספות מופעלות לפי סוג השינוי ובתזמון השבועי.
 `npm run setup:browsers` מתקין את הדפדפנים הדרושים. אותן בדיקות נדרשות לפני פריסה.

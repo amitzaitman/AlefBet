@@ -11,7 +11,6 @@ export default defineConfig({
       entry: {
         runtime: resolve(root, 'src/runtime/index.ts'),
         common: resolve(root, 'src/runtime/common.ts'),
-        editor: resolve(root, 'src/editor/index.ts'),
       },
       formats: ['es'],
       fileName: (_format, name) => `${name}.js`,
@@ -40,7 +39,7 @@ export default defineConfig({
       };
       visit('runtime.js');
       visit('common.js');
-      // Dynamic editor dependencies are cached on first use, never required for play.
+      // Dynamic imports are cached on first use, never required for play.
       this.emitFile({ type: 'asset', fileName: 'runtime-assets.js',
         source: `self.ALEFBET_RUNTIME_ASSETS = ${JSON.stringify([...files].sort())};\n` });
     },

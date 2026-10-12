@@ -1,8 +1,8 @@
 /**
- * bootstrapGame — שלוש נתיבים עיקריים:
- * 1) עורך מופעל: activeRounds נלקחים מ-defaultRounds כש-localStorage ריק,
- *    GameShell נבנה, GameData נבנה עם meta וה-distractors.
- * 2) עורך מושבת: gameData הוא null.
+ * bootstrapGame - שלושה נתיבים עיקריים:
+ * 1) עם חוזה תוכן: סיבובים שמורים תקינים מחליפים את defaultRounds,
+ *    ובלי תוכן שמור משחקים ב-defaultRounds.
+ * 2) בלי חוזה תוכן: תוכן שמור לא נקרא.
  * 3) onBeforeHide מחזיר false: כל השלבים שאחריו לא רצים, aborted=true.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -14,7 +14,6 @@ vi.mock('../utils/nakdan.js', () => ({
 }));
 
 import { bootstrapGame, runGame } from '../core/bootstrap.ts';
-import { GameData } from '../editor/game-data.ts';
 import { mountContainer } from './helpers.js';
 import { preloadNikud } from '../utils/nakdan.js';
 
@@ -103,50 +102,59 @@ describe('bootstrapGame', () => {
     add.mockRestore();
     remove.mockRestore();
   });
-  it('builds shell + editor + gameData when editor options are provided', async () => {
+  const content = {
+    version: 1,
+    createRound: () => ({ target: 'א' }),
+    validateRound: round => typeof round.target === 'string',
+  };
+
+  it('plays saved rounds when the game has a content contract', async () => {
     const host = mountContainer();
-    const rounds = [{ target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }];
+    const saved = [{ id: 'saved-1', target: 'ב', zones: [{ id: 'z', x: 1, y: 1, w: 5, h: 5 }] }];
+    localStorage.setItem('alefbet.editor.test-game', JSON.stringify({
+      id: 'test-game', version: 1, meta: { title: '', type: 'multiple-choice' }, rounds: saved, distractors: [],
+    }));
 
     const result = await bootstrapGame(host, {
       gameId: 'test-game',
       title: 'בדיקה',
       preloadTexts: ['שלום'],
-      defaultRounds: rounds,
-      editor: {
-        type: 'multiple-choice',
-        title: 'כותרת עורך',
-        distractors: [{ text: 'x' }],
-        restartGame: () => {},
-      },
+      defaultRounds: [{ id: 'default', target: 'א' }],
+      editor: { content },
     });
 
     expect(result.aborted).toBe(false);
-    expect(result.shell).not.toBeNull();
+    // Rounds saved by the removed editor, zones included, still load.
+    expect(result.activeRounds).toEqual(saved);
     expect(result.shell.state.totalRounds).toBe(1);
-    expect(result.activeRounds).toEqual(rounds);
-    expect(result.gameData).toBeInstanceOf(GameData);
-    expect(result.gameData.id).toBe('test-game');
-    expect(result.gameData.meta.type).toBe('multiple-choice');
-    expect(result.gameData.meta.title).toBe('כותרת עורך');
-    expect(result.gameData.distractors).toEqual([{ text: 'x' }]);
     expect(preloadNikud).toHaveBeenCalledWith(['שלום']);
-    // loading screen removed and shell DOM injected
     expect(host.querySelector('.ab-loading')).toBeNull();
     expect(host.querySelector('.game-title')?.textContent).toBe('בדיקה');
+    // There is no editing UI any more.
+    expect(host.querySelector('.ab-lazy-editor')).toBeNull();
+    expect(host.querySelector('.adult-tools')).toBeNull();
   });
 
-  it('returns gameData=null when editor is omitted', async () => {
+  it('plays the default rounds when nothing is saved', async () => {
     const host = mountContainer();
+    const rounds = [{ id: 'default', target: 'א' }];
+    const result = await bootstrapGame(host, { gameId: 'test-empty', title: 'ריק', defaultRounds: rounds, editor: { content } });
+    expect(result.activeRounds).toEqual(rounds);
+  });
+
+  it('ignores saved content when the game has no content contract', async () => {
+    const host = mountContainer();
+    localStorage.setItem('alefbet.editor.test-no-editor', JSON.stringify({ id: 'test-no-editor', rounds: [{ id: 'x' }] }));
 
     const result = await bootstrapGame(host, {
       gameId: 'test-no-editor',
-      title: 'ללא עורך',
+      title: 'ללא תוכן שמור',
       preloadTexts: [],
       totalRounds: 8,
     });
 
     expect(result.aborted).toBe(false);
-    expect(result.gameData).toBeNull();
+    expect(result.activeRounds).toEqual([]);
     expect(result.shell.state.totalRounds).toBe(8);
   });
 
@@ -160,7 +168,7 @@ describe('bootstrapGame', () => {
       onBeforeHide: () => false,
     });
 
-    expect(result).toEqual({ shell: null, activeRounds: [], gameData: null, aborted: true });
+    expect(result).toEqual({ shell: null, activeRounds: [], aborted: true });
     // caller is responsible for the DOM; bootstrap did not hide the loading screen
     expect(host.querySelector('.ab-loading')).not.toBeNull();
     expect(host.querySelector('.game-title')).toBeNull();

@@ -1,11 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createDragSource, createDropTarget } from '../input/drag.js';
 import { createVoiceRecorder } from '../audio/voice-recorder.js';
-import { createZonePlayer } from '../ui/zone-player.js';
 import { createVoiceRecordButton } from '../ui/voice-record-button.js';
 import { createOptionCards } from '../ui/option-cards.js';
 import { makeMockMediaRecorder } from './helpers.js';
-import { playVoice } from '../audio/voice-store.js';
 vi.mock('../audio/voice-store.js', () => ({ playVoice: vi.fn(async () => true), loadVoice: vi.fn(async () => null), saveVoice: vi.fn(), deleteVoice: vi.fn() }));
 afterEach(() => { vi.unstubAllGlobals(); vi.clearAllMocks(); });
 function pointer(el, type, pointerId = 1) {
@@ -80,29 +78,6 @@ describe('recording permissions', () => {
     allow({ getTracks: () => [{ stop }] });
     expect((await results).every(result => result.status === 'rejected')).toBe(true);
     expect(stop).toHaveBeenCalledOnce();
-  });
-});
-describe('zone lifetime', () => {
-  it('cancels delayed instruction and removes listeners on destroy', () => {
-    vi.useFakeTimers();
-    const host = element();
-    const onCorrect = vi.fn();
-    const player = createZonePlayer(host, { image: '', gameId: 'g', roundId: 'r', zones: [{ id: 'z', correct: true }], onCorrect });
-    const zone = host.querySelector('.ab-zp-zone');
-    player.destroy(); zone.click(); vi.runAllTimers();
-    expect(playVoice).not.toHaveBeenCalled(); expect(onCorrect).not.toHaveBeenCalled();
-  });
-  it('aborts playing audio and clears timers on reset and destroy', async () => {
-    vi.useFakeTimers();
-    const player = createZonePlayer(element(), { image: '', gameId: 'g', roundId: 'r' });
-    await player.playInstruction();
-    const signal = vi.mocked(playVoice).mock.calls[0][2].signal;
-    player.reset(); expect(signal.aborted).toBe(true);
-    expect(vi.getTimerCount()).toBe(0);
-    await player.playInstruction();
-    const next = vi.mocked(playVoice).mock.calls[1][2].signal;
-    expect(next.aborted).toBe(false);
-    player.destroy(); expect(next.aborted).toBe(true);
   });
 });
 it('renders answer text and emoji literally', () => {

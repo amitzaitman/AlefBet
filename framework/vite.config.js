@@ -18,7 +18,6 @@ export default defineConfig({
       exclude: [
         'src/**/*.test.*',
         'src/__tests__/**',
-        'src/editor/**/*.ts',
       ],
     },
   },

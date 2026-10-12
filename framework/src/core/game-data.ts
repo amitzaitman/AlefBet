@@ -2,7 +2,17 @@
  * GameData — typed model for editable game rounds.
  * Manages rounds, change events, undo/redo, and JSON serialisation.
  */
-import type { GameDataJson, RoundRecord } from '../editor/schemas.js';
+/** סיבוב: מפה פתוחה עם מזהה. */
+export type RoundRecord = Record<string, unknown> & { id: string };
+
+/** התוכן כפי שנשמר ב-localStorage. */
+export interface GameDataJson {
+  id:          string;
+  version:     number;
+  meta:        { title: string; type: string; [key: string]: unknown };
+  rounds:      Record<string, unknown>[];
+  distractors: unknown[];
+}
 
 /** Game-owned content rules; no editor or schema library is loaded at runtime. */
 export interface ContentContract {

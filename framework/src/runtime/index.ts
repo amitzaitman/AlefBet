@@ -26,7 +26,6 @@ export { nikudList, nikudBaseLetters, letterWithNikud, randomNikud }  from '../d
 
 // ===== UI =====
 export { showNikudSettingsDialog } from '../ui/nikud-settings.js';
-export { createZonePlayer }        from '../ui/zone-player.js';
 export { createVoiceRecordButton } from '../ui/voice-record-button.js';
 
 // ===== Render =====

@@ -1,6 +1,5 @@
 import { getNikud as P } from "./nakdan-DFzp_6d3.js";
-import { u as B } from "./drag-NEBgUr1u.js";
-import { mountAudioStatusBanner as A } from "./common.js";
+import { unlockAudioOutput as B, mountAudioStatusBanner as A } from "./common.js";
 const g = [
   { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
   { letter: "ב", name: "בַּיִת", nameNikud: "בֵּית", sound: "b", exampleWord: "בַּיִת", emoji: "🏠", isFinal: !1 },
@@ -30,13 +29,13 @@ const g = [
   { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
   { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
 ];
-function K(e) {
+function J(e) {
   return g.find((n) => n.letter === e) || null;
 }
 function T(e = "regular") {
   return e === "regular" ? g.filter((n) => !n.isFinal) : e === "final" ? g.filter((n) => n.isFinal) : g;
 }
-function X(e, n = "regular") {
+function K(e, n = "regular") {
   const t = T(n);
   return [...t].sort(() => Math.random() - 0.5).slice(0, Math.min(e, t.length));
 }
@@ -48,11 +47,11 @@ const N = [
   { id: "segol", name: "סְגוֹל", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶה", color: "#783952", textColor: "#fff" },
   { id: "holam", name: "חוֹלָם", nameNikud: "חוֹלָם", symbol: "ֹ", sound: "אוֹ", color: "#5F7A42", textColor: "#fff" },
   { id: "kubbutz", name: "קֻבּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אוּ", color: "#6B4A8A", textColor: "#fff" }
-], Y = g.filter((e) => !e.isFinal).map((e) => e.letter);
-function Z(e, n) {
+], X = g.filter((e) => !e.isFinal).map((e) => e.letter);
+function Y(e, n) {
   return e + n;
 }
-function $(e) {
+function Z(e) {
   let n = [...N];
   if (typeof window < "u" && window.location && window.location.search) {
     const i = new URLSearchParams(window.location.search), o = i.get("allowedNikud");
@@ -376,20 +375,20 @@ function G(e, { banner: n = !0 } = {}) {
     e.container.removeEventListener("pointerdown", i, !0), e.container.removeEventListener("keydown", i, !0), t == null || t.destroy(), j.cancel();
   });
 }
-const ee = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const $ = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   attachGameAudio: G
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  Y as a,
+  X as a,
   G as b,
   T as c,
-  $ as d,
-  ee as e,
-  K as g,
+  Z as d,
+  $ as e,
+  J as g,
   g as h,
-  Z as l,
+  Y as l,
   N as n,
-  X as r,
+  K as r,
   j as t
 };

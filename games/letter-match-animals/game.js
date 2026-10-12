@@ -70,8 +70,8 @@ export async function startGame(container) {
     transitionMs: 800,
     playCorrectSound: false,
     onReplay: () => startGame(container),
+    // Rounds a teacher saved in the past still load (alefbet.editor.letter-match-animals).
     editor: {
-      type: 'multiple-choice',
       content: {
         version: 1,
         createRound: () => ({ target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }),
@@ -80,9 +80,6 @@ export async function startGame(container) {
           && round.correct.replace(/[\u0591-\u05C7]/g, '').startsWith(round.target)
           && typeof round.correctEmoji === 'string',
       },
-      title: 'התאמת אותיות',
-      distractors: ALL_REGULAR_WORDS,
-      restartGame: startGame,
     },
     buildRound: context => {
       const { shell, round, scope } = context;

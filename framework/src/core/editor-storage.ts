@@ -4,7 +4,7 @@
 import { createLocalState } from './local-state.js';
 import { GameData } from './game-data.js';
 import type { ContentContract } from './game-data.js';
-import type { GameDataJson } from '../editor/schemas.js';
+import type { GameDataJson } from './game-data.js';
 
 const KEY_PREFIX = 'alefbet.editor.';
 

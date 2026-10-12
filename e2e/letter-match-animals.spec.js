@@ -143,36 +143,22 @@ test.describe('letter-match-animals', () => {
   });
 });
 
-test('editor loads on demand, preserves saved content, and reopens offline', async ({ page, network }) => {
-  const editorRequests = [];
-  page.on('request', request => {
-    if (/\/editor\.(js|css)/.test(request.url())) editorRequests.push(request.url());
-  });
+test('rounds saved with the old editor still play, offline too', async ({ page, network }) => {
   await page.addInitScript(() => {
     localStorage.setItem('alefbet.editor.letter-match-animals', JSON.stringify({
       id: 'letter-match-animals', version: 1, meta: { type: 'multiple-choice' },
-      rounds: [{ id: 'saved', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }],
+      rounds: [{ id: 'saved', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁', zones: [{ id: 'z', x: 1, y: 1, w: 5, h: 5 }] }],
     }));
   });
   await page.goto(`${network.url}/games/letter-match-animals/`);
   await expect(page.locator('.letter-display')).toHaveText('א');
-  expect(editorRequests).toEqual([]);
-  await page.getByText('למבוגרים', { exact: true }).click();
-  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
-  await expect(page.locator('#game')).toHaveClass(/ab-editor-active/);
-  expect(editorRequests.some(url => url.endsWith('editor.js'))).toBe(true);
-  expect(editorRequests.some(url => url.endsWith('editor.css'))).toBe(true);
+  await expect(page.locator('.progress-bar__label')).toHaveText('0 / 1');
+  // Editing is gone, so this game has no adult menu.
+  await expect(page.locator('.adult-tools')).toHaveCount(0);
   await page.evaluate(() => navigator.serviceWorker.ready);
-  await expect(async () => {
-    const css = await page.evaluate(async () => !!await caches.match('/framework/dist/editor.css'));
-    expect(css).toBe(true);
-  }).toPass();
   await network.offline(page);
   await page.reload();
   await expect(page.locator('.letter-display')).toHaveText('א');
-  await page.getByText('למבוגרים', { exact: true }).click();
-  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
-  await expect(page.locator('#game')).toHaveClass(/ab-editor-active/);
 });
 
 test('completion and replay do not accumulate audio listeners', async ({ page }) => {
@@ -258,28 +244,4 @@ test('phone choices fill the panel and remain inside the screen', async ({ page 
     expect(box.x).toBeGreaterThanOrEqual(0);
     expect(box.x + box.width).toBeLessThanOrEqual(390);
   }
-});
-
-
-test('failed editor save stays editable and permits export and retry', async ({ page }) => {
-  await blockGoogleTTS(page);
-  await page.goto(GAME_URL);
-  await page.getByText('למבוגרים', { exact: true }).click();
-  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
-  await page.locator('.ab-editor-btn--add').click();
-  await page.evaluate(() => {
-    window.originalSetItem = Storage.prototype.setItem;
-    Storage.prototype.setItem = () => { throw new DOMException('Full', 'QuotaExceededError'); };
-  });
-  await page.getByRole('button', { name: '💾 שמור', exact: true }).click();
-  await expect(page.locator('.ab-editor-save-status')).toContainText('לא נשמר');
-  await expect(page.locator('.ab-editor-toast')).toHaveCount(0);
-  await page.getByRole('button', { name: '▶ שחק', exact: true }).click();
-  await expect(page.locator('.ab-editor-active')).toHaveCount(1);
-  const download = page.waitForEvent('download');
-  await page.getByRole('button', { name: '⬇ ייצוא', exact: true }).click();
-  expect((await download).suggestedFilename()).toBe('letter-match-animals-rounds.json');
-  await page.evaluate(() => { Storage.prototype.setItem = window.originalSetItem; });
-  await page.getByRole('button', { name: '💾 שמור', exact: true }).click();
-  await expect(page.locator('.ab-editor-save-status')).toHaveText('נשמר');
 });

@@ -18,7 +18,6 @@ export { createOptionCards }       from '../ui/option-cards.js';
 export { createProgressBar }       from '../ui/progress-bar.js';
 export { createFeedback }          from '../ui/feedback.js';
 export { showCompletionScreen }    from '../ui/completion-screen.js';
-export { createZone }              from '../ui/interactive-zones.js';
 export { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
 export { injectHeaderButton }      from '../ui/header-button.js';
 export { mountAudioStatusBanner } from '../ui/audio-status-banner.js';

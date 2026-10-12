@@ -48,16 +48,23 @@ test('adult tools stay separate and feedback does not move the choices', async (
   await expect(studio).toBeHidden();
   await page.getByText('להורים ולמורים', { exact: true }).click();
   await expect(studio).toBeVisible();
+  // The adult menu (here: nikud settings) opens without moving the child's choices.
+  await page.goto('/games/syllable-read/');
+  const choices = page.locator('.option-cards-grid');
+  await expect(choices).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  const closed = await choices.boundingBox();
+  await expect(page.getByRole('button', { name: 'הגדרות', exact: true })).toBeHidden();
+  await page.getByText('למבוגרים', { exact: true }).tap();
+  await expect(page.getByRole('button', { name: 'הגדרות', exact: true })).toBeVisible();
+  expect(await choices.boundingBox()).toEqual(closed);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.adult-tools')).not.toHaveAttribute('open', '');
   await page.goto('/games/letter-match-animals/');
   const cards = page.locator('.option-cards-grid');
   await expect(cards).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   const before = await cards.boundingBox();
-  await expect(page.getByRole('button', { name: '✏️ ערוך', exact: true })).toBeHidden();
-  await page.getByText('למבוגרים', { exact: true }).tap();
-  expect(await cards.boundingBox()).toEqual(before);
-  await page.keyboard.press('Escape');
-  await expect(page.locator('.adult-tools')).not.toHaveAttribute('open', '');
   await page.locator('[data-id="wrong-0"]').tap();
   await expect(page.locator('.feedback-message--hint')).toBeVisible();
   const after = await cards.boundingBox();

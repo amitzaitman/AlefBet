@@ -94,29 +94,12 @@ test.describe('PWA', () => {
   });
 });
 
-test('an unvisited editable game plays offline without downloading the editor', async ({ page, network }) => {
-  const scripts = [];
-  page.on('request', request => scripts.push(request.url()));
+test('a game that was never opened plays offline, including its own modules', async ({ page, network }) => {
   await page.goto(`${network.url}/games/syllable-read/`);
   await expect(page.locator('.option-card')).toHaveCount(3);
   await page.evaluate(() => navigator.serviceWorker.ready);
-  expect(scripts.some(url => /\/editor\.(js|css)/.test(url))).toBe(false);
   await network.offline(page);
-  await page.goto(`${network.url}/games/letter-match-animals/`);
-  await expect(page.locator('.option-card')).toHaveCount(4);
-  expect(scripts.some(url => /\/editor\.(js|css)/.test(url))).toBe(false);
-});
-
-test.describe('editor download failure', () => {
-  test.use({ serviceWorkers: 'block' });
-
-  test('keeps the game playable when the editor cannot download', async ({ page }) => {
-    await page.route('**/framework/dist/editor.*', route => route.abort());
-    await page.goto('/games/letter-match-animals/');
-    await expect(page.locator('.option-card')).toHaveCount(4);
-    await page.getByText('למבוגרים', { exact: true }).click();
-  await page.getByRole('button', { name: '✏️ ערוך', exact: true }).click();
-    await expect(page.locator('.ab-lazy-editor [role="status"]')).toContainText('לֹא הִצְלַחְנוּ');
-    await expect(page.locator('.option-card')).toHaveCount(4);
-  });
+  // nikud-match draws its choices with nikud-box.js, a file in its own folder.
+  await page.goto(`${network.url}/games/nikud-match/`);
+  await expect(page.locator('.ab-nikud-box')).toHaveCount(2);
 });

@@ -6,23 +6,14 @@ import { createProgressBar } from '../ui/progress-bar.js';
 import { installGlobalErrorScreen } from '../ui/error-screen.js';
 import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
 import { loadGameData } from './editor-storage.js';
-import { GameData } from './game-data.js';
-import type { ContentContract } from './game-data.js';
-import { attachLazyEditor } from './lazy-editor.js';
-import type { RoundRecord } from '../editor/schemas.js';
+import type { ContentContract, RoundRecord } from './game-data.js';
 
 const starts = new WeakMap<HTMLElement, object>();
 
+/** תוכן שמור: סיבובים שנערכו בעבר ונשמרו ב-alefbet.editor.<gameId>. */
 export interface BootstrapEditorOptions {
+  /** חוזה התוכן של המשחק: בדיקת סיבוב שמור, גרסה והמרה אופציונלית */
   content?: ContentContract;
-  /** סוג המשחק (meta.type), למשל 'multiple-choice' או 'drag-match' */
-  type?:        string;
-  /** כותרת לתצוגה בעורך (meta.title) - ברירת מחדל title של bootstrap */
-  title?:       string;
-  /** מפתים אופציונליים שיישמרו ב-GameData */
-  distractors?: unknown[];
-  /** מופעל ע"י העורך בעת חזרה למצב משחק */
-  restartGame?: (container: HTMLElement) => void;
 }
 
 export interface BootstrapOptions {
@@ -38,7 +29,7 @@ export interface BootstrapOptions {
   defaultRounds?:  RoundRecord[];
   /** אם לא מסופק, נגזר מ-activeRounds.length */
   totalRounds?:    number;
-  /** השמט כדי להשבית את העורך */
+  /** השמט אם למשחק אין תוכן שמור */
   editor?:         BootstrapEditorOptions;
   audio?:          boolean;
   /**
@@ -53,8 +44,6 @@ export interface BootstrapResult {
   shell:        GameShell | null;
   /** הסיבובים שיש להציג בפועל */
   activeRounds: RoundRecord[];
-  /** null כאשר העורך לא הופעל או במצב abort */
-  gameData:     GameData | null;
   /** true אם onBeforeHide החזיר false */
   aborted:      boolean;
 }
@@ -79,13 +68,13 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
   }
   const audioModule = opts.audio !== false ? await import('../audio/game-audio.js') : null;
   if (starts.get(container) !== start) {
-    return { shell: null, activeRounds: [], gameData: null, aborted: true };
+    return { shell: null, activeRounds: [], aborted: true };
   }
 
   if (opts.onBeforeHide) {
     const proceed = await opts.onBeforeHide();
     if (proceed === false || starts.get(container) !== start) {
-      return { shell: null, activeRounds: [], gameData: null, aborted: true };
+      return { shell: null, activeRounds: [], aborted: true };
     }
   }
 
@@ -101,17 +90,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
   });
   audioModule?.attachGameAudio(shell);
 
-  let gameData: GameData | null = null;
-  if (opts.editor) {
-    const meta = {
-      title: opts.editor.title ?? opts.title,
-      type:  opts.editor.type  ?? 'multiple-choice',
-    };
-    gameData = GameData.fromRoundsArray(opts.gameId, activeRounds, meta, opts.editor.distractors ?? [], opts.editor.content);
-    attachLazyEditor(shell, gameData, { restartGame: opts.editor.restartGame });
-  }
-
-  return { shell, activeRounds, gameData, aborted: false };
+  return { shell, activeRounds, aborted: false };
 }
 
 export interface RoundContext {
