@@ -35,7 +35,8 @@ framework/src/
   editor/index.ts   optional editor API
   __tests__/ vitest suites
 
-games/<name>/     index.html + game.js + game.css  (single-screen games)
+games/<name>/     index.html + game.js + game.css, plus any modules or assets the game owns
+                  (every file in the folder is precached for offline play)
 e2e/              Playwright specs, one per live game + pwa
 deploy/           Cloudflare Worker (Nakdan proxy) + infra
 ```

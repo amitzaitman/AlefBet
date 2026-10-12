@@ -3,6 +3,17 @@ import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { runInNewContext } from 'node:vm';
 
+/**
+ * Every file in a game folder is part of the release, so a game can keep its
+ * own modules and assets next to game.js and still play offline.
+ */
+function gameFiles(root, id) {
+  const list = dir => readdirSync(resolve(root, dir), { withFileTypes: true })
+    .filter(entry => !entry.name.startsWith('.'))
+    .flatMap(entry => (entry.isDirectory() ? list(`${dir}/${entry.name}`) : [`./${dir}/${entry.name}`]));
+  return list(`games/${id}`);
+}
+
 /** Deterministic release identity covers deployed content and worker behavior. */
 export function writeReleaseManifest(root) {
   const read = path => readFileSync(resolve(root, path));
@@ -15,9 +26,7 @@ export function writeReleaseManifest(root) {
     './assets/icons/icon-192.png', './assets/icons/icon-512.png', './assets/icons/apple-touch-icon.png',
     './framework/dist/runtime-assets.js',
     ...context.self.ALEFBET_RUNTIME_ASSETS.map(file => `./framework/dist/${file}`),
-    ...context.self.ALEFBET_CATALOG.flatMap(({ id }) => [
-      `./games/${id}/`, `./games/${id}/index.html`, `./games/${id}/game.js`, `./games/${id}/game.css`,
-    ]),
+    ...context.self.ALEFBET_CATALOG.flatMap(({ id }) => [`./games/${id}/`, ...gameFiles(root, id)]),
   ].sort();
   // Optional editor assets are verified on first use, but never downloaded for play.
   const optional = readdirSync(resolve(root, 'framework/dist'))
