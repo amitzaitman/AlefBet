@@ -99,6 +99,7 @@ Pushing to `main` triggers `.github/workflows/deploy.yml`, gated by unit/type/li
 - `preloadTexts` is optional; omit for arithmetic.
 - Examples: `make-ten` (choice), `number-line` (custom interaction); guide: `docs/adding-games.md`.
 - Avoid putting arithmetic rules or Hebrew content in common.ts.
+- Math games follow `docs/math-pedagogy.md` (Aharoni: meaning before calculation; story, picture and exercise each enough alone). `balloon-stories` is the narrated reference.
 
 ## Lightweight CI
 

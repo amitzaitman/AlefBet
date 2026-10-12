@@ -176,3 +176,132 @@ test('long-exercise: solve part by part, hints, keyboard, completion, replay and
   await expect(page.locator('.chain-choice').first()).toBeEnabled();
   expect(errors).toEqual([]);
 });
+
+/** Reads a balloon-stories question: a − b = ?, a + b = ? or a + ? = b. */
+async function solveBalloonExercise(equation) {
+  const [x, op, y, , z] = (await equation.innerText()).trim().split(/\s+/);
+  if (y === '?') return Number(z) - Number(x);
+  return op === '+' ? Number(x) + Number(y) : Number(x) - Number(y);
+}
+
+test('balloon-stories: narrated story, hints, exercise to story, completion, replay and offline', async ({ page, isMobile, network }) => {
+  test.setTimeout(180_000);
+  const activate = locator => isMobile ? locator.tap() : locator.click();
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  // A recording voice that answers at once, so the story's sentences can be checked.
+  await page.addInitScript(() => {
+    window.__spoken = [];
+    window.SpeechSynthesisUtterance = class { constructor(text) { this.text = text; } };
+    const voice = { name: 'Carmit', lang: 'he-IL', localService: true };
+    const synth = {
+      getVoices: () => [voice],
+      speak(utterance) { if (utterance.text) window.__spoken.push(utterance.text); setTimeout(() => utterance.onend?.(), 20); },
+      cancel() {}, addEventListener() {}, removeEventListener() {},
+    };
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => synth });
+  });
+  await page.goto(`${network.url}/games/balloon-stories/`);
+  const choice = page.locator('.bs-choice');
+  const equation = page.locator('.bs-equation');
+  const feedback = page.locator('.feedback-message');
+  const solved = page.locator('.bs-solved');
+  const fits = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  const solve = () => solveBalloonExercise(equation);
+  await expect(page.locator('.bs-scene')).toBeVisible();
+  // Speech needs a first tap on phones, so the first story waits for one with its answers locked.
+  const start = page.locator('.bs-start');
+  if (await start.count()) {
+    await expect(choice.first()).toBeDisabled();
+    await activate(start);
+  }
+  await expect(choice.first()).toBeEnabled();
+  await expect(page.locator('.bs-line')).toHaveCount(3);
+  await expect(equation).toHaveAttribute('dir', 'ltr');
+  await expect(equation).toContainText('= ?');
+  // Shown with digits, spoken with number words.
+  await expect(page.locator('.bs-line').first()).toHaveText(/^לְנוֹעָה יֵשׁ \d+ בָּלוֹנִים\.$/);
+  expect((await page.evaluate(() => window.__spoken))[0]).toMatch(/^לְנוֹעָה יֵשׁ \D+ בָּלוֹנִים\.$/);
+  for (const button of await choice.all()) {
+    const box = await button.boundingBox();
+    expect(box.width).toBeGreaterThanOrEqual(64);
+    expect(box.height).toBeGreaterThanOrEqual(64);
+  }
+  const answer = await solve();
+  const correct = page.locator(`.bs-choice[data-value="${answer}"]`);
+  const wrong = page.locator(`.bs-choice:enabled:not([data-value="${answer}"])`);
+  // The help goes back to the picture: the story again, then counting aloud, then the answer.
+  await activate(wrong.first());
+  await expect(feedback).toContainText('הַסִּפּוּר');
+  await expect(page.locator('.bs-pick--tried')).toBeDisabled();
+  await activate(wrong.first());
+  await expect(feedback).toContainText('שֶׁנִּשְׁאֲרוּ');
+  await expect(page.locator('.bs-balloon--counted')).toHaveCount(answer);
+  await expect(page.locator('.bs-balloon--counted').last()).toHaveText(String(answer));
+  await activate(wrong.first());
+  await expect(correct).toHaveClass(/bs-pick--hint/);
+  await activate(correct);
+  await expect(solved).toHaveText(String(answer));
+  await expect(page.locator('.bs-line--result')).toBeVisible();
+
+  for (let round = 2; round <= 9; round++) {
+    await expect(solved).toHaveCount(0, { timeout: 10_000 });
+    // The comparing rounds are the widest pictures; they still fit a small phone.
+    if (round === 4) await page.setViewportSize({ width: 320, height: 640 });
+    if (round <= 6) {
+      await expect(choice.first()).toBeEnabled({ timeout: 10_000 });
+      // Each of the first two stages ends with plain circles instead of drawn balloons.
+      await expect(page.locator('.bs-scene--dots')).toHaveCount(round === 3 || round === 6 ? 1 : 0);
+      expect(await fits()).toBe(true);
+      const value = await solve();
+      await activate(page.locator(`.bs-choice[data-value="${value}"]`));
+      await expect(solved).toHaveText(String(value));
+    } else {
+      // From exercise to story: pick the picture that matches a op b.
+      const cards = page.locator('.bs-card');
+      await expect(cards).toHaveCount(3);
+      await expect(cards.first()).toBeEnabled();
+      const [a, op, b] = (await equation.innerText()).trim().split(/\s+/);
+      const sign = op === '+' ? '+' : '-';
+      if (round === 7) {
+        await activate(page.locator(`.bs-card[data-op="${sign === '+' ? '-' : '+'}"]`));
+        await expect(feedback).toContainText('בְּכָל סִפּוּר');
+        await expect(page.locator('.bs-card.bs-pick--tried')).toBeDisabled();
+      }
+      await activate(page.locator(`.bs-card[data-op="${sign}"][data-a="${a}"][data-b="${b}"]`));
+      await expect(solved).toHaveText(String(sign === '+' ? Number(a) + Number(b) : Number(a) - Number(b)));
+      await expect.poll(() => page.evaluate(() => window.__spoken.at(-1))).toContain('שָׁוֶה');
+    }
+  }
+  await expect(page.locator('.completion-screen')).toBeVisible({ timeout: 10_000 });
+  await activate(page.locator('.completion-screen__replay'));
+  // After the first tap the replayed story starts by itself.
+  await expect(page.locator('.bs-scene')).toBeVisible();
+  await expect(start).toHaveCount(0);
+  await expect(choice.first()).toBeEnabled({ timeout: 10_000 });
+  expect(await fits()).toBe(true);
+  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+  await network.offline(page);
+  await page.reload();
+  await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
+  await expect(page.locator('.bs-scene')).toBeVisible();
+  await expect(choice).toHaveCount(4);
+  expect(errors).toEqual([]);
+});
+
+test('balloon-stories: without a voice the story still plays and can be answered', async ({ page, isMobile, network }) => {
+  const activate = locator => isMobile ? locator.tap() : locator.click();
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => undefined });
+  });
+  await page.goto(`${network.url}/games/balloon-stories/`);
+  await expect(page.locator('.bs-scene')).toBeVisible();
+  const start = page.locator('.bs-start');
+  if (await start.count()) await activate(start);
+  await expect(page.locator('.bs-choice').first()).toBeEnabled();
+  await expect(page.locator('#alefbet-audio-status-banner')).toContainText('הַקּוֹל אֵינוֹ זָמִין');
+  const answer = await solveBalloonExercise(page.locator('.bs-equation'));
+  await activate(page.locator(`.bs-choice[data-value="${answer}"]`));
+  await expect(page.locator('.bs-line--result')).toBeVisible();
+  await expect(page.locator('.progress-bar__label')).toContainText('1');
+});

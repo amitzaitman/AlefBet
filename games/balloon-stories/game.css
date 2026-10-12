@@ -1,0 +1,67 @@
+.bs-game { --bs-size: clamp(28px, 10vw, 52px); width: min(100%, 640px); margin-inline: auto; text-align: center; }
+.bs-story { display: grid; align-content: center; gap: 2px; min-height: 5em; margin: 4px 0 8px; }
+.bs-game--match .bs-story { min-height: 0; }
+.bs-line { margin: 0; color: #7a6a55; font-size: clamp(1.05rem, 3.8vw, 1.35rem); font-weight: 600; }
+.bs-line--now { color: #1b140c; font-weight: 700; }
+.bs-line--result { color: #1e5a52; }
+.bs-start { justify-self: center; min-height: 72px; padding: 10px 28px; border: 0; border-radius: 20px; background: #2868a6; color: #fff; font: inherit; font-size: clamp(1.2rem, 4.5vw, 1.5rem); font-weight: 700; cursor: pointer; touch-action: manipulation; }
+
+/* The picture: rows of five like a ten frame, or one column per pair when comparing. */
+.bs-scene { display: grid; justify-content: center; gap: 8px; margin: 4px auto; }
+.bs-scene--compare { --bs-size: clamp(22px, 7vw, 44px); }
+.bs-row { display: flex; gap: clamp(6px, 2vw, 12px); }
+.bs-pairs { display: flex; align-items: flex-start; gap: clamp(4px, 1.6vw, 10px); }
+.bs-pair { display: grid; gap: 6px; justify-items: center; padding: 4px 2px; border-radius: 12px; }
+.bs-pair--group { margin-left: clamp(4px, 2vw, 12px); }
+.bs-pair--matched { background: #e7eef7; }
+.bs-who { padding-inline: 0; }
+.bs-face { display: grid; place-items: start center; height: calc(var(--bs-size) * 1.18); margin-bottom: calc(var(--bs-size) * 0.5); font-size: calc(var(--bs-size) * 0.8); line-height: 1.2; }
+
+.bs-balloon { --bs-color: #2868a6; position: relative; box-sizing: border-box; display: grid; place-items: center; width: var(--bs-size); height: calc(var(--bs-size) * 1.18); margin-bottom: calc(var(--bs-size) * 0.5); border-radius: 50% 50% 46% 46% / 56% 56% 44% 44%; background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .55) 0 10%, transparent 11%), var(--bs-color); color: #fff; font-size: calc(var(--bs-size) * .5); font-weight: 700; }
+.bs-balloon::before { content: ''; position: absolute; top: calc(100% - 2px); left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top: 0; border-bottom-color: var(--bs-color); }
+.bs-balloon::after { content: ''; position: absolute; top: calc(100% + 3px); left: calc(50% - 1px); width: 2px; height: calc(var(--bs-size) * .42); border-radius: 1px; background: #8c96a8; }
+.bs-balloon--added { --bs-color: #d99221; }
+.bs-balloon--dani { --bs-color: #783952; }
+.bs-balloon__mark { line-height: 1; }
+
+/* Plain circles: the same story, one step closer to the exercise. */
+.bs-scene--dots .bs-balloon, .bs-scene--dots .bs-face { height: var(--bs-size); margin-bottom: 0; }
+.bs-scene--dots .bs-balloon { border-radius: 50%; background: var(--bs-color); }
+.bs-scene--dots .bs-balloon::before, .bs-scene--dots .bs-balloon::after { display: none; }
+.bs-scene--dots .bs-face { place-items: center; }
+
+.bs-balloon[data-state="hidden"], .bs-balloon--none { visibility: hidden; }
+/* A popped balloon leaves its outline and string, so it can still be counted. */
+.bs-balloon[data-state="popped"] { background: none; box-shadow: inset 0 0 0 2px #c7cfdb; }
+.bs-balloon[data-state="popped"]::before { display: none; }
+.bs-balloon[data-state="popped"] .bs-balloon__mark { position: absolute; inset: 45% -10%; border-radius: 2px; background: #c9442c; transform: rotate(-45deg); }
+.bs-balloon[data-state="empty"] { background: none; border: 2px dashed #9aa6b8; color: #783952; }
+.bs-balloon[data-state="empty"]::before, .bs-balloon[data-state="empty"]::after { display: none; }
+.bs-balloon--counted { box-shadow: 0 0 0 4px rgba(120, 57, 82, .35); }
+
+.bs-scene--mini { --bs-size: clamp(14px, 4vw, 20px); gap: 4px; margin: 0; }
+.bs-scene--mini .bs-row { gap: 4px; }
+.bs-scene--mini .bs-balloon[data-state="popped"] { box-shadow: inset 0 0 0 1.5px #9aa6b8; }
+
+.bs-equation { min-height: 1.3em; margin: 6px 0; font-size: clamp(30px, 7vw, 44px); font-weight: 700; }
+.bs-unknown { color: #783952; }
+.bs-solved { padding: 0 8px; border-radius: 10px; background: #2a7b71; color: #fff; }
+
+.bs-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2.5vw, 12px); margin: 8px 0 12px; }
+.bs-choice { display: grid; justify-items: center; align-content: center; gap: 6px; min-width: 68px; min-height: 84px; padding: 6px 8px; border: 3px solid #2868a6; border-radius: 18px; background: #fff; color: #174774; font: inherit; cursor: pointer; touch-action: manipulation; }
+.bs-choice__number { font-size: clamp(28px, 7vw, 36px); font-weight: 700; line-height: 1; }
+.bs-choice__dots { display: grid; grid-template-columns: repeat(5, 7px); gap: 3px; min-height: 7px; }
+.bs-choice__dots span { width: 7px; height: 7px; border-radius: 50%; background: #2868a6; }
+
+.bs-cards { display: grid; gap: 10px; width: min(100%, 440px); margin: 8px auto 12px; }
+.bs-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 72px; padding: 10px 14px; border: 3px solid #2868a6; border-radius: 18px; background: #fff; color: #1b140c; font: inherit; font-size: clamp(1rem, 3.8vw, 1.2rem); font-weight: 700; text-align: start; cursor: pointer; touch-action: manipulation; }
+
+.bs-pick--tried { opacity: .35; border-style: dashed; }
+.bs-pick--hint { border-color: #783952; background: #f0e4eb; box-shadow: 0 0 0 4px rgba(120, 57, 82, .25); }
+.bs-pick--correct { border-color: #2a7b71; background: #dcefe9; }
+.bs-choice:disabled, .bs-card:disabled, .bs-again:disabled { cursor: default; }
+.bs-choice:disabled:not(.bs-pick--tried, .bs-pick--correct), .bs-card:disabled:not(.bs-pick--tried, .bs-pick--correct) { opacity: .6; }
+.bs-again { min-width: 96px; min-height: 64px; padding: 8px 24px; border: 2px solid #2868a6; border-radius: 16px; background: #fff; color: #2868a6; font: inherit; font-size: 1.1rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.bs-again:disabled { opacity: .45; }
+.bs-choice:focus-visible, .bs-card:focus-visible, .bs-again:focus-visible, .bs-start:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
+.bs-game .feedback-message { min-height: 2.4em; }
