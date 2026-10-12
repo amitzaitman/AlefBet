@@ -6,17 +6,18 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../../audio/voice-store.js', () => ({
+// The compiler lives in the sound studio and uses the runtime bundle, so the store is mocked there.
+vi.mock('../../dist/runtime.js', async importOriginal => ({
+  ...await importOriginal(),
   saveVoice: vi.fn(async () => {}),
   listVoiceKeys: vi.fn(async () => []),
   playVoice: vi.fn(async () => false),
 }));
 
-import { compileTextForKey, compileSoundBank, resolveTtsProxyUrl } from '../../audio/sound-bank-compiler.js';
-import { standardSoundKeys } from '../../audio/hebrew-audio.js';
-import { saveVoice, listVoiceKeys } from '../../audio/voice-store.js';
-import { getLetter } from '../../data/hebrew-letters.js';
-import { nikudList } from '../../data/nikud.js';
+import { compileTextForKey, compileSoundBank, resolveTtsProxyUrl } from '../../../games/sound-studio/sound-bank-compiler.js';
+import { standardSoundKeys, saveVoice, listVoiceKeys } from '../../dist/runtime.js';
+import { getLetter } from '../data/hebrew-letters.js';
+import { nikudList } from '../data/nikud.js';
 
 function okAudioResponse() {
   return {

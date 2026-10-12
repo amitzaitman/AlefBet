@@ -14,10 +14,9 @@
  *   compileTextForKey(key) - איזה טקסט יוקרא עבור מפתח בנק (טהור, לבדיקות).
  *   compileSoundBank(opts) - הורדת כל הצלילים החסרים אל הבנק.
  */
-import { SOUND_BANK_ID, standardSoundKeys } from './hebrew-audio.js';
-import { saveVoice, listVoiceKeys } from './voice-store.js';
-import { getLetter } from '../data/hebrew-letters.js';
-import { nikudList, letterWithNikud } from '../data/nikud.js';
+import {
+  SOUND_BANK_ID, standardSoundKeys, saveVoice, listVoiceKeys, getLetter, nikudList, letterWithNikud,
+} from '../../framework/dist/runtime.js';
 
 /** מפתח localStorage לכתובת שירות הקולות. */
 const PROXY_STORAGE_KEY = 'alefbet.ttsProxyUrl';

@@ -23,7 +23,7 @@ Read [`MIGRATION.md`](./MIGRATION.md) before touching build, `sw.js`, the framew
 framework/src/
   core/      EventBus, GameState, GameShell, round-manager, local-state, bootstrap
   audio/     hebrew-audio, tts, phoneme-synth, audio-context, vowel-detector,
-             sound-bank-compiler, sounds, voice-recorder, voice-store
+             sounds, voice-recorder, voice-store
   data/      hebrew-letters, nikud, encouragement
   ui/        option-cards, progress-bar, feedback, zones, completion, ...
   render/    animations

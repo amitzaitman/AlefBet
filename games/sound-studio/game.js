@@ -16,10 +16,9 @@ import {
   speakSyllable,
   createVoiceRecordButton,
   isVoiceRecordingSupported,
-  compileSoundBank,
-  resolveTtsProxyUrl,
   tts,
 } from '../../framework/dist/runtime.js';
+import { compileSoundBank, resolveTtsProxyUrl } from './sound-bank-compiler.js';
 
 const GROUPS = [
   { id: 'letters',   title: 'שְׁמוֹת הָאוֹתִיּוֹת',  hint: 'הַקְלִיטוּ אֶת שֵׁם הָאוֹת, לְמָשָׁל: "בֵּית"' },
