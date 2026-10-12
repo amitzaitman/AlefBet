@@ -6,10 +6,10 @@
  * הסימנים הצירופיים של מנוע הטקסט (היה בעייתי במיוחד ב-iOS Safari).
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createNikudBox } from '../../ui/nikud-box.js';
-import { nikudGlyphSvg, NIKUD_GLYPH_IDS } from '../../ui/nikud-glyphs.js';
-import { nikudList } from '../../data/nikud.js';
-import { mountContainer } from '../helpers.js';
+import { createNikudBox } from '../../../games/nikud-match/nikud-box.js';
+import { nikudGlyphSvg, NIKUD_GLYPH_IDS } from '../../../games/nikud-match/nikud-glyphs.js';
+import { nikudList } from '../data/nikud.js';
+import { mountContainer } from './helpers.js';
 
 let container;
 beforeEach(() => { container = mountContainer(); });

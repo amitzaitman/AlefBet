@@ -13,11 +13,11 @@ import {
   randomNikud,
   showNikudSettingsDialog,
   injectHeaderButton,
-  createNikudBox,
   createDragSource,
   createDropTarget,
   speakSyllable,
 } from '../../framework/dist/runtime.js';
+import { createNikudBox } from './nikud-box.js';
 
 const ROUNDS = 8;
 
