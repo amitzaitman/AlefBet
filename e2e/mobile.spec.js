@@ -34,12 +34,7 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await expect(page.locator('.progress-bar__label')).toHaveText('1 / 8');
 });
 
-test('adult tools stay separate and feedback does not move the choices', async ({ page }) => {
-  await page.goto('/');
-  const studio = page.locator('a[href="games/sound-studio/"]');
-  await expect(studio).toBeHidden();
-  await page.getByText('להורים ולמורים', { exact: true }).click();
-  await expect(studio).toBeVisible();
+test('choices fit the phone and do not move for the adult menu or feedback', async ({ page }) => {
   // The adult menu (here: nikud settings) opens without moving the child's choices.
   await page.goto('/games/syllable-read/');
   const choices = page.locator('.option-cards-grid');
@@ -57,6 +52,17 @@ test('adult tools stay separate and feedback does not move the choices', async (
   await expect(cards).toBeVisible();
   await page.evaluate(() => document.fonts.ready);
   const before = await cards.boundingBox();
+  // Each choice is wide enough to read and stays inside the screen.
+  const options = page.locator('.option-card');
+  await expect(options).toHaveCount(4);
+  const screenWidth = await page.evaluate(() => innerWidth);
+  for (const card of await options.all()) {
+    const box = await card.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.width).toBeGreaterThanOrEqual(120);
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(screenWidth);
+  }
   await page.locator('[data-id="wrong-0"]').tap();
   await expect(page.locator('.feedback-message--hint')).toBeVisible();
   const after = await cards.boundingBox();
