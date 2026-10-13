@@ -5,6 +5,8 @@ for (const game of ['fraction-picture', 'fraction-whole', 'fraction-compare']) {
     const painting = game !== 'fraction-compare';
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
+    // The page clock skips the fixed 1600 ms round transition; it still flows in real time otherwise.
+    await page.clock.install();
     await page.goto(`${network.url}/games/${game}/`);
     for (let round = 0; round < 6; round++) {
       const bars = page.locator('.fraction-bar');
@@ -52,6 +54,7 @@ for (const game of ['fraction-picture', 'fraction-whole', 'fraction-compare']) {
         await expect(cells.first()).toBeDisabled();
         await expect(page.locator('.fraction-reset')).toBeDisabled();
         if (game === 'fraction-whole') await expect(page.locator('.fraction-equation .fraction-label')).toHaveCount(2);
+        await page.clock.runFor(1600);
         if (round < 5) await expect(page.locator('.fraction-check:enabled')).toBeVisible();
       } else {
         const [m, e] = values[1];
@@ -70,10 +73,13 @@ for (const game of ['fraction-picture', 'fraction-whole', 'fraction-compare']) {
         }
         await activate(correct);
         await expect(correct).toBeDisabled();
+        // The last feedback is read before the completion screen replaces it.
         if (round === 5) {
           expect(answer).toBe('equal');
           await expect(page.locator('.feedback-message')).toContainText('אוֹתָהּ');
-        } else await expect(page.locator('.option-card:enabled').first()).toBeVisible();
+        }
+        await page.clock.runFor(1600);
+        if (round < 5) await expect(page.locator('.option-card:enabled').first()).toBeVisible();
       }
     }
     await expect(page.locator('.completion-screen')).toBeVisible();

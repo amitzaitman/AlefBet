@@ -4,6 +4,8 @@ for (const game of ['make-ten', 'number-line']) {
   test(`${game}: retry, completion, replay and offline`, async ({ page, activate, network }) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
+    // The page clock skips the fixed 800 ms round transition; it still flows in real time otherwise.
+    await page.clock.install();
     await page.goto(`${network.url}/games/${game}/`);
     await expect(page.locator('.game-title')).toBeVisible();
     for (let i = 0; i < 6; i++) {
@@ -33,11 +35,10 @@ for (const game of ['make-ten', 'number-line']) {
         }
         await activate(page.getByRole('button', { name: 'בדיקת התשובה', exact: true }));
       }
-      if (i < 5) {
-        // A completed answer is locked until the following round is built.
-        await expect(page.locator(game === 'make-ten' ? '.option-card:disabled' : '.line-check:disabled')).not.toHaveCount(0);
-        await expect(page.locator(game === 'make-ten' ? '.option-card:enabled' : '.line-check:enabled').first()).toBeVisible();
-      }
+      // A completed answer is locked until the following round is built.
+      await expect(page.locator(game === 'make-ten' ? '.option-card:disabled' : '.line-check:disabled')).not.toHaveCount(0);
+      await page.clock.runFor(800);
+      if (i < 5) await expect(page.locator(game === 'make-ten' ? '.option-card:enabled' : '.line-check:enabled').first()).toBeVisible();
     }
     await expect(page.locator('.completion-screen')).toBeVisible();
     await activate(page.locator('.completion-screen__replay'));
@@ -99,9 +100,11 @@ test('equations and the number line read left to right inside the RTL page', asy
 });
 
 test('long-exercise: solve part by part, hints, keyboard, completion, replay and offline', async ({ page, activate, network }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(60_000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
+  // The page clock skips the fixed pauses: 700 ms on each merged part and the 1600 ms round transition.
+  await page.clock.install();
   await page.goto(`${network.url}/games/long-exercise/`);
   await expect(page.locator('.game-title')).toBeVisible();
   const part = page.locator('.chain-part');
@@ -145,12 +148,14 @@ test('long-exercise: solve part by part, hints, keyboard, completion, replay and
       if (step < terms[round] - 2) {
         // The solved part merges into one number before the next part is marked.
         await expect(page.locator('.chain-current .chain-term--total')).toHaveText(String(last));
+        await page.clock.runFor(700);
       }
     }
     await expect(page.locator('.chain-original .chain-answer--solved')).toHaveText(String(last));
     await expect(page.locator('.chain-current .chain-term')).toHaveText(String(last));
     await expect(page.locator('.chain-choice')).toHaveCount(0);
     await expect(page.locator('.chain-help')).toBeDisabled();
+    await page.clock.runFor(1600);
   }
   await expect(page.locator('.completion-screen')).toBeVisible();
   await activate(page.locator('.completion-screen__replay'));
@@ -171,7 +176,7 @@ async function solveBalloonExercise(equation) {
 }
 
 test('balloon-stories: narrated story, hints, exercise to story, completion, replay and offline', async ({ page, activate, network }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(60_000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   // A recording voice that answers at once, so the story's sentences can be checked.
@@ -186,6 +191,12 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
     };
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => synth });
   });
+  // The story's pacing is fixed waits: a beat lasts at least 1200 ms, a change step staggers
+  // up to 6 x 280 ms, counting aloud takes 700 ms per balloon and the round transition 2600 ms.
+  // The page clock skips them; it still flows in real time otherwise. The no-voice test below
+  // plays its story in real time.
+  await page.clock.install();
+  const skip = ms => page.clock.runFor(ms);
   await page.goto(`${network.url}/games/balloon-stories/`);
   const choice = page.locator('.bs-choice');
   const equation = page.locator('.bs-equation');
@@ -199,7 +210,9 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
   if (await start.count()) {
     await expect(choice.first()).toBeDisabled();
     await activate(start);
+    await expect(start).toHaveCount(0);
   }
+  await skip(3000);
   await expect(choice.first()).toBeEnabled();
   await expect(page.locator('.bs-line')).toHaveCount(3);
   await expect(equation).toHaveAttribute('dir', 'ltr');
@@ -217,6 +230,7 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
   await expect(page.locator('.bs-pick--tried')).toBeDisabled();
   await activate(wrong.first());
   await expect(feedback).toContainText('שֶׁנִּשְׁאֲרוּ');
+  await skip(300 + 700 * answer);
   await expect(page.locator('.bs-balloon--counted')).toHaveCount(answer);
   await expect(page.locator('.bs-balloon--counted').last()).toHaveText(String(answer));
   await activate(wrong.first());
@@ -226,6 +240,7 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
   await expect(page.locator('.bs-line--result')).toBeVisible();
 
   for (let round = 2; round <= 9; round++) {
+    await skip(6500);
     await expect(solved).toHaveCount(0, { timeout: 10_000 });
     // The comparing rounds are the widest pictures; they still fit a small phone.
     if (round === 4) await page.setViewportSize({ width: 320, height: 640 });
@@ -254,10 +269,12 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
       await expect.poll(() => page.evaluate(() => window.__spoken.at(-1))).toContain('שָׁוֶה');
     }
   }
+  await skip(3000);
   await expect(page.locator('.completion-screen')).toBeVisible({ timeout: 10_000 });
   await activate(page.locator('.completion-screen__replay'));
   // After the first tap the replayed story starts by itself.
   await expect(page.locator('.bs-scene')).toBeVisible();
+  await skip(3000);
   await expect(start).toHaveCount(0);
   await expect(choice.first()).toBeEnabled({ timeout: 10_000 });
   expect(await fits()).toBe(true);

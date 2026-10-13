@@ -4,6 +4,8 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await page.route('**/translate.google.com/**', route => route.abort());
   await page.route('**/translate_tts**', route => route.abort());
   await noVoice(page);
+  // The page clock skips the fixed 800 ms round transition; it still flows in real time otherwise.
+  await page.clock.install();
   await page.goto(`${network.url}/games/letter-match-animals/`);
   const cards = page.locator('.option-card');
   await expect(cards).toHaveCount(4);
@@ -18,6 +20,9 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await expect(page.locator('#alefbet-audio-status-banner')).toBeVisible();
   for (let round = 0; round < 8; round++) {
     await page.locator('[data-id="correct"]:enabled').tap();
+    // The score moves before the transition starts, so the tap was handled.
+    await expect(page.locator('.progress-bar__label')).toHaveText(`${round + 1} / 8`);
+    await page.clock.runFor(800);
   }
   await expect(page.locator('.completion-screen')).toBeVisible();
   await page.locator('.completion-screen__replay').tap();
@@ -61,6 +66,8 @@ test('adult tools stay separate and feedback does not move the choices', async (
 });
 
 test('nikud supports tap selection, retry, completion and returning home', async ({ page }) => {
+  // The page clock skips the fixed 800 ms round transition; it still flows in real time otherwise.
+  await page.clock.install();
   await page.goto('/games/nikud-match/');
   const letter = page.locator('.nm-arena .nm-letter');
   const label = page.locator('.progress-bar__label');
@@ -76,7 +83,13 @@ test('nikud supports tap selection, retry, completion and returning home', async
   await expect(letter).toBeEnabled();
   await expect(letter).toHaveAttribute('aria-pressed', 'true');
   // Each answered letter is marked, so the next round is read only once it is on screen.
-  const answer = async () => { await letter.evaluate(el => { el.dataset.answered = ''; }); await correct().tap(); };
+  const answer = async () => {
+    await letter.evaluate(el => { el.dataset.answered = ''; });
+    await correct().tap();
+    // An answered letter is locked, so the tap was handled before the transition is skipped.
+    await expect(letter).toBeDisabled();
+    await page.clock.runFor(800);
+  };
   await answer();
   for (let round = 1; round < 8; round++) {
     await expect(page.locator('.nm-arena .nm-letter:not([data-answered])')).toBeVisible();
