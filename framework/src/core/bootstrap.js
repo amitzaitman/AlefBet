@@ -8,6 +8,7 @@ import { createRoundManager } from './round-manager.js';
 import { createProgressBar } from '../ui/progress-bar.js';
 import { installGlobalErrorScreen } from '../ui/error-screen.js';
 import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
+import { attachGameAudio } from '../audio/game-audio.js';
 
 /** @type {WeakMap<HTMLElement, object>} */
 const starts = new WeakMap();
@@ -40,8 +41,8 @@ const starts = new WeakMap();
  */
 
 /**
- * מציג מסך טעינה, טוען את מודול השמע (אלא אם audio=false), מריץ onBeforeHide
- * ובונה GameShell - הכל בקריאה אחת.
+ * מציג מסך טעינה, מריץ onBeforeHide, בונה GameShell ומחבר אליו את השמע
+ * (אלא אם audio=false) - הכל בקריאה אחת.
  * @param {HTMLElement} container
  * @param {BootstrapOptions} opts
  * @returns {Promise<BootstrapResult>}
@@ -55,11 +56,6 @@ export async function bootstrapGame(container, opts) {
   installGlobalErrorScreen();
 
   showLoadingScreen(container, opts.loadingMessage ?? 'טוֹעֵן...');
-
-  const audioModule = opts.audio !== false ? await import('../audio/game-audio.js') : null;
-  if (starts.get(container) !== start) {
-    return { shell: null, activeRounds: [], aborted: true };
-  }
 
   if (opts.onBeforeHide) {
     const proceed = await opts.onBeforeHide();
@@ -78,7 +74,7 @@ export async function bootstrapGame(container, opts) {
     title:       opts.title,
     gameId:      opts.gameId,
   });
-  audioModule?.attachGameAudio(shell);
+  if (opts.audio !== false) attachGameAudio(shell);
 
   return { shell, activeRounds, aborted: false };
 }
