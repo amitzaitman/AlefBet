@@ -297,3 +297,126 @@ test('balloon-stories: without a voice the story still plays and can be answered
   await expect(page.locator('.story-line--result')).toBeVisible();
   await expect(page.locator('.progress-bar__label')).toContainText('1');
 });
+
+test('apple-basket: count by touch, put a number in the basket, help, completion, replay and offline', async ({ page, activate, network }) => {
+  test.setTimeout(60_000);
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  // Without a voice every sentence takes its fixed 1200 ms and every counted step 700 ms;
+  // the page clock skips those and the 2400 ms round transition.
+  await noVoice(page);
+  await page.clock.install();
+  const skip = ms => page.clock.runFor(ms);
+  await page.goto(`${network.url}/games/apple-basket/`);
+  const choice = page.locator('.story-choice');
+  const onTree = page.locator('.ab-tree .ab-apple[data-state="shown"]');
+  const inBasket = page.locator('.ab-basket .ab-apple[data-state="shown"]');
+  const counted = page.locator('.ab-apple--counted');
+  const solved = page.locator('.story-solved');
+  const feedback = page.locator('.feedback-message');
+  const done = page.locator('.ab-done');
+  const fits = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  const start = page.locator('.story-start');
+  await expect(page.locator('.ab-tree')).toBeVisible();
+  if (await start.count()) await activate(start);
+  await skip(3000);
+  await expect(choice.first()).toBeEnabled();
+
+  // How many: each touch counts one apple, once.
+  const n = await onTree.count();
+  expect(n).toBeGreaterThanOrEqual(2);
+  expect(n).toBeLessThanOrEqual(5);
+  await expectTouchTargets(onTree);
+  await expectTouchTargets(choice);
+  await activate(onTree.nth(1));
+  await activate(onTree.nth(0));
+  await activate(onTree.nth(1));
+  await expect(counted).toHaveCount(2);
+  await expect(onTree.nth(1)).toHaveText('1');
+  await expect(onTree.nth(0)).toHaveText('2');
+  // A wrong number shows what it says on the tree, then the help counts together.
+  const wrong = n + 1;
+  await activate(page.locator(`.story-choice[data-value="${wrong}"]`));
+  await expect(page.locator('.ab-apple--chosen')).toHaveCount(n);
+  await expect(page.locator('.ab-tree .ab-apple[data-state="ghost"]')).toHaveCount(1);
+  await expect(page.locator('.story-pick--tried')).toBeDisabled();
+  await skip(1300);
+  await expect(feedback).toContainText('נִסְפֹּר יַחַד');
+  await skip(700 * n + 1300);
+  await expect(counted).toHaveCount(n);
+  await expect(page.locator('.ab-apple--total')).toHaveCount(n);
+  await expect(onTree.nth(n - 1)).toHaveText(String(n));
+  await activate(page.locator(`.story-choice[data-value="${n}"]`));
+  await expect(solved).toHaveText(String(n));
+  await expect(page.locator('.story-line--result')).toContainText(`${n} תַּפּוּחִים`);
+
+  /** Reads the number to put in the basket from the instruction. */
+  const target = async () => Number((await page.locator('.ab-build .story-line').first().innerText()).match(/\d+/)[0]);
+  /** Moves apples until the basket holds count. */
+  const fill = async count => {
+    while (await inBasket.count() < count) await activate(onTree.first());
+    while (await inBasket.count() > count) await activate(inBasket.last());
+  };
+  /** Counting the basket aloud: 700 ms a step, by the row of five past five, then the total. */
+  const countTime = count => 700 * (count > 5 ? count - 4 : count) + 1300;
+
+  for (let round = 2; round <= 6; round++) {
+    await skip(2600);
+    await expect(solved).toHaveCount(0);
+    const building = page.locator('.ab-build');
+    if (round === 2 || round === 5 || (round === 6 && await building.count())) {
+      await expect(building).toBeVisible();
+      const goal = await target();
+      if (round === 2) {
+        // One too many: the count ends with the total, then says what is needed.
+        await fill(goal + 1);
+        await expect(onTree).toHaveCount(10 - goal - 1);
+        await expect(page.locator('.ab-tree .ab-apple[data-state="taken"]')).toHaveCount(goal + 1);
+        await expectTouchTargets(done);
+        await activate(done);
+        await expect(done).toBeDisabled();
+        await skip(countTime(goal + 1));
+        await expect(page.locator('.ab-miss')).toHaveText(`בַּסַּל ${goal + 1} תַּפּוּחִים. צָרִיךְ ${goal}.`);
+        await expect(feedback).toContainText('יוֹתֵר מִדַּי');
+        await expect(page.locator('.ab-basket .ab-apple--total')).toHaveCount(goal + 1);
+        // A second miss marks the places to fill.
+        await activate(done);
+        await skip(countTime(goal + 1));
+        await expect(page.locator('.ab-slot--target')).toHaveCount(goal);
+        // A touch in the basket puts the apple back on the tree, and the old count is cleared.
+        await activate(inBasket.last());
+        await expect(page.locator('.ab-basket .ab-apple--counted')).toHaveCount(0);
+        await expect(inBasket).toHaveCount(goal);
+      } else {
+        await fill(goal);
+      }
+      await activate(done);
+      await skip(countTime(goal));
+      await expect(solved).toHaveText(String(goal));
+      await expect(page.locator('.story-line--result')).toContainText(`${goal} תַּפּוּחִים`);
+    } else {
+      await skip(3000);
+      await expect(choice.first()).toBeEnabled();
+      const count = await onTree.count();
+      expect(count).toBeGreaterThanOrEqual(round === 3 ? 2 : 6);
+      expect(await fits()).toBe(true);
+      await activate(page.locator(`.story-choice[data-value="${count}"]`));
+      await expect(solved).toHaveText(String(count));
+    }
+  }
+  await skip(2600);
+  await expect(page.locator('.completion-screen')).toBeVisible();
+  await activate(page.locator('.completion-screen__replay'));
+  // After the first tap the replayed story starts by itself.
+  await expect(page.locator('.ab-tree')).toBeVisible();
+  await skip(3000);
+  await expect(start).toHaveCount(0);
+  const again = await onTree.count();
+  await activate(page.locator(`.story-choice[data-value="${again}"]`));
+  await expect(solved).toHaveText(String(again));
+  expect(await fits()).toBe(true);
+  await network.reloadOffline(page);
+  await expect(page.locator('.ab-tree')).toBeVisible();
+  await expect(choice).toHaveCount(4);
+  expect(errors).toEqual([]);
+});

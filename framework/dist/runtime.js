@@ -407,7 +407,7 @@ function It(e, t, {
   let u = !1;
   const l = /* @__PURE__ */ new Set();
   function d(w) {
-    u = w || e.ended, l.forEach((te) => te(u));
+    u = w || e.ended, l.forEach((ne) => ne(u));
   }
   function y(w) {
     return l.add(w), w(u || e.ended), () => {
@@ -1023,17 +1023,19 @@ const C = {
       }), U();
     });
   }
-}, on = 1200, ie = 250, sn = /[֑-ׇ]/g;
+}, on = 1200, ee = 250, sn = /[֑-ׇ]/g;
 let Re = 0;
 function an(e) {
-  const t = (i) => new Promise((s) => {
-    e.schedule(() => s(void 0), i);
-  }), n = (i) => (Re++, C.speak(i).finally(() => {
+  const t = (s) => new Promise((a) => {
+    e.schedule(() => a(void 0), s);
+  }), n = (s) => (Re++, C.speak(s).finally(() => {
     Re--;
-  })), r = () => Re ? (C.cancel(), !0) : !1, o = (i, s = on, a = s + 1500 + i.replace(sn, "").length * 120) => Promise.all([t(s), Promise.race([n(i), t(a)])]);
+  })), r = () => Re ? (C.cancel(), !0) : !1, o = (s, a = on, c = a + 1500 + s.replace(sn, "").length * 120) => Promise.all([t(a), Promise.race([n(s), t(c)])]), i = async () => {
+    r() && await t(ee);
+  };
   return e.use(() => {
     r();
-  }), { wait: t, say: o, speak: n, hush: r };
+  }), { wait: t, say: o, speak: n, hush: r, quiet: i };
 }
 const cn = () => {
   var e;
@@ -1149,15 +1151,15 @@ function Ye(e, t) {
   return n.type = "button", n;
 }
 function Wn(e, t) {
-  const { shell: n, scope: r, isActive: o } = e, { wait: i, say: s, speak: a, hush: c } = an(r), u = t({ wait: i, say: s, speak: a }), { beats: l, scene: d, choices: y, result: f, ladder: b, onMiss: v, beforeResult: $ } = u, w = "cards" in y, te = u.solvedEquation ?? l[l.length - 1].equation;
-  let S = 0, ne = !1, be = 0;
-  const re = I("section", ["story-round", u.className, w && "story-round--cards"].filter(Boolean).join(" ")), F = I("div", "story");
+  const { shell: n, scope: r, isActive: o } = e, { wait: i, say: s, speak: a, hush: c } = an(r), u = t({ wait: i, say: s, speak: a }), { beats: l, scene: d, choices: y, result: f, ladder: b, onMiss: v, beforeResult: $ } = u, w = "cards" in y, ne = u.solvedEquation ?? l[l.length - 1].equation;
+  let S = 0, re = !1, be = 0;
+  const oe = I("section", ["story-round", u.className, w && "story-round--cards"].filter(Boolean).join(" ")), F = I("div", "story");
   F.setAttribute("aria-live", "polite");
   const we = I("p", "story-equation");
   we.dir = "ltr";
   const P = ln(y, { retireTried: u.retireTried ?? !0 }), q = Ye("story-again", "עוֹד פַּעַם 🔁");
-  q.setAttribute("aria-label", "שמיעת הסיפור שוב"), re.append(F, ...d ? [d.root] : [], we, P.root, q), n.bodyEl.append(re);
-  const ge = r.use(fn(re));
+  q.setAttribute("aria-label", "שמיעת הסיפור שוב"), oe.append(F, ...d ? [d.root] : [], we, P.root, q), n.bodyEl.append(oe);
+  const ge = r.use(fn(oe));
   function ve(m, p = "story-line") {
     var h;
     (h = F.querySelector(".story-line--now")) == null || h.classList.remove("story-line--now"), F.append(I("p", `${p} story-line--now`, m.text)), d == null || d.root.setAttribute("aria-label", [...F.querySelectorAll(".story-line")].map((g) => g.textContent).join(" "));
@@ -1169,14 +1171,14 @@ function Wn(e, t) {
       return g && g[k] !== _ && V.classList.add("story-term--new"), k ? [" ", V] : [V];
     }));
   }
-  async function oe() {
+  async function ie() {
     var g, _;
     const m = ++S, p = () => m === S && o();
-    if (c() && await i(ie), !p()) return;
+    if (c() && await i(ee), !p()) return;
     (g = d == null ? void 0 : d.clearCount) == null || g.call(d), d == null || d.reset(), F.replaceChildren();
     let h = "";
     for (const k of l) {
-      ve(k), _e(k.equation, u.highlight ? { before: h } : {}), h = k.equation, k.scene === "question" && !ne && (ne = !0, qe());
+      ve(k), _e(k.equation, u.highlight ? { before: h } : {}), h = k.equation, k.scene === "question" && !re && (re = !0, qe());
       const V = s(k.say);
       if (await Promise.all([V, (_ = d == null ? void 0 : d[k.scene]) == null ? void 0 : _.call(d, p, V)]), !p()) return;
     }
@@ -1189,7 +1191,7 @@ function Wn(e, t) {
   }
   async function bt() {
     const m = ke(), p = S, h = () => p === S && o();
-    if (m && await i(ie), !h() || !(d != null && d.counting)) return;
+    if (m && await i(ee), !h() || !(d != null && d.counting)) return;
     const { items: g, total: _ } = await d.counting(h);
     for (const k of g) {
       if (!h()) return;
@@ -1198,24 +1200,24 @@ function Wn(e, t) {
     _ && h() && await s(_);
   }
   function qe() {
-    P.lock(!ne || e.isAnswered()), q.disabled = e.isAnswered();
+    P.lock(!re || e.isAnswered()), q.disabled = e.isAnswered();
   }
   function Ve(m) {
     if (m.action === "mark") {
       P.mark(), ge.hint(m.hint);
       return;
     }
-    ge.hint(m.hint), m.action === "count" ? bt() : oe();
+    ge.hint(m.hint), m.action === "count" ? bt() : ie();
   }
   function wt(m) {
-    if (!(!ne || e.isAnswered() || m.disabled)) {
+    if (!(!re || e.isAnswered() || m.disabled)) {
       if (!P.isRight(m)) {
         e.onWrong(() => {
           be++, P.tried(m);
           const p = b[Math.min(be, b.length) - 1];
           return v ? (async () => {
             const h = ke(), g = S;
-            h && await i(ie), o() && (await v(P.valueOf(m), () => g === S && o()), o() && Ve(p));
+            h && await i(ee), o() && (await v(P.valueOf(m), () => g === S && o()), o() && Ve(p));
           })() : Ve(p);
         });
         return;
@@ -1223,9 +1225,9 @@ function Wn(e, t) {
       e.onCorrect(() => {
         P.correct(m);
         const p = ke(), h = () => {
-          _e(te, { answer: y.answer }), (u.resultLine ?? !0) && ve(f, "story-line story-line--result"), ge.correct(), r.schedule(() => {
+          _e(ne, { answer: y.answer }), (u.resultLine ?? !0) && ve(f, "story-line story-line--result"), ge.correct(), r.schedule(() => {
             a(f.say);
-          }, p ? ie : 0);
+          }, p ? ee : 0);
         };
         if (!$) return h();
         const g = S, _ = () => g === S && o();
@@ -1237,15 +1239,15 @@ function Wn(e, t) {
   }
   for (const m of P.buttons) r.listen(m, "click", () => wt(m));
   if (r.listen(q, "click", () => {
-    oe();
+    ie();
   }), e.subscribeAnswered(qe), cn()) {
     const m = Ye("story-start", "▶ הַקְשִׁיבוּ לַסִּפּוּר");
     F.append(m), q.hidden = !0, r.listen(m, "click", () => {
-      q.hidden = !1, oe();
+      q.hidden = !1, ie();
     });
   } else
-    oe();
-  return { host: re, get misses() {
+    ie();
+  return { host: oe, get misses() {
     return be;
   } };
 }
@@ -1305,11 +1307,11 @@ function Vn(e, t, n) {
   return `${me(t)} ${e === "+" ? "וְעוֹד" : "פָּחוֹת"} ${me(n)}`;
 }
 let B = null, E = null, ot = 0, it = 0, G = null, Me = 0, xe = 0;
-const ee = /* @__PURE__ */ new Map();
+const te = /* @__PURE__ */ new Map();
 function st(e, t) {
   var r;
   const n = (r = document.elementFromPoint(e, t)) == null ? void 0 : r.closest('[data-drop-target="true"]');
-  return n && ee.has(n) && !n.matches(":disabled") && n.getAttribute("aria-disabled") !== "true" ? n : null;
+  return n && te.has(n) && !n.matches(":disabled") && n.getAttribute("aria-disabled") !== "true" ? n : null;
 }
 function yn(e, t, n) {
   const r = e.getBoundingClientRect();
@@ -1375,7 +1377,7 @@ function On(e, t, { onTap: n } = {}) {
         n();
         return;
       }
-      v && ee.has(v) && ee.get(v).onDrop({ data: t, sourceEl: e, targetEl: v });
+      v && te.has(v) && te.get(v).onDrop({ data: t, sourceEl: e, targetEl: v });
     }, i = (f) => {
       f.pointerId === s && a();
     }, e.addEventListener("pointermove", r), e.addEventListener("pointerup", o), e.addEventListener("pointercancel", i), e.addEventListener("lostpointercapture", i);
@@ -1387,9 +1389,9 @@ function On(e, t, { onTap: n } = {}) {
   };
 }
 function Dn(e, t) {
-  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), ee.set(e, { onDrop: t }), {
+  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), te.set(e, { onDrop: t }), {
     destroy() {
-      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), ee.delete(e);
+      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), te.delete(e);
     }
   };
 }
@@ -1795,6 +1797,7 @@ export {
   Dn as createDropTarget,
   fn as createFeedback,
   jn as createHintTracker,
+  an as createNarrator,
   Wt as createProgressBar,
   Lt as createRoundScope,
   Wn as createStoryRound,

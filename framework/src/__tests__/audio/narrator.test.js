@@ -78,6 +78,22 @@ it('hushes only when there is speech', async () => {
   expect(tts.cancel).toHaveBeenCalledOnce();
 });
 
+it('quiet cuts speech and pauses only when there was speech', async () => {
+  const { narrator, tts, HUSH_MS } = await setup();
+  const silent = track(narrator.quiet());
+  await vi.advanceTimersByTimeAsync(0);
+  expect(silent.done).toBe(true);
+  expect(tts.cancel).not.toHaveBeenCalled();
+
+  void narrator.speak('שָׁלוֹם');
+  const cut = track(narrator.quiet());
+  expect(tts.cancel).toHaveBeenCalledOnce();
+  await vi.advanceTimersByTimeAsync(HUSH_MS - 1);
+  expect(cut.done).toBe(false);
+  await vi.advanceTimersByTimeAsync(1);
+  expect(cut.done).toBe(true);
+});
+
 it('cancels speech on dispose, leaves no timers, and never settles afterwards', async () => {
   const { narrator, tts, scope } = await setup();
   const sentence = track(narrator.say('שָׁלוֹם'));

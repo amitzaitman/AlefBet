@@ -1,0 +1,43 @@
+/* An apple is a button the size of a touch target; the fruit is drawn inside it. */
+/* Five apples, the gaps and the basket's border fit a 390px phone at 64px each. */
+.ab-game { --ab-apple: clamp(44px, calc((100vw - 70px) / 5), 68px); }
+.ab-build .story { min-height: 0; }
+
+/* The tree and the basket are ten places: two rows of five, left to right. */
+.ab-tree { position: relative; width: fit-content; margin: 4px auto 22px; padding: 6px; border-radius: 44px; background: #dcefd9; }
+.ab-tree::after { content: ''; position: absolute; top: 100%; left: 50%; width: 24px; height: 16px; border-radius: 0 0 6px 6px; background: #8a5a3b; transform: translateX(-50%); }
+.ab-frame, .ab-basket { display: grid; gap: 4px; }
+.ab-row { display: flex; gap: 4px; border-radius: 999px; }
+/* Up to five apples the tree is one row, until a wrong number asks for more. */
+.ab-tree--small .ab-row + .ab-row { display: none; }
+.ab-row--counted { box-shadow: 0 0 0 3px rgba(120, 57, 82, .45); }
+.ab-basket { width: fit-content; margin: 4px auto; padding: 6px 6px 12px; border: 3px solid #a8763e; border-radius: 16px 16px 40px 40px; background: #f6e9cf; }
+
+.ab-apple { position: relative; display: grid; place-items: center; width: var(--ab-apple); height: var(--ab-apple); padding: 0; border: 0; border-radius: 50%; background: none; color: #fff; font: inherit; font-size: calc(var(--ab-apple) * .4); font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.ab-apple::before { content: ''; position: absolute; inset: 12%; border-radius: 46% 46% 50% 50% / 52% 52% 48% 48%; background: radial-gradient(circle at 34% 30%, rgba(255, 255, 255, .5) 0 9%, transparent 10%), #c9442c; }
+.ab-apple::after { content: ''; position: absolute; top: 3%; left: 50%; width: 24%; height: 14%; border-radius: 0 100% 0 100%; background: #3d8b3d; }
+.ab-apple__mark { position: relative; line-height: 1; }
+.ab-apple:disabled { cursor: default; }
+.ab-apple:focus-visible { outline: 3px solid #be6922; outline-offset: 1px; }
+
+.ab-apple[data-state="hidden"], .ab-apple[data-state="none"] { visibility: hidden; }
+/* An apple that went to the basket leaves its place, so the tree can still be counted. */
+.ab-apple[data-state="taken"]::before, .ab-apple[data-state="empty"]::before, .ab-apple[data-state="ghost"]::before { background: none; border: 2px dashed #9aa6b8; }
+.ab-apple[data-state="taken"]::after, .ab-apple[data-state="empty"]::after, .ab-apple[data-state="ghost"]::after { display: none; }
+.ab-apple[data-state="empty"]::before { border-color: #c2a273; }
+/* An apple a wrong number asked for that is not on the tree. */
+.ab-apple[data-state="ghost"]::before { border: 3px dashed #783952; }
+
+.ab-apple--counted::before { box-shadow: 0 0 0 4px rgba(120, 57, 82, .45); }
+.ab-apple--chosen::before { box-shadow: 0 0 0 4px #d99221; }
+.ab-apple--total::before { box-shadow: 0 0 0 4px rgba(42, 123, 113, .6); }
+/* From the second miss the basket shows the places to fill, and apples past them fade. */
+.ab-slot--target[data-state="empty"]::before { border: 3px solid #783952; }
+.ab-basket--target .ab-apple[data-state="shown"]:not(.ab-slot--target) { opacity: .45; }
+
+.ab-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 4px 0 8px; }
+.ab-done { min-width: 120px; min-height: 64px; padding: 8px 24px; border: 0; border-radius: 16px; background: #2a7b71; color: #fff; font: inherit; font-size: 1.2rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.ab-done:disabled { opacity: .45; cursor: default; }
+.ab-done:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
+.ab-miss { color: #783952; }
+

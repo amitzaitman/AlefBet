@@ -9,7 +9,7 @@
  * מסתיימות לעולם, והסיפור פשוט נעצר. ניקוי שייך ל-scope.use, לא לקוד שאחרי await.
  *
  * API ציבורי:
- *   createNarrator(scope)          - { wait, say, speak, hush } לסיבוב אחד.
+ *   createNarrator(scope)          - { wait, say, speak, hush, quiet } לסיבוב אחד.
  *   needsTap()                     - האם הקול עוד מחכה לנגיעה ראשונה בדף.
  *   BEAT_MS, HUSH_MS               - משך משפט מינימלי, והפסקה אחרי ביטול דיבור.
  */
@@ -74,8 +74,15 @@ export function createNarrator(scope) {
   const say = (text, minMs = BEAT_MS, limitMs = minMs + 1500 + text.replace(MARKS, '').length * 120) =>
     Promise.all([wait(minMs), Promise.race([speak(text), wait(limitMs)])]);
 
+  /**
+   * מבטל דיבור, ואם היה כזה מחכה HUSH_MS לפני שממשיכים לדבר. משחק שמדבר בלי
+   * סיבוב סיפור (סיבובי הבנייה של apple-basket, המאזניים) קורא לו לפני ספירה בקול.
+   * @returns {Promise<void>}
+   */
+  const quiet = async () => { if (hush()) await wait(HUSH_MS); };
+
   scope.use(() => { hush(); });
-  return { wait, say, speak, hush };
+  return { wait, say, speak, hush, quiet };
 }
 
 /**
