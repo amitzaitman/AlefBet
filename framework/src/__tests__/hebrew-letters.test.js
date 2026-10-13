@@ -7,6 +7,7 @@ describe('hebrewLetters data integrity', () => {
     expect(hebrewLetters.filter(l => !l.isFinal)).toHaveLength(22);
     expect(hebrewLetters.filter(l => l.isFinal).map(l => l.letter).sort()).toEqual(['ך', 'ם', 'ן', 'ף', 'ץ'].sort());
     expect(new Set(hebrewLetters.map(l => l.letter)).size).toBe(27);
+    expect(['ך', 'ם', 'ן', 'ף', 'ץ'].map(ch => getLetter(ch)?.isFinal)).toEqual([true, true, true, true, true]);
   });
 
   it('every entry has the required fields and a single bare letter - no embedded nikud', () => {

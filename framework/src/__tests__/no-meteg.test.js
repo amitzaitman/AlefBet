@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, extname, relative } from 'path';
 
 /**
@@ -15,7 +15,8 @@ const METEG = '\u05BD';
 function collectFiles(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) return SKIP_DIRS.has(entry.name) ? [] : collectFiles(full);
+    const isDir = entry.isDirectory() || (entry.isSymbolicLink() && statSync(full).isDirectory());
+    if (isDir) return SKIP_DIRS.has(entry.name) ? [] : collectFiles(full);
     return SCAN_EXTENSIONS.has(extname(entry.name)) ? [full] : [];
   });
 }

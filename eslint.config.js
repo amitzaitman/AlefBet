@@ -12,6 +12,7 @@ export default [
   {
     ignores: [
       '**/node_modules/**',
+      '.claude/**',
       '**/dist/**',
       'framework/dist/**',
       'games/_template/**',

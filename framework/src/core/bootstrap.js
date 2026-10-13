@@ -25,7 +25,7 @@ const starts = new WeakMap();
  * @property {string} [loadingMessage] - ברירת מחדל: 'טוֹעֵן...'
  * @property {RoundRecord[]} [defaultRounds] - סיבובי המשחק
  * @property {number} [totalRounds] - אם לא מסופק, נגזר מ-activeRounds.length
- * @property {boolean} [audio] - false מוותר על טעינת השמע (דיבור ובאנר שמע)
+ * @property {boolean} [audio] - false מוותר על חיבור השמע למשחק: באנר מצב הקול, שחרור הקול בנגיעה הראשונה וביטול דיבור ביציאה
  * @property {() => boolean | void | Promise<boolean | void>} [onBeforeHide]
  *   הפעל בין preload ל-hide. החזרת false מאותתת שהמשחק טיפל ב-DOM בעצמו
  *   והאתחול יבוטל; במצב זה bootstrap לא יסיר את מסך הטעינה ולא יבנה shell.
