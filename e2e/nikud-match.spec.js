@@ -1,118 +1,24 @@
 // @ts-check
-import { test, expect } from '@playwright/test';
+import { test, expect, noVoice, targetNikud } from './network-server.js';
 
 const GAME_URL = '/games/nikud-match/';
-const BANNER_SELECTOR = '#alefbet-audio-status-banner';
 
 async function blockGoogleTTS(page) {
   await page.route('**/translate.google.com/**', route => route.abort());
   await page.route('**/translate_tts**', route => route.abort());
 }
 
-/** The nikud on the letter, read from the screen with the game's own nikud list. */
-async function targetNikud(page) {
-  return page.evaluate(async () => {
-    const { nikudList } = await import('/framework/dist/runtime.js');
-    const text = document.querySelector('.nm-arena .nm-letter').textContent;
-    const shown = [...document.querySelectorAll('.nm-zone')].map(zone => zone.dataset.nikud);
-    return nikudList.find(n => shown.includes(n.id) && text.includes(n.symbol)).id;
-  });
-}
-
-/** גרירה עם קלט עכבר אמיתי, כולל לכידת המצביע של הדפדפן. */
-async function dispatchDragToZone(page, zoneSelector) {
-  const letter = page.locator('.nm-arena .nm-letter');
-  await letter.evaluate(el => Promise.all(el.getAnimations().map(animation => animation.finished)));
-  const source = await letter.boundingBox();
-  const target = await page.locator(zoneSelector).boundingBox();
-  if (!source || !target) return false;
-  await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2, { steps: 8 });
-  await page.mouse.up();
-  return true;
-}
-
-/**
- * Drag the letter to whichever zone is the correct nikud match by trying the
- * left zone first, then the right if the round didn't advance. nikud-match
- * advances only on a correct drop, so two attempts cover both possibilities.
- */
-async function dragLetterToCorrectZone(page) {
-  await expect(page.locator('.nm-letter')).toBeVisible({ timeout: 10_000 });
-  await expect(page.locator('.nm-zone--left')).toBeVisible();
-  await expect(page.locator('.nm-zone--right')).toBeVisible();
-
-  const labelBefore = await page.locator('.progress-bar__label').textContent();
-  await dispatchDragToZone(page, '.nm-zone--left');
-  await page.waitForTimeout(200);
-
-  // If the left zone wasn't the correct one, try the right zone.
-  const labelAfter = await page.locator('.progress-bar__label').textContent();
-  if (labelAfter === labelBefore) {
-    // Wait for any wrong-answer pulse to finish, then try the other zone.
-    await page.waitForTimeout(900);
-    await dispatchDragToZone(page, '.nm-zone--right');
-  }
-}
-
-test.describe('nikud-match', () => {
-  test.beforeEach(async ({ page }) => {
-    await blockGoogleTTS(page);
-  });
-
-  test('golden path: dragging the letter to the matching zone advances a round', async ({ page }) => {
-    await page.goto(GAME_URL);
-
-    await expect(page.locator('.nm-arena')).toBeVisible({ timeout: 10_000 });
-    await page.getByText('למבוגרים', { exact: true }).click();
-    await expect(page.getByRole('button', { name: 'הגדרות', exact: true })).toBeVisible();
-    await page.getByText('למבוגרים', { exact: true }).click();
-    const initialLabel = await page.locator('.progress-bar__label').textContent();
-
-    await dragLetterToCorrectZone(page);
-
-    await expect(async () => {
-      const label = await page.locator('.progress-bar__label').textContent();
-      expect(label).not.toBe(initialLabel);
-    }).toPass({ timeout: 5_000 });
-  });
-
-  test('audio-failure path: banner surfaces and the game still progresses', async ({ page }) => {
-    await page.addInitScript(() => {
-      Object.defineProperty(window, 'speechSynthesis', {
-        configurable: true,
-        get: () => undefined,
-      });
-      HTMLAudioElement.prototype.play = function () {
-        return Promise.reject(new DOMException('blocked', 'NotAllowedError'));
-      };
-    });
-
-    await page.goto(GAME_URL);
-
-    await expect(page.locator('.nm-arena')).toBeVisible({ timeout: 10_000 });
-    const initialLabel = await page.locator('.progress-bar__label').textContent();
-
-    await dragLetterToCorrectZone(page);
-
-    const banner = page.locator(BANNER_SELECTOR);
-    await expect(banner).toBeVisible({ timeout: 5_000 });
-    const bannerText = (await banner.textContent()) || '';
-    expect(
-      bannerText.includes('הַקּוֹל אֵינוֹ זָמִין') || bannerText.includes('בְּעָיָה בַּקּוֹל'),
-      `unexpected banner text: ${JSON.stringify(bannerText)}`,
-    ).toBeTruthy();
-
-    await expect(async () => {
-      const label = await page.locator('.progress-bar__label').textContent();
-      expect(label).not.toBe(initialLabel);
-    }).toPass({ timeout: 5_000 });
-  });
-});
-
-test('keyboard selection works and the optional demonstration cleans up on input', async ({ page }) => {
+test('keyboard play, the settings button, the demonstration and the no-voice banner', async ({ page }) => {
+  // The syllable spoken after a correct answer has no voice, so the audio banner must show.
+  await noVoice(page);
   await page.goto(GAME_URL);
+  // The game adds its own settings button to the adult menu.
+  const adultMenu = page.getByText('למבוגרים', { exact: true });
+  const settings = page.getByRole('button', { name: 'הגדרות', exact: true });
+  await adultMenu.click();
+  await expect(settings).toBeVisible();
+  await adultMenu.click();
+  await expect(settings).toBeHidden();
   await page.locator('.nm-help').click();
   await expect(page.locator('.nm-demo')).toHaveCount(1);
   const letter = page.locator('.nm-arena .nm-letter');
@@ -121,8 +27,12 @@ test('keyboard selection works and the optional demonstration cleans up on input
   await expect(letter).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.nm-demo')).toHaveCount(0);
   await page.locator(`.nm-zone[data-nikud="${await targetNikud(page)}"]`).focus();
+  const banner = page.locator('#alefbet-audio-status-banner');
+  await expect(banner).toBeHidden();
   await page.keyboard.press('Enter');
   await expect(page.locator('.progress-bar__label')).toHaveText('1 / 8');
+  await expect(banner).toBeVisible();
+  await expect(banner).toContainText('הַקּוֹל אֵינוֹ זָמִין');
 });
 
 for (const input of ['mouse', 'touch']) {
