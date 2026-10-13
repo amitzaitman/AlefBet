@@ -1,53 +1,23 @@
 import { describe, it, expect } from 'vitest';
-import {
-  hebrewLetters,
-  getLetter,
-  getLettersByGroup,
-  randomLetters,
-} from '../data/hebrew-letters.js';
+import { hebrewLetters, getLetter, getLettersByGroup, randomLetters } from '../data/hebrew-letters.js';
 
 describe('hebrewLetters data integrity', () => {
-  it('has 27 entries: 22 regular + 5 final forms', () => {
+  it('has 22 regular letters plus the 5 final forms, all unique and the finals marked', () => {
     expect(hebrewLetters).toHaveLength(27);
-  });
-
-  it('has exactly 5 final-form letters', () => {
-    expect(hebrewLetters.filter(l => l.isFinal)).toHaveLength(5);
-  });
-
-  it('has exactly 22 regular letters', () => {
     expect(hebrewLetters.filter(l => !l.isFinal)).toHaveLength(22);
+    expect(hebrewLetters.filter(l => l.isFinal).map(l => l.letter).sort()).toEqual(['ך', 'ם', 'ן', 'ף', 'ץ'].sort());
+    expect(new Set(hebrewLetters.map(l => l.letter)).size).toBe(27);
   });
 
-  it('every entry has required fields', () => {
+  it('every entry has the required fields and a single bare letter - no embedded nikud', () => {
     for (const l of hebrewLetters) {
-      expect(l.letter,      `letter field missing for ${l.name}`).toBeTruthy();
-      expect(l.name,        `name missing for ${l.letter}`).toBeTruthy();
-      expect(l.nameNikud,   `nameNikud missing for ${l.letter}`).toBeTruthy();
-      expect(l.exampleWord, `exampleWord missing for ${l.letter}`).toBeTruthy();
-      expect(l.emoji,       `emoji missing for ${l.letter}`).toBeTruthy();
+      for (const field of ['letter', 'name', 'nameNikud', 'exampleWord', 'emoji']) {
+        expect(l[field], `${field} missing for ${l.letter ?? l.name}`).toBeTruthy();
+      }
       expect(typeof l.isFinal).toBe('boolean');
-    }
-  });
-
-  it('letter characters are unique', () => {
-    const chars = hebrewLetters.map(l => l.letter);
-    expect(new Set(chars).size).toBe(chars.length);
-  });
-
-  it('all final forms are marked correctly', () => {
-    const finalChars = ['ך', 'ם', 'ן', 'ף', 'ץ'];
-    for (const ch of finalChars) {
-      expect(getLetter(ch)?.isFinal, `${ch} should be isFinal`).toBe(true);
-    }
-  });
-
-  it('letter field is a single bare character - no embedded nikud', () => {
-    // רגרסיה: ם נשמרה בעבר עם חיריק תקוע ו-ך עם שווא, ולכן getLetter('ם')
-    // נכשל וכל התאמה לפי תו נשברה בשקט.
-    for (const l of hebrewLetters) {
-      expect(l.letter.length, `letter "${l.name}" must be one char`).toBe(1);
-      expect(/^[א-ת]$/.test(l.letter), `letter "${l.name}" must be a bare Hebrew letter`).toBe(true);
+      // רגרסיה: ם נשמרה בעבר עם חיריק תקוע ו-ך עם שווא, ולכן getLetter('ם')
+      // נכשל וכל התאמה לפי תו נשברה בשקט.
+      expect(l.letter, `letter "${l.name}" must be one bare Hebrew letter`).toMatch(/^[א-ת]$/);
     }
   });
 
@@ -63,9 +33,6 @@ describe('getLetter', () => {
   it('returns the correct entry for known letters', () => {
     expect(getLetter('א')?.name).toBe('אֶלֶף');
     expect(getLetter('ת')?.name).toBe('תָּו');
-  });
-
-  it('name field matches nameNikud for the letters that had corrupted spellings', () => {
     // רגרסיה: ל היה שמור בעבר כ-'לָמַד' (הפועל "למד", לא שם האות),
     // צ כ-'צִדֵּי' (ניקוד שגוי), ו-פ/ף ללא ניקוד כלל ('פא'/'פא סופית').
     expect(getLetter('ל')?.name).toBe('לָמֵד');
@@ -74,54 +41,30 @@ describe('getLetter', () => {
     expect(getLetter('ף')?.name).toBe('פֵּא סוֹפִית');
   });
 
-  it('returns null for characters not in the alphabet', () => {
-    expect(getLetter('X')).toBeNull();
-    expect(getLetter('a')).toBeNull();
-    expect(getLetter('')).toBeNull();
+  it.each(['X', 'a', ''])('returns null for %j, which is not in the alphabet', char => {
+    expect(getLetter(char)).toBeNull();
   });
 });
 
-describe('getLettersByGroup', () => {
-  it('returns only regular letters by default', () => {
-    const regular = getLettersByGroup();
-    expect(regular).toHaveLength(22);
-    expect(regular.every(l => !l.isFinal)).toBe(true);
+describe('letter groups', () => {
+  it.each([
+    [undefined, 22, l => !l.isFinal],
+    ['final', 5, l => l.isFinal],
+    ['all', 27, () => true],
+    ['???', 27, () => true], // unknown group falls through to all letters
+  ])('getLettersByGroup(%j) returns %i letters', (group, count, belongs) => {
+    const letters = getLettersByGroup(group);
+    expect(letters).toHaveLength(count);
+    expect(letters.every(belongs)).toBe(true);
   });
 
-  it('"final" returns only final-form letters', () => {
-    const final = getLettersByGroup('final');
-    expect(final).toHaveLength(5);
-    expect(final.every(l => l.isFinal)).toBe(true);
-  });
-
-  it('"all" returns all 27 letters', () => {
-    expect(getLettersByGroup('all')).toHaveLength(27);
-  });
-
-  it('unknown group falls through and returns all 27 letters', () => {
-    expect(getLettersByGroup('???')).toHaveLength(27);
-  });
-});
-
-describe('randomLetters', () => {
-  it('returns the requested count', () => {
+  it('randomLetters returns the requested count without duplicates, capped at the pool, within the group', () => {
     expect(randomLetters(4)).toHaveLength(4);
     expect(randomLetters(1)).toHaveLength(1);
-  });
-
-  it('returns no duplicate letters', () => {
-    const result = randomLetters(10);
-    const unique = new Set(result.map(l => l.letter));
-    expect(unique.size).toBe(result.length);
-  });
-
-  it('caps at pool size rather than throwing', () => {
-    // 22 regular letters maximum
-    expect(randomLetters(100)).toHaveLength(22);
-  });
-
-  it('respects the "final" group filter', () => {
-    const result = randomLetters(3, 'final');
-    expect(result.every(l => l.isFinal)).toBe(true);
+    const ten = randomLetters(10);
+    expect(ten).toHaveLength(10);
+    expect(new Set(ten.map(l => l.letter)).size).toBe(10);
+    expect(randomLetters(100)).toHaveLength(22); // 22 regular letters maximum, rather than throwing
+    expect(randomLetters(3, 'final').every(l => l.isFinal)).toBe(true);
   });
 });

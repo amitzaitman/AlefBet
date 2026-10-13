@@ -9,6 +9,7 @@ import { createOptionCards } from '../../ui/option-cards.js';
 import { mountContainer } from '../helpers.js';
 
 let container;
+const cards = () => container.querySelectorAll('.option-card');
 beforeEach(() => { container = mountContainer(); });
 
 const OPTIONS = [
@@ -17,73 +18,40 @@ const OPTIONS = [
   { id: 'c', text: 'גָּמָל', emoji: '🐫' },
 ];
 
-describe('createOptionCards — rendering', () => {
-  it('renders one button per option with matching id, text, and emoji', () => {
-    createOptionCards(container, OPTIONS, () => {});
-
-    const cards = container.querySelectorAll('.option-card');
-    expect(cards).toHaveLength(3);
-    expect(cards[0].dataset.id).toBe('a');
-    expect(cards[0].querySelector('.option-card__text').textContent).toBe('אוֹר');
-    expect(cards[0].querySelector('.option-card__emoji').textContent).toBe('🌞');
-  });
-
-  it('replaces any existing contents of the container', () => {
+describe('createOptionCards', () => {
+  it('replaces the container contents with one button per option, with matching id, text and emoji', () => {
     container.innerHTML = '<span class="old">stale</span>';
     createOptionCards(container, OPTIONS, () => {});
     expect(container.querySelector('.old')).toBeNull();
+    expect(cards()).toHaveLength(3);
+    expect(cards()[0].dataset.id).toBe('a');
+    expect(cards()[0].querySelector('.option-card__text').textContent).toBe('אוֹר');
+    expect(cards()[0].querySelector('.option-card__emoji').textContent).toBe('🌞');
   });
 
-  it('tolerates options with no emoji', () => {
-    createOptionCards(container, [{ id: 'x', text: 'הלום' }], () => {});
-    const card = container.querySelector('.option-card');
-    expect(card.querySelector('.option-card__text').textContent).toBe('הלום');
-    expect(card.querySelector('.option-card__emoji').textContent).toBe('');
-  });
-
-  it('renders answer text and emoji literally', () => {
-    createOptionCards(container, [{ id: 'x', text: '<b>text</b>', emoji: '<img src=x>' }], vi.fn());
-    expect(container.querySelector('.option-card__text').textContent).toBe('<b>text</b>');
+  it('tolerates a missing emoji and renders answer text and emoji literally', () => {
+    createOptionCards(container, [{ id: 'x', text: 'הלום' }, { id: 'y', text: '<b>text</b>', emoji: '<img src=x>' }], vi.fn());
+    expect(cards()[0].querySelector('.option-card__text').textContent).toBe('הלום');
+    expect(cards()[0].querySelector('.option-card__emoji').textContent).toBe('');
+    expect(cards()[1].querySelector('.option-card__text').textContent).toBe('<b>text</b>');
     expect(container.querySelector('b, img')).toBeNull();
   });
-});
 
-describe('createOptionCards — click', () => {
   it('calls onSelect with the selected option', () => {
     const onSelect = vi.fn();
     createOptionCards(container, OPTIONS, onSelect);
-
-    container.querySelectorAll('.option-card')[1].click();
-
+    cards()[1].click();
     expect(onSelect).toHaveBeenCalledOnce();
     expect(onSelect).toHaveBeenCalledWith(OPTIONS[1]);
   });
-});
 
-describe('createOptionCards — highlight', () => {
-  it('applies a type-specific class to the matching card', () => {
-    const cards = createOptionCards(container, OPTIONS, () => {});
-    cards.highlight('b', 'correct');
-
-    const [, bCard] = container.querySelectorAll('.option-card');
-    expect(bCard.classList.contains('option-card--correct')).toBe(true);
-  });
-
-  it('leaves other cards unchanged', () => {
-    const cards = createOptionCards(container, OPTIONS, () => {});
-    cards.highlight('a', 'wrong');
-
-    const nodes = container.querySelectorAll('.option-card');
-    expect(nodes[0].classList.contains('option-card--wrong')).toBe(true);
-    expect(nodes[1].classList.contains('option-card--wrong')).toBe(false);
-    expect(nodes[2].classList.contains('option-card--wrong')).toBe(false);
-  });
-});
-
-describe('createOptionCards — destroy', () => {
-  it('empties the container', () => {
-    const cards = createOptionCards(container, OPTIONS, () => {});
-    cards.destroy();
+  it('highlights only the matching card with a type-specific class, and destroy empties the container', () => {
+    const handle = createOptionCards(container, OPTIONS, () => {});
+    handle.highlight('b', 'correct');
+    handle.highlight('a', 'wrong');
+    expect(cards()[1].classList.contains('option-card--correct')).toBe(true);
+    expect([...cards()].map(card => card.classList.contains('option-card--wrong'))).toEqual([true, false, false]);
+    handle.destroy();
     expect(container.innerHTML).toBe('');
   });
 });

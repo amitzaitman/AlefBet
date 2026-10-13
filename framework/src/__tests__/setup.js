@@ -11,17 +11,10 @@ import { afterEach, vi } from 'vitest';
 // `framework/src/render/animations.js` קורא ל-`el.animate(...)`. ב-jsdom
 // הפונקציה אינה קיימת, ובלעדיה רכיבי feedback/completion-screen זורקים.
 if (typeof Element !== 'undefined' && typeof Element.prototype.animate !== 'function') {
-  Element.prototype.animate = function () {
-    return {
-      finished: Promise.resolve(),
-      cancel() {},
-      finish() {},
-      play() {},
-      pause() {},
-      addEventListener() {},
-      removeEventListener() {},
-    };
-  };
+  Element.prototype.animate = () => ({
+    finished: Promise.resolve(),
+    cancel() {}, finish() {}, play() {}, pause() {}, addEventListener() {}, removeEventListener() {},
+  });
 }
 
 // ── Web Audio API ──────────────────────────────────────────────────────────
@@ -30,39 +23,23 @@ if (typeof Element !== 'undefined' && typeof Element.prototype.animate !== 'func
 if (typeof window !== 'undefined' && typeof window.AudioContext === 'undefined') {
   // פרמטר אודיו מדומה שמקבל את כל שיטות התזמון של AudioParam.
   const silentParam = () => ({
-    value: 0,
-    setValueAtTime() {},
-    linearRampToValueAtTime() {},
-    exponentialRampToValueAtTime() {},
+    value: 0, setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {},
   });
 
   class SilentAudioContext {
-    constructor() {
-      this.currentTime = 0;
-      this.state = 'running';
-      this.destination = {};
-      this.sampleRate = 44100;
-    }
+    currentTime = 0;
+    state = 'running';
+    destination = {};
+    sampleRate = 44100;
     createOscillator() {
-      return {
-        connect() {},
-        start() {},
-        stop() {},
-        frequency: silentParam(),
-        type: 'sine',
-      };
+      return { connect() {}, start() {}, stop() {}, frequency: silentParam(), type: 'sine' };
     }
     createGain() {
       return { connect() {}, disconnect() {}, gain: silentParam() };
     }
     // נדרשים ל-phoneme-synth (מסנני פורמנטים ורעש)
     createBiquadFilter() {
-      return {
-        connect() {},
-        type: 'bandpass',
-        frequency: silentParam(),
-        Q: silentParam(),
-      };
+      return { connect() {}, type: 'bandpass', frequency: silentParam(), Q: silentParam() };
     }
     createBuffer(channels, length, sampleRate) {
       return { sampleRate, getChannelData: () => new Float32Array(length) };

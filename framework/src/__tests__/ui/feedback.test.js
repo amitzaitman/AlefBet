@@ -18,108 +18,70 @@ import { PRAISE_PHRASES } from '../../data/encouragement.js';
 import { mountContainer } from '../helpers.js';
 
 let container;
+const message = () => container.querySelector('.feedback-message');
 beforeEach(() => {
   container = mountContainer();
   vi.clearAllMocks();
   vi.useFakeTimers();
 });
 
-describe('createFeedback — element setup', () => {
-  it('appends an aria-live status element to the container', () => {
-    createFeedback(container);
-    const el = container.querySelector('.feedback-message');
-    expect(el).not.toBeNull();
-    expect(el.getAttribute('aria-live')).toBe('polite');
-    expect(el.getAttribute('role')).toBe('status');
-  });
-});
-
-describe('createFeedback — correct', () => {
-  it('plays the correct sound, shows a random praise phrase and bounces', () => {
+describe('createFeedback', () => {
+  it('appends an aria-live status element; correct() plays the sound, shows a praise phrase and bounces', () => {
     const fb = createFeedback(container);
+    expect(message().getAttribute('aria-live')).toBe('polite');
+    expect(message().getAttribute('role')).toBe('status');
     fb.correct();
-
-    const el = container.querySelector('.feedback-message');
     expect(sounds.correct).toHaveBeenCalledOnce();
     // הטקסט הוא "!" + אחד מביטויי השבח המשותפים - לא נניח איזה נבחר.
-    expect(el.textContent.startsWith('!')).toBe(true);
-    expect(PRAISE_PHRASES).toContain(el.textContent.slice(1));
-    expect(el.className).toBe('feedback-message feedback-message--correct');
-    expect(animate).toHaveBeenCalledWith(el, 'bounce');
+    expect(message().textContent.startsWith('!')).toBe(true);
+    expect(PRAISE_PHRASES).toContain(message().textContent.slice(1));
+    expect(message().className).toBe('feedback-message feedback-message--correct');
+    expect(animate).toHaveBeenCalledWith(message(), 'bounce');
   });
 
-  it('accepts a custom praise message', () => {
-    const fb = createFeedback(container);
-    fb.correct('מעולה');
-    expect(container.querySelector('.feedback-message').textContent).toBe('מעולה');
-  });
-
-  it('auto-clears after 1800ms', () => {
-    const fb = createFeedback(container);
-    fb.correct('מעולה');
-    const el = container.querySelector('.feedback-message');
-
+  it('shows a custom praise message and clears it after 1800ms', () => {
+    createFeedback(container).correct('מעולה');
     vi.advanceTimersByTime(1799);
-    expect(el.textContent).toBe('מעולה');
-
+    expect(message().textContent).toBe('מעולה');
     vi.advanceTimersByTime(1);
-    expect(el.textContent).toBe('');
-    expect(el.className).toBe('feedback-message');
+    expect(message().textContent).toBe('');
+    expect(message().className).toBe('feedback-message');
   });
-});
 
-describe('createFeedback — wrong', () => {
-  it('plays the wrong sound, shows an encouraging retry message and pulses', () => {
-    const fb = createFeedback(container);
-    fb.wrong();
-
-    const el = container.querySelector('.feedback-message');
+  it('wrong() plays the wrong sound, shows an encouraging retry message and pulses', () => {
+    createFeedback(container).wrong();
     expect(sounds.wrong).toHaveBeenCalledOnce();
     expect(sounds.correct).not.toHaveBeenCalled();
-    expect(el.textContent).toMatch(/נ.*ס.*ה.*ש.*ו.*ב/); // "נסה שוב" with any nikud
-    expect(el.className).toBe('feedback-message feedback-message--wrong');
-    expect(animate).toHaveBeenCalledWith(el, 'pulse');
+    expect(message().textContent).toMatch(/נ.*ס.*ה.*ש.*ו.*ב/); // "נסה שוב" with any nikud
+    expect(message().className).toBe('feedback-message feedback-message--wrong');
+    expect(animate).toHaveBeenCalledWith(message(), 'pulse');
   });
-});
 
-describe('createFeedback — hint', () => {
-  it('shows the hint text without playing any sound', () => {
-    const fb = createFeedback(container);
-    fb.hint('התחל באות א');
-
-    const el = container.querySelector('.feedback-message');
+  it('hint() shows the hint text without playing any sound', () => {
+    createFeedback(container).hint('התחל באות א');
     expect(sounds.correct).not.toHaveBeenCalled();
     expect(sounds.wrong).not.toHaveBeenCalled();
-    expect(el.textContent).toBe('התחל באות א');
-    expect(el.className).toBe('feedback-message feedback-message--hint');
+    expect(message().textContent).toBe('התחל באות א');
+    expect(message().className).toBe('feedback-message feedback-message--hint');
   });
-});
 
-describe('createFeedback — destroy', () => {
-  it('removes the element and cancels the pending clear timer', () => {
-    const fb = createFeedback(container);
-    fb.correct();
-    fb.destroy();
-
-    expect(container.querySelector('.feedback-message')).toBeNull();
-    // advancing time after destroy should not throw (no stale ref)
-    expect(() => vi.advanceTimersByTime(2000)).not.toThrow();
-  });
-});
-
-describe('createFeedback — consecutive messages', () => {
   it('replacing a message resets the auto-clear timer', () => {
     const fb = createFeedback(container);
     fb.correct('ראשון');
     vi.advanceTimersByTime(1000);
     fb.wrong('שני'); // replaces mid-flight
-    const el = container.querySelector('.feedback-message');
-    expect(el.textContent).toBe('שני');
-
+    expect(message().textContent).toBe('שני');
     vi.advanceTimersByTime(1000); // 1000ms after wrong() — still within 1800ms
-    expect(el.textContent).toBe('שני');
-
+    expect(message().textContent).toBe('שני');
     vi.advanceTimersByTime(900);
-    expect(el.textContent).toBe('');
+    expect(message().textContent).toBe('');
+  });
+
+  it('destroy removes the element and cancels the pending clear timer', () => {
+    const fb = createFeedback(container);
+    fb.correct();
+    fb.destroy();
+    expect(message()).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
   });
 });

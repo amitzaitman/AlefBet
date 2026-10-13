@@ -27,22 +27,15 @@ function fireError(message) {
 }
 
 describe('installGlobalErrorScreen', () => {
-  it('שגיאה לא-מטופלת מציגה את הכיסוי עם כפתור התחלה מחדש', () => {
+  it('שגיאה לא-מטופלת מציגה את הכיסוי עם כפתור התחלה מחדש, פעם אחת בלבד גם על שגיאות מרובות', () => {
     handle = installGlobalErrorScreen();
     fireError('boom');
-
+    fireError('boom-2');
+    expect(document.querySelectorAll('.ab-error-screen')).toHaveLength(1);
     const overlay = document.querySelector('.ab-error-screen');
-    expect(overlay).not.toBeNull();
     expect(overlay.textContent).toContain('מַשֶּׁהוּ הִשְׁתַּבֵּשׁ');
     expect(overlay.querySelector('.ab-error-screen__reload')).not.toBeNull();
     expect(errorLog).toHaveBeenCalledWith('[alefbet] uncaught error:', expect.objectContaining({ message: 'boom' }));
-  });
-
-  it('הכיסוי מוצג פעם אחת בלבד גם על שגיאות מרובות', () => {
-    handle = installGlobalErrorScreen();
-    fireError('boom-1');
-    fireError('boom-2');
-    expect(document.querySelectorAll('.ab-error-screen')).toHaveLength(1);
   });
 
   it('unhandledrejection מציג את הכיסוי', () => {

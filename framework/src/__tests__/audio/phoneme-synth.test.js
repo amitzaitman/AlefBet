@@ -20,15 +20,10 @@ describe('vowelFormantSpec', () => {
     expect(spec.formants[1]).toBeLessThan(spec.formants[2]);
   });
 
-  it('F1/F2 זהים לתבניות הגלאי - סינתזה וזיהוי עקביים', () => {
+  it('F1/F2 זהים לתבניות הגלאי - סינתזה וזיהוי עקביים; תנועה לא מוכרת מחזירה null', () => {
     for (const [vowel, t] of Object.entries(VOWEL_TEMPLATES)) {
-      const spec = vowelFormantSpec(vowel);
-      expect(spec.formants[0]).toBe(t.F1);
-      expect(spec.formants[1]).toBe(t.F2);
+      expect(vowelFormantSpec(vowel).formants.slice(0, 2)).toEqual([t.F1, t.F2]);
     }
-  });
-
-  it('מחזיר null לתנועה לא מוכרת', () => {
     expect(vowelFormantSpec('x')).toBeNull();
     expect(vowelFormantSpec('')).toBeNull();
   });
@@ -48,27 +43,18 @@ describe('consonantOnsetSpec', () => {
     }
   });
 
-  it('אותיות גרוניות (sound ריק) מקבלות onset מסוג none', () => {
+  it('אותיות גרוניות (sound ריק) ועיצור לא מוכר מקבלים onset מסוג none במקום לזרוק', () => {
     expect(consonantOnsetSpec('').type).toBe('none');
-  });
-
-  it('עיצור לא מוכר נופל ל-none במקום לזרוק', () => {
     expect(consonantOnsetSpec('zzz').type).toBe('none');
   });
 });
 
-describe('synthesizeVowel', () => {
-  it('תנועה לא מוכרת נפתרת ב-false בלי לגעת באודיו', async () => {
-    await expect(synthesizeVowel('x')).resolves.toBe(false);
-  });
-
-  it('תנועה תקינה מנוגנת דרך ה-AudioContext (stub) ונפתרת ב-true', async () => {
-    // setup.js מספק SilentAudioContext, כך שהמסלול המלא רץ בלי קול.
-    expect(isSynthSupported()).toBe(true);
-    await expect(synthesizeVowel('a', { durationMs: 30 })).resolves.toBe(true);
-  });
+it('synthesizeVowel: תנועה לא מוכרת נפתרת ב-false, ותקינה מנוגנת דרך ה-AudioContext ונפתרת ב-true', async () => {
+  await expect(synthesizeVowel('x')).resolves.toBe(false);
+  // setup.js מספק SilentAudioContext, כך שהמסלול המלא רץ בלי קול.
+  expect(isSynthSupported()).toBe(true);
+  await expect(synthesizeVowel('a', { durationMs: 30 })).resolves.toBe(true);
 });
-
 
 it('disconnects an active syllable and settles immediately when its round ends', async () => {
   vi.useFakeTimers();
