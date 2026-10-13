@@ -7,7 +7,7 @@
  * התשובה אומרת (עיקרון 10). העקרונות ב-docs/math-pedagogy.md.
  */
 import {
-  runGame, createNarrator, createFeedback, numberWord, countingSteps, shuffle,
+  runGame, createNarrator, needsTap, createFeedback, numberWord, countingSteps, shuffle,
 } from '../../framework/dist/runtime.js';
 
 /** A pan holds two rows of five. */
@@ -361,7 +361,7 @@ function buildRound(context, round) {
   scope.listen(again, 'click', () => {
     void (async () => {
       await quiet();
-      if (isActive()) void say(`${equationWords(round)} ${ASK}`);
+      if (isActive() && !context.isAnswered()) void say(`${equationWords(round)} ${ASK}`);
     })();
   });
   context.subscribeAnswered(render);
@@ -371,7 +371,18 @@ function buildRound(context, round) {
   showEquation();
   tilt('level');
   render();
-  void say([round.tip ? EQUALS_TIP.say : '', equationWords(round), ASK].filter(Boolean).join(' '));
+  const intro = [round.tip ? EQUALS_TIP.say : '', equationWords(round), ASK].filter(Boolean).join(' ');
+  // Speech needs a first tap on most phones; until then the intro waits for one, as a story does.
+  // Playing without listening removes the button too: the words are on the screen.
+  if (needsTap()) {
+    const start = button('story-start', '▶ הַקְשִׁיבוּ');
+    story.append(start);
+    const begin = () => start.remove();
+    scope.listen(start, 'click', () => { begin(); void say(intro); });
+    for (const control of [less, more, weigh, again]) scope.listen(control, 'click', begin);
+  } else {
+    void say(intro);
+  }
 }
 
 export function startGame(container) {

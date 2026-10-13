@@ -1816,6 +1816,7 @@ export {
   Qt as letterWithNikud,
   Sn as loadVoice,
   St as lockPageZoom,
+  cn as needsTap,
   Gt as nikudBaseLetters,
   x as nikudList,
   te as numberWord,

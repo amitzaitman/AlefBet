@@ -11,7 +11,7 @@ export { runGame, bootstrapGame }               from '../core/bootstrap.js';
 export { createRoundScope }                     from '../core/round-scope.js';
 export { createChoiceRound }                    from '../core/choice-round.js';
 export { createStoryRound }                     from '../core/story-round.js';
-export { createNarrator }                       from '../audio/narrator.js';
+export { createNarrator, needsTap }             from '../audio/narrator.js';
 export { createHintTracker }                    from '../core/hints.js';
 export { createFeedback }                       from '../ui/feedback.js';
 export { createProgressBar }                    from '../ui/progress-bar.js';

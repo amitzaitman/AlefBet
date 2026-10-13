@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "18d871a30770a98f94eaf8fabb46680a9ac60cc05e8590c0717025821ccbdb51",
+  "version": "d2188e34e913bd2a4d9b70f1b835086320669146f8250dbcbfb67f01ae628bee",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -86,14 +86,14 @@ self.ALEFBET_RELEASE = {
     "./framework/dist/game-audio-BJuG8VE5.js": "ea3579fb338c06a2a5b018b1d721277993199d49eeb82350a73707fbfd894665",
     "./framework/dist/runtime-assets.js": "214af9c1195de81d8fc27ea727cad36039f50e32e2a7428e91be24de80ca0a71",
     "./framework/dist/runtime.css": "e2f6774d5d6c124a86eadc60aa896a876cd7f1af488b3b9db337e86ef5d80bd1",
-    "./framework/dist/runtime.js": "5ace54adc1e89fa66d5cf2ad640e18c4f09fe22829c2bf0001f99dda49cd1e46",
+    "./framework/dist/runtime.js": "f62f1b764453ec1c135df1a3a401a92a69f8c56e2b5960f09d2454cb853a780f",
     "./games/apple-basket/": "69742441eeb4f5542a52e85470c52297874e5bf2ce947493ce24d90dc45c6d9d",
     "./games/apple-basket/game.css": "5663f1cc0b92c5bc20b83b0c0eaa45bd20e30cc53b7090b4cbaf405f59885711",
     "./games/apple-basket/game.js": "995c6a665acc54e19d8a391587b64b2d2ec40d1654cf7fbb4eaa8522caa640dc",
     "./games/apple-basket/index.html": "69742441eeb4f5542a52e85470c52297874e5bf2ce947493ce24d90dc45c6d9d",
     "./games/balance-scale/": "2885699232feeabfd9a0843018ae8ae0c33b200264385ed3c8f7369696e667a3",
     "./games/balance-scale/game.css": "919d651788ee1c20402cee356fab126678f36eefc619392ea9ac8c9d424b840f",
-    "./games/balance-scale/game.js": "88c0aef8de0d94ae796ce309d5bae6d9c3c942979e0494e948aed8ed6523302f",
+    "./games/balance-scale/game.js": "403e041e7d2924e2e68bd56dcdb3a9ee5e3eab616b5e3964c13e87b037dc86e0",
     "./games/balance-scale/index.html": "2885699232feeabfd9a0843018ae8ae0c33b200264385ed3c8f7369696e667a3",
     "./games/balloon-stories/": "ad387374dc4b99f2fb6279cba05becbcb1cc189581b83745f532098db25a6626",
     "./games/balloon-stories/game.css": "eb88e3a30a6746d28599927d1367f7e8b755e3ecc1dfcb11e9ae8d9cb787131b",

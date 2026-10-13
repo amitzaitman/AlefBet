@@ -574,6 +574,10 @@ test('balance-scale: add cubes and weigh, the beam shows the heavier side, help,
 
   await expect(scale).toBeVisible();
   await expect(page.locator('.story-line').first()).toContainText('אוֹמֵר: שְׁנֵי הַצְּדָדִים שָׁוִים');
+  // Speech needs a first tap on phones, so the first intro waits for one.
+  const start = page.locator('.story-start');
+  if (await start.count()) await activate(start);
+  await expect(start).toHaveCount(0);
   const first = await read();
   expect(first.childLeft).toBe(false);
   await expect(page.locator('.story-equation')).toHaveText(`${first.other} = ?`);
@@ -628,6 +632,7 @@ test('balance-scale: add cubes and weigh, the beam shows the heavier side, help,
   await expect(page.locator('.completion-screen')).toBeVisible();
   await activate(page.locator('.completion-screen__replay'));
   await expect(scale).toBeVisible();
+  await expect(start).toHaveCount(0);
   const again = await read();
   await setCubes(again.answer);
   await activate(weigh);
