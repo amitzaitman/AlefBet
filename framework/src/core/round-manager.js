@@ -13,8 +13,6 @@ import { showCompletionScreen } from '../ui/completion-screen.js';
  * @param {number} opts.totalRounds - מספר סיבובים כולל
  * @param {{ update: (n: number) => void } | null} opts.progressBar - סרגל התקדמות (אופציונלי)
  * @param {function} opts.buildRoundUI - קולבק לבניית ממשק הסיבוב הבא
- * @param {function} [opts.onCorrect] - קולבק אופציונלי לאחר תשובה נכונה (לפני קידום)
- * @param {function} [opts.onWrong] - קולבק אופציונלי לאחר תשובה שגויה
  * @param {number} [opts.transitionMs] - זמן לפני הסיבוב הבא
  * @param {boolean} [opts.playCorrectSound] - כבה אם המשחק כבר משמיע משוב
  * @param {boolean} [opts.completionOnly] - הצג משימות שהושלמו במקום ציון
@@ -24,8 +22,6 @@ export function createRoundManager(shell, container, {
   totalRounds,
   progressBar = null,
   buildRoundUI,
-  onCorrect,
-  onWrong,
   transitionMs = 800,
   playCorrectSound = true,
   completionOnly = false,
@@ -56,8 +52,6 @@ export function createRoundManager(shell, container, {
 
     try {
       if (extraAction) await extraAction();
-      if (shell.ended) return;
-      if (onCorrect) await onCorrect();
     } catch (error) {
       setAnswered(false);
       throw error;
@@ -87,7 +81,6 @@ export function createRoundManager(shell, container, {
 
     try {
       if (extraAction) await extraAction();
-      if (!shell.ended && onWrong) await onWrong();
     } finally {
       setAnswered(false);
     }

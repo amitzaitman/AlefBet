@@ -55,19 +55,6 @@ export function createOptionCards(container, options, onSelect) {
       cards.forEach(({ el }) => { el.disabled = disabled; });
     },
 
-    /** נטרל את כל הכרטיסים */
-    disable() {
-      cards.forEach(({ el }) => { el.disabled = true; });
-    },
-
-    /** אפס את מצב הכרטיסים */
-    reset() {
-      cards.forEach(({ el }) => {
-        el.className = 'option-card';
-        el.disabled = false;
-      });
-    },
-
     /** הסר את הרכיב */
     destroy() {
       container.innerHTML = '';

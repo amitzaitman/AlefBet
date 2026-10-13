@@ -1,8 +1,8 @@
 /**
  * חוזה createLocalState
  *
- * עטיפה סביב localStorage שמשדרת לנרשמים בכל שינוי. משמש במשחקים
- * בעלי מצב מתמשך כמקור אמת עמיד לאיפוס.
+ * עטיפה סביב localStorage שעמידה לנתונים פגומים ולאחסון מלא. מסך הסיום
+ * שומר דרכה את ההתקדמות שדף הבית מציג.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createLocalState } from '../../core/local-state.js';
@@ -36,19 +36,6 @@ describe('createLocalState — set', () => {
     s.set([1, 2, 3]);
     expect(JSON.parse(localStorage.getItem('test:set'))).toEqual([1, 2, 3]);
   });
-
-  it('notifies every subscriber with the new value', () => {
-    const s = createLocalState('test:notify', { n: 0 });
-    const a = vi.fn();
-    const b = vi.fn();
-    s.subscribe(a);
-    s.subscribe(b);
-
-    s.set({ n: 5 });
-
-    expect(a).toHaveBeenCalledWith({ n: 5 });
-    expect(b).toHaveBeenCalledWith({ n: 5 });
-  });
 });
 
 describe('createLocalState — update', () => {
@@ -59,41 +46,9 @@ describe('createLocalState — update', () => {
   });
 });
 
-describe('createLocalState — subscribe', () => {
-  it('returns an unsubscribe function that stops further notifications', () => {
-    const s = createLocalState('test:unsub', 0);
-    const handler = vi.fn();
-    const unsubscribe = s.subscribe(handler);
-
-    s.set(1);
-    unsubscribe();
-    s.set(2);
-
-    expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler).toHaveBeenCalledWith(1);
-  });
-
-  it('unsubscribing one handler does not affect others', () => {
-    const s = createLocalState('test:multi', 0);
-    const a = vi.fn();
-    const b = vi.fn();
-    const unsubA = s.subscribe(a);
-    s.subscribe(b);
-
-    unsubA();
-    s.set(99);
-
-    expect(a).not.toHaveBeenCalled();
-    expect(b).toHaveBeenCalledWith(99);
-  });
-});
-
-
-it('reports failed persistence without publishing an unsaved value', () => {
+it('reports failed persistence and keeps the saved value', () => {
   const s = createLocalState('test:quota', 0);
   s.set(1);
-  const listener = vi.fn();
-  s.subscribe(listener);
   const fail = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
     throw new DOMException('Full', 'QuotaExceededError');
   });
@@ -101,7 +56,6 @@ it('reports failed persistence without publishing an unsaved value', () => {
   try {
     expect(s.update(n => n + 1)).toBe(false);
     expect(s.get()).toBe(1);
-    expect(listener).not.toHaveBeenCalled();
     expect(warn).toHaveBeenCalledOnce();
   } finally { fail.mockRestore(); warn.mockRestore(); }
 });

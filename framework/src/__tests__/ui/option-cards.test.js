@@ -2,7 +2,7 @@
  * חוזה createOptionCards
  *
  * רשת כרטיסי בחירה למשחקי רב-ברירה. כל כרטיס מציג emoji + טקסט, מגיב ללחיצה,
- * וניתן להדגיש / לנטרל / לאפס. משחקים רבים בונים את הסיבוב סביב החוזה הזה.
+ * וניתן להדגיש ולנטרל. משחקי בחירה בונים את הסיבוב סביבו דרך createChoiceRound.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createOptionCards } from '../../ui/option-cards.js';
@@ -77,34 +77,6 @@ describe('createOptionCards — highlight', () => {
     expect(nodes[0].classList.contains('option-card--wrong')).toBe(true);
     expect(nodes[1].classList.contains('option-card--wrong')).toBe(false);
     expect(nodes[2].classList.contains('option-card--wrong')).toBe(false);
-  });
-});
-
-describe('createOptionCards — disable / reset', () => {
-  it('disable() blocks further clicks from invoking onSelect', () => {
-    const onSelect = vi.fn();
-    const cards = createOptionCards(container, OPTIONS, onSelect);
-
-    cards.disable();
-    container.querySelectorAll('.option-card').forEach(el => el.click());
-
-    expect(onSelect).not.toHaveBeenCalled();
-  });
-
-  it('reset() re-enables the cards and clears state classes', () => {
-    const onSelect = vi.fn();
-    const cards = createOptionCards(container, OPTIONS, onSelect);
-
-    cards.highlight('a', 'correct');
-    cards.disable();
-    cards.reset();
-
-    const nodes = container.querySelectorAll('.option-card');
-    expect(nodes[0].className).toBe('option-card');
-    expect(nodes[0].disabled).toBe(false);
-
-    nodes[0].click();
-    expect(onSelect).toHaveBeenCalledOnce();
   });
 });
 

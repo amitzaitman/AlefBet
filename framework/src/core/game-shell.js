@@ -122,9 +122,6 @@ export class GameShell {
     });
   }
 
-  /** קבל את מצב המשחק הנוכחי */
-  getState() { return this.state; }
-
   /** הירשם לאירועי מחזור החיים: start, round, end */
   on(event, handler) {
     this.events.on(event, handler);

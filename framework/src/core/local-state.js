@@ -1,21 +1,17 @@
 /**
- * מנהל מצב מקומי — שמירה ב-localStorage עם הודעה לנרשמים
+ * מנהל מצב מקומי — שמירה ב-localStorage
  *
  * @template T
  * @param {string} storageKey - המפתח לשמירה ב-localStorage
  * @param {T} defaultValue - ערך ברירת המחדל אם אין נתונים שמורים
- * @returns {{ get: () => T, set: (v: T) => boolean, update: (fn: (v: T) => T) => boolean, subscribe: (fn: (v: T) => void) => () => void }}
+ * @returns {{ get: () => T, set: (v: T) => boolean, update: (fn: (v: T) => T) => boolean }}
  *
  * @example
  * const state = createLocalState('myApp:tasks', []);
- * state.subscribe(tasks => console.log('עודכן:', tasks));
  * state.set([{ id: 1, done: false }]);
  * state.update(tasks => tasks.map(t => ({ ...t, done: true })));
  */
 export function createLocalState(storageKey, defaultValue) {
-  /** @type {Array<(v: T) => void>} רשימת הפונקציות הנרשמות */
-  const subscribers = [];
-
   /**
    * קרא את הערך הנוכחי מ-localStorage
    * @returns {*} הערך המפורש, או ערך ברירת המחדל אם אין נתונים
@@ -31,7 +27,7 @@ export function createLocalState(storageKey, defaultValue) {
   }
 
   /**
-   * שמור ערך חדש ב-localStorage והודע לכל הנרשמים
+   * שמור ערך חדש ב-localStorage
    * @param {*} newVal - הערך החדש לשמירה
    */
   function set(newVal) {
@@ -41,7 +37,6 @@ export function createLocalState(storageKey, defaultValue) {
       console.warn(`[createLocalState] שגיאה בשמירת "${storageKey}":`, err);
       return false;
     }
-    subscribers.forEach(fn => fn(newVal));
     return true;
   }
 
@@ -53,18 +48,5 @@ export function createLocalState(storageKey, defaultValue) {
     return set(fn(get()));
   }
 
-  /**
-   * הירשם לשינויים במצב
-   * @param {(v: T) => void} fn - פונקציה שתיקרא עם הערך החדש בכל שינוי
-   * @returns {() => void} פונקציית ביטול הרישום
-   */
-  function subscribe(fn) {
-    subscribers.push(fn);
-    return function unsubscribe() {
-      const idx = subscribers.indexOf(fn);
-      if (idx !== -1) subscribers.splice(idx, 1);
-    };
-  }
-
-  return { get, set, update, subscribe };
+  return { get, set, update };
 }

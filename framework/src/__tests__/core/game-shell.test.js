@@ -107,11 +107,4 @@ describe('GameShell — lifecycle events', () => {
     const ret = shell.on('start', () => {}).on('end', () => {});
     expect(ret).toBe(shell);
   });
-
-  it('getState returns the live GameState instance', () => {
-    const shell = new GameShell(container, { totalRounds: 4 });
-    shell.start();
-    expect(shell.getState()).toBe(shell.state);
-    expect(shell.getState().currentRound).toBe(1);
-  });
 });

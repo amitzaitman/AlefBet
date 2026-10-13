@@ -1,6 +1,6 @@
 /**
  * מצב המשחק
- * מנהל ניקוד, סיבובים והתקדמות
+ * מנהל ניקוד וסיבובים
  */
 export class GameState {
   constructor(totalRounds) {
@@ -23,18 +23,5 @@ export class GameState {
     if (this._currentRound >= this._totalRounds) return false;
     this._currentRound++;
     return this._currentRound <= this._totalRounds;
-  }
-
-  /** קבל מידע על התקדמות */
-  get progress() {
-    return {
-      current: this._currentRound,
-      total: this._totalRounds,
-      percentage: Math.round((this._currentRound / this._totalRounds) * 100),
-    };
-  }
-
-  get isComplete() {
-    return this._currentRound >= this._totalRounds;
   }
 }

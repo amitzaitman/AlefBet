@@ -35,8 +35,6 @@ function setup(opts = {}) {
     totalRounds: opts.totalRounds ?? 3,
     progressBar,
     buildRoundUI,
-    onCorrect: opts.onCorrect,
-    onWrong: opts.onWrong,
   });
   return { shell, container, progressBar, buildRoundUI, manager };
 }
@@ -54,21 +52,6 @@ describe('createRoundManager — handleCorrect', () => {
     expect(progressBar.update).toHaveBeenCalledWith(1);
     expect(buildRoundUI).toHaveBeenCalledOnce();
     expect(shell.state.currentRound).toBe(2);
-  });
-
-  it('invokes onCorrect before scoring so callers can run finishing touches', async () => {
-    const order = [];
-    const onCorrect = vi.fn(async () => { order.push('onCorrect'); });
-    const { shell, manager } = setup({ onCorrect });
-    const original = shell.state.addScore.bind(shell.state);
-    shell.state.addScore = vi.fn((p) => { order.push('addScore'); original(p); });
-
-    const promise = manager.handleCorrect();
-    await vi.runAllTimersAsync();
-    await promise;
-
-    expect(onCorrect).toHaveBeenCalledOnce();
-    expect(order).toEqual(['onCorrect', 'addScore']);
   });
 
   it('awaits the extraAction argument before advancing', async () => {
@@ -115,22 +98,6 @@ describe('createRoundManager — handleCorrect', () => {
     expect(showCompletionScreen).toHaveBeenCalledWith(container, shell.state.score, 2, expect.any(Function), { gameId: shell.gameId, completionOnly: false, homeUrl: shell.config.homeUrl });
     expect(buildRoundUI).toHaveBeenCalledTimes(1); // only after round 1
   });
-
-  it('tolerates a missing progressBar', async () => {
-    const shell = makeShellStub(2);
-    shell.state.nextRound();
-    const manager = createRoundManager(shell, document.createElement('div'), {
-      totalRounds: 2,
-      progressBar: null,
-      buildRoundUI: vi.fn(),
-    });
-
-    await expect((async () => {
-      const p = manager.handleCorrect();
-      await vi.runAllTimersAsync();
-      await p;
-    })()).resolves.not.toThrow();
-  });
 });
 
 describe('createRoundManager — handleWrong', () => {
@@ -146,15 +113,6 @@ describe('createRoundManager — handleWrong', () => {
     expect(sounds.correct).not.toHaveBeenCalled();
   });
 
-  it('invokes the onWrong callback when supplied', async () => {
-    const onWrong = vi.fn().mockResolvedValue(undefined);
-    const { manager } = setup({ onWrong });
-
-    await manager.handleWrong();
-
-    expect(onWrong).toHaveBeenCalledOnce();
-  });
-
   it('leaves the lock open so the user can try again', async () => {
     const { manager } = setup();
 
@@ -164,22 +122,14 @@ describe('createRoundManager — handleWrong', () => {
   });
 });
 
-describe('createRoundManager — lock / reset', () => {
-  it('isAnswered() is false on a fresh manager', () => {
+describe('createRoundManager — reset', () => {
+  it('reset() re-opens a lock held by an answer in flight', async () => {
     const { manager } = setup();
-    expect(manager.isAnswered()).toBe(false);
-  });
-
-  it('reset() re-opens the lock after a correct answer was locked', async () => {
-    const { manager } = setup();
-    // Lock the manager without advancing (simulate mid-flight)
     const pending = manager.handleCorrect();
     expect(manager.isAnswered()).toBe(true);
-    await vi.runAllTimersAsync();
-    await pending;
-    // After handleCorrect completes it unlocks on its own before buildRoundUI,
-    // but reset() is still expected to be safe to call.
     manager.reset();
     expect(manager.isAnswered()).toBe(false);
+    await vi.runAllTimersAsync();
+    await pending;
   });
 });
