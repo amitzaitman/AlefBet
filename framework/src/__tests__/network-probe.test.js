@@ -39,7 +39,7 @@ describe('offline test probes', () => {
     const directory = new URL('../../../e2e/', import.meta.url);
     for (const file of readdirSync(directory).filter(name => name.endsWith('.spec.js'))) {
       const source = readFileSync(new URL(file, directory), 'utf8');
-      expect(source, `${file}: use network.offline/online instead`).not.toMatch(/\.setOffline\s*\(|network-probe|\.disconnect\s*\(/);
+      expect(source, `${file}: use network.reloadOffline (or network.offline) from e2e/network-server.js instead`).not.toMatch(/\.setOffline\s*\(|network-probe|\.disconnect\s*\(/);
     }
   });
 });

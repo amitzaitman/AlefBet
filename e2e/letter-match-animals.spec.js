@@ -70,4 +70,8 @@ test('eight rounds with a retry, a completion summary and a replay that keeps on
   await page.locator('.completion-screen__replay').click();
   await expect(cards).toHaveCount(4);
   expect(await audioListeners()).toBe(1);
+  // The replayed game starts from zero and takes answers.
+  await expect(progress).toHaveText('0 / 8');
+  await answerCorrectly(page);
+  await expect(progress).toHaveText('1 / 8');
 });

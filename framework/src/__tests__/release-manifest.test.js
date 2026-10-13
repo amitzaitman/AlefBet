@@ -58,5 +58,10 @@ describe('committed release files', () => {
     const context = { self: {} };
     runInNewContext(readFileSync(join(repo, 'framework/dist/runtime-assets.js'), 'utf8'), context);
     expect(context.self.ALEFBET_RUNTIME_ASSETS).toEqual(expect.arrayContaining(['runtime.css', 'runtime.js', 'common.js']));
+    // The service worker installs the release core, so every runtime file must be in it.
+    runInNewContext(readFileSync(join(repo, 'framework/dist/release-manifest.js'), 'utf8'), context);
+    for (const file of context.self.ALEFBET_RUNTIME_ASSETS) {
+      expect(context.self.ALEFBET_RELEASE.core).toContain(`./framework/dist/${file}`);
+    }
   });
 });
