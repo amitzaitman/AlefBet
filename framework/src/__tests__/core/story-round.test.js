@@ -46,14 +46,20 @@ function fakeScene(log) {
   };
 }
 
-/**
- * A round on a real round manager, with a fresh story-round module (so its speech counter starts at zero).
- * @param {object} [spec] overrides for the round spec
- */
-async function setup(spec = {}) {
+/** A fresh story-round module, so its speech counter starts at zero. */
+async function load() {
   vi.resetModules();
   const { createStoryRound } = await import('../../core/story-round.js');
   const { tts } = await import('../../audio/tts.js');
+  return { createStoryRound, tts };
+}
+
+/**
+ * A round on a real round manager, built in the same tick.
+ * @param {Awaited<ReturnType<typeof load>>} module
+ * @param {object} [spec] overrides for the round spec
+ */
+function build({ createStoryRound, tts }, spec = {}) {
   const shell = makeShellStub(2);
   shell.state.nextRound();
   document.body.append(shell.container);
@@ -86,6 +92,9 @@ async function setup(spec = {}) {
     feedback: () => $('.feedback-message').textContent,
   };
 }
+
+/** @param {object} [spec] overrides for the round spec */
+const setup = async (spec = {}) => build(await load(), spec);
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -128,16 +137,25 @@ it('locks the answers until the question, and "again" once answered', async () =
   shell.end();
 });
 
-it('speaks an act beat first, then waits for the child before the next beat', async () => {
+it('starts a step with its sentence and hands it the sentence; the next beat waits for both', async () => {
   let done;
   const log = [];
-  const scene = { ...fakeScene(log), change: () => { log.push('act'); return new Promise(resolve => { done = resolve; }); } };
-  const beats = BEATS.map((beat, k) => (k === 1 ? { ...beat, act: true } : beat));
-  const { lines, shell } = await setup({ beats, scene });
-  await vi.advanceTimersByTimeAsync(1200 + 1199);
-  expect(log).not.toContain('act');
+  // An act: the picture changes as the sentence starts, the cue follows the sentence, then the child acts.
+  const scene = {
+    ...fakeScene(log),
+    change: (live, sentence) => {
+      log.push('picture');
+      void sentence.then(() => log.push('cue'));
+      return new Promise(resolve => { done = resolve; });
+    },
+  };
+  const { lines, shell } = await setup({ scene });
+  await vi.advanceTimersByTimeAsync(1200);
+  expect(log.at(-1)).toBe('picture');
+  await vi.advanceTimersByTimeAsync(1199);
+  expect(log.at(-1)).toBe('picture');
   await vi.advanceTimersByTimeAsync(1);
-  expect(log).toContain('act');
+  expect(log.at(-1)).toBe('cue');
   await vi.advanceTimersByTimeAsync(10_000);
   expect(lines()).toHaveLength(2);
   done();
@@ -173,7 +191,9 @@ it('climbs the hint ladder: the story again, counting aloud, then the marked ans
   await vi.advanceTimersByTimeAsync(0);
   expect(feedback()).toBe('מְסֻמָּן');
   expect(choice(5).classList.contains('story-pick--hint')).toBe(true);
-  // The last step repeats.
+  // The last step repeats, once the third miss's message has faded.
+  await vi.advanceTimersByTimeAsync(1800);
+  expect(feedback()).toBe('');
   choice(6).click();
   await vi.advanceTimersByTimeAsync(0);
   expect(feedback()).toBe('מְסֻמָּן');
@@ -215,8 +235,11 @@ it('retires a tried answer only with retireTried', async () => {
 it('awaits onMiss with the answers locked, before the ladder', async () => {
   let release;
   const onMiss = vi.fn(() => new Promise(resolve => { release = resolve; }));
-  const { choice, $$, feedback, round, shell } = await setup({ onMiss, retireTried: false });
-  await vi.advanceTimersByTimeAsync(2400);
+  const log = [];
+  const steps = [];
+  const scene = { ...fakeScene(log), change: live => { steps.push(live); } };
+  const { choice, $$, feedback, round, shell } = await setup({ onMiss, scene, retireTried: false });
+  await vi.advanceTimersByTimeAsync(3600);
   choice(6).click();
   expect(onMiss).toHaveBeenCalledWith(6, expect.any(Function));
   expect(onMiss.mock.calls[0][1]()).toBe(true);
@@ -228,7 +251,92 @@ it('awaits onMiss with the answers locked, before the ladder', async () => {
   await vi.advanceTimersByTimeAsync(0);
   expect(feedback()).toBe('שׁוּב');
   expect(choice(6).disabled).toBe(false);
+
+  // A miss while the replay is still speaking stops it on the final picture, and the miss shows after a hush.
+  await vi.advanceTimersByTimeAsync(1210);
+  expect(steps[1]()).toBe(true);
+  log.length = 0;
+  choice(7).click();
+  expect(log).toEqual(['clearCount', 'settle']);
+  expect(steps[1]()).toBe(false);
+  await vi.advanceTimersByTimeAsync(249);
+  expect(onMiss).toHaveBeenCalledOnce();
+  await vi.advanceTimersByTimeAsync(1);
+  expect(onMiss).toHaveBeenCalledTimes(2);
+  expect(onMiss.mock.calls[1][1]()).toBe(true);
+  await vi.advanceTimersByTimeAsync(5000);
+  expect(log).toEqual(['clearCount', 'settle']);
   shell.end();
+});
+
+it('tells a running step to stop when a hint replays the story or an answer settles it', async () => {
+  const steps = [];
+  const scene = { ...fakeScene([]), change: live => { steps.push(live); } };
+  const { choice, shell } = await setup({ scene, retireTried: false });
+  await vi.advanceTimersByTimeAsync(2400);
+  expect(steps[0]()).toBe(true);
+  choice(4).click();
+  expect(steps[0]()).toBe(false);
+  await vi.advanceTimersByTimeAsync(250 + 1200);
+  expect(steps[1]()).toBe(true);
+  choice(5).click();
+  expect(steps[1]()).toBe(false);
+  shell.end();
+});
+
+it('waits HUSH_MS before counting when the count cuts a sentence', async () => {
+  const { choice, log, shell } = await setup({ ladder: [LADDER[1]] });
+  await vi.advanceTimersByTimeAsync(2410);
+  log.length = 0;
+  choice(4).click();
+  await vi.advanceTimersByTimeAsync(249);
+  expect(log).toEqual(['clearCount', 'settle']);
+  await vi.advanceTimersByTimeAsync(1);
+  expect(log).toEqual(['clearCount', 'settle', 'mark 1']);
+  shell.end();
+});
+
+it('lets the picture lead in before the first count, and counts nothing if the story restarts meanwhile', async () => {
+  const log = [];
+  const plain = fakeScene(log);
+  let wait;
+  // The frog goes back to her start first; the count begins once she is there.
+  const scene = { ...plain, counting: async () => { log.push('lead-in'); await wait(300); return plain.counting(); } };
+  const { choice, tools, $, shell } = await setup({ scene, ladder: [LADDER[1]], retireTried: false });
+  wait = tools.wait;
+  await vi.advanceTimersByTimeAsync(3600);
+  log.length = 0;
+  choice(4).click();
+  await vi.advanceTimersByTimeAsync(299);
+  expect(log).toEqual(['clearCount', 'settle', 'lead-in']);
+  await vi.advanceTimersByTimeAsync(1);
+  expect(log.at(-1)).toBe('mark 1');
+  await vi.advanceTimersByTimeAsync(700 * 3 + 1200);
+
+  log.length = 0;
+  choice(4).click();
+  await vi.advanceTimersByTimeAsync(100);
+  /** @type {HTMLButtonElement} */ ($('.story-again')).click();
+  await vi.advanceTimersByTimeAsync(5000);
+  expect(log.filter(entry => entry.startsWith('mark'))).toEqual([]);
+  shell.end();
+});
+
+it('waits HUSH_MS before the next round speaks when the last one was cut in the same tick', async () => {
+  const module = await load();
+  const first = build(module);
+  await vi.advanceTimersByTimeAsync(10);
+  // runGame disposes the old round and builds the next one before any microtask runs.
+  first.scope.dispose();
+  const next = build(module);
+  await vi.advanceTimersByTimeAsync(249);
+  expect(next.lines()).toEqual([]);
+  expect(voice.said).toEqual([BEATS[0].say]);
+  await vi.advanceTimersByTimeAsync(1);
+  expect(next.lines()).toEqual(['יֵשׁ 3.']);
+  expect(voice.said).toEqual([BEATS[0].say, BEATS[0].say]);
+  first.shell.end();
+  next.shell.end();
 });
 
 it('on a right pick settles, awaits beforeResult, shows the answer and the result, then speaks it after a hush', async () => {
@@ -258,7 +366,9 @@ it('on a right pick settles, awaits beforeResult, shows the answer and the resul
 });
 
 it('shows only the solved equation when resultLine is false, and speaks at once when nothing was cut', async () => {
-  const { choice, $, lines, equation, shell } = await setup({ resultLine: false, solvedEquation: '3 + 2 = ?' });
+  // As in a match round: the last beat has no '= ?', and the solved equation adds it.
+  const beats = BEATS.map((beat, k) => (k === 2 ? { ...beat, equation: '3 + 2' } : beat));
+  const { choice, $, lines, equation, shell } = await setup({ beats, resultLine: false, solvedEquation: '3 + 2 = ?' });
   await vi.advanceTimersByTimeAsync(3600);
   voice.said = [];
   choice(5).click();

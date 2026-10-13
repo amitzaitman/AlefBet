@@ -25,7 +25,18 @@ import { createFeedback } from '../ui/feedback.js';
  * @property {string} say - נאמר, עם מילות מספר
  * @property {string} equation - התרגיל עד עכשיו, אסימונים מופרדים ברווח; '?' הוא הנעלם; '' מסתיר
  * @property {'start' | 'change' | 'question'} scene - צעד התמונה שמתנגן עם המשפט
- * @property {boolean} [act] - הילד פועל בצעד הזה: הצעד מתחיל אחרי המשפט, והסיפור מחכה לו
+ */
+
+/**
+ * צעד בתמונה. מתחיל יחד עם המשפט שלו ומקבל אותו (sentence), והמשפט הבא מחכה
+ * לשניהם. צעד שבו הילד פועל מציג את התמונה מיד, מחכה ל-sentence, ורק אז
+ * מעביר את השליטה לילד.
+ * @typedef {(live: () => boolean, sentence: Promise<unknown>) => void | Promise<void>} StoryStep
+ */
+
+/**
+ * מה שהרמז 'count' סופר: כל פריט מסומן ונאמר בתורו, ו-total נאמר בסוף ('שָׁלוֹשׁ קְפִיצוֹת').
+ * @typedef {{ items: { say: string, mark: () => void }[], total?: string }} StoryCount
  */
 
 /**
@@ -33,12 +44,12 @@ import { createFeedback } from '../ui/feedback.js';
  * @typedef {Object} StoryScene
  * @property {HTMLElement} root
  * @property {() => void} reset - לפני שהסיפור מתנגן (שוב)
- * @property {() => void} settle - התמונה הסופית מיד, כשרמז או תשובה קוטעים את הסיפור
- * @property {(live: () => boolean) => void | Promise<void>} [start]
- * @property {(live: () => boolean) => void | Promise<void>} [change]
- * @property {(live: () => boolean) => void | Promise<void>} [question]
- * @property {() => { items: { say: string, mark: () => void }[], total?: string }} [counting]
- *   מה שהרמז 'count' סופר, נקרא אחרי settle; total נאמר בסוף ('שָׁלוֹשׁ קְפִיצוֹת')
+ * @property {() => void} settle - התמונה הסופית מיד, כשרמז, טעות או תשובה קוטעים את הסיפור
+ * @property {StoryStep} [start]
+ * @property {StoryStep} [change]
+ * @property {StoryStep} [question]
+ * @property {(live: () => boolean) => StoryCount | Promise<StoryCount>} [counting]
+ *   נקרא אחרי settle; הספירה מתחילה כשהוא מסתיים, כך שהתמונה יכולה קודם לחזור להתחלה
  * @property {() => void} [clearCount] - מסיר את סימוני הספירה
  */
 
@@ -61,7 +72,7 @@ import { createFeedback } from '../ui/feedback.js';
  * @property {boolean} [highlight] - איברים חדשים בתרגיל מהבהבים כשהמשפט שלהם מתחיל (ברירת מחדל false)
  * @property {boolean} [retireTried] - true: תשובה שגויה נפסלת ונעולה; false: נשארת לחיצה (ברירת מחדל true)
  * @property {(choice: number | string, live: () => boolean) => void | Promise<void>} [onMiss]
- *   רץ בבחירה שגויה לפני הסולם; התשובות נעולות עד שהוא מסתיים
+ *   רץ בבחירה שגויה לפני הסולם, אחרי שהסיפור נעצר על התמונה הסופית; התשובות נעולות עד שהוא מסתיים
  * @property {(live: () => boolean) => void | Promise<void>} [beforeResult]
  *   רץ אחרי בחירה נכונה ו-settle, לפני משפט הסיום; ממתינים לו בתוך onCorrect
  */
@@ -152,19 +163,14 @@ export function createStoryRound(context, build) {
       showEquation(beat.equation, spec.highlight ? { before: shown } : {});
       shown = beat.equation;
       if (beat.scene === 'question' && !asked) { asked = true; update(); }
-      if (beat.act) {
-        await say(beat.say);
-        if (!live()) return;
-        await scene?.[beat.scene]?.(live);
-      } else {
-        await Promise.all([say(beat.say), scene?.[beat.scene]?.(live)]);
-      }
+      const sentence = say(beat.say);
+      await Promise.all([sentence, scene?.[beat.scene]?.(live, sentence)]);
       if (!live()) return;
     }
   }
 
   /**
-   * מציג את כל הסיפור מיד, כשרמז או תשובה קוטעים אותו.
+   * מציג את כל הסיפור מיד, כשרמז, טעות או תשובה קוטעים אותו.
    * @returns {boolean} האם דיבור בוטל
    */
   function settle() {
@@ -184,7 +190,7 @@ export function createStoryRound(context, build) {
     const live = () => run === storyRun && isActive();
     if (hushed) await wait(HUSH_MS);
     if (!live() || !scene?.counting) return;
-    const { items, total } = scene.counting();
+    const { items, total } = await scene.counting(live);
     for (const item of items) {
       if (!live()) return;
       item.mark();
@@ -218,8 +224,12 @@ export function createStoryRound(context, build) {
         answers.tried(pick);
         const step = ladder[Math.min(misses, ladder.length) - 1];
         if (!onMiss) return help(step);
-        const run = storyRun;
         return (async () => {
+          // Nothing else moves while the game shows the miss: a story or count still playing stops on its final picture.
+          const hushed = settle();
+          const run = storyRun;
+          if (hushed) await wait(HUSH_MS);
+          if (!isActive()) return;
           await onMiss(answers.valueOf(pick), () => run === storyRun && isActive());
           if (isActive()) help(step);
         })();
