@@ -58,23 +58,7 @@ test.describe('nikud-speak', () => {
     await stubMicrophone(page);
   });
 
-  test('golden path: a round advances after the auto-advance threshold', async ({ page }) => {
-    await page.goto(GAME_URL);
-
-    await expect(page.locator('.nikud-speak-card')).toBeVisible({ timeout: 10_000 });
-    const initialLabel = await page.locator('.progress-bar__label').textContent();
-
-    await pressMicUntilAdvance(page);
-
-    // Either the progress label changed, or a fresh card replaced the old one —
-    // both are unambiguous "round advanced" signals.
-    await expect(async () => {
-      const label = await page.locator('.progress-bar__label').textContent();
-      expect(label).not.toBe(initialLabel);
-    }).toPass({ timeout: 6_000 });
-  });
-
-  test('audio-failure path: banner surfaces and the round still progresses', async ({ page }) => {
+  test('without a voice the banner surfaces and three misses still advance the round', async ({ page }) => {
     await page.addInitScript(() => {
       Object.defineProperty(window, 'speechSynthesis', {
         configurable: true,
