@@ -1,6 +1,7 @@
 /* An apple is a button the size of a touch target; the fruit is drawn inside it. */
 /* Five 64px apples, thin gaps and the basket's border fit a 360px phone; the fruit is drawn
-   inside its button, so the apples still look apart. Narrower phones get smaller apples. */
+   inside its button, so the apples still look apart. Narrower phones get smaller apples
+   (56px at 320px): rows of five matter more there than 64px (owner decision 2026-10-13). */
 .ab-game { --ab-apple: clamp(44px, calc((100vw - 38px) / 5), 68px); }
 .ab-build .story { min-height: 0; }
 
