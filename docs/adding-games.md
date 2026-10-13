@@ -15,14 +15,12 @@
 מפעילים `node start.js` ופותחים `/games/my-game/`. התבנית היא משחק בחירה
 עובד, שאפשר להחליף את תוכנו או את כל `buildRound` שלו.
 
-`common.js` הוא API כללי. `runtime.js` כולל את כל `common.js`, ועוד שמע עברי,
-אותיות וניקוד. לשניהם משתמשים ב-`runtime.css`. משחק ללא דיבור מגדיר `audio: false`;
-צלילי הצלחה עדיין זמינים דרך `sounds` ו-`createFeedback`. זו הפרדת JavaScript; הסגנון המשותף עדיין
-כולל גם רכיבי עברית. טקסט עברי נכתב מנוקד בקוד המשחק.
+כל משחק מייבא מ-`framework/dist/runtime.js` ומשתמש ב-`runtime.css`. משחק ללא דיבור
+מגדיר `audio: false`, כך שלא נטען באנר הקול ולא מתבצע שחרור קול בנגיעה הראשונה.
+צלילי הצלחה עדיין זמינים דרך `sounds` ו-`createFeedback`. טקסט עברי נכתב מנוקד בקוד המשחק.
 
 הכניסות מייצאות רק מה שמשחקים כבר משתמשים בו. משחק שצריך רכיב קיים שלא
-מיוצא מוסיף אותו ל-`framework/src/runtime/common.ts` (או ל-`runtime/index.ts`
-אם יש בו תוכן עברי) ומריץ `npm run build`. בדיקות יחידה ללוגיקה של המשחק
+מיוצא מוסיף אותו ל-`framework/src/runtime/index.js` ומריץ `npm run build`. בדיקות יחידה ללוגיקה של המשחק
 נכתבות ב-`framework/src/__tests__/` ומייבאות מתיקיית המשחק, כי כל קובץ
 בתיקיית המשחק נשמר במכשיר.
 
@@ -36,7 +34,7 @@
 3. פעילות חופשית: `bootstrapGame` ללא מנהל סיבובים, לדוגמה:
 
 ```js
-import { bootstrapGame, createRoundScope } from '../../framework/dist/common.js';
+import { bootstrapGame, createRoundScope } from '../../framework/dist/runtime.js';
 
 export async function startGame(container) {
   const result = await bootstrapGame(container, {
@@ -82,7 +80,7 @@ export async function startGame(container) {
 מריצים `npm run verify`. הפקודה בונה מחדש ובודקת הכול; מחייבים גם dist.
 לבדיקת המשחק בלבד: `npm run e2e -- e2e/math.spec.js` (כולל בנייה אוטומטית).
 התקנת דפדפנים ראשונית: `npm run setup:browsers`.
-הבנייה שומרת את שתי כניסות ה-runtime ואת תלויותיהן במטמון המשותף; זו אינה
+הבנייה שומרת את כניסת ה-runtime ואת תלויותיה במטמון המשותף; זו אינה
 התקנה נפרדת לכל משחק. בדיקת דפדפן אוטומטית אינה מחליפה בדיקת שמע בטלפון אמיתי.
 
 ### בדיקות אופליין

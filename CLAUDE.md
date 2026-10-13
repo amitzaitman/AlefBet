@@ -14,14 +14,14 @@ Where things are documented:
 
 - Game rules, content, hints and rendering stay in the game. Code only one game uses lives in that game's folder (`nikud-match/nikud-box.js`, `nikud-speak/vowel-detector.js`, `sound-studio/voice-recorder.js`).
 - Move behavior into `framework/src/` only when a second game needs the same thing. New games do not have to grow the framework.
-- The entries export only what games use: `runtime/common.ts` (general gameplay, no Hebrew content) and `runtime/index.ts` (everything in common plus Hebrew audio, letters and nikud). When a game needs another export, add it there and rebuild. Don't re-add exports "for completeness".
+- There is one entry, `framework/src/runtime/index.js`, built to `framework/dist/runtime.js`. It exports only what games use. When a game needs another export, add it there and rebuild. Don't re-add exports "for completeness".
 - `runGame` is optional composition for round-based games, not a requirement for every game or teacher tool.
 
 ## Layout
 
 ```
 framework/src/
-  runtime/   common.ts (general API), index.ts (Hebrew API)
+  runtime/   index.js (the one game API)
   core/      bootstrap (runGame, bootstrapGame), game-shell, round-manager, round-scope,
              choice-round, hints, progress, state, events, local-state
   audio/     hebrew-audio, tts, phoneme-synth, voice-store, audio-context, sounds, game-audio
@@ -42,9 +42,9 @@ scripts/          build, release manifest, check-dist, create-game
 
 ## Build and offline contract
 
-- Games load `../../framework/dist/runtime.js` (or `common.js`) and `runtime.css`.
+- Games load `../../framework/dist/runtime.js` and `runtime.css`.
 - **After editing site code or assets, run `npm run build`** and commit `framework/dist/`. The owner decided (2026-10-13) to keep dist in git so games open without a build step; don't propose removing it.
-- The build writes `runtime-assets.js` (entry files, following static and dynamic imports) and `release-manifest.js` (SHA-256 of every release file: home page, catalog, icons, runtime files and every file in every catalog game folder).
+- The build writes `runtime-assets.js` (the entry and the files it imports, statically or on demand) and `release-manifest.js` (SHA-256 of every release file: home page, catalog, icons, runtime files and every file in every catalog game folder).
 - Every file in a game folder is precached for offline play. Don't put tests, drafts or large unused files there.
 - `sw.js`: all-or-nothing verified install, no `skipWaiting`/`clients.claim` (updates wait for old tabs to close), cache-first only for release files; `refresh.html` triggers the adult "full refresh" (`refresh-assets` message).
 - Dev server: `node start.js` (or `start.bat` on Windows). Node 20+.
@@ -62,9 +62,8 @@ scripts/          build, release manifest, check-dist, create-game
 
 ## Conventions
 
-- **JavaScript by default.** A few `core`/`runtime` files are TypeScript for historical reasons. Don't convert JS to TS while a file is open; that is a separate PR nobody needs.
+- **JavaScript only.** The framework is JavaScript with JSDoc types; `globals.d.ts` holds only ambient type declarations. Don't convert JS to TypeScript (owner decision 2026-10-13).
 - **JSDoc types** on framework JS files; `tsc --noEmit` checks them (`checkJs: true`). Avoid em-dash (`—`) in JSDoc type/param lines; it breaks the parser. Use `-`.
-- Importers write `./foo.js` even when the target is `foo.ts` (Vite resolves it).
 - **Named exports only.**
 - **Hebrew JSDoc prose** on framework modules, explaining purpose and public API.
 - **RTL** everywhere; buttons ≥ 64px. Equations and number lines use `dir="ltr"` inside the Hebrew page.
