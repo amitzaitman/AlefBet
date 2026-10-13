@@ -3,15 +3,14 @@
  *
  * אין כאן אף ספק רשת: קול המערכת (speechSynthesis) הוא הספק היחיד.
  * הקלטות מורה וסינתזת פונמות אופליין נמצאות מעליו בשרשרת של
- * hebrew-audio.js, ומילוי חד-פעמי של בנק הצלילים דרך הרשת נעשה
- * ב-games/sound-studio/sound-bank-compiler.js - כך שבזמן משחק לא יוצאת אף בקשת רשת.
+ * hebrew-audio.js, כך שבזמן משחק לא יוצאת אף בקשת רשת. הטקסטים מגיעים
+ * מנוקדים מהמשחקים.
  *
  * מכונת מצבים מדווחת אירועים (`alefbet:tts-state` ו-`alefbet:tts-error`)
  * ב-window כדי שמשחקים יציגו באנר ברור ולא ייכשלו בשקט.
  * מצבים: idle | ready | awaiting-interaction | unsupported | failed.
  * הבטחות תמיד נפתרות (גם בכשל) כדי שמשחק לא יתקע על המתנה לקול.
  */
-import { getNikud } from '../utils/nakdan.js';
 import { nikudList } from '../data/nikud.js';
 import { unlockAudioOutput } from './audio-context.js';
 
@@ -387,9 +386,8 @@ export const tts = {
    * @returns {Promise<void>}
    */
   speak(text) {
-    const toSpeak = getNikud(text);
     return new Promise(resolve => {
-      _queue.push({ text: toSpeak, resolve });
+      _queue.push({ text, resolve });
       _processQueue();
     });
   },

@@ -1,5 +1,4 @@
-import { getNikud as P } from "./nakdan-DFzp_6d3.js";
-import { unlockAudioOutput as B, mountAudioStatusBanner as A } from "./common.js";
+import { unlockAudioOutput as P, mountAudioStatusBanner as B } from "./common.js";
 const g = [
   { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
   { letter: "ב", name: "בַּיִת", nameNikud: "בֵּית", sound: "b", exampleWord: "בַּיִת", emoji: "🏠", isFinal: !1 },
@@ -29,14 +28,14 @@ const g = [
   { letter: "ש", name: "שִׁין", nameNikud: "שִׁין", sound: "sh", exampleWord: "שֶׁמֶשׁ", emoji: "☀️", isFinal: !1 },
   { letter: "ת", name: "תָּו", nameNikud: "תָּו", sound: "t", exampleWord: "תַּפּוּחַ", emoji: "🍎", isFinal: !1 }
 ];
-function J(e) {
+function D(e) {
   return g.find((n) => n.letter === e) || null;
 }
-function T(e = "regular") {
+function A(e = "regular") {
   return e === "regular" ? g.filter((n) => !n.isFinal) : e === "final" ? g.filter((n) => n.isFinal) : g;
 }
-function K(e, n = "regular") {
-  const t = T(n);
+function Q(e, n = "regular") {
+  const t = A(n);
   return [...t].sort(() => Math.random() - 0.5).slice(0, Math.min(e, t.length));
 }
 const N = [
@@ -47,11 +46,11 @@ const N = [
   { id: "segol", name: "סְגוֹל", nameNikud: "סְגוֹל", symbol: "ֶ", sound: "אֶה", color: "#783952", textColor: "#fff" },
   { id: "holam", name: "חוֹלָם", nameNikud: "חוֹלָם", symbol: "ֹ", sound: "אוֹ", color: "#5F7A42", textColor: "#fff" },
   { id: "kubbutz", name: "קֻבּוּץ", nameNikud: "קֻבּוּץ", symbol: "ֻ", sound: "אוּ", color: "#6B4A8A", textColor: "#fff" }
-], X = g.filter((e) => !e.isFinal).map((e) => e.letter);
-function Y(e, n) {
+], J = g.filter((e) => !e.isFinal).map((e) => e.letter);
+function K(e, n) {
   return e + n;
 }
-function Z(e) {
+function X(e) {
   let n = [...N];
   if (typeof window < "u" && window.location && window.location.search) {
     const i = new URLSearchParams(window.location.search), o = i.get("allowedNikud");
@@ -75,8 +74,8 @@ function Z(e) {
     t.push(...n);
   return t.sort(() => Math.random() - 0.5).slice(0, e);
 }
-const R = 2e3;
-let d = [], k = !1, p = 0.9, b = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, S = !1, w = null, m = null, c = null, C = null, v = !1, l = "idle";
+const T = 2e3;
+let d = [], v = !1, p = 0.9, b = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5, S = !1, w = null, m = null, c = null, C = null, k = !1, l = "idle";
 function E() {
   return typeof speechSynthesis < "u";
 }
@@ -88,20 +87,20 @@ function u(e, n, t = !1) {
     n && (o.reason = n), window.dispatchEvent(new CustomEvent("alefbet:tts-state", { detail: o }));
   }
 }
-function M() {
+function R() {
   E() ? l = "idle" : u("unsupported", "no-speech-synthesis");
 }
-M();
-function x(e, n) {
+R();
+function L(e, n) {
   C = String(n || "unknown"), console.warn("[tts] browser TTS failed", { text: e, reason: n }), typeof window < "u" && typeof window.dispatchEvent == "function" && window.dispatchEvent(new CustomEvent("alefbet:tts-error", {
     detail: { provider: "browser", text: e, sentText: e, reason: n }
   }));
 }
-function I(e) {
+function M(e) {
   const n = String(e).toLowerCase();
   return n.includes("not-allowed") || n.includes("notallowed") || n.includes("didn't interact") || n.includes("user gesture");
 }
-function U() {
+function I() {
   var e;
   return typeof window > "u" || typeof document > "u" ? Promise.resolve() : S || (e = document.userActivation) != null && e.hasBeenActive ? (S = !0, Promise.resolve()) : w || (w = new Promise((n) => {
     const t = () => {
@@ -112,11 +111,11 @@ function U() {
     w = null;
   }), w);
 }
-let f = null, y = null, F = !1, L = !1;
-const O = ["carmit", "hila", "female"];
-function V(e) {
+let f = null, y = null, F = !1, x = !1;
+const U = ["carmit", "hila", "female"];
+function O(e) {
   const n = (e.name || "").toLowerCase();
-  return O.some((t) => n.includes(t));
+  return U.some((t) => n.includes(t));
 }
 function _() {
   if (typeof speechSynthesis > "u") return null;
@@ -125,9 +124,9 @@ function _() {
   );
   if (n.length === 0) return null;
   const i = typeof navigator < "u" && navigator.onLine === !1 && n.filter((r) => r.localService !== !1) || n, o = i.length > 0 ? i : n;
-  return o.find(V) || o[0];
+  return o.find(O) || o[0];
 }
-function z() {
+function V() {
   return typeof speechSynthesis > "u" ? Promise.resolve() : (f = _(), f ? (F = !0, Promise.resolve()) : F ? Promise.resolve() : y || (y = new Promise((e) => {
     let n = !1;
     const t = () => {
@@ -137,13 +136,13 @@ function z() {
     };
     typeof speechSynthesis.addEventListener == "function" && speechSynthesis.addEventListener("voiceschanged", i);
     const o = setTimeout(() => {
-      L || (L = !0, x("", "voice-load-timeout")), t();
-    }, R);
+      x || (x = !0, L("", "voice-load-timeout")), t();
+    }, T);
   }).finally(() => {
     y = null;
   }), y));
 }
-function H(e) {
+function z(e) {
   return 5e3 + ((e == null ? void 0 : e.length) ?? 0) * 200;
 }
 function W(e) {
@@ -165,7 +164,7 @@ function W(e) {
           }
           t(new Error("utterance-timeout"));
         }
-      }, H(e));
+      }, z(e));
       i.onend = () => {
         o || (o = !0, clearTimeout(r), c === i && (c = null), n());
       }, i.onerror = (a) => {
@@ -176,33 +175,33 @@ function W(e) {
     }
   });
 }
-async function q(e) {
+async function H(e) {
   if (typeof speechSynthesis > "u")
     return { ok: !1, reason: "speechSynthesis unavailable" };
-  await z();
+  await V();
   try {
-    return await W(e), v = !1, { ok: !0 };
+    return await W(e), k = !1, { ok: !0 };
   } catch (n) {
     const t = (n == null ? void 0 : n.message) || "speech-error";
-    if (I(t)) {
-      v || (v = !0, u("awaiting-interaction", "autoplay-blocked")), await U(), v = !1;
+    if (M(t)) {
+      k || (k = !0, u("awaiting-interaction", "autoplay-blocked")), await I(), k = !1;
       try {
         return await W(e), { ok: !0 };
       } catch (i) {
         const o = (i == null ? void 0 : i.message) || "speech-error";
-        return x(e, o), { ok: !1, reason: o };
+        return L(e, o), { ok: !1, reason: o };
       }
     }
-    return x(e, t), { ok: !1, reason: t };
+    return L(e, t), { ok: !1, reason: t };
   }
 }
 function h() {
-  if (k || d.length === 0) return;
+  if (v || d.length === 0) return;
   const e = d.shift();
-  k = !0, m = e;
+  v = !0, m = e;
   const n = p, t = typeof e.rate == "number";
-  t && (p = e.rate), q(e.text).then((i) => {
-    t && (p = n), k = !1;
+  t && (p = e.rate), H(e.text).then((i) => {
+    t && (p = n), v = !1;
     const o = m === e;
     if (m = null, !o) {
       h();
@@ -210,7 +209,7 @@ function h() {
     }
     i.ok ? l !== "unsupported" && u("ready") : E() ? u("failed", i.reason, !0) : u("unsupported", i.reason || "no-provider", !0), e.resolve(), h();
   }).catch((i) => {
-    t && (p = n), k = !1, m = null, u("failed", (i == null ? void 0 : i.message) || "unknown"), e.resolve(), h();
+    t && (p = n), v = !1, m = null, u("failed", (i == null ? void 0 : i.message) || "unknown"), e.resolve(), h();
   });
 }
 const j = {
@@ -220,9 +219,8 @@ const j = {
    * @returns {Promise<void>}
    */
   speak(e) {
-    const n = P(e);
-    return new Promise((t) => {
-      d.push({ text: n, resolve: t }), h();
+    return new Promise((n) => {
+      d.push({ text: e, resolve: n }), h();
     });
   },
   /**
@@ -245,7 +243,7 @@ const j = {
         e.resolve();
       } catch {
       }
-    }), d = [], k = !1, c && (c = null), typeof speechSynthesis < "u" && typeof speechSynthesis.cancel == "function")
+    }), d = [], v = !1, c && (c = null), typeof speechSynthesis < "u" && typeof speechSynthesis.cancel == "function")
       try {
         speechSynthesis.cancel();
       } catch {
@@ -276,7 +274,7 @@ const j = {
    * @returns {Promise<void>}
    */
   unlock() {
-    if (S = !0, v = !1, B().catch(() => {
+    if (S = !0, k = !1, P().catch(() => {
     }), typeof speechSynthesis < "u" && typeof SpeechSynthesisUtterance < "u")
       try {
         const e = new SpeechSynthesisUtterance("");
@@ -367,28 +365,28 @@ const j = {
     });
   }
 };
-function G(e, { banner: n = !0 } = {}) {
-  const t = n ? A(e.container) : null, i = () => {
+function q(e, { banner: n = !0 } = {}) {
+  const t = n ? B(e.container) : null, i = () => {
     e.container.removeEventListener("pointerdown", i, !0), e.container.removeEventListener("keydown", i, !0), j.unlock();
   };
   e.container.addEventListener("pointerdown", i, { once: !0, capture: !0 }), e.container.addEventListener("keydown", i, { once: !0, capture: !0 }), e.on("end", () => {
     e.container.removeEventListener("pointerdown", i, !0), e.container.removeEventListener("keydown", i, !0), t == null || t.destroy(), j.cancel();
   });
 }
-const $ = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Y = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  attachGameAudio: G
+  attachGameAudio: q
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  X as a,
-  G as b,
-  T as c,
-  Z as d,
-  $ as e,
-  J as g,
+  J as a,
+  q as b,
+  A as c,
+  X as d,
+  Y as e,
+  D as g,
   g as h,
-  Y as l,
+  K as l,
   N as n,
-  K as r,
+  Q as r,
   j as t
 };

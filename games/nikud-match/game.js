@@ -21,12 +21,6 @@ import { createNikudBox } from './nikud-box.js';
 
 const ROUNDS = 8;
 
-const STATIC_TEXTS = [
-  'בְּרוּכִים הַבָּאִים לְמִשְׂחַק הַנִּיקּוּד',
-  'כָּל הַכָּבוֹד',
-  ...nikudList.map(n => n.name),
-];
-
 function pickDistractor(correct, pool) {
   const others = pool.filter(n => n.id !== correct.id);
   return others[Math.floor(Math.random() * others.length)];
@@ -42,7 +36,6 @@ export async function startGame(container) {
   return runGame(container, {
     gameId: 'nikud-match',
     title: 'לִמּוּד נִיקּוּד',
-    preloadTexts: STATIC_TEXTS,
     loadingMessage: 'טוֹעֵן נִיקּוּד...',
     defaultRounds: randomNikud(ROUNDS).map(n => ({ target: pickLetter(), correct: n.id, correctEmoji: '' })),
     transitionMs: 800,

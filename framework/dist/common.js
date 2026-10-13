@@ -316,7 +316,7 @@ function w(e, t, n = "sine", r = 0.3) {
     } catch {
     }
 }
-const L = {
+const x = {
   /** צליל תשובה נכונה */
   correct() {
     w(523.25, 0.15), setTimeout(() => w(659.25, 0.2), 120), setTimeout(() => w(783.99, 0.3), 240);
@@ -371,7 +371,7 @@ const L = {
   fadeIn: 320,
   confetti: 700
 };
-function x(e, t) {
+function L(e, t) {
   !e || !X[t] || e.animate(X[t], {
     duration: ge[t] || 400,
     easing: "ease-in-out",
@@ -435,7 +435,7 @@ function Ye() {
   return O.get();
 }
 function ye(e, t, n, r, s = {}) {
-  L.cheer(), s.gameId && be(s.gameId, { score: t, total: n });
+  x.cheer(), s.gameId && be(s.gameId, { score: t, total: n });
   const i = s.completionOnly ? n === 1 ? "הִשְׁלַמְתֶּם מְשִׂימָה!" : `הִשְׁלַמְתֶּם ${n} מְשִׂימוֹת!` : `נִיקּוּד: ${t} מִתּוֹךְ ${n}`, o = K(t, n), a = "⭐".repeat(o) + "☆".repeat(3 - o), d = document.createElement("div");
   d.className = "completion-screen", d.innerHTML = `
     <div class="completion-screen__content">
@@ -454,7 +454,7 @@ function ye(e, t, n, r, s = {}) {
   }
   d.querySelector(".completion-screen__replay").addEventListener("click", () => {
     d.remove(), r();
-  }), e.innerHTML = "", e.appendChild(d), x(d.querySelector(".completion-screen__content"), "fadeIn");
+  }), e.innerHTML = "", e.appendChild(d), L(d.querySelector(".completion-screen__content"), "fadeIn");
 }
 function we(e, t, {
   totalRounds: n,
@@ -482,7 +482,7 @@ function we(e, t, {
   });
   async function y(p) {
     if (f || e.ended) return;
-    u(!0), d && L.correct();
+    u(!0), d && x.correct();
     try {
       if (p && await p(), e.ended) return;
       i && await i();
@@ -573,7 +573,7 @@ function Ee(e, t) {
     }
   };
 }
-let T = !1, D = !1, E = null;
+let k = !1, D = !1, E = null;
 const Re = [
   "ResizeObserver loop",
   // אזהרת דפדפן שפירה
@@ -606,9 +606,9 @@ function j() {
 function Se() {
   if (typeof window > "u") return { destroy() {
   } };
-  if (T) return { destroy() {
+  if (k) return { destroy() {
   } };
-  T = !0;
+  k = !0;
   const e = (n) => {
     U(n == null ? void 0 : n.message) || (console.error("[alefbet] uncaught error:", (n == null ? void 0 : n.error) ?? (n == null ? void 0 : n.message)), j());
   }, t = (n) => {
@@ -619,22 +619,22 @@ function Se() {
     U((r == null ? void 0 : r.message) ?? r) || (console.error("[alefbet] unhandled rejection:", r), j());
   };
   return window.addEventListener("error", e), window.addEventListener("unhandledrejection", t), E = () => {
-    window.removeEventListener("error", e), window.removeEventListener("unhandledrejection", t), T = !1, D = !1;
+    window.removeEventListener("error", e), window.removeEventListener("unhandledrejection", t), k = !1, D = !1;
   }, { destroy: () => {
     E == null || E(), E = null;
   } };
 }
-function xe(e, t = "טוֹעֵן...") {
+function Le(e, t = "טוֹעֵן...") {
   e.innerHTML = `<div class="ab-loading">${t}</div>`;
 }
-function Le(e) {
+function xe(e) {
   e.innerHTML = "";
 }
-function k(e) {
+function T(e) {
   return e !== null && typeof e == "object" && !Array.isArray(e);
 }
 function G(e) {
-  if (!k(e) || typeof e.id != "string" || !e.id || !Array.isArray(e.rounds) || !e.rounds.every(k) || e.meta !== void 0 && !k(e.meta) || e.distractors !== void 0 && !Array.isArray(e.distractors))
+  if (!T(e) || typeof e.id != "string" || !e.id || !Array.isArray(e.rounds) || !e.rounds.every(T) || e.meta !== void 0 && !T(e.meta) || e.distractors !== void 0 && !Array.isArray(e.distractors))
     throw new Error("Invalid game content");
   const t = e.version ?? 1;
   if (!Number.isInteger(t) || Number(t) < 1) throw new Error("Invalid content version");
@@ -770,11 +770,11 @@ class A {
   }
 }
 const Ce = "alefbet.editor.";
-function Te(e) {
+function ke(e) {
   return z(`${Ce}${e}`, null);
 }
-function ke(e, t) {
-  const n = Te(e).get();
+function Te(e, t) {
+  const n = ke(e).get();
   if (!n) return null;
   try {
     const r = A.fromJSON(n, t);
@@ -783,29 +783,25 @@ function ke(e, t) {
     return null;
   }
 }
-const N = /* @__PURE__ */ new WeakMap();
+const M = /* @__PURE__ */ new WeakMap();
 async function Ie(e, t) {
-  var a;
   J(e);
   const n = {};
-  if (N.set(e, n), Se(), xe(e, t.loadingMessage ?? "טוֹעֵן..."), (a = t.preloadTexts) != null && a.length) {
-    const { preloadNikud: d } = await import("./nakdan-DFzp_6d3.js");
-    await d(t.preloadTexts);
-  }
-  const r = t.audio !== !1 ? await import("./game-audio-DWDnzTwh.js").then((d) => d.e) : null;
-  if (N.get(e) !== n)
+  M.set(e, n), Se(), Le(e, t.loadingMessage ?? "טוֹעֵן...");
+  const r = t.audio !== !1 ? await import("./game-audio-Cwpuytb0.js").then((a) => a.e) : null;
+  if (M.get(e) !== n)
     return { shell: null, activeRounds: [], aborted: !0 };
-  if (t.onBeforeHide && (await t.onBeforeHide() === !1 || N.get(e) !== n))
+  if (t.onBeforeHide && (await t.onBeforeHide() === !1 || M.get(e) !== n))
     return { shell: null, activeRounds: [], aborted: !0 };
-  Le(e);
-  const s = t.editor ? ke(t.gameId, t.editor.content) : null, i = s != null && s.rounds.length ? s.rounds : t.defaultRounds ?? [], o = new me(e, {
+  xe(e);
+  const s = t.editor ? Te(t.gameId, t.editor.content) : null, i = s != null && s.rounds.length ? s.rounds : t.defaultRounds ?? [], o = new me(e, {
     totalRounds: t.totalRounds ?? i.length,
     title: t.title,
     gameId: t.gameId
   });
   return r == null || r.attachGameAudio(o), { shell: o, activeRounds: i, aborted: !1 };
 }
-async function Ne(e, t) {
+async function Me(e, t) {
   const n = await Ie(e, t);
   if (n.aborted) return n;
   const { shell: r, activeRounds: s } = n;
@@ -822,7 +818,7 @@ async function Ne(e, t) {
     transitionMs: t.transitionMs,
     playCorrectSound: t.playCorrectSound,
     onReplay: t.onReplay ?? (() => {
-      Ne(e, t);
+      Me(e, t);
     }),
     buildRoundUI: c
   });
@@ -860,7 +856,7 @@ async function Ne(e, t) {
   }
   return r.start(), n;
 }
-function Me(e, t, n) {
+function Ne(e, t, n) {
   e.innerHTML = "";
   const r = document.createElement("div");
   r.className = "option-cards-grid";
@@ -911,7 +907,7 @@ function Me(e, t, n) {
   };
 }
 function We(e, t, n) {
-  const r = e.scope.use(Me(t, n.options, (s) => {
+  const r = e.scope.use(Ne(t, n.options, (s) => {
     e.isAnswered() || (n.isCorrect(s) ? e.onCorrect(() => {
       var i;
       return r.highlight(s.id, "correct"), (i = n.onCorrect) == null ? void 0 : i.call(n, s);
@@ -979,15 +975,15 @@ function Ke(e) {
   return {
     /** הצג משוב חיובי - טקסט מפורש, או ביטוי שבח אקראי אם לא סופק */
     correct(s) {
-      L.correct(), r(s ?? `!${He()}`, "correct"), x(t, "bounce");
+      x.correct(), r(s ?? `!${He()}`, "correct"), L(t, "bounce");
     },
     /** הצג עידוד — נסה שוב */
     wrong(s = "נַסֵּה שׁוּב") {
-      L.wrong(), r(s, "wrong"), x(t, "pulse");
+      x.wrong(), r(s, "wrong"), L(t, "pulse");
     },
     /** הצג רמז */
     hint(s) {
-      r(s, "hint"), x(t, "pulse");
+      r(s, "hint"), L(t, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -1014,7 +1010,7 @@ function Ze(e, t, n, r) {
     a && (a.open = !1), r(o);
   }, s.appendChild(i), i;
 }
-let b = null, g = null, Z = 0, V = 0, v = null, M = 0, H = 0;
+let b = null, g = null, Z = 0, V = 0, v = null, N = 0, H = 0;
 const R = /* @__PURE__ */ new Map();
 function Q(e, t) {
   var r;
@@ -1046,8 +1042,8 @@ function ee(e, t) {
   g && (g.style.transform = `translate3d(${e - Z}px, ${t - V}px, 0) scale(1.12)`);
 }
 function Pe(e, t) {
-  M = e, H = t, v === null && (v = requestAnimationFrame(() => {
-    v = null, ee(M, H), qe(Q(M, H));
+  N = e, H = t, v === null && (v = requestAnimationFrame(() => {
+    v = null, ee(N, H), qe(Q(N, H));
   }));
 }
 function Oe() {
@@ -1109,7 +1105,7 @@ export {
   ce as GameState,
   Y as PRAISE_PHRASES,
   W as RETRY_HINTS,
-  x as animate,
+  L as animate,
   Ie as bootstrapGame,
   We as createChoiceRound,
   Ve as createDragSource,
@@ -1117,7 +1113,7 @@ export {
   Ke as createFeedback,
   Je as createHintTracker,
   z as createLocalState,
-  Me as createOptionCards,
+  Ne as createOptionCards,
   Ee as createProgressBar,
   we as createRoundManager,
   ve as createRoundScope,
@@ -1126,7 +1122,7 @@ export {
   Ye as getAllProgress,
   P as getAudioContext,
   Ge as getGameProgress,
-  Le as hideLoadingScreen,
+  xe as hideLoadingScreen,
   Ze as injectHeaderButton,
   Se as installGlobalErrorScreen,
   he as lockPageZoom,
@@ -1135,11 +1131,11 @@ export {
   He as randomPraise,
   ze as randomRetryHint,
   be as recordGameResult,
-  Ne as runGame,
+  Me as runGame,
   ye as showCompletionScreen,
-  xe as showLoadingScreen,
+  Le as showLoadingScreen,
   je as shuffle,
-  L as sounds,
+  x as sounds,
   K as starsFor,
   Fe as unlockAudioOutput
 };

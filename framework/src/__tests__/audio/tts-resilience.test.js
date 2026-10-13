@@ -9,14 +9,6 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// `tts.js` מייבא את `getNikud` ו-`nikudList`. אנחנו לא בודקים את הנקדן עצמו,
-// לכן נחזיר זהות כדי שלא תהיה תלות ברשת או בקאש פנימי בזמן הבדיקה.
-vi.mock('../../utils/nakdan.js', () => ({
-  getNikud: (text) => text,
-  preloadNikud: vi.fn().mockResolvedValue(undefined),
-  addNikud: vi.fn(async (text) => text),
-}));
-
 vi.mock('../../data/nikud.js', () => ({
   nikudList: [
     { id: 'kamatz', symbol: 'ָ', sound: 'אָה' },

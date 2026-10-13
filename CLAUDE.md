@@ -28,7 +28,7 @@ framework/src/
   ui/        option-cards, progress-bar, feedback, completion, adult-tools, ...
   render/    animations
   input/     drag
-  utils/     nakdan (Dicta auto-vowelization)
+  utils/     shuffle
   styles/    alefbet.css
   runtime/index.ts  public gameplay API
   runtime/common.ts general gameplay API (no Hebrew content)
@@ -37,7 +37,6 @@ framework/src/
 games/<name>/     index.html + game.js + game.css, plus any modules or assets the game owns
                   (every file in the folder is precached for offline play)
 e2e/              Playwright specs, one per live game + pwa
-deploy/           Cloudflare Worker (Nakdan proxy) + infra
 ```
 
 There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-detector.js`.
@@ -95,7 +94,7 @@ Pushing to `main` triggers `.github/workflows/deploy.yml`, gated by unit/type/li
 - New games: `npm run new:game -- my-game "Title"`; edits template + catalog automatically.
 - General gameplay API: `framework/dist/common.js`, with existing `runtime.css`.
 - Hebrew API and backward compatibility: `framework/dist/runtime.js`.
-- `preloadTexts` is optional; omit for arithmetic.
+- Write Hebrew text with nikud in the source; there is no runtime vowelization.
 - Examples: `make-ten` (choice), `number-line` (custom interaction); guide: `docs/adding-games.md`.
 - Avoid putting arithmetic rules or Hebrew content in common.ts.
 - Math games follow `docs/math-pedagogy.md` (Aharoni: meaning before calculation; story, picture and exercise each enough alone). `balloon-stories` is the narrated reference.

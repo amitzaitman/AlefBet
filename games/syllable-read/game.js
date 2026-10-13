@@ -25,17 +25,11 @@ import {
   injectHeaderButton,
   showNikudSettingsDialog,
   animate,
-  RETRY_HINTS,
   randomRetryHint,
 } from '../../framework/dist/runtime.js';
 
 const ROUNDS = 8;
 
-const STATIC_TEXTS = [
-  'הַקְשִׁיבוּ לַהֲבָרָה וּבַחֲרוּ אוֹתָהּ',
-  'כָּל הַכָּבוֹד',
-  ...RETRY_HINTS,
-];
 
 function pickOther(pool, exclude) {
   const others = pool.filter(x => !exclude.includes(x));
@@ -72,7 +66,6 @@ export async function startGame(container) {
   return runGame(container, {
     gameId: 'syllable-read',
     title: 'קְרִיאַת הֲבָרוֹת',
-    preloadTexts: STATIC_TEXTS,
     loadingMessage: 'טוֹעֵן הֲבָרוֹת...',
     defaultRounds: randomNikud(ROUNDS).map(buildRound),
     playCorrectSound: false, // createFeedback already owns the success sound.

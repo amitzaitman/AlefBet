@@ -12,10 +12,7 @@ import {
   randomLetters,
   createChoiceRound,
   createFeedback,
-  getNikud,
   animate,
-  PRAISE_PHRASES,
-  RETRY_HINTS,
   randomPraise,
   randomRetryHint,
 } from '../../framework/dist/runtime.js';
@@ -33,29 +30,17 @@ function buildRounds() {
   }));
 }
 
-/** כל 22 המילים לדוגמה - למאגר המסיחים של העורך ולטעינה מראש של ניקוד. */
-const ALL_REGULAR_WORDS = getLettersByGroup('regular').map(l => ({ text: l.exampleWord, emoji: l.emoji }));
-
-// ── All texts that need nikud ──────────────────────────────────────────────
-
 const INSTRUCTION = 'אֵיזוֹ מִלָּה מַתְחִילָה בָּאוֹת?';
 
-const STATIC_TEXTS = [
-  INSTRUCTION,
-  'הָאוֹת',
-  ...PRAISE_PHRASES,
-  ...RETRY_HINTS,
-  ...ALL_REGULAR_WORDS.map(w => w.text),
-];
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 
 function buildOptions(round) {
-  const correct = { id: 'correct', text: getNikud(round.correct), emoji: round.correctEmoji };
+  const correct = { id: 'correct', text: round.correct, emoji: round.correctEmoji };
   const pool = getLettersByGroup('regular').filter(l => l.letter !== round.target);
   const distractors = shuffle(pool).slice(0, 3)
-    .map((l, i) => ({ id: `wrong-${i}`, text: getNikud(l.exampleWord), emoji: l.emoji }));
+    .map((l, i) => ({ id: `wrong-${i}`, text: l.exampleWord, emoji: l.emoji }));
   return shuffle([correct, ...distractors]);
 }
 
@@ -64,8 +49,7 @@ function buildOptions(round) {
 export async function startGame(container) {
   return runGame(container, {
     gameId: 'letter-match-animals',
-    title: getNikud('התאמת אותיות') || 'התאמת אותיות',
-    preloadTexts: STATIC_TEXTS,
+    title: 'הַתְאָמַת אוֹתִיּוֹת',
     defaultRounds: buildRounds(),
     transitionMs: 800,
     playCorrectSound: false,
@@ -117,7 +101,7 @@ export async function startGame(container) {
       createChoiceRound(context, optionsContainer, {
         options,
         isCorrect: option => option.id === 'correct',
-        onCorrect: () => feedback.correct(`!${randomPraise()} — ${getNikud(round.correct)} ${round.correctEmoji}`),
+        onCorrect: () => feedback.correct(`!${randomPraise()} — ${round.correct} ${round.correctEmoji}`),
         onWrong: option => {
           const letterName = getLetter(round.target)?.nameNikud || round.target;
           const pressedEl = rightPanel.querySelector(`.option-card[data-id="${CSS.escape(option.id)}"]`);

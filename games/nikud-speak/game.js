@@ -6,7 +6,6 @@
 import {
   bootstrapGame,
   tts,
-  nikudList,
   letterWithNikud,
   createFeedback,
   createProgressBar,
@@ -15,24 +14,13 @@ import {
   sounds,
   createVowelDetector,
   matchNikudVowel,
-  getNikud,
   randomNikud,
   showNikudSettingsDialog,
   injectHeaderButton,
   speakNikudSound,
   isSynthSupported,
-  RETRY_HINTS,
   randomRetryHint,
 } from '../../framework/dist/runtime.js';
-
-// ── Texts to preload ──────────────────────────────────────────────────────
-const STATIC_TEXTS = [
-  'בְּרוּכִים הַבָּאִים! אֱמוֹר אֶת הַנִּיקּוּד',
-  'כָּל הַכָּבוֹד',
-  'הַמִּשְׂחָק דּוֹרֵשׁ גִּישָׁה לַמִּיקְרוֹפוֹן',
-  ...RETRY_HINTS,
-  ...nikudList.map(n => n.nameNikud),
-];
 
 // ── Game ──────────────────────────────────────────────────────────────────
 
@@ -42,14 +30,13 @@ export async function startGame(container) {
   const { shell, aborted } = await bootstrapGame(container, {
     gameId: 'nikud-speak',
     title: 'אֱמוֹר אֶת הַנִּיקּוּד',
-    preloadTexts: STATIC_TEXTS,
     loadingMessage: 'טוֹעֵן נִיקּוּד...',
     totalRounds: 8,
     onBeforeHide: () => {
       if (!listener.available) {
         container.innerHTML = `
           <div style="display:flex;align-items:center;justify-content:center;min-height:100dvh;font-family:Heebo,Arial;font-size:1.4rem;color:#e53e3e;direction:rtl;text-align:center;padding:2rem;">
-            ${getNikud('הַמִּשְׂחָק דּוֹרֵשׁ גִּישָׁה לַמִּיקְרוֹפוֹן')}
+            הַמִּשְׂחָק דּוֹרֵשׁ גִּישָׁה לַמִּיקְרוֹפוֹן
           </div>
         `;
         return false;
@@ -202,7 +189,7 @@ export async function startGame(container) {
 
       if (failCount >= 3) {
         // Auto-advance after 3 fails
-        feedback.hint(getNikud('הַצְּלִיל הַנָּכוֹן הוּא:'));
+        feedback.hint('הַצְּלִיל הַנָּכוֹן הוּא:');
 
         progressBar?.update(shell.state.currentRound);
 
@@ -217,7 +204,7 @@ export async function startGame(container) {
         }, 1600);
 
       } else {
-        feedback.hint(`${getNikud(randomRetryHint())} 🔊`);
+        feedback.hint(`${randomRetryHint()} 🔊`);
         micBtn.disabled = false;
         listening = false;
       }

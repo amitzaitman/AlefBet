@@ -1,1 +1,1 @@
-self.ALEFBET_RUNTIME_ASSETS = ["common.js","game-audio-DWDnzTwh.js","nakdan-DFzp_6d3.js","runtime.css","runtime.js"];
+self.ALEFBET_RUNTIME_ASSETS = ["common.js","game-audio-Cwpuytb0.js","runtime.css","runtime.js"];

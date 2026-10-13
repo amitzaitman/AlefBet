@@ -7,15 +7,8 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../utils/nakdan.js', () => ({
-  preloadNikud: vi.fn().mockResolvedValue(undefined),
-  addNikud: vi.fn(async t => t),
-  getNikud: vi.fn(t => t),
-}));
-
 import { bootstrapGame, runGame } from '../core/bootstrap.ts';
 import { mountContainer } from './helpers.js';
-import { preloadNikud } from '../utils/nakdan.js';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -31,7 +24,7 @@ describe('bootstrapGame', () => {
       const dispose = vi.fn();
       const replay = vi.fn();
       const result = await runGame(host, {
-        gameId: 'runner', title: 'בדיקה', preloadTexts: [], audio: false,
+        gameId: 'runner', title: 'בדיקה', audio: false,
         defaultRounds: [{ target: 'א' }, { target: 'ב' }],
         transitionMs: 20, onReplay: replay,
         buildRound: context => { rounds.push(context); return dispose; },
@@ -60,12 +53,12 @@ describe('bootstrapGame', () => {
       const host = mountContainer();
       let round;
       const result = await runGame(host, {
-        gameId: 'cancel-runner', title: 'ישן', preloadTexts: [], audio: false,
+        gameId: 'cancel-runner', title: 'ישן', audio: false,
         defaultRounds: [{ target: 'א' }, { target: 'ב' }],
         buildRound: context => { round = context; },
       });
       const pending = round.onCorrect();
-      await bootstrapGame(host, { gameId: 'next', title: 'חדש', preloadTexts: [], audio: false });
+      await bootstrapGame(host, { gameId: 'next', title: 'חדש', audio: false });
       await vi.runAllTimersAsync();
       await pending;
       expect(result.shell.ended).toBe(true);
@@ -76,10 +69,10 @@ describe('bootstrapGame', () => {
   it('does not let a slow start overwrite a newer game', async () => {
     const host = mountContainer();
     let release;
-    preloadNikud.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
-    const older = bootstrapGame(host, { gameId: 'old', title: 'ישן', preloadTexts: ['שלום'] });
-    const newer = await bootstrapGame(host, { gameId: 'new', title: 'חדש', preloadTexts: [] });
+    // The older start pauses just before building its shell; the newer one finishes first.
+    const older = bootstrapGame(host, { gameId: 'old', title: 'ישן', onBeforeHide: () => new Promise(resolve => { release = resolve; }) });
     await vi.waitFor(() => expect(release).toBeTypeOf('function'));
+    const newer = await bootstrapGame(host, { gameId: 'new', title: 'חדש' });
     release();
     expect((await older).aborted).toBe(true);
     expect(host.querySelector('.game-title').textContent).toBe('חדש');
@@ -90,7 +83,7 @@ describe('bootstrapGame', () => {
     const host = mountContainer();
     const add = vi.spyOn(window, 'addEventListener');
     const remove = vi.spyOn(window, 'removeEventListener');
-    const opts = { gameId: 'again', title: 'שוב', preloadTexts: [] };
+    const opts = { gameId: 'again', title: 'שוב' };
     const first = await bootstrapGame(host, opts);
     const listener = add.mock.calls.find(([name]) => name === 'alefbet:tts-state')[1];
     const second = await bootstrapGame(host, opts);
@@ -118,7 +111,6 @@ describe('bootstrapGame', () => {
     const result = await bootstrapGame(host, {
       gameId: 'test-game',
       title: 'בדיקה',
-      preloadTexts: ['שלום'],
       defaultRounds: [{ id: 'default', target: 'א' }],
       editor: { content },
     });
@@ -127,7 +119,6 @@ describe('bootstrapGame', () => {
     // Rounds saved by the removed editor, zones included, still load.
     expect(result.activeRounds).toEqual(saved);
     expect(result.shell.state.totalRounds).toBe(1);
-    expect(preloadNikud).toHaveBeenCalledWith(['שלום']);
     expect(host.querySelector('.ab-loading')).toBeNull();
     expect(host.querySelector('.game-title')?.textContent).toBe('בדיקה');
     // There is no editing UI any more.
@@ -149,7 +140,6 @@ describe('bootstrapGame', () => {
     const result = await bootstrapGame(host, {
       gameId: 'test-no-editor',
       title: 'ללא תוכן שמור',
-      preloadTexts: [],
       totalRounds: 8,
     });
 
@@ -164,7 +154,6 @@ describe('bootstrapGame', () => {
     const result = await bootstrapGame(host, {
       gameId: 'test-abort',
       title: 'יבטל',
-      preloadTexts: [],
       onBeforeHide: () => false,
     });
 
@@ -182,7 +171,7 @@ it('round scope removes old timers and listeners on advance and after a synchron
   const button = document.createElement('button');
   const cleanup = vi.fn();
   await runGame(mountContainer(), {
-    gameId: 'scopes', title: '', preloadTexts: [], audio: false,
+    gameId: 'scopes', title: '', audio: false,
     defaultRounds: [{ target: 'א' }, { target: 'ב' }], transitionMs: 10,
     buildRound: context => {
       contexts.push(context);
@@ -199,13 +188,4 @@ it('round scope removes old timers and listeners on advance and after a synchron
   expect(action).not.toHaveBeenCalled();
   expect(cleanup).toHaveBeenCalledTimes(2);
   expect(contexts.every(context => context.scope.signal.aborted)).toBe(true);
-});
-
-it('starts a generic game without invoking Hebrew preprocessing', async () => {
-  const result = await bootstrapGame(mountContainer(), {
-    gameId: 'math', title: 'חשבון', audio: false,
-  });
-  expect(result.aborted).toBe(false);
-  expect(preloadNikud).not.toHaveBeenCalled();
-  result.shell.end();
 });

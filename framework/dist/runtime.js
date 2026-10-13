@@ -1,8 +1,7 @@
-import { g as K, n as C, t as R, h as ie, a as se, l as ce } from "./game-audio-DWDnzTwh.js";
-import { b as We, c as Ke, r as Ze, d as Xe } from "./game-audio-DWDnzTwh.js";
+import { g as K, n as C, t as R, h as ie, a as se, l as ce } from "./game-audio-Cwpuytb0.js";
+import { b as We, c as Ke, r as Ze, d as Xe } from "./game-audio-Cwpuytb0.js";
 import { playBlob as ue, getAudioContext as le, ensureAudioRunning as Z } from "./common.js";
 import { EventBus as Je, GameShell as et, GameState as tt, PRAISE_PHRASES as nt, RETRY_HINTS as rt, animate as ot, bootstrapGame as at, createChoiceRound as it, createDragSource as st, createDropTarget as ct, createFeedback as ut, createHintTracker as lt, createLocalState as dt, createOptionCards as ft, createProgressBar as mt, createRoundManager as pt, createRoundScope as bt, endGame as ht, getAllProgress as yt, getGameProgress as vt, hideLoadingScreen as wt, injectHeaderButton as gt, installGlobalErrorScreen as kt, lockPageZoom as Mt, mountAudioStatusBanner as Ft, randomPraise as At, randomRetryHint as St, recordGameResult as Et, runGame as Rt, showCompletionScreen as Nt, showLoadingScreen as Vt, shuffle as _t, sounds as Lt, starsFor as Tt, unlockAudioOutput as Ct } from "./common.js";
-import { addNikud as Bt, getNikud as xt, isVowelized as Pt, preloadNikud as zt } from "./nakdan-DFzp_6d3.js";
 const X = {
   a: { F1: 850, F2: 1400 },
   e: { F1: 550, F2: 2100 },
@@ -194,7 +193,7 @@ function he() {
 }
 const ye = "alefbet-voices", F = "recordings", ve = 1;
 let T = null;
-function P() {
+function x() {
   return T || (T = new Promise((e, t) => {
     const n = indexedDB.open(ye, ve);
     n.onupgradeneeded = () => {
@@ -208,28 +207,28 @@ function j(e, t) {
   return `${e}/${t}`;
 }
 async function we(e, t, n) {
-  const r = await P();
+  const r = await x();
   return new Promise((a, c) => {
     const s = r.transaction(F, "readwrite");
     s.objectStore(F).put(n, j(e, t)), s.oncomplete = a, s.onerror = (o) => c(o.target.error);
   });
 }
 async function I(e, t) {
-  const n = await P();
+  const n = await x();
   return new Promise((r, a) => {
     const s = n.transaction(F, "readonly").objectStore(F).get(j(e, t));
     s.onsuccess = () => r(s.result ?? null), s.onerror = (o) => a(o.target.error);
   });
 }
 async function ge(e, t) {
-  const n = await P();
+  const n = await x();
   return new Promise((r, a) => {
     const c = n.transaction(F, "readwrite");
     c.objectStore(F).delete(j(e, t)), c.oncomplete = r, c.onerror = (s) => a(s.target.error);
   });
 }
 async function ke(e) {
-  const t = await P();
+  const t = await x();
   return new Promise((n, r) => {
     const c = t.transaction(F, "readonly").objectStore(F).getAllKeys();
     c.onsuccess = () => {
@@ -257,7 +256,7 @@ async function G(e, t, { signal: n } = {}) {
     n == null || n.addEventListener("abort", i, { once: !0 }), s.onended = () => u(!0), s.onerror = () => u(!1), s.play().catch(() => u(!1));
   });
 }
-async function xe(e, t) {
+async function Pe(e, t) {
   return await I(e, t).catch(() => null) !== null;
 }
 const Y = 210, J = 550, Me = {
@@ -267,7 +266,7 @@ const Y = 210, J = 550, Me = {
   o: { F3: 2600, bandwidths: [80, 90, 150], gains: [1, 0.5, 0.1] },
   u: { F3: 2400, bandwidths: [60, 80, 140], gains: [1, 0.45, 0.1] }
 };
-function x(e) {
+function P(e) {
   const t = X[e], n = Me[e];
   return !t || !n ? null : {
     formants: [t.F1, t.F2, n.F3],
@@ -299,7 +298,7 @@ const W = {
 function Fe(e) {
   return W[e] ?? W[""];
 }
-function Pe() {
+function xe() {
   return le() !== null;
 }
 let B = null;
@@ -357,7 +356,7 @@ function ne(e, t, n, r) {
 }
 async function Ee(e, t = {}) {
   var s, o;
-  const n = x(e);
+  const n = P(e);
   if (!n || (s = t.signal) != null && s.aborted) return !1;
   const r = await Z();
   if (!r || (o = t.signal) != null && o.aborted) return !1;
@@ -373,7 +372,7 @@ async function Ee(e, t = {}) {
 }
 async function $(e, t, n = {}) {
   var l, d;
-  const r = x(t);
+  const r = P(t);
   if (!r || (l = n.signal) != null && l.aborted) return !1;
   const a = await Z();
   if (!a || (d = n.signal) != null && d.aborted) return !1;
@@ -410,7 +409,7 @@ function Re(e, t, n, r, a, c, s = e.destination) {
       break;
     }
     case "glide": {
-      const i = x(n === "y" ? "i" : "u");
+      const i = P(n === "y" ? "i" : "u");
       u = i ? i.formants : null;
       break;
     }
@@ -661,7 +660,6 @@ export {
   rt as RETRY_HINTS,
   Q as SOUND_BANK_ID,
   X as VOWEL_TEMPLATES,
-  Bt as addNikud,
   ot as animate,
   We as attachGameAudio,
   at as bootstrapGame,
@@ -689,16 +687,14 @@ export {
   vt as getGameProgress,
   K as getLetter,
   Ke as getLettersByGroup,
-  xt as getNikud,
-  xe as hasVoice,
+  Pe as hasVoice,
   ie as hebrewLetters,
   wt as hideLoadingScreen,
   gt as injectHeaderButton,
   kt as installGlobalErrorScreen,
   _e as isOffline,
-  Pe as isSynthSupported,
+  xe as isSynthSupported,
   be as isVoiceRecordingSupported,
-  Pt as isVowelized,
   ze as keyLabel,
   re as letterKey,
   ce as letterWithNikud,
@@ -712,7 +708,6 @@ export {
   C as nikudList,
   ue as playBlob,
   G as playVoice,
-  zt as preloadNikud,
   Ze as randomLetters,
   Xe as randomNikud,
   At as randomPraise,
@@ -737,6 +732,6 @@ export {
   Ee as synthesizeVowel,
   R as tts,
   Ct as unlockAudioOutput,
-  x as vowelFormantSpec,
+  P as vowelFormantSpec,
   Ne as wordKey
 };

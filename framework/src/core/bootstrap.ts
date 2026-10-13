@@ -21,8 +21,6 @@ export interface BootstrapOptions {
   gameId:          string;
   /** כותרת ה-shell - המתקשר אחראי לניקוד אם נדרש */
   title:           string;
-  /** טקסטים שיועברו ל-preloadNikud */
-  preloadTexts?:   string[];
   /** ברירת מחדל: 'טוֹעֵן...' */
   loadingMessage?: string;
   /** סיבובים שיוחלו כאשר אין נתונים שמורים */
@@ -61,11 +59,6 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
 
   showLoadingScreen(container, opts.loadingMessage ?? 'טוֹעֵן...');
 
-  // יכולת עברית נטענת רק אם המשחק מבקש ניקוד לטקסטים.
-  if (opts.preloadTexts?.length) {
-    const { preloadNikud } = await import('../utils/nakdan.js');
-    await preloadNikud(opts.preloadTexts);
-  }
   const audioModule = opts.audio !== false ? await import('../audio/game-audio.js') : null;
   if (starts.get(container) !== start) {
     return { shell: null, activeRounds: [], aborted: true };

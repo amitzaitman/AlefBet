@@ -52,11 +52,7 @@ node start.js 3000   # פורט אחר
 בזמן משחק **לא יוצאת אף בקשת רשת**. כל השמעה עוברת שרשרת ספקים מקומיים
 (`audio/hebrew-audio.js`):
 
-1. **בנק הצלילים** — הקלטות אנושיות ב-IndexedDB במכשיר. ממלאים אותו
-   באחת משתי דרכים באולפן הצלילים:
-   - 🎤 הקלטה בקול שלכם (מורה/הורה) — הכי טוב פדגוגית.
-   - ⬇️ **מילוי אוטומטי חד-פעמי** — הורדת קולות מחשב דרך ה-proxy של
-     הפרויקט (חיבור רשת פעם אחת, ואז הכול מקומי לתמיד).
+1. **בנק הצלילים** — הקלטות של מורה או הורה ב-IndexedDB במכשיר, מאולפן הצלילים.
 2. **קול מערכת** — Web Speech API מקומי (`audio/tts.js`), עם watchdog
    נגד קולות רשת תקועים והעדפת קול מותקן כשאין אינטרנט.
 3. **סינתזת פונמות** — יצירת תנועות והברות ב-Web Audio
@@ -64,10 +60,8 @@ node start.js 3000   # פורט אחר
 
 אם שום ספק לא הצליח — מוצג באנר ברור לילד; אין כשלים שקטים.
 
-גם הניקוד האוטומטי (Dicta Nakdan, `utils/nakdan.js`) לא נדרש בזמן משחק:
-טקסטים מנוקדים מראש מדלגים על הרשת לגמרי, ותוצאות שהושגו פעם אחת נשמרות
-ב-localStorage. הגופנים (Rubik, Frank Ruhl Libre) ארוזים בריפו — אין תלות
-ב-Google Fonts.
+הטקסטים במשחקים כתובים מנוקדים. הגופנים (Rubik, Frank Ruhl Libre) ארוזים
+בריפו — אין תלות ב-Google Fonts.
 
 ---
 
@@ -133,13 +127,11 @@ framework/src/
   data/      hebrew-letters, nikud
   ui/        option-cards, progress-bar, feedback, adult-tools,
              audio-status-banner, completion-screen, ...
-  utils/     nakdan (ניקוד אוטומטי, עם מטמון מתמיד)
   runtime/   API לרכיבי המשחק
   styles/    alefbet.css + גופנים מקומיים
 framework/dist/   תוצר בנוי ומחויב — המשחקים טוענים ממנו ישירות
 games/<name>/     index.html + game.js + game.css, ומודולים ונכסים של המשחק
 e2e/              בדיקות Playwright
-deploy/           Cloudflare Worker: proxy לנקדן + מסלול /tts לקימפול
 ```
 
 ### משחק חדש
@@ -156,7 +148,6 @@ node start.js
 
 - **משחק כללי:** מייבאים מ-`framework/dist/common.js`; הסגנון המשותף נשאר `runtime.css`.
 - **יכולות עברית:** מייבאים לפי צורך מ-`runtime.js`, שממשיך לייצא גם את ה-API הקיים.
-- `preloadTexts` אופציונלי. נקדן נטען רק כאשר מבקשים לנקד רשימת טקסטים לא ריקה.
 - **בחירת תשובה:** `runGame` + `createChoiceRound`; ראו `games/make-ten/game.js`.
 - **אינטראקציה מותאמת:** `runGame` + רכיבים ומצב מקומי; ראו `games/number-line/game.js`.
 - **פעילות ללא סיבובים:** `bootstrapGame` + `createRoundScope`; ראו [מדריך הפיתוח](docs/adding-games.md).
@@ -171,11 +162,6 @@ node start.js
 
 דחיפה ל-`main` מפרסמת אוטומטית ל-GitHub Pages
 (`.github/workflows/deploy.yml`).
-
-**Proxy (חד-פעמי, אופציונלי):** ה-worker שב-`deploy/cloudflare-nakdan-proxy/`
-משרת שני מסלולים עם CORS — ניקוד אוטומטי (Dicta) ומסלול `/tts` למילוי
-האוטומטי של בנק הצלילים. פריסה עם `wrangler deploy`; חיבור דרך
-`?nakdanProxy=...` או `localStorage`. פרטים ב-README של התיקייה.
 
 ---
 

@@ -33,4 +33,3 @@ export { createVoiceRecordButton } from '../ui/voice-record-button.js';
 // ===== Input =====
 
 // ===== Utils =====
-export { addNikud, getNikud, preloadNikud, isVowelized } from '../utils/nakdan.js';
