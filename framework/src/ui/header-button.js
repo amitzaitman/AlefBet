@@ -12,8 +12,8 @@ import { getAdultTools } from './adult-tools.js';
  * @returns {HTMLElement|null}
  */
 export function injectHeaderButton(container, icon, ariaLabel, onClick) {
-  const spacer = getAdultTools(container);
-  if (!spacer) return null;
+  const panel = getAdultTools(container);
+  if (!panel) return null;
   const btn = document.createElement('button');
   btn.className = 'btn';
   btn.setAttribute('aria-label', ariaLabel);
@@ -23,6 +23,6 @@ export function injectHeaderButton(container, icon, ariaLabel, onClick) {
     if (menu) menu.open = false;
     onClick(event);
   };
-  spacer.appendChild(btn);
+  panel.appendChild(btn);
   return btn;
 }

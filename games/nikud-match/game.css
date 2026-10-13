@@ -160,7 +160,7 @@
   animation: ab-stamp 0.5s ease-out;
 }
 
-/* Animations: using framework @keyframes (ab-zone-in, ab-pop, ab-stamp, ab-hint-pulse) from alefbet.css */
+/* Animations: using framework @keyframes (ab-zone-in, ab-pop, ab-stamp) from alefbet.css */
 
 /* ── Mobile: stack vertically on narrow phones ─────────────────────────── */
 @media (max-width: 480px) {

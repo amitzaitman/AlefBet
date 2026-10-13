@@ -48,11 +48,10 @@ export class GameShell {
 
     const backBtn = this.config.homeUrl
       ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>`
-      : '<div class="game-header__spacer"></div>';
+      : '';
 
     this.container.innerHTML = `
       <div class="game-header">
-        <div class="game-header__spacer"></div>
         <h1 class="game-title"></h1>
         ${backBtn}
       </div>

@@ -5,9 +5,6 @@ declare module '*.css';
 
 interface Window {
   webkitAudioContext: typeof AudioContext;
-  SpeechRecognition?: any;
-  webkitSpeechRecognition?: any;
-  ALEFBET_NAKDAN_PROXY_URL?: string;
 }
 
 interface Document {

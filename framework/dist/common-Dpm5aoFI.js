@@ -85,10 +85,9 @@ class re {
   }
   _buildShell() {
     this.container.classList.add("alefbet-game"), ne(this.container.ownerDocument);
-    const t = this.config.homeUrl ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>` : '<div class="game-header__spacer"></div>';
+    const t = this.config.homeUrl ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>` : "";
     this.container.innerHTML = `
       <div class="game-header">
-        <div class="game-header__spacer"></div>
         <h1 class="game-title"></h1>
         ${t}
       </div>
@@ -252,7 +251,7 @@ async function Ie(e, { signal: t } = {}) {
   }
   return t != null && t.aborted ? !1 : new Promise((a) => {
     let s, o, i = !1;
-    const c = (d) => {
+    const c = (l) => {
       if (!i) {
         if (i = !0, clearTimeout(o), t == null || t.removeEventListener("abort", u), s) {
           s.onended = null;
@@ -261,7 +260,7 @@ async function Ie(e, { signal: t } = {}) {
           } catch {
           }
         }
-        a(d);
+        a(l);
       }
     }, u = () => c(!1);
     try {
@@ -346,7 +345,7 @@ function L(e, t) {
     fill: "none"
   });
 }
-function de(e, t) {
+function le(e, t) {
   const n = [];
   function r() {
     try {
@@ -375,7 +374,7 @@ function de(e, t) {
   }
   return { get: r, set: a, update: s, subscribe: o };
 }
-const le = "alefbet.progress.v1", fe = de(le, {});
+const de = "alefbet.progress.v1", fe = le(de, {});
 function j(e, t) {
   if (!Number.isFinite(e) || !Number.isFinite(t) || t <= 0) return 1;
   const n = e / t;
@@ -411,8 +410,8 @@ function me(e, t, n, r, a = {}) {
   `;
   const u = a.homeUrl === void 0 ? "../../index.html" : a.homeUrl;
   if (u) {
-    const d = document.createElement("a");
-    d.className = "completion-screen__home btn", d.href = u, d.textContent = "בְּחִירַת מִשְׂחָק", c.querySelector(".completion-screen__actions").appendChild(d);
+    const l = document.createElement("a");
+    l.className = "completion-screen__home btn", l.href = u, l.textContent = "בְּחִירַת מִשְׂחָק", c.querySelector(".completion-screen__actions").appendChild(l);
   }
   c.querySelector(".completion-screen__replay").addEventListener("click", () => {
     c.remove(), r();
@@ -427,40 +426,40 @@ function pe(e, t, {
   transitionMs: i = 800,
   playCorrectSound: c = !0,
   completionOnly: u = !1,
-  onReplay: d = () => location.reload()
+  onReplay: l = () => location.reload()
 }) {
   let f = !1;
-  const g = /* @__PURE__ */ new Set();
-  function l(m) {
-    f = m || e.ended, g.forEach(($) => $(f));
+  const b = /* @__PURE__ */ new Set();
+  function d(m) {
+    f = m || e.ended, b.forEach(($) => $(f));
   }
   function h(m) {
-    return g.add(m), m(f || e.ended), () => {
-      g.delete(m);
+    return b.add(m), m(f || e.ended), () => {
+      b.delete(m);
     };
   }
   e.on("end", () => {
-    l(!0), g.clear();
+    d(!0), b.clear();
   });
-  async function y(m) {
+  async function _(m) {
     if (f || e.ended) return;
-    l(!0), c && C.correct();
+    d(!0), c && C.correct();
     try {
       if (m && await m(), e.ended) return;
       s && await s();
     } catch (K) {
-      throw l(!1), K;
+      throw d(!1), K;
     }
     if (e.ended || (e.state.addScore(1), r == null || r.update(e.state.currentRound), !await e.delay(i))) return;
-    e.nextRound() ? (l(!1), a()) : me(t, e.state.score, n, d, { gameId: e.gameId, completionOnly: u, homeUrl: e.config.homeUrl });
+    e.nextRound() ? (d(!1), a()) : me(t, e.state.score, n, l, { gameId: e.gameId, completionOnly: u, homeUrl: e.config.homeUrl });
   }
   async function z(m) {
     if (!(f || e.ended)) {
-      l(!0);
+      d(!0);
       try {
         m && await m(), !e.ended && o && await o();
       } finally {
-        l(!1);
+        d(!1);
       }
     }
   }
@@ -468,11 +467,11 @@ function pe(e, t, {
     return f;
   }
   function Z() {
-    l(!1);
+    d(!1);
   }
-  return { handleCorrect: y, handleWrong: z, isAnswered: J, reset: Z, subscribe: h };
+  return { handleCorrect: _, handleWrong: z, isAnswered: J, reset: Z, subscribe: h };
 }
-function ge(e, t) {
+function be(e, t) {
   const n = document.createElement("div");
   n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(t)), n.innerHTML = `
     <div class="progress-bar__track">
@@ -497,7 +496,7 @@ function ge(e, t) {
   };
 }
 let A = !1, H = !1, E = null;
-const be = [
+const ge = [
   "ResizeObserver loop",
   // אזהרת דפדפן שפירה
   "Script error."
@@ -505,7 +504,7 @@ const be = [
 ];
 function O(e) {
   const t = String(e || "");
-  return be.some((n) => t.includes(n));
+  return ge.some((n) => t.includes(n));
 }
 function q() {
   var t;
@@ -526,7 +525,7 @@ function q() {
     }
   }), document.body.appendChild(e);
 }
-function _e() {
+function ye() {
   if (typeof window > "u") return { destroy() {
   } };
   if (A) return { destroy() {
@@ -547,7 +546,7 @@ function _e() {
     E == null || E(), E = null;
   } };
 }
-function ye(e, t = "טוֹעֵן...") {
+function _e(e, t = "טוֹעֵן...") {
   e.innerHTML = `<div class="ab-loading">${t}</div>`;
 }
 function we(e) {
@@ -557,8 +556,8 @@ const T = /* @__PURE__ */ new WeakMap();
 async function ve(e, t) {
   F(e);
   const n = {};
-  T.set(e, n), _e(), ye(e, t.loadingMessage ?? "טוֹעֵן...");
-  const r = t.audio !== !1 ? await import("./game-audio-Dm1AcWhC.js") : null;
+  T.set(e, n), ye(), _e(e, t.loadingMessage ?? "טוֹעֵן...");
+  const r = t.audio !== !1 ? await import("./game-audio-HLue6dWe.js") : null;
   if (T.get(e) !== n)
     return { shell: null, activeRounds: [], aborted: !0 };
   if (t.onBeforeHide && (await t.onBeforeHide() === !1 || T.get(e) !== n))
@@ -577,7 +576,7 @@ async function Ee(e, t) {
   const { shell: r, activeRounds: a } = n;
   if (!a.length)
     return r.bodyEl.textContent = "אֵין סִבּוּבִים לַמִּשְׂחָק.", r.end(), n;
-  const s = ge(r.footerEl, a.length);
+  const s = be(r.footerEl, a.length);
   let o;
   const i = () => {
     o == null || o.dispose(), o = void 0;
@@ -593,23 +592,23 @@ async function Ee(e, t) {
     buildRoundUI: u
   });
   r.on("end", i), r.on("start", () => {
-    var d;
-    s.update(0), (d = t.onStart) == null || d.call(t, r), c.reset();
+    var l;
+    s.update(0), (l = t.onStart) == null || l.call(t, r), c.reset();
   }), r.on("start", u);
   function u() {
     i(), r.bodyEl.innerHTML = "";
-    const d = se();
-    o = d;
-    const f = () => !r.ended && !d.signal.aborted, g = r.state.currentRound - 1;
+    const l = se();
+    o = l;
+    const f = () => !r.ended && !l.signal.aborted, b = r.state.currentRound - 1;
     try {
-      const l = t.buildRound({
+      const d = t.buildRound({
         shell: r,
-        index: g,
-        round: a[g],
+        index: b,
+        round: a[b],
         isActive: f,
-        scope: d,
+        scope: l,
         isAnswered: () => !f() || c.isAnswered(),
-        subscribeAnswered: (h) => f() ? d.use(c.subscribe(h)) : (h(!0), () => {
+        subscribeAnswered: (h) => f() ? l.use(c.subscribe(h)) : (h(!0), () => {
         }),
         onCorrect: async (h) => {
           f() && await c.handleCorrect(h);
@@ -617,11 +616,11 @@ async function Ee(e, t) {
         onWrong: async (h) => {
           f() && await c.handleWrong(h);
         },
-        schedule: d.schedule
+        schedule: l.schedule
       });
-      l && d.use(l);
-    } catch (l) {
-      throw d.dispose(), l;
+      d && l.use(d);
+    } catch (d) {
+      throw l.dispose(), d;
     }
   }
   return r.start(), n;
@@ -780,7 +779,7 @@ function Pe(e, t, n, r) {
     i && (i.open = !1), r(o);
   }, a.appendChild(s), s;
 }
-let _ = null, p = null, G = 0, Y = 0, v = null, M = 0, k = 0;
+let y = null, p = null, G = 0, Y = 0, v = null, M = 0, k = 0;
 const S = /* @__PURE__ */ new Map();
 function U(e, t) {
   var r;
@@ -819,46 +818,46 @@ function xe(e, t) {
 function Ae() {
   v !== null && (cancelAnimationFrame(v), v = null), p == null || p.remove(), p = null;
 }
-let b = null;
+let g = null;
 function Te(e) {
-  b !== e && (b == null || b.classList.remove("drop-target--hover"), b = e, e == null || e.classList.add("drop-target--hover"));
+  g !== e && (g == null || g.classList.remove("drop-target--hover"), g = e, e == null || e.classList.add("drop-target--hover"));
 }
 function Me() {
-  b == null || b.classList.remove("drop-target--hover"), b = null;
+  g == null || g.classList.remove("drop-target--hover"), g = null;
 }
 function Oe(e, t, { onTap: n } = {}) {
   e.classList.add("drag-source");
   let r = null, a = null, s = null, o = null;
   function i() {
-    var d;
-    r && (e.removeEventListener("pointermove", r), e.removeEventListener("pointerup", a), e.removeEventListener("pointercancel", s), e.removeEventListener("lostpointercapture", s), r = a = s = null), Me(), Ae(), e.classList.remove("drag-source--dragging"), _ = null;
+    var l;
+    r && (e.removeEventListener("pointermove", r), e.removeEventListener("pointerup", a), e.removeEventListener("pointercancel", s), e.removeEventListener("lostpointercapture", s), r = a = s = null), Me(), Ae(), e.classList.remove("drag-source--dragging"), y = null;
     const u = o;
-    o = null, u !== null && ((d = e.hasPointerCapture) != null && d.call(e, u)) && e.releasePointerCapture(u);
+    o = null, u !== null && ((l = e.hasPointerCapture) != null && l.call(e, u)) && e.releasePointerCapture(u);
   }
   function c(u) {
     if (e.matches(":disabled") || e.getAttribute("aria-disabled") === "true" || u.button !== void 0 && u.button !== 0 || o !== null) return;
-    u.preventDefault(), _ && _.cancel(), _ = { el: e, data: t, cancel: i }, o = u.pointerId;
-    let d = !1;
+    u.preventDefault(), y && y.cancel(), y = { el: e, data: t, cancel: i }, o = u.pointerId;
+    let l = !1;
     const f = () => {
-      d = !0, e.classList.add("drag-source--dragging"), Ce(e, u.clientX, u.clientY);
-    }, g = (l) => Math.hypot(l.clientX - u.clientX, l.clientY - u.clientY) >= 8;
-    n || f(), e.setPointerCapture(u.pointerId), r = (l) => {
-      l.pointerId === o && (!d && g(l) && f(), d && xe(l.clientX, l.clientY));
-    }, a = (l) => {
-      if (l.pointerId !== o) return;
-      const h = !d && !g(l), y = h && n ? null : U(l.clientX, l.clientY);
+      l = !0, e.classList.add("drag-source--dragging"), Ce(e, u.clientX, u.clientY);
+    }, b = (d) => Math.hypot(d.clientX - u.clientX, d.clientY - u.clientY) >= 8;
+    n || f(), e.setPointerCapture(u.pointerId), r = (d) => {
+      d.pointerId === o && (!l && b(d) && f(), l && xe(d.clientX, d.clientY));
+    }, a = (d) => {
+      if (d.pointerId !== o) return;
+      const h = !l && !b(d), _ = h && n ? null : U(d.clientX, d.clientY);
       if (i(), h && n) {
         n();
         return;
       }
-      y && S.has(y) && S.get(y).onDrop({ data: t, sourceEl: e, targetEl: y });
-    }, s = (l) => {
-      l.pointerId === o && i();
+      _ && S.has(_) && S.get(_).onDrop({ data: t, sourceEl: e, targetEl: _ });
+    }, s = (d) => {
+      d.pointerId === o && i();
     }, e.addEventListener("pointermove", r), e.addEventListener("pointerup", a), e.addEventListener("pointercancel", s), e.addEventListener("lostpointercapture", s);
   }
   return e.addEventListener("pointerdown", c), {
     destroy() {
-      e.removeEventListener("pointerdown", c), (_ == null ? void 0 : _.el) === e && i(), e.classList.remove("drag-source");
+      e.removeEventListener("pointerdown", c), (y == null ? void 0 : y.el) === e && i(), e.classList.remove("drag-source");
     }
   };
 }
@@ -887,7 +886,7 @@ export {
   N as g,
   De as h,
   Ne as i,
-  ge as j,
+  be as j,
   se as k,
   Pe as l,
   ne as m,
