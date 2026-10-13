@@ -5,6 +5,9 @@
 הספר מול העיניים: עקרונות שאומתו במקור כתוב מסומנים ב"מקור", והשאר
 ב"זיכרון". כשיש גישה לספר, כדאי לעדכן את הניסוח לפיו.
 
+עקרונות 8 עד 21 באים ממחקר על ילדים בגיל 3 עד 8, ונבדקו מול המקורות. כל
+משחק חשבון חדש, וכל שינוי במשחק קיים, נבנה לפי כל העקרונות.
+
 ## העקרונות
 
 ### 1. משמעות לפני חישוב (מקור)
@@ -39,7 +42,8 @@
 | השוואה | לנועה 5, לדני 3. כמה יותר יש לנועה? | `5 − 3 = ?` |
 | השלמה | נועה רוצה 7, יש לה 4. כמה חסרים? | `4 + ? = 7` |
 
-במשחק: מתרגלים כל משמעות בנפרד, ולא נתקעים על "לקחו".
+במשחק: קודם מכירים כל משמעות לבד, ואחר כך מערבבים (עיקרון 17). לא נתקעים
+על "לקחו".
 
 ### 5. מהמוחשי אל המופשט (מקור)
 
@@ -54,13 +58,271 @@
 שבו כל דוגמאות השברים היו פיצות.
 
 במשחק: מגוונים את השלם (פס, עוגה, קבוצה של חפצים) ותמיד אומרים של מה
-השבר. שבר של קבוצה ("חצי מ-6 בלונים") חשוב לא פחות משבר של צורה.
+השבר. שבר של קבוצה ("חצי מ-6 בלונים") הוא עוד שלם אפשרי, ולצידו הציר
+מ-0 עד 1 (עיקרון 15).
 
 ### 7. היחידה (זיכרון)
 
 מספר סופר יחידות. עשרת היא יחידה חדשה שבנויה מעשר יחידות.
 
 במשחק: מסדרים חפצים בשורות של חמש ועשר, ובהמשך קושרים עשרה לצרור אחד.
+
+## מה המחקר מוסיף
+
+העקרונות 1 עד 7 באים מאהרוני, ו-8 עד 21 ממחקר. 8 עד 19 מסודרים לפי כמה
+הם ישפרו את המשחקים שלנו, ו-20 ו-21 נוספו אחריהם. כל עיקרון מסומן לפי
+חוזק הראיות:
+
+- **מחקר חזק:** מטא-אנליזות, או ממצא שחזר במעבדות ובמדינות רבות.
+- **מחקר בינוני:** ניסויים מבוקרים מעטים, או ממצא חזק שעבר לגיל אחר או
+  להקשר אחר.
+- **בלי ניסוי:** מאמר למורים או תצפית. כיוון טוב, אבל לא ראיה.
+
+רוב הניסויים נעשו עם מבוגר ליד הילדים, ולא באפליקציה, וחלקם עם ילדים
+גדולים יותר או עם מבוגרים. ממשחק שמשחקים בו לבד צריך לצפות להשפעה קטנה
+יותר. כללים כמו "עולים רמה אחרי 3 הצלחות" הם החלטות עיצוב, לא ממצאים.
+רוב המקורות נמצאו בחיפוש ברשת ב-13 באוקטובר 2026. שניים (Stern 1993, Nesher
+& Teubal 1975) נמצאו רק ברשימות מקורות של מאמרים אחרים. לפני ציטוט של מספר
+כדאי לבדוק אותו במאמר.
+
+### 8. מבנה הבעיה ומקום הנעלם (מחקר חזק)
+
+הקושי של בעיה תלוי פחות בפעולה ויותר במבנה שלה ובמקום של הנעלם. אותו
+`8 − 5` קל כש"היו 8, 5 עפו", וקשה כש"היו כמה, 5 עפו, נשארו 3". יש שלושה
+מבנים. בשינוי (הוסיפו או לקחו) חסר הסוף, השינוי או ההתחלה. בשני חלקים
+ושלם חסר השלם או חלק. בהשוואה חסר ההפרש או אחת הקבוצות. זה מרחיב את
+עיקרון 4: לצד המשמעות יש ציר שני, מקום הנעלם.
+
+סדר הקושי דומה ברוב המחקרים: נעלם בסוף קל, נעלם בהתחלה והשוואה קשים. ילדי
+גן שפגשו בעיות מילוליות כל השנה, עם חפצים, פתרו יותר מזה (מחקר אחד). לכן
+הסדר קובע כמה עזרה לתת, ולא הגיל.
+
+במשחק: יוצרים סיבוב לפי מבנה, מקום הנעלם וניסוח, ולא לפי פעולה ושני מספרים.
+התרגיל הולך אחרי הסיפור: "היו 4, הגיעו עוד כמה, עכשיו יש 7" נכתב
+`4 + ? = 7`. מבנה חדש מתחיל במספרים עד 5, ורק אחר כך עולה עד 10.
+
+### 9. מסלול ישר, ואומרים את המספר שנוחתים עליו (מחקר בינוני)
+
+משחק לוח על שורה ישרה של משבצות שוות וממוספרות שיפר אצל ילדי גן הערכת
+גודל, ספירה וזיהוי ספרות, גם אחרי 9 שבועות. הממצא חזר במעבדה ובמדינה
+אחרת. לוח צבעים בלי מספרים לא עזר, ולוח עגול עזר הרבה פחות. בגיל 5 עד 6,
+מי שאמרו בכל צעד את מספר המשבצת ("5, 6, 7") למדו יותר ממי שספרו
+"1, 2, 3". בניסויים האלה מבוגר שיחק עם הילדים.
+
+אצל מבוגרים, הכיוון שבו מספרים "גדלים" מושפע מהרגלי קריאה, ומבוגרים
+ישראלים לא הראו כיוון אחיד. מכאן אנחנו מסיקים שצריך ללמד את הכיוון ולשמור
+עליו קבוע.
+
+במשחק: הצפרדע קופצת על שורה ישרה של אבנים שוות, 0 בקצה השמאלי ומספר על כל
+אבן. בכל נחיתה המספר נאמר ומוגדל. אומרים "קדימה" ו"אחורה", לא "ימינה"
+ו"שמאלה". כל קפיצה היא נגיעה של הילדים, ומצוירת כקשת כדי לספור קפיצות ולא
+אבנים. קודם סופרים קדימה, ורק אחר כך אחורה.
+
+### 10. משוב שמסביר, ועזרה מהטעות הראשונה (מחקר בינוני)
+
+משוב עוזר בממוצע, ומה שעוזר הוא המידע שבו. משוב עם הסבר עוזר הרבה יותר
+מ"נכון" או "לא נכון", שבלמידה במחשב כמעט לא עזר. חיזוק או עונש בלבד
+עוזרים מעט (d בערך 0.24). בסקירה של קלוגר ודניסי, ביותר משליש מגדלי
+האפקט המשוב הוריד את הביצוע, ומשוב שמעביר את תשומת הלב מהמשימה אל האדם
+עזר פחות. רוב המחקרים היו עם ילדים גדולים או עם מבוגרים.
+
+במשחק: אחרי בחירה שגויה מראים בתמונה מה הבחירה אומרת (הצפרדע נוחתת על
+המספר שנבחר). העזרה מתחילה בטעות הראשונה, בכל משחק חשבון: קודם הסיפור שוב,
+אחר כך ספירה על התמונה, ורק בסוף סימון התשובה. אחרי טעות יש הפסקה קצרה,
+כדי שלא ינחשו עד שפוגעים. אחרי תשובה נכונה מראים את התרגיל המלא על
+התמונה. שבחים מתארים מה נעשה ("ספרתם את המקומות הריקים"), ולא "אתם
+חכמים".
+
+### 11. רמות לפי מסלול למידה, והתקדמות לפי הצלחה (מחקר בינוני)
+
+בכיתות א' עד ג', דרכי הפתרון של חיבור וחיסור מתפתחות בסדר ידוע: לספור את
+הכול בחפצים, לספור מהמספר הראשון או מהגדול, ולגזור עובדה מעובדה. בניסוי
+עם 40 מורים לכיתה א', מורים שלמדו על הדרכים האלה לימדו יותר פתרון בעיות,
+והתלמידים שלהם הצליחו יותר. תוכנית לגן שבנויה על מסלולי למידה הצליחה
+בניסוי ב-36 כיתות (החוקרים פיתחו אותה). מדריך אמריקאי לגיל 3 עד 6 מדרג
+הוראה לפי מסלול התפתחותי כראיה בינונית.
+
+במשחק: לכל משחק יש סולם רמות. עולים רמה אחרי 2 או 3 הצלחות בניסיון
+הראשון, ויורדים אחרי 2 טעויות ברצף. הרמה נשמרת במכשיר, וכשחוזרים ממשיכים
+ממנה. יש רמת כניסה לגיל 3 עד 4: "כמה יש?" עד 5.
+
+### 12. שפת היחסים, בלי מילות מפתח (מחקר בינוני)
+
+בבעיות השוואה הקושי הוא בעיקר בהבנת המשפט, ולא בחשבון. בכיתה א', עם תמונה,
+"כמה יותר יש לנועה?" קשה הרבה יותר מ"כמה בלונים של נועה בלי זוג?", כי
+הניסוח השני מראה את היחס. ילדים טועים הרבה יותר כשמילת רמז ("ביחד",
+"נשארו") מובילה לפעולה ההפוכה. בניסוי אחד עם ילדים מתקשים בכיתה א',
+הוראה של הבנת שפה בתוך בעיות מילוליות הוסיפה על הוראת התבניות, ולכן
+ההמלצה ללמד את השפה עצמה בינונית.
+
+במשחק: מחליפים את הפעלים בכל מבנה (התפוצצו, עפו, נתנה לדני). "עוד" מופיע
+גם בסיפור השלמה שנפתר בחיסור ("כמה עוד היא צריכה?"). בהשוואה מתחילים
+בשאלת הזוגות, אחר כך "כמה יותר", אחר כך "כמה פחות". בגיל 7 עד 8 מוסיפים
+ניסוח הפוך: "לנועה 7. יש לה 2 יותר מלדני. כמה לדני?". טקסט להורים לא נותן
+טיפים של מילות מפתח.
+
+### 13. ספירה נגמרת ב"כמה" (מחקר חזק)
+
+לדקלם מספרים ולגעת בחפצים זה עוד לא להבין שהמילה האחרונה אומרת כמה יש.
+ילדים לומדים את זה לאט, מילה אחרי מילה, בדרך כלל בין גיל 3 ל-5. המחקרים
+האלה בודקים מתי ילדים מבינים, ולא איך ללמד.
+
+במשחק: כל ספירה בקול נגמרת בסכום עם שם החפץ: "1, 2, 3, 4, 5. חמישה
+בלונים", ועיגול סביב כל הקבוצה. כל נגיעה מסמנת חפץ אחד, ואי אפשר לסמן
+אותו פעמיים. לגיל 3 עד 5 יש סיבובים של "שימו 4 בלונים על החוט", שבהם בונים
+קבוצה ולא רק בוחרים מספר.
+
+### 14. מבנה של חמש ועשר, ושני חלקים ושלם (בלי ניסוי)
+
+עד בערך 4 חפצים רואים בלי לספור. כמות גדולה יותר רואים מהר רק דרך מבנה:
+"שורה מלאה של חמש ועוד 2". ראייה כזו (`7 = 5 + 2 = 4 + 3`) היא בסיס
+לחשיבה על חלקים ושלם ולחיבור, ומחזקת את עיקרון 7. המקור הוא מאמר למורים,
+לא ניסוי.
+
+במשחק: אותו סידור בכל המשחקים: שורות של חמש, מסודרות משמאל לימין כמו
+התרגיל והציר. רמזים לגדולים מצביעים על המבנה ("השורה העליונה מלאה, זה
+חמש. כמה עוד?"), ולא רק על ספירה אחד אחד. אחרי תשובה נכונה מראים את
+המשפחה של העובדה: `4 + 3 = 7`, `7 − 4 = 3`.
+
+### 15. שבר הוא מספר עם מקום על הציר (מחקר בינוני)
+
+הבנת שברים נשענת על ההבנה ש-3/4 הוא מספר אחד עם גודל, ולא שני מספרים
+("3 צבועים מתוך 4"). בניסוי בכיתות ב' עד ג', אימון על ציר מספרים עבר
+להשוואת שברים, ואימון על שטח לא עבר. הטעות "רבע גדול משליש, כי 4 גדול
+מ-3" מתאימה לכלל "יותר A, יותר B". סטבי וטירוש הראו שכמה כללים כאלה
+מנבאים הרבה טעויות. ההבנה של שבר צומחת מחלוקה הוגנת, כמו שנראה בכיתה א'
+אחת, אבל לכך יש מעט ראיות. הניסויים המבוקרים היו מגיל 7 ומעלה.
+
+במשחק: הפס מתחיל ב-0 ונגמר ב-1, ואחרי התשובה שני השברים יורדים לאותו ציר.
+השוואה של 1/3 ו-1/4 נפתחת בסיפור: אותה עוגה מתחלקת בין 3 ילדים או בין 4.
+הפריטים מאוזנים כך שכל כלל שטחי נכשל. חלק מהסיבובים מציגים רק סמלים,
+והתמונה באה אחר כך כמשוב. סופרים יחידות: "רבע, שני רבעים, שלושה רבעים".
+זה מוסיף לעיקרון 6: על הציר, ה"משהו" הוא הקטע מ-0 עד 1.
+
+### 16. חוזרים אחרי כמה ימים (מחקר חזק)
+
+פתרון מהזיכרון אחרי הפסקה משאיר למידה ארוכה יותר מתרגול רב ברצף. אותו
+תרגול, כשהוא מפוזר על פני ימים, עדיף על אותו תרגול בבת אחת. הממצאים
+חזקים מאוד ונמצאו בגילים שונים. ניסויים בחשבון בגיל 4 עד 7 כמעט אין.
+
+במשחק: משחק קצר, 6 עד 9 סיבובים, שחוזרים אליו ביום אחר. "שחקו שוב" יוצר
+מספרים חדשים. משחק נפתח בסיבוב או שניים של משהו שנלמד במשחק קודם. החזרה
+היא סיפור או תמונה, לא כרטיסיות של עובדות.
+
+### 17. מערבבים אחרי ההיכרות (מחקר בינוני)
+
+כשכל סוג בעיה בא בגוש נפרד, אפשר לדעת את הפעולה מהמקום בגוש, בלי להבין את
+הסיפור. בניסוי גדול בכיתה ז', תרגול מעורב העלה את הציון במבחן פתע חודש
+אחר כך (61% מול 38%). עד כיתה ב' לא מצאנו ניסויים כאלה בחשבון. אצל
+קטנים זו הסקה.
+
+במשחק: קודם מכירים כל משמעות לבד, כמו היום. אחר כך בא שלב שבו לקחו,
+הוסיפו, השוואה והשלמה מגיעים בסדר אקראי ובאותו מראה. אותם מספרים במבנה אחר
+באים זה אחרי זה. זה מתקן את עיקרון 4: "מתרגלים כל משמעות בנפרד" נכון
+להיכרות, ואחריה מערבבים.
+
+### 18. אותו מבנה, אותו ציור, מהסיפור אל הסמל (מחקר בינוני)
+
+לימוד מפורש של כמה תבניות (משהו קרה, שני חלקים ושלם, משווים), עם סיפורים
+שמתחלפים, שיפר פתרון בעיות אצל ילדים מתקשים מכיתה א' ומעלה, עם מדריך.
+בגן ובאפליקציה זה לא נבדק. סקירה ממליצה לעבור בהדרגה מחפצים לציור ומשם
+לסמל. גם זה נבדק בעיקר מגיל 7, וחלק מהמחקרים עם מבוגרים.
+
+במשחק: כל משחק עובר שלושה מראות: חפצי הסיפור, נקודות או פס, ותרגיל בלבד
+עם כפתור "תראו לי את התמונה" שנחשב לרמז. החפצים הופכים לנקודות באותו מקום,
+כך שרואים שזה אותו דבר. השלם, החלק וההפרש צבועים באותם צבעים בכל
+המשחקים. כשמספר נאמר בסיפור, הוא והחפצים שלו מודגשים יחד.
+
+זה מתקן שני דברים. לפי עיקרון 1 החפצים שייכים לסיפור, ולכן הציור הכללי
+נוצר מחפצי הסיפור. ו"כל שכבה מספיקה לבד" נשאר ברירת מחדל, אבל חלק
+מהסיבובים מסתירים את התמונה. אחרת תמיד אפשר לספור ולא לקרוא את הסמל.
+
+### 19. מסך נקי, והפעולה היא החשבון (מחקר בינוני)
+
+בניסוי על קריאת גרפים בגן חובה עד כיתה ב', ציורים בתוך העמודות הורידו את
+הלמידה: ילדים ספרו את הציורים ואת הקישוטים במקום לקרוא את הסולם. מכאן
+אנחנו מסיקים שחפצים פשוטים ואחידים עדיפים גם לספירה. פרסים מוחשיים וצפויים
+על משימה שהייתה מעניינת הורידו את העניין בה אחרי שהפסיקו לתת אותם. מטבעות ורצפים לא נבדקו,
+אבל עלולים לעשות אותו דבר. במאמר אחד עם שני ניסויים קטנים (גיל 7 עד 11,
+עם מורה), ילדים למדו יותר ושיחקו יותר מרצונם כשהחשבון היה הפעולה המרכזית
+במשחק.
+
+במשחק: מה שזז בזמן שאלה הוא חלק מהכמות. אין אנימציה ברקע, אין מוזיקה מתחת
+להקראה, ואין ליד הציר נוף שאפשר לספור. החגיגה היא סוף הסיפור: הצפרדע
+מגיעה לאבן. אין מטבעות, מנעולים, רצפים או שעון. הילדים עושים את הפעולה
+בעצמם: מפוצצים, מקפיצים, מחלקים. בחירת כרטיס מספר נשארת כבדיקה.
+
+### 20. סימן השוויון אומר "אותו דבר כמו" (מחקר בינוני)
+
+הרבה ילדים קוראים את `=` כ"כאן כותבים את התשובה", ולא כ"שני הצדדים שווים".
+בחטיבת הביניים, מי שהבינו את `=` כיחס פתרו משוואות טוב יותר (מחקר מתאם).
+בניסוי עם ילדי כיתות א' עד ג', תרגול בצורות לא רגילות כמו `4 = 2 + 2` שיפר את ההבנה של
+שוויון. מטא-אנליזה מצאה שמשוב משפיע על החשיבה של ילדים בבעיות שוויון.
+
+במשחק: היום כל תרגיל נגמר בתוצאה. בחלק מהסיבובים הסכום או הנעלם יהיו
+בצד שמאל: `7 = 3 + ?`, `? = 3 + 4`. בהקראה, `=` נקרא "שָׁוֶה לְ" או
+"זֶה כְּמוֹ". אחרי טעות, המשוב מראה ששני הצדדים שווים.
+
+### 21. משחקים יחד עם מבוגר (מחקר בינוני)
+
+בניסוי אקראי עם 587 ילדי כיתה א', משפחות שפתרו יחד בעיות סיפור קצרות
+באפליקציה (Bedtime Math) שיפרו את ההישגים בחשבון, לעומת אפליקציית קריאה.
+השיפור היה תלוי בכמה השתמשו (מתאם, לא הגרלה), והגדול ביותר אצל ילדים
+להורים עם חרדה ממתמטיקה. ההתערבות נעשתה דרך ההורה: מבוגר קרא ושאל,
+והילדים לא שיחקו לבד.
+
+במשחק: הצעה לא מחייבת למבוגר, למשל לקרוא את הסיפור יחד ולשאול "איך
+ידעתם?". אין דוח ציונים להורים.
+
+### מה לא לבנות עליו
+
+- **סגנונות למידה.** אין ראיות שהתאמה ל"לומד חזותי" או "שמיעתי" עוזרת.
+  תמונה, תרגיל וסיפור ניתנים לכולם, כי כל אחד מהם נושא משמעות.
+- **מילות מפתח.** "ביחד זה פלוס" נותן את הפעולה ההפוכה בכל ניסוח הפוך,
+  וילדים טועים בניסוחים כאלה הרבה יותר.
+- **"ריאליסטי יותר, טוב יותר".** פרטים בציור מסיחים, בעיקר אצל קטנים.
+
+### מקורות למחקר
+
+- Carpenter, T. P., & Moser, J. M. (1984). The acquisition of addition and subtraction concepts in grades one through three. *Journal for Research in Mathematics Education*, 15(3), 179-202.
+- Carpenter, T. P., Ansell, E., Franke, M. L., Fennema, E., & Weisbeck, L. (1993). Models of problem solving: A study of kindergarten children's problem-solving processes. *Journal for Research in Mathematics Education*, 24(5), 428-441.
+- Riley, M. S., Greeno, J. G., & Heller, J. I. (1983). Development of children's problem-solving ability in arithmetic. In H. P. Ginsburg (Ed.), *The Development of Mathematical Thinking*. New York: Academic Press.
+- Nesher, P., Greeno, J. G., & Riley, M. S. (1982). The development of semantic categories for addition and subtraction. *Educational Studies in Mathematics*, 13(4), 373-394.
+- Carpenter, T. P., Fennema, E., Peterson, P. L., Chiang, C.-P., & Loef, M. (1989). Using knowledge of children's mathematics thinking in classroom teaching: An experimental study. *American Educational Research Journal*, 26(4), 499-531. https://doi.org/10.3102/00028312026004499
+- Fuchs, L. S., Seethaler, P. M., Sterba, S. K., Craddock, C., Fuchs, D., Compton, D. L., Geary, D. C., & Changas, P. (2021). Closing the word-problem achievement gap in first grade: Schema-based word-problem intervention with embedded language comprehension instruction. *Journal of Educational Psychology*, 113(1), 86-103. https://doi.org/10.1037/edu0000467
+- Gersten, R., Beckmann, S., Clarke, B., Foegen, A., Marsh, L., Star, J. R., & Witzel, B. (2009). *Assisting Students Struggling with Mathematics: Response to Intervention (RtI) for Elementary and Middle Schools* (NCEE 2009-4060). Washington, DC: National Center for Education Evaluation and Regional Assistance, Institute of Education Sciences.
+- Hudson, T. (1983). Correspondences and numerical differences between disjoint sets. *Child Development*, 54(1), 84-90.
+- Stern, E. (1993). What makes certain arithmetic word problems involving the comparison of sets so difficult for children? *Journal of Educational Psychology*, 85(1), 7-23.
+- Nesher, P., & Teubal, E. (1975). Verbal cues as an interfering factor in verbal problem solving. *Educational Studies in Mathematics*, 6, 41-51.
+- Ramani, G. B., & Siegler, R. S. (2008). Promoting broad and stable improvements in low-income children's numerical knowledge through playing number board games. *Child Development*, 79(2), 375-394.
+- Siegler, R. S., & Ramani, G. B. (2009). Playing linear number board games - but not circular ones - improves low-income preschoolers' numerical understanding. *Journal of Educational Psychology*, 101(3), 545-560.
+- Whyte, J. C., & Bull, R. (2008). Number games, magnitude representation, and basic number skills in preschoolers. *Developmental Psychology*, 44(2), 588-596. https://doi.org/10.1037/0012-1649.44.2.588
+- Laski, E. V., & Siegler, R. S. (2014). Learning from number board games: You learn what you encode. *Developmental Psychology*, 50(3), 853-864. https://doi.org/10.1037/a0034321
+- Shaki, S., Fischer, M. H., & Petrusic, W. M. (2009). Reading habits for both words and numbers contribute to the SNARC effect. *Psychonomic Bulletin & Review*, 16(2), 328-331. https://doi.org/10.3758/PBR.16.2.328
+- Kluger, A. N., & DeNisi, A. (1996). The effects of feedback interventions on performance: A historical review, a meta-analysis, and a preliminary feedback intervention theory. *Psychological Bulletin*, 119(2), 254-284.
+- Van der Kleij, F. M., Feskens, R. C. W., & Eggen, T. J. H. M. (2015). Effects of feedback in a computer-based learning environment on students' learning outcomes: A meta-analysis. *Review of Educational Research*, 85(4), 475-511. https://doi.org/10.3102/0034654314564881
+- Wisniewski, B., Zierer, K., & Hattie, J. (2020). The power of feedback revisited: A meta-analysis of educational feedback research. *Frontiers in Psychology*, 10, Article 3087. https://doi.org/10.3389/fpsyg.2019.03087
+- Clements, D. H., & Sarama, J. (2008). Experimental evaluation of the effects of a research-based preschool mathematics curriculum. *American Educational Research Journal*, 45(2), 443-494. https://doi.org/10.3102/0002831207312908
+- Frye, D., Baroody, A. J., Burchinal, M., Carver, S. M., Jordan, N. C., & McDowell, J. (2013). *Teaching Math to Young Children: A Practice Guide* (NCEE 2014-4005). Washington, DC: National Center for Education Evaluation and Regional Assistance, Institute of Education Sciences.
+- Wynn, K. (1990). Children's understanding of counting. *Cognition*, 36(2), 155-193. https://doi.org/10.1016/0010-0277(90)90003-3
+- Le Corre, M., & Carey, S. (2007). One, two, three, four, nothing more: An investigation of the conceptual sources of the verbal counting principles. *Cognition*, 105(2), 395-438. https://doi.org/10.1016/j.cognition.2006.10.005
+- Clements, D. H. (1999, March). Subitizing: What is it? Why teach it? *Teaching Children Mathematics*, 5(7), 400-405. Reprinted 2021 in *Mathematics Teacher: Learning and Teaching PK-12*, 114(12), 984-991. https://doi.org/10.5951/MTLT.2021.0220
+- Siegler, R., Carpenter, T., Fennell, F., Geary, D., Lewis, J., Okamoto, Y., Thompson, L., & Wray, J. (2010). *Developing Effective Fractions Instruction for Kindergarten Through 8th Grade: A Practice Guide* (NCEE 2010-4039). Washington, DC: National Center for Education Evaluation and Regional Assistance, Institute of Education Sciences.
+- Hamdan, N., & Gunderson, E. A. (2017). The number line is a critical spatial-numerical representation: Evidence from a fraction intervention. *Developmental Psychology*, 53(3), 587-596. https://doi.org/10.1037/dev0000252
+- Stavy, R., & Tirosh, D. (2000). *How Students (Mis-)Understand Science and Mathematics: Intuitive Rules*. Teachers College Press.
+- Empson, S. B. (1999). Equal sharing and shared meaning: The development of fraction concepts in a first-grade classroom. *Cognition and Instruction*, 17(3), 283-342. https://doi.org/10.1207/s1532690xci1703_3
+- Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. *Psychological Bulletin*, 132(3), 354-380. https://doi.org/10.1037/0033-2909.132.3.354
+- Dunlosky, J., Rawson, K. A., Marsh, E. J., Nathan, M. J., & Willingham, D. T. (2013). Improving students' learning with effective learning techniques: Promising directions from cognitive and educational psychology. *Psychological Science in the Public Interest*, 14(1), 4-58. https://doi.org/10.1177/1529100612453266
+- Rohrer, D., Dedrick, R. F., Hartwig, M. K., & Cheung, C.-N. (2020). A randomized controlled trial of interleaved mathematics practice. *Journal of Educational Psychology*, 112(1), 40-52. https://doi.org/10.1037/edu0000367
+- Fyfe, E. R., McNeil, N. M., Son, J. Y., & Goldstone, R. L. (2014). Concreteness fading in mathematics and science instruction: A systematic review. *Educational Psychology Review*, 26(1), 9-25. https://doi.org/10.1007/s10648-014-9249-3
+- Kaminski, J. A., & Sloutsky, V. M. (2013). Extraneous perceptual information interferes with children's acquisition of mathematical knowledge. *Journal of Educational Psychology*, 105(2), 351-363. https://doi.org/10.1037/a0031040
+- Habgood, M. P. J., & Ainsworth, S. E. (2011). Motivating children to learn effectively: Exploring the value of intrinsic integration in educational games. *Journal of the Learning Sciences*, 20(2), 169-206. https://doi.org/10.1080/10508406.2010.508029
+- Deci, E. L., Koestner, R., & Ryan, R. M. (1999). A meta-analytic review of experiments examining the effects of extrinsic rewards on intrinsic motivation. *Psychological Bulletin*, 125(6), 627-668. https://doi.org/10.1037/0033-2909.125.6.627
+- Pashler, H., McDaniel, M., Rohrer, D., & Bjork, R. (2008). Learning styles: Concepts and evidence. *Psychological Science in the Public Interest*, 9(3), 105-119.
+- McNeil, N. M., Fyfe, E. R., Petersen, L. A., Dunwiddie, A. E., & Brletic-Shipley, H. (2011). Benefits of practicing 4 = 2 + 2: Nontraditional problem formats facilitate children's understanding of mathematical equivalence. *Child Development*, 82(5), 1620-1633.
+- Knuth, E. J., Stephens, A. C., McNeil, N. M., & Alibali, M. W. (2006). Does understanding the equal sign matter? Evidence from solving equations. *Journal for Research in Mathematics Education*, 37(4), 297-312.
+- Fyfe, E. R., & Brown, S. A. (2018). Feedback influences children's reasoning about math equivalence: A meta-analytic review. *Thinking & Reasoning*, 24(2), 157-178. https://doi.org/10.1080/13546783.2017.1359208
+- Berkowitz, T., Schaeffer, M. W., Maloney, E. A., Peterson, L., Gregor, C., Levine, S. C., & Beilock, S. L. (2015). Math at home adds up to achievement in school. *Science*, 350(6257), 196-198.
 
 ## הסיפור עוטף את התרגיל ולא מחליף אותו
 
@@ -86,6 +348,13 @@
   בסוף סימון התשובה?
 - האם המסיחים מלמדים משהו? למשל, התוצאה של הפעולה האחרת.
 - האם מספרים בדיבור מותאמים למין ולמספר ("שְׁנֵי בָּלוֹנִים", "בָּלוֹן אֶחָד")?
+- האם הסיבובים משתנים לפי מבנה ומקום הנעלם, ולא רק לפי פעולה (עיקרון 8)?
+- האם העזרה מתחילה בטעות הראשונה ומראה בתמונה מה התשובה השגויה אומרת (עיקרון 10)?
+- האם כל ספירה בקול נגמרת בסכום עם שם החפץ (עיקרון 13)?
+- האם שורות של חמש מסודרות משמאל לימין, כמו התרגיל והציר (עיקרונות 9 ו-14)?
+- האם מבנה חדש מתחיל במספרים עד 5, ומערבבים רק אחרי ההיכרות (עיקרונות 8 ו-17)?
+- האם מה שזז בזמן שאלה הוא רק הכמות, והילדים עושים את הפעולה בעצמם (עיקרון 19)?
+- האם לפעמים הנעלם או הסכום בצד שמאל של `=` (עיקרון 20)?
 
 ## המצב היום
 
@@ -93,11 +362,13 @@
 |---|---|---|
 | `balloon-stories` | סיפור, שלוש שכבות, שלוש משמעויות, מתרגיל לסיפור | שבר של קבוצה, עשרות |
 | `make-ten` | מבנה של עשר | סיפור; זו משמעות ההשלמה בלי מצב |
-| `number-line` | תנועה על ציר | הצפרדע מהסמל אינה מופיעה במשחק |
+| `number-line` | תנועה על ציר | בעבודה: הצפרדע, עם קפיצות של הילדים, מספרי נחיתה בקול, והשלמה והשוואה על הציר |
 | `long-exercise` | פירוק לשלבים, נקודות לספירה | סיפור לשרשרת (אוטובוס שעובר תחנות) |
 | משחקי השברים | השוואת שטחים על פס | שלם מגוון ושבר של קבוצה |
 
-המשימות שעולות מהטבלה רשומות ב-[`BACKLOG.md`](../BACKLOG.md).
+רק `balloon-stories` מדבר. שאר משחקי החשבון שקטים היום (`audio: false`), ולכן
+לא מתאימים לילדים שעוד לא קוראים. המשימות שעולות מהטבלה ומהעקרונות רשומות
+ב-[`BACKLOG.md`](../BACKLOG.md).
 
 ## מקורות
 
