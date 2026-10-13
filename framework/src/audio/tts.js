@@ -123,7 +123,8 @@ function _waitForFirstInteraction() {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return Promise.resolve();
   }
-  if (_interactionReady || document.userActivation?.hasBeenActive) {
+  // גם אם כבר נגעו בדף, מחכים לנגיעה הבאה: ב-iOS הניסיון החוזר מצליח רק בתוך מחווה.
+  if (_interactionReady) {
     _interactionReady = true;
     return Promise.resolve();
   }

@@ -236,20 +236,20 @@ async function et(e, { signal: t } = {}) {
   }
   return t != null && t.aborted ? !1 : new Promise((o) => {
     let i, a, s = !1;
-    const c = (l) => {
+    const c = (u) => {
       if (!s) {
-        if (s = !0, clearTimeout(a), t == null || t.removeEventListener("abort", u), i) {
+        if (s = !0, clearTimeout(a), t == null || t.removeEventListener("abort", l), i) {
           i.onended = null;
           try {
             i.stop(), i.disconnect();
           } catch {
           }
         }
-        o(l);
+        o(u);
       }
-    }, u = () => c(!1);
+    }, l = () => c(!1);
     try {
-      i = n.createBufferSource(), i.buffer = r, i.connect(n.destination), i.onended = () => c(!0), t == null || t.addEventListener("abort", u, { once: !0 }), a = setTimeout(() => c(!0), (r.duration + 0.5) * 1e3), i.start(0);
+      i = n.createBufferSource(), i.buffer = r, i.connect(n.destination), i.onended = () => c(!0), t == null || t.addEventListener("abort", l, { once: !0 }), a = setTimeout(() => c(!0), (r.duration + 0.5) * 1e3), i.start(0);
     } catch {
       c(!1);
     }
@@ -386,10 +386,10 @@ function st(e, t, n, r, o = {}) {
       </div>
     </div>
   `;
-  const u = o.homeUrl === void 0 ? "../../index.html" : o.homeUrl;
-  if (u) {
-    const l = document.createElement("a");
-    l.className = "completion-screen__home btn", l.href = u, l.textContent = "בְּחִירַת מִשְׂחָק", c.querySelector(".completion-screen__actions").appendChild(l);
+  const l = o.homeUrl === void 0 ? "../../index.html" : o.homeUrl;
+  if (l) {
+    const u = document.createElement("a");
+    u.className = "completion-screen__home btn", u.href = l, u.textContent = "בְּחִירַת מִשְׂחָק", c.querySelector(".completion-screen__actions").appendChild(u);
   }
   c.querySelector(".completion-screen__replay").addEventListener("click", () => {
     c.remove(), r();
@@ -404,21 +404,21 @@ function ct(e, t, {
   completionOnly: s = !1,
   onReplay: c = () => location.reload()
 }) {
-  let u = !1;
-  const l = /* @__PURE__ */ new Set();
+  let l = !1;
+  const u = /* @__PURE__ */ new Set();
   function d(p) {
-    u = p || e.ended, l.forEach((pe) => pe(u));
+    l = p || e.ended, u.forEach((pe) => pe(l));
   }
   function h(p) {
-    return l.add(p), p(u || e.ended), () => {
-      l.delete(p);
+    return u.add(p), p(l || e.ended), () => {
+      u.delete(p);
     };
   }
   e.on("end", () => {
-    d(!0), l.clear();
+    d(!0), u.clear();
   });
   async function f(p) {
-    if (u || e.ended) return;
+    if (l || e.ended) return;
     d(!0), a && G.correct();
     try {
       p && await p();
@@ -429,7 +429,7 @@ function ct(e, t, {
     e.nextRound() ? (d(!1), o()) : st(t, e.state.score, n, c, { gameId: e.gameId, completionOnly: s, homeUrl: e.config.homeUrl });
   }
   async function m(p) {
-    if (!(u || e.ended)) {
+    if (!(l || e.ended)) {
       d(!0);
       try {
         p && await p();
@@ -439,14 +439,14 @@ function ct(e, t, {
     }
   }
   function g() {
-    return u;
+    return l;
   }
   function O() {
     d(!1);
   }
   return { handleCorrect: f, handleWrong: m, isAnswered: g, reset: O, subscribe: h };
 }
-function ut(e, t) {
+function lt(e, t) {
   const n = document.createElement("div");
   n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(t)), n.innerHTML = `
     <div class="progress-bar__track">
@@ -471,7 +471,7 @@ function ut(e, t) {
   };
 }
 let J = !1, se = !1, P = null;
-const lt = [
+const ut = [
   "ResizeObserver loop",
   // אזהרת דפדפן שפירה
   "Script error."
@@ -479,7 +479,7 @@ const lt = [
 ];
 function we(e) {
   const t = String(e || "");
-  return lt.some((n) => t.includes(n));
+  return ut.some((n) => t.includes(n));
 }
 function ge() {
   var t;
@@ -551,7 +551,7 @@ async function pt(e, t) {
   const { shell: r, activeRounds: o } = n;
   if (!o.length)
     return r.bodyEl.textContent = "אֵין סִבּוּבִים לַמִּשְׂחָק.", r.end(), n;
-  const i = ut(
+  const i = lt(
     /** @type {HTMLElement} */
     r.footerEl,
     o.length
@@ -568,26 +568,26 @@ async function pt(e, t) {
     onReplay: t.onReplay ?? (() => {
       pt(e, t);
     }),
-    buildRoundUI: u
+    buildRoundUI: l
   });
   r.on("end", s), r.on("start", () => {
-    var l;
-    i.update(0), (l = t.onStart) == null || l.call(t, r), c.reset();
-  }), r.on("start", u);
-  function u() {
+    var u;
+    i.update(0), (u = t.onStart) == null || u.call(t, r), c.reset();
+  }), r.on("start", l);
+  function l() {
     s(), r.bodyEl.innerHTML = "";
-    const l = Ye();
-    a = l;
-    const d = () => !r.ended && !l.signal.aborted, h = r.state.currentRound - 1;
+    const u = Ye();
+    a = u;
+    const d = () => !r.ended && !u.signal.aborted, h = r.state.currentRound - 1;
     try {
       const f = t.buildRound({
         shell: r,
         index: h,
         round: o[h],
         isActive: d,
-        scope: l,
+        scope: u,
         isAnswered: () => !d() || c.isAnswered(),
-        subscribeAnswered: (m) => d() ? l.use(c.subscribe(m)) : (m(!0), () => {
+        subscribeAnswered: (m) => d() ? u.use(c.subscribe(m)) : (m(!0), () => {
         }),
         onCorrect: async (m) => {
           d() && await c.handleCorrect(m);
@@ -595,11 +595,11 @@ async function pt(e, t) {
         onWrong: async (m) => {
           d() && await c.handleWrong(m);
         },
-        schedule: l.schedule
+        schedule: u.schedule
       });
-      f && l.use(f);
+      f && u.use(f);
     } catch (f) {
-      throw l.dispose(), f;
+      throw u.dispose(), f;
     }
   }
   return r.start(), n;
@@ -796,23 +796,23 @@ function en(e, t, { onTap: n } = {}) {
   e.classList.add("drag-source");
   let r = null, o = null, i = null, a = null;
   function s() {
-    var l;
+    var u;
     r && (e.removeEventListener("pointermove", r), e.removeEventListener("pointerup", o), e.removeEventListener("pointercancel", i), e.removeEventListener("lostpointercapture", i), r = o = i = null), St(), _t(), e.classList.remove("drag-source--dragging"), L = null;
-    const u = a;
-    a = null, u !== null && ((l = e.hasPointerCapture) != null && l.call(e, u)) && e.releasePointerCapture(u);
+    const l = a;
+    a = null, l !== null && ((u = e.hasPointerCapture) != null && u.call(e, l)) && e.releasePointerCapture(l);
   }
-  function c(u) {
-    if (e.matches(":disabled") || e.getAttribute("aria-disabled") === "true" || u.button !== void 0 && u.button !== 0 || a !== null) return;
-    u.preventDefault(), L && L.cancel(), L = { el: e, data: t, cancel: s }, a = u.pointerId;
-    let l = !1;
+  function c(l) {
+    if (e.matches(":disabled") || e.getAttribute("aria-disabled") === "true" || l.button !== void 0 && l.button !== 0 || a !== null) return;
+    l.preventDefault(), L && L.cancel(), L = { el: e, data: t, cancel: s }, a = l.pointerId;
+    let u = !1;
     const d = () => {
-      l = !0, e.classList.add("drag-source--dragging"), gt(e, u.clientX, u.clientY);
-    }, h = (f) => Math.hypot(f.clientX - u.clientX, f.clientY - u.clientY) >= 8;
-    n || d(), e.setPointerCapture(u.pointerId), r = (f) => {
-      f.pointerId === a && (!l && h(f) && d(), l && vt(f.clientX, f.clientY));
+      u = !0, e.classList.add("drag-source--dragging"), gt(e, l.clientX, l.clientY);
+    }, h = (f) => Math.hypot(f.clientX - l.clientX, f.clientY - l.clientY) >= 8;
+    n || d(), e.setPointerCapture(l.pointerId), r = (f) => {
+      f.pointerId === a && (!u && h(f) && d(), u && vt(f.clientX, f.clientY));
     }, o = (f) => {
       if (f.pointerId !== a) return;
-      const m = !l && !h(f), g = m && n ? null : Me(f.clientX, f.clientY);
+      const m = !u && !h(f), g = m && n ? null : Me(f.clientX, f.clientY);
       if (s(), m && n) {
         n();
         return;
@@ -950,12 +950,11 @@ function At(e) {
   return t.includes("not-allowed") || t.includes("notallowed") || t.includes("didn't interact") || t.includes("user gesture");
 }
 function Mt() {
-  var e;
-  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : U || (e = document.userActivation) != null && e.hasBeenActive ? (U = !0, Promise.resolve()) : B || (B = new Promise((t) => {
-    const n = () => {
-      U = !0, window.removeEventListener("pointerdown", n, !0), window.removeEventListener("keydown", n, !0), window.removeEventListener("touchstart", n, !0), t();
+  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : U ? (U = !0, Promise.resolve()) : B || (B = new Promise((e) => {
+    const t = () => {
+      U = !0, window.removeEventListener("pointerdown", t, !0), window.removeEventListener("keydown", t, !0), window.removeEventListener("touchstart", t, !0), e();
     };
-    window.addEventListener("pointerdown", n, { once: !0, capture: !0 }), window.addEventListener("keydown", n, { once: !0, capture: !0 }), window.addEventListener("touchstart", n, { once: !0, capture: !0 });
+    window.addEventListener("pointerdown", t, { once: !0, capture: !0 }), window.addEventListener("keydown", t, { once: !0, capture: !0 }), window.addEventListener("touchstart", t, { once: !0, capture: !0 });
   }).finally(() => {
     B = null;
   }), B);
@@ -1272,10 +1271,10 @@ async function Ee(e, t, { signal: n } = {}) {
   return !r || n != null && n.aborted ? !1 : await et(r, { signal: n }) ? !0 : n != null && n.aborted ? !1 : new Promise((o) => {
     const i = URL.createObjectURL(r), a = new Audio(i);
     let s = !1;
-    const c = (l) => {
-      s || (s = !0, n == null || n.removeEventListener("abort", u), a.onended = null, a.onerror = null, a.pause(), URL.revokeObjectURL(i), o(l));
-    }, u = () => c(!1);
-    n == null || n.addEventListener("abort", u, { once: !0 }), a.onended = () => c(!0), a.onerror = () => c(!1), a.play().catch(() => c(!1));
+    const c = (u) => {
+      s || (s = !0, n == null || n.removeEventListener("abort", l), a.onended = null, a.onerror = null, a.pause(), URL.revokeObjectURL(i), o(u));
+    }, l = () => c(!1);
+    n == null || n.addEventListener("abort", l, { once: !0 }), a.onended = () => c(!0), a.onerror = () => c(!1), a.play().catch(() => c(!1));
   });
 }
 const Vt = {
@@ -1347,10 +1346,10 @@ function Ie(e, t, n, r = e.destination) {
   const i = e.createGain();
   i.gain.value = 0;
   const a = t.formants.map((s, c) => {
-    const u = e.createBiquadFilter();
-    u.type = "bandpass", u.frequency.value = s, u.Q.value = s / t.bandwidths[c];
-    const l = e.createGain();
-    return l.gain.value = t.gains[c], o.connect(u), u.connect(l), l.connect(i), u;
+    const l = e.createBiquadFilter();
+    l.type = "bandpass", l.frequency.value = s, l.Q.value = s / t.bandwidths[c];
+    const u = e.createGain();
+    return u.gain.value = t.gains[c], o.connect(l), l.connect(u), u.connect(i), l;
   });
   return i.connect(r), { source: o, filters: a, master: i };
 }
@@ -1363,16 +1362,16 @@ function ie(e, t, n, r, o = e.destination) {
   return c.gain.setValueAtTime(0, t), c.gain.linearRampToValueAtTime(r, t + Math.min(0.01, i / 3)), c.gain.linearRampToValueAtTime(1e-4, t + i), a.connect(s), s.connect(c), c.connect(o), a.start(t), a.stop(t + i + 0.02), t + i;
 }
 function We(e, t, n, r, o, i, a = e.destination) {
-  const s = r / 1e3, { source: c, filters: u, master: l } = Ie(e, n, o, a);
+  const s = r / 1e3, { source: c, filters: l, master: u } = Ie(e, n, o, a);
   if (c.frequency.setValueAtTime(o * 1.04, t), c.frequency.linearRampToValueAtTime(o * 0.92, t + s), i) {
     const f = Math.min(0.09, s / 3);
-    u.forEach((m, g) => {
+    l.forEach((m, g) => {
       const O = i[g];
       O && (m.frequency.setValueAtTime(O, t), m.frequency.exponentialRampToValueAtTime(n.formants[g], t + f));
     });
   }
   const d = 0.04, h = 0.12;
-  return l.gain.setValueAtTime(0, t), l.gain.linearRampToValueAtTime(0.5, t + d), l.gain.setValueAtTime(0.5, t + s - h), l.gain.linearRampToValueAtTime(1e-4, t + s), c.start(t), c.stop(t + s + 0.05), t + s;
+  return u.gain.setValueAtTime(0, t), u.gain.linearRampToValueAtTime(0.5, t + d), u.gain.setValueAtTime(0.5, t + s - h), u.gain.linearRampToValueAtTime(1e-4, t + s), c.start(t), c.stop(t + s + 0.05), t + s;
 }
 function Dt(e, t, n, r, o = e.destination) {
   const i = n / 1e3, a = { formants: [250, 1100, 2200], bandwidths: [80, 200, 300], gains: [1, 0.12, 0.05] }, { source: s, master: c } = Ie(e, a, r, o);
@@ -1403,20 +1402,20 @@ async function zt(e, t = {}) {
   }
   return je(r, o, i, t.signal);
 }
-async function ue(e, t, n = {}) {
-  var l, d;
+async function le(e, t, n = {}) {
+  var u, d;
   const r = X(t);
-  if (!r || (l = n.signal) != null && l.aborted) return !1;
+  if (!r || (u = n.signal) != null && u.aborted) return !1;
   const o = await de();
   if (!o || (d = n.signal) != null && d.aborted) return !1;
   const i = $t(e), a = n.pitchHz ?? Be, s = n.durationMs ?? He;
-  let c, u;
+  let c, l;
   try {
-    u = o.createGain(), u.connect(o.destination), c = Ut(o, i, e, r, s, a, u);
+    l = o.createGain(), l.connect(o.destination), c = Ut(o, i, e, r, s, a, l);
   } catch {
-    return u == null || u.disconnect(), !1;
+    return l == null || l.disconnect(), !1;
   }
-  return je(o, c, u, n.signal);
+  return je(o, c, l, n.signal);
 }
 function Ut(e, t, n, r, o, i, a = e.destination) {
   let s = e.currentTime + 0.03, c = null;
@@ -1442,14 +1441,14 @@ function Ut(e, t, n, r, o, i, a = e.destination) {
       break;
     }
     case "glide": {
-      const u = X(n === "y" ? "i" : "u");
-      c = u ? u.formants : null;
+      const l = X(n === "y" ? "i" : "u");
+      c = l ? l.formants : null;
       break;
     }
   }
   return We(e, s, r, o, i, c, a);
 }
-const le = "sound-bank";
+const ue = "sound-bank";
 function Ve(e) {
   return `letter:${e}`;
 }
@@ -1459,7 +1458,7 @@ function Oe(e) {
 function $e(e, t) {
   return `syllable:${e}:${t}`;
 }
-function un() {
+function ln() {
   const e = [];
   for (const t of F)
     e.push({ key: Ve(t.letter), label: t.nameNikud, group: "letters" });
@@ -1479,7 +1478,7 @@ function Gt() {
 }
 async function me(e, t = void 0) {
   try {
-    return typeof indexedDB > "u" ? !1 : await (t ? Ee(le, e, t) : Ee(le, e));
+    return typeof indexedDB > "u" ? !1 : await (t ? Ee(ue, e, t) : Ee(ue, e));
   } catch {
     return !1;
   }
@@ -1495,9 +1494,9 @@ async function he(e) {
 function Qt() {
   return typeof speechSynthesis < "u";
 }
-async function ln() {
+async function un() {
   try {
-    return typeof indexedDB > "u" ? [] : await jt(le);
+    return typeof indexedDB > "u" ? [] : await jt(ue);
   } catch {
     return [];
   }
@@ -1505,7 +1504,7 @@ async function ln() {
 async function dn(e) {
   if (await me(Ve(e))) return "bank";
   const t = Fe(e), n = t ? t.nameNikud : e;
-  return await he(() => R.speak(n)) ? "tts" : t && await ue(t.sound, "a", { durationMs: 400 }) ? "synth" : "none";
+  return await he(() => R.speak(n)) ? "tts" : t && await le(t.sound, "a", { durationMs: 400 }) ? "synth" : "none";
 }
 async function fn(e) {
   if (await me(Oe(e))) return "bank";
@@ -1528,7 +1527,7 @@ async function mn(e, t, n = {}) {
   }
   if (r != null && r.aborted) return "none";
   const a = Fe(e), s = Pe[t];
-  return s && await (r ? ue(a ? a.sound : "", s, n) : ue(a ? a.sound : "", s)) ? "synth" : "none";
+  return s && await (r ? le(a ? a.sound : "", s, n) : le(a ? a.sound : "", s)) ? "synth" : "none";
 }
 function hn(e, t) {
   let n = document.getElementById("nikud-settings");
@@ -1550,12 +1549,12 @@ function hn(e, t) {
       <h2 style="margin-top:0">בחר ניקוד</h2>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin:1rem 0; text-align:right;">
   `;
-  S.forEach((u) => {
-    const l = o.length === 0 || o.includes(u.id) || o.includes(u.name);
+  S.forEach((l) => {
+    const u = o.length === 0 || o.includes(l.id) || o.includes(l.name);
     i += `
       <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-        <input type="checkbox" value="${u.id}" class="nikud-filter-cb" ${l ? "checked" : ""} style="width:1.2rem;height:1.2rem;">
-        <span>${u.nameNikud}</span>
+        <input type="checkbox" value="${l.id}" class="nikud-filter-cb" ${u ? "checked" : ""} style="width:1.2rem;height:1.2rem;">
+        <span>${l.nameNikud}</span>
       </label>
     `;
   });
@@ -1581,23 +1580,23 @@ function hn(e, t) {
   s.oninput = () => {
     c.textContent = s.value;
   }, document.getElementById("save-settings-btn").onclick = () => {
-    const u = parseFloat(s.value);
-    localStorage.setItem("alefbet.nikudRate", String(u)), R.setNikudEmphasis({ rate: u });
-    const l = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((h) => (
+    const l = parseFloat(s.value);
+    localStorage.setItem("alefbet.nikudRate", String(l)), R.setNikudEmphasis({ rate: l });
+    const u = Array.from(n.querySelectorAll(".nikud-filter-cb")).filter((h) => (
       /** @type {HTMLInputElement} */
       h.checked
     )).map((h) => (
       /** @type {HTMLInputElement} */
       h.value
     )), d = new URL(window.location.href);
-    l.length > 0 && l.length < S.length ? d.searchParams.set("allowedNikud", l.join(",")) : d.searchParams.delete("allowedNikud"), d.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", d), t && t(e);
+    u.length > 0 && u.length < S.length ? d.searchParams.set("allowedNikud", u.join(",")) : d.searchParams.delete("allowedNikud"), d.searchParams.delete("excludedNikud"), n.style.display = "none", window.history.replaceState({}, "", d), t && t(e);
   }, document.getElementById("close-settings-btn").onclick = () => {
     n.style.display = "none";
   };
 }
 export {
   Pe as NIKUD_VOWEL,
-  le as SOUND_BANK_ID,
+  ue as SOUND_BANK_ID,
   Vt as VOWEL_TEMPLATES,
   D as animate,
   ht as bootstrapGame,
@@ -1606,7 +1605,7 @@ export {
   tn as createDropTarget,
   Zt as createFeedback,
   Yt as createHintTracker,
-  ut as createProgressBar,
+  lt as createProgressBar,
   Ye as createRoundScope,
   sn as deleteVoice,
   Y as getAudioContext,
@@ -1624,7 +1623,7 @@ export {
   on as randomNikud,
   bt as randomPraise,
   Kt as randomRetryHint,
-  ln as recordedKeys,
+  un as recordedKeys,
   pt as runGame,
   an as saveVoice,
   st as showCompletionScreen,
@@ -1634,6 +1633,6 @@ export {
   dn as speakLetter,
   fn as speakNikudSound,
   mn as speakSyllable,
-  un as standardSoundKeys,
+  ln as standardSoundKeys,
   R as tts
 };

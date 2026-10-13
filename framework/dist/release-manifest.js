@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "452c79329b20bf6d3aa30b1f5c497e55f8ebca711b801ec0ea51dd80eb7e40b1",
+  "version": "0da8019c722af0644331b39fe3dbebd500b2b0b5d8f21ff6908e20268b90535b",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -74,7 +74,7 @@ self.ALEFBET_RELEASE = {
     "./framework/dist/game-audio-BJuG8VE5.js": "ea3579fb338c06a2a5b018b1d721277993199d49eeb82350a73707fbfd894665",
     "./framework/dist/runtime-assets.js": "214af9c1195de81d8fc27ea727cad36039f50e32e2a7428e91be24de80ca0a71",
     "./framework/dist/runtime.css": "3912f3faed447a2656d10714917492d709f9565d428bdbf896cb60b3ebc9b53c",
-    "./framework/dist/runtime.js": "82aed49d4ba3c1afea3d6caaa99e463417045eaae8079af56b7cf001d8bcdb75",
+    "./framework/dist/runtime.js": "132fa5f96dfe86e7d8214a24c6aaacc8e451ccaed9f0cc43728237f4593a16d7",
     "./games/balloon-stories/": "ad387374dc4b99f2fb6279cba05becbcb1cc189581b83745f532098db25a6626",
     "./games/balloon-stories/game.css": "7d8d0b93d08ff33730197e3cf66c2f62f6b5d8f1af551377bc9a0f0a3bf2f51c",
     "./games/balloon-stories/game.js": "b38ff2e170f0f8e753083f29f1ac39b213a325bb395c349bb9ef5f924a58d7e7",

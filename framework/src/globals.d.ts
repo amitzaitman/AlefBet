@@ -6,7 +6,3 @@ declare module '*.css';
 interface Window {
   webkitAudioContext: typeof AudioContext;
 }
-
-interface Document {
-  userActivation?: { hasBeenActive: boolean; isActive: boolean };
-}
