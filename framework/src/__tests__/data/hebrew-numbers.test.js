@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { numberWord, countNoun, exerciseWords } from '../../data/hebrew-numbers.js';
+import { numberWord, countNoun, exerciseWords, countingSteps } from '../../data/hebrew-numbers.js';
 
 const HOP = { one: 'קְפִיצָה', many: 'קְפִיצוֹת', gender: /** @type {const} */ ('f') };
 const BALLOON = { one: 'בָּלוֹן', many: 'בָּלוֹנִים', gender: /** @type {const} */ ('m') };
@@ -30,4 +30,16 @@ it('makes the number agree with the noun, in words or digits', () => {
 it('reads an exercise in counting words', () => {
   expect(exerciseWords('-', 6, 2)).toBe('שֵׁשׁ פָּחוֹת שְׁתַּיִם');
   expect(exerciseWords('+', 4, 3)).toBe('אַרְבַּע וְעוֹד שָׁלוֹשׁ');
+});
+
+it('counts one by one up to five, and from a full row of five past it', () => {
+  expect(countingSteps(3)).toEqual([
+    { upto: 1, say: 'אַחַת' }, { upto: 2, say: 'שְׁתַּיִם' }, { upto: 3, say: 'שָׁלוֹשׁ' },
+  ]);
+  expect(countingSteps(5).map(step => step.upto)).toEqual([1, 2, 3, 4, 5]);
+  expect(countingSteps(7)).toEqual([
+    { upto: 5, say: 'חָמֵשׁ' }, { upto: 6, say: 'שֵׁשׁ' }, { upto: 7, say: 'שֶׁבַע' },
+  ]);
+  expect(countingSteps(10).at(-1)).toEqual({ upto: 10, say: 'עֶשֶׂר' });
+  expect(countingSteps(0)).toEqual([]);
 });

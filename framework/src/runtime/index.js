@@ -21,7 +21,7 @@ export { animate }                              from '../render/animations.js';
 export { sounds }                               from '../audio/sounds.js';
 export { getAudioContext }                      from '../audio/audio-context.js';
 export { randomPraise, randomRetryHint }        from '../data/encouragement.js';
-export { numberWord, countNoun, exerciseWords } from '../data/hebrew-numbers.js';
+export { numberWord, countNoun, exerciseWords, countingSteps } from '../data/hebrew-numbers.js';
 export { createDragSource, createDropTarget }   from '../input/drag.js';
 export { lockPageZoom }                         from '../input/zoom-lock.js';
 export { shuffle }                              from '../utils/shuffle.js';

@@ -9,6 +9,7 @@
  *   numberWord(n, gender)       - המילה למספר, או הספרות מחוץ לטווח 0 עד 10.
  *   countNoun(n, noun, options) - מספר ושם עצם שמתאימים זה לזה.
  *   exerciseWords(op, a, b)     - תרגיל במילים: "אַרְבַּע וְעוֹד שָׁלוֹשׁ".
+ *   countingSteps(n)            - ספירה בקול של n חפצים, עם שורה מלאה של חמש כצעד אחד.
  */
 
 /** צורת הזכר מתאימה לשמות עצם בזכר, כמו בָּלוֹן. */
@@ -59,4 +60,16 @@ export function countNoun(n, noun, { digits = false } = {}) {
  */
 export function exerciseWords(op, a, b) {
   return `${numberWord(a)} ${op === '+' ? 'וְעוֹד' : 'פָּחוֹת'} ${numberWord(b)}`;
+}
+
+/**
+ * צעדי ספירה בקול של n חפצים בשורות של חמש. עד חמש סופרים אחד אחד. מעבר
+ * לחמש השורה המלאה היא צעד אחד, 'חָמֵשׁ', וממשיכים ממנה: 'חָמֵשׁ, שֵׁשׁ, שֶׁבַע'.
+ * upto הוא כמה חפצים נספרו אחרי הצעד, כדי שהמשחק יסמן אותם.
+ * @param {number} n
+ * @returns {{ upto: number, say: string }[]}
+ */
+export function countingSteps(n) {
+  const from = n > 5 ? 5 : 1;
+  return Array.from({ length: Math.max(0, n - from + 1) }, (_, k) => ({ upto: from + k, say: numberWord(from + k) }));
 }

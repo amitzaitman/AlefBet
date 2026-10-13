@@ -54,10 +54,10 @@ function St(e = typeof document < "u" ? document : null) {
   const t = { passive: !1 };
   return e.addEventListener("gesturestart", Te, t), e.addEventListener("gesturechange", Te, t), e.addEventListener("touchmove", kt, t), !0;
 }
-const ae = /* @__PURE__ */ new WeakMap();
+const ce = /* @__PURE__ */ new WeakMap();
 function et(e) {
   var t;
-  (t = ae.get(e)) == null || t.end();
+  (t = ce.get(e)) == null || t.end();
 }
 class Et {
   /**
@@ -65,7 +65,7 @@ class Et {
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
    */
   constructor(t, n = {}) {
-    et(t), ae.set(t, this), this.ended = !1, this._timers = /* @__PURE__ */ new Set(), this.container = t, this.config = {
+    et(t), ce.set(t, this), this.ended = !1, this._timers = /* @__PURE__ */ new Set(), this.container = t, this.config = {
       totalRounds: 8,
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
@@ -103,7 +103,7 @@ class Et {
     if (!this.ended) {
       this.ended = !0;
       for (const n of this._timers) clearTimeout(n);
-      this._timers.clear(), ae.get(this.container) === this && ae.delete(this.container), this.events.emit("end", { score: t, state: this.state });
+      this._timers.clear(), ce.get(this.container) === this && ce.delete(this.container), this.events.emit("end", { score: t, state: this.state });
     }
   }
   /** פעולה מושהית מתבטלת אוטומטית בסיום או בהפעלה מחדש. */
@@ -172,12 +172,12 @@ function Lt() {
   };
 }
 let Se = null;
-function Nt() {
+function At() {
   return typeof window > "u" ? null : window.AudioContext || /** @type {any} */
   window.webkitAudioContext || null;
 }
 function pe() {
-  const e = Nt();
+  const e = At();
   if (!e) return null;
   if (!Se)
     try {
@@ -187,7 +187,7 @@ function pe() {
     }
   return Se;
 }
-async function At() {
+async function Nt() {
   const e = pe();
   if (!e) return !1;
   try {
@@ -268,7 +268,7 @@ function O(e, t, n = "sine", r = 0.3) {
     } catch {
     }
 }
-const de = {
+const fe = {
   /** צליל תשובה נכונה */
   correct() {
     O(523.25, 0.15), setTimeout(() => O(659.25, 0.2), 120), setTimeout(() => O(783.99, 0.3), 240);
@@ -323,7 +323,7 @@ const de = {
   fadeIn: 320,
   confetti: 700
 };
-function ce(e, t) {
+function ue(e, t) {
   !e || !De[t] || e.animate(De[t], {
     duration: Ct[t] || 400,
     easing: "ease-in-out",
@@ -374,7 +374,7 @@ function $t(e, { score: t, total: n }) {
   }), o;
 }
 function Bt(e, t, n, r, o = {}) {
-  de.cheer(), o.gameId && $t(o.gameId, { score: t, total: n });
+  fe.cheer(), o.gameId && $t(o.gameId, { score: t, total: n });
   const i = o.completionOnly ? n === 1 ? "הִשְׁלַמְתֶּם מְשִׂימָה!" : `הִשְׁלַמְתֶּם ${n} מְשִׂימוֹת!` : `נִיקּוּד: ${t} מִתּוֹךְ ${n}`, s = tt(t, n), a = "⭐".repeat(s) + "☆".repeat(3 - s), c = document.createElement("div");
   c.className = "completion-screen", c.innerHTML = `
     <div class="completion-screen__content">
@@ -393,7 +393,7 @@ function Bt(e, t, n, r, o = {}) {
   }
   c.querySelector(".completion-screen__replay").addEventListener("click", () => {
     c.remove(), r();
-  }), e.innerHTML = "", e.appendChild(c), ce(c.querySelector(".completion-screen__content"), "fadeIn");
+  }), e.innerHTML = "", e.appendChild(c), ue(c.querySelector(".completion-screen__content"), "fadeIn");
 }
 function It(e, t, {
   totalRounds: n,
@@ -407,7 +407,7 @@ function It(e, t, {
   let u = !1;
   const l = /* @__PURE__ */ new Set();
   function d(w) {
-    u = w || e.ended, l.forEach((ne) => ne(u));
+    u = w || e.ended, l.forEach((re) => re(u));
   }
   function y(w) {
     return l.add(w), w(u || e.ended), () => {
@@ -419,7 +419,7 @@ function It(e, t, {
   });
   async function f(w) {
     if (u || e.ended) return;
-    d(!0), s && de.correct();
+    d(!0), s && fe.correct();
     try {
       w && await w();
     } catch (S) {
@@ -730,16 +730,16 @@ function Bn(e) {
   return n.sort(() => Math.random() - 0.5).slice(0, e);
 }
 const Xt = 2e3;
-let A = [], Z = !1, D = 0.9, ue = 0.5;
+let N = [], Z = !1, D = 0.9, le = 0.5;
 try {
-  ue = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5;
+  le = typeof localStorage < "u" && parseFloat(localStorage.getItem("alefbet.nikudRate")) || 0.5;
 } catch {
 }
-let le = !1, X = null, H = null, R = null, rt = null, J = !1, L = "idle";
-function fe() {
+let de = !1, X = null, H = null, R = null, rt = null, J = !1, L = "idle";
+function me() {
   return typeof speechSynthesis < "u";
 }
-function N(e, t, n = !1) {
+function A(e, t, n = !1) {
   if (L === e && !n) return;
   const r = L;
   if (L = e, typeof window < "u" && typeof window.dispatchEvent == "function") {
@@ -748,7 +748,7 @@ function N(e, t, n = !1) {
   }
 }
 function Kt() {
-  fe() ? L = "idle" : N("unsupported", "no-speech-synthesis");
+  me() ? L = "idle" : A("unsupported", "no-speech-synthesis");
 }
 Kt();
 function Pe(e, t) {
@@ -761,22 +761,22 @@ function Yt(e) {
   return t.includes("not-allowed") || t.includes("notallowed") || t.includes("didn't interact") || t.includes("user gesture");
 }
 function Zt() {
-  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : le ? (le = !0, Promise.resolve()) : X || (X = new Promise((e) => {
+  return typeof window > "u" || typeof document > "u" ? Promise.resolve() : de ? (de = !0, Promise.resolve()) : X || (X = new Promise((e) => {
     const t = () => {
-      le = !0, window.removeEventListener("pointerdown", t, !0), window.removeEventListener("keydown", t, !0), window.removeEventListener("touchstart", t, !0), e();
+      de = !0, window.removeEventListener("pointerdown", t, !0), window.removeEventListener("keydown", t, !0), window.removeEventListener("touchstart", t, !0), e();
     };
     window.addEventListener("pointerdown", t, { once: !0, capture: !0 }), window.addEventListener("keydown", t, { once: !0, capture: !0 }), window.addEventListener("touchstart", t, { once: !0, capture: !0 });
   }).finally(() => {
     X = null;
   }), X);
 }
-let W = null, K = null, Ne = !1, Ge = !1;
+let W = null, K = null, Ae = !1, Ge = !1;
 const Jt = ["carmit", "hila", "female"];
 function en(e) {
   const t = (e.name || "").toLowerCase();
   return Jt.some((n) => t.includes(n));
 }
-function Ae() {
+function Ne() {
   if (typeof speechSynthesis > "u") return null;
   const t = speechSynthesis.getVoices().filter(
     (i) => i.lang === "he-IL" || i.lang === "iw-IL" || (i.lang || "").startsWith("he")
@@ -786,12 +786,12 @@ function Ae() {
   return o.find(en) || o[0];
 }
 function tn() {
-  return typeof speechSynthesis > "u" ? Promise.resolve() : (W = Ae(), W ? (Ne = !0, Promise.resolve()) : Ne ? Promise.resolve() : K || (K = new Promise((e) => {
+  return typeof speechSynthesis > "u" ? Promise.resolve() : (W = Ne(), W ? (Ae = !0, Promise.resolve()) : Ae ? Promise.resolve() : K || (K = new Promise((e) => {
     let t = !1;
     const n = () => {
-      t || (t = !0, Ne = !0, W = Ae(), typeof speechSynthesis < "u" && typeof speechSynthesis.removeEventListener == "function" && speechSynthesis.removeEventListener("voiceschanged", r), clearTimeout(o), e());
+      t || (t = !0, Ae = !0, W = Ne(), typeof speechSynthesis < "u" && typeof speechSynthesis.removeEventListener == "function" && speechSynthesis.removeEventListener("voiceschanged", r), clearTimeout(o), e());
     }, r = () => {
-      W = Ae(), W && n();
+      W = Ne(), W && n();
     };
     typeof speechSynthesis.addEventListener == "function" && speechSynthesis.addEventListener("voiceschanged", r);
     const o = setTimeout(() => {
@@ -843,7 +843,7 @@ async function rn(e) {
   } catch (t) {
     const n = (t == null ? void 0 : t.message) || "speech-error";
     if (Yt(n)) {
-      J || (J = !0, N("awaiting-interaction", "autoplay-blocked")), await Zt(), J = !1;
+      J || (J = !0, A("awaiting-interaction", "autoplay-blocked")), await Zt(), J = !1;
       try {
         return await Qe(e), { ok: !0 };
       } catch (r) {
@@ -855,8 +855,8 @@ async function rn(e) {
   }
 }
 function U() {
-  if (Z || A.length === 0) return;
-  const e = A.shift();
+  if (Z || N.length === 0) return;
+  const e = N.shift();
   Z = !0, H = e;
   const t = D, n = typeof e.rate == "number";
   n && (D = e.rate), rn(e.text).then((r) => {
@@ -866,9 +866,9 @@ function U() {
       U();
       return;
     }
-    r.ok ? L !== "unsupported" && N("ready") : fe() ? N("failed", r.reason, !0) : N("unsupported", r.reason || "no-provider", !0), e.resolve(), U();
+    r.ok ? L !== "unsupported" && A("ready") : me() ? A("failed", r.reason, !0) : A("unsupported", r.reason || "no-provider", !0), e.resolve(), U();
   }).catch((r) => {
-    n && (D = t), Z = !1, H = null, N("failed", (r == null ? void 0 : r.message) || "unknown"), e.resolve(), U();
+    n && (D = t), Z = !1, H = null, A("failed", (r == null ? void 0 : r.message) || "unknown"), e.resolve(), U();
   });
 }
 const C = {
@@ -879,7 +879,7 @@ const C = {
    */
   speak(e) {
     return new Promise((t) => {
-      A.push({ text: e, resolve: t }), U();
+      N.push({ text: e, resolve: t }), U();
     });
   },
   /**
@@ -897,23 +897,23 @@ const C = {
       }
       H = null;
     }
-    if (A.forEach((e) => {
+    if (N.forEach((e) => {
       try {
         e.resolve();
       } catch {
       }
-    }), A = [], Z = !1, R && (R = null), typeof speechSynthesis < "u" && typeof speechSynthesis.cancel == "function")
+    }), N = [], Z = !1, R && (R = null), typeof speechSynthesis < "u" && typeof speechSynthesis.cancel == "function")
       try {
         speechSynthesis.cancel();
       } catch {
       }
-    N("idle", "cancelled");
+    A("idle", "cancelled");
   },
   /**
    * האם יש יכולת קול מקומית במכשיר.
    */
   get available() {
-    return L !== "unsupported" && fe();
+    return L !== "unsupported" && me();
   },
   /** המצב הנוכחי של מנוע ה-TTS. */
   get audioState() {
@@ -933,14 +933,14 @@ const C = {
    * @returns {Promise<void>}
    */
   unlock() {
-    if (le = !0, J = !1, At().catch(() => {
+    if (de = !0, J = !1, Nt().catch(() => {
     }), typeof speechSynthesis < "u" && typeof SpeechSynthesisUtterance < "u")
       try {
         const e = new SpeechSynthesisUtterance("");
         e.volume = 0, speechSynthesis.speak(e), speechSynthesis.cancel();
       } catch {
       }
-    return L === "awaiting-interaction" && N("ready", "unlocked"), Promise.resolve();
+    return L === "awaiting-interaction" && A("ready", "unlocked"), Promise.resolve();
   },
   /**
    * רושם handler לאירועי `alefbet:tts-state`. מחזיר פונקציית unsubscribe.
@@ -974,7 +974,7 @@ const C = {
    * סריקת יכולת מחודשת. מחזירה את הערך של `tts.available`. שימושית לבדיקות.
    */
   probe() {
-    return fe() ? L === "unsupported" && N("idle", "recovered") : N("unsupported", "no-speech-synthesis"), this.available;
+    return me() ? L === "unsupported" && A("idle", "recovered") : A("unsupported", "no-speech-synthesis"), this.available;
   },
   /**
    * הגדר מהירות דיבור (0.5-2.0).
@@ -988,7 +988,7 @@ const C = {
    * @param {{ rate?: number }} opts - rate: מהירות הדגשה (ברירת מחדל 0.5).
    */
   setNikudEmphasis({ rate: e } = {}) {
-    e != null && (ue = Math.max(0.3, Math.min(1.5, e)));
+    e != null && (le = Math.max(0.3, Math.min(1.5, e)));
   },
   /**
    * הקרא אות עם ניקוד בשני שלבים: קודם את ההברה בקצב טבעי כדי שהעיצור יהיה קצר,
@@ -1000,12 +1000,12 @@ const C = {
   speakNikud(e, t) {
     const n = e + t, r = x.find((o) => o.symbol === t);
     return new Promise((o) => {
-      r && r.sound ? (A.push({ text: n, resolve: () => {
-      } }), A.push({
+      r && r.sound ? (N.push({ text: n, resolve: () => {
+      } }), N.push({
         text: r.sound,
-        rate: ue,
+        rate: le,
         resolve: () => o(void 0)
-      })) : A.push({ text: n, resolve: () => o(void 0) }), U();
+      })) : N.push({ text: n, resolve: () => o(void 0) }), U();
     });
   },
   /**
@@ -1016,9 +1016,9 @@ const C = {
   speakVowel(e) {
     const t = x.find((n) => n.id === e);
     return !t || !t.sound ? Promise.resolve() : new Promise((n) => {
-      A.push({
+      N.push({
         text: t.sound,
-        rate: ue,
+        rate: le,
         resolve: () => n(void 0)
       }), U();
     });
@@ -1123,15 +1123,15 @@ function fn(e) {
   return {
     /** הצג משוב חיובי - טקסט מפורש, או ביטוי שבח אקראי אם לא סופק */
     correct(o) {
-      de.correct(), r(o ?? `!${dn()}`, "correct"), ce(t, "bounce");
+      fe.correct(), r(o ?? `!${dn()}`, "correct"), ue(t, "bounce");
     },
     /** הצג עידוד — נסה שוב */
     wrong(o = "נַסֵּה שׁוּב") {
-      de.wrong(), r(o, "wrong"), ce(t, "pulse");
+      fe.wrong(), r(o, "wrong"), ue(t, "pulse");
     },
     /** הצג רמז */
     hint(o) {
-      r(o, "hint"), ce(t, "pulse");
+      r(o, "hint"), ue(t, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -1151,15 +1151,15 @@ function Ye(e, t) {
   return n.type = "button", n;
 }
 function Wn(e, t) {
-  const { shell: n, scope: r, isActive: o } = e, { wait: i, say: s, speak: a, hush: c } = an(r), u = t({ wait: i, say: s, speak: a }), { beats: l, scene: d, choices: y, result: f, ladder: b, onMiss: v, beforeResult: $ } = u, w = "cards" in y, ne = u.solvedEquation ?? l[l.length - 1].equation;
-  let S = 0, re = !1, be = 0;
-  const oe = I("section", ["story-round", u.className, w && "story-round--cards"].filter(Boolean).join(" ")), F = I("div", "story");
+  const { shell: n, scope: r, isActive: o } = e, { wait: i, say: s, speak: a, hush: c } = an(r), u = t({ wait: i, say: s, speak: a }), { beats: l, scene: d, choices: y, result: f, ladder: b, onMiss: v, beforeResult: $ } = u, w = "cards" in y, re = u.solvedEquation ?? l[l.length - 1].equation;
+  let S = 0, oe = !1, be = 0;
+  const ie = I("section", ["story-round", u.className, w && "story-round--cards"].filter(Boolean).join(" ")), F = I("div", "story");
   F.setAttribute("aria-live", "polite");
   const we = I("p", "story-equation");
   we.dir = "ltr";
   const P = ln(y, { retireTried: u.retireTried ?? !0 }), q = Ye("story-again", "עוֹד פַּעַם 🔁");
-  q.setAttribute("aria-label", "שמיעת הסיפור שוב"), oe.append(F, ...d ? [d.root] : [], we, P.root, q), n.bodyEl.append(oe);
-  const ge = r.use(fn(oe));
+  q.setAttribute("aria-label", "שמיעת הסיפור שוב"), ie.append(F, ...d ? [d.root] : [], we, P.root, q), n.bodyEl.append(ie);
+  const ge = r.use(fn(ie));
   function ve(m, p = "story-line") {
     var h;
     (h = F.querySelector(".story-line--now")) == null || h.classList.remove("story-line--now"), F.append(I("p", `${p} story-line--now`, m.text)), d == null || d.root.setAttribute("aria-label", [...F.querySelectorAll(".story-line")].map((g) => g.textContent).join(" "));
@@ -1171,14 +1171,14 @@ function Wn(e, t) {
       return g && g[k] !== _ && V.classList.add("story-term--new"), k ? [" ", V] : [V];
     }));
   }
-  async function ie() {
+  async function se() {
     var g, _;
     const m = ++S, p = () => m === S && o();
     if (c() && await i(ee), !p()) return;
     (g = d == null ? void 0 : d.clearCount) == null || g.call(d), d == null || d.reset(), F.replaceChildren();
     let h = "";
     for (const k of l) {
-      ve(k), _e(k.equation, u.highlight ? { before: h } : {}), h = k.equation, k.scene === "question" && !re && (re = !0, qe());
+      ve(k), _e(k.equation, u.highlight ? { before: h } : {}), h = k.equation, k.scene === "question" && !oe && (oe = !0, qe());
       const V = s(k.say);
       if (await Promise.all([V, (_ = d == null ? void 0 : d[k.scene]) == null ? void 0 : _.call(d, p, V)]), !p()) return;
     }
@@ -1200,17 +1200,17 @@ function Wn(e, t) {
     _ && h() && await s(_);
   }
   function qe() {
-    P.lock(!re || e.isAnswered()), q.disabled = e.isAnswered();
+    P.lock(!oe || e.isAnswered()), q.disabled = e.isAnswered();
   }
   function Ve(m) {
     if (m.action === "mark") {
       P.mark(), ge.hint(m.hint);
       return;
     }
-    ge.hint(m.hint), m.action === "count" ? bt() : ie();
+    ge.hint(m.hint), m.action === "count" ? bt() : se();
   }
   function wt(m) {
-    if (!(!re || e.isAnswered() || m.disabled)) {
+    if (!(!oe || e.isAnswered() || m.disabled)) {
       if (!P.isRight(m)) {
         e.onWrong(() => {
           be++, P.tried(m);
@@ -1225,7 +1225,7 @@ function Wn(e, t) {
       e.onCorrect(() => {
         P.correct(m);
         const p = ke(), h = () => {
-          _e(ne, { answer: y.answer }), (u.resultLine ?? !0) && ve(f, "story-line story-line--result"), ge.correct(), r.schedule(() => {
+          _e(re, { answer: y.answer }), (u.resultLine ?? !0) && ve(f, "story-line story-line--result"), ge.correct(), r.schedule(() => {
             a(f.say);
           }, p ? ee : 0);
         };
@@ -1239,15 +1239,15 @@ function Wn(e, t) {
   }
   for (const m of P.buttons) r.listen(m, "click", () => wt(m));
   if (r.listen(q, "click", () => {
-    ie();
+    se();
   }), e.subscribeAnswered(qe), cn()) {
     const m = Ye("story-start", "▶ הַקְשִׁיבוּ לַסִּפּוּר");
     F.append(m), q.hidden = !0, r.listen(m, "click", () => {
-      q.hidden = !1, ie();
+      q.hidden = !1, se();
     });
   } else
-    ie();
-  return { host: oe, get misses() {
+    se();
+  return { host: ie, get misses() {
     return be;
   } };
 }
@@ -1297,21 +1297,25 @@ function Hn(e, t, n, r) {
   }, o.appendChild(i), i;
 }
 const hn = ["אֶפֶס", "אֶחָד", "שְׁנַיִם", "שְׁלוֹשָׁה", "אַרְבָּעָה", "חֲמִשָּׁה", "שִׁשָּׁה", "שִׁבְעָה", "שְׁמוֹנָה", "תִּשְׁעָה", "עֲשָׂרָה"], pn = ["אֶפֶס", "אַחַת", "שְׁתַּיִם", "שָׁלוֹשׁ", "אַרְבַּע", "חָמֵשׁ", "שֵׁשׁ", "שֶׁבַע", "שְׁמוֹנֶה", "תֵּשַׁע", "עֶשֶׂר"];
-function me(e, t = "f") {
+function te(e, t = "f") {
   return !Number.isInteger(e) || e < 0 || e > 10 ? String(e) : (t === "m" ? hn : pn)[e];
 }
 function qn(e, t, { digits: n = !1 } = {}) {
-  return e === 1 ? `${t.one} ${me(1, t.gender)}` : n ? `${e} ${t.many}` : e === 2 ? `${t.gender === "m" ? "שְׁנֵי" : "שְׁתֵּי"} ${t.many}` : `${me(e, t.gender)} ${t.many}`;
+  return e === 1 ? `${t.one} ${te(1, t.gender)}` : n ? `${e} ${t.many}` : e === 2 ? `${t.gender === "m" ? "שְׁנֵי" : "שְׁתֵּי"} ${t.many}` : `${te(e, t.gender)} ${t.many}`;
 }
 function Vn(e, t, n) {
-  return `${me(t)} ${e === "+" ? "וְעוֹד" : "פָּחוֹת"} ${me(n)}`;
+  return `${te(t)} ${e === "+" ? "וְעוֹד" : "פָּחוֹת"} ${te(n)}`;
+}
+function On(e) {
+  const t = e > 5 ? 5 : 1;
+  return Array.from({ length: Math.max(0, e - t + 1) }, (n, r) => ({ upto: t + r, say: te(t + r) }));
 }
 let B = null, E = null, ot = 0, it = 0, G = null, Me = 0, xe = 0;
-const te = /* @__PURE__ */ new Map();
+const ne = /* @__PURE__ */ new Map();
 function st(e, t) {
   var r;
   const n = (r = document.elementFromPoint(e, t)) == null ? void 0 : r.closest('[data-drop-target="true"]');
-  return n && te.has(n) && !n.matches(":disabled") && n.getAttribute("aria-disabled") !== "true" ? n : null;
+  return n && ne.has(n) && !n.matches(":disabled") && n.getAttribute("aria-disabled") !== "true" ? n : null;
 }
 function yn(e, t, n) {
   const r = e.getBoundingClientRect();
@@ -1352,7 +1356,7 @@ function gn(e) {
 function vn() {
   M == null || M.classList.remove("drop-target--hover"), M = null;
 }
-function On(e, t, { onTap: n } = {}) {
+function Dn(e, t, { onTap: n } = {}) {
   e.classList.add("drag-source");
   let r = null, o = null, i = null, s = null;
   function a() {
@@ -1377,7 +1381,7 @@ function On(e, t, { onTap: n } = {}) {
         n();
         return;
       }
-      v && te.has(v) && te.get(v).onDrop({ data: t, sourceEl: e, targetEl: v });
+      v && ne.has(v) && ne.get(v).onDrop({ data: t, sourceEl: e, targetEl: v });
     }, i = (f) => {
       f.pointerId === s && a();
     }, e.addEventListener("pointermove", r), e.addEventListener("pointerup", o), e.addEventListener("pointercancel", i), e.addEventListener("lostpointercapture", i);
@@ -1388,14 +1392,14 @@ function On(e, t, { onTap: n } = {}) {
     }
   };
 }
-function Dn(e, t) {
-  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), te.set(e, { onDrop: t }), {
+function zn(e, t) {
+  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), ne.set(e, { onDrop: t }), {
     destroy() {
-      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), te.delete(e);
+      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), ne.delete(e);
     }
   };
 }
-function zn(e) {
+function Un(e) {
   const t = [...e];
   for (let n = t.length - 1; n > 0; n--) {
     const r = Math.floor(Math.random() * (n + 1));
@@ -1418,7 +1422,7 @@ function ye() {
 function We(e, t) {
   return `${e}/${t}`;
 }
-async function Un(e, t, n) {
+async function Gn(e, t, n) {
   const r = await ye();
   return new Promise((o, i) => {
     const s = r.transaction(T, "readwrite");
@@ -1432,7 +1436,7 @@ async function Sn(e, t) {
     s.onsuccess = () => r(s.result ?? null), s.onerror = (a) => o(a.target.error);
   });
 }
-async function Gn(e, t) {
+async function Qn(e, t) {
   const n = await ye();
   return new Promise((r, o) => {
     const i = n.transaction(T, "readwrite");
@@ -1482,7 +1486,7 @@ const Ln = {
   hiriq: "i",
   holam: "o",
   kubbutz: "u"
-}, ut = 210, lt = 550, Nn = {
+}, ut = 210, lt = 550, An = {
   a: { F3: 2700, bandwidths: [90, 110, 170], gains: [1, 0.5, 0.15] },
   e: { F3: 2900, bandwidths: [80, 100, 160], gains: [1, 0.55, 0.2] },
   i: { F3: 3300, bandwidths: [60, 100, 160], gains: [1, 0.6, 0.25] },
@@ -1490,7 +1494,7 @@ const Ln = {
   u: { F3: 2400, bandwidths: [60, 80, 140], gains: [1, 0.45, 0.1] }
 };
 function he(e) {
-  const t = Ln[e], n = Nn[e];
+  const t = Ln[e], n = An[e];
   return !t || !n ? null : {
     formants: [t.F1, t.F2, n.F3],
     bandwidths: [...n.bandwidths],
@@ -1518,18 +1522,18 @@ const Je = {
   r: { type: "liquid", voiced: !0, durationMs: 80 },
   sh: { type: "fricative", voiced: !1, noiseHz: 3e3, noiseQ: 1.8, durationMs: 140 }
 };
-function An(e) {
+function Nn(e) {
   return Je[e] ?? Je[""];
 }
-function Qn() {
+function Xn() {
   return pe() !== null;
 }
-let se = null;
+let ae = null;
 function Rn(e) {
-  if (se && se.sampleRate === e.sampleRate) return se;
+  if (ae && ae.sampleRate === e.sampleRate) return ae;
   const t = e.sampleRate, n = e.createBuffer(1, t, e.sampleRate), r = n.getChannelData(0);
   for (let o = 0; o < t; o++) r[o] = Math.random() * 2 - 1;
-  return se = n, n;
+  return ae = n, n;
 }
 function dt(e, t, n, r = e.destination) {
   const o = e.createOscillator();
@@ -1599,7 +1603,7 @@ async function $e(e, t, n = {}) {
   if (!r || (l = n.signal) != null && l.aborted) return !1;
   const o = await Ie();
   if (!o || (d = n.signal) != null && d.aborted) return !1;
-  const i = An(e), s = n.pitchHz ?? ut, a = n.durationMs ?? lt;
+  const i = Nn(e), s = n.pitchHz ?? ut, a = n.durationMs ?? lt;
   let c, u;
   try {
     u = o.createGain(), u.connect(o.destination), c = Cn(o, i, e, r, a, s, u);
@@ -1649,7 +1653,7 @@ function pt(e) {
 function yt(e, t) {
   return `syllable:${e}:${t}`;
 }
-function Xn() {
+function Kn() {
   const e = [];
   for (const t of z)
     e.push({ key: ht(t.letter), label: t.nameNikud, group: "letters" });
@@ -1685,25 +1689,25 @@ async function He(e) {
 function Fn() {
   return typeof speechSynthesis < "u";
 }
-async function Kn() {
+async function Yn() {
   try {
     return typeof indexedDB > "u" ? [] : await En(Be);
   } catch {
     return [];
   }
 }
-async function Yn(e) {
+async function Zn(e) {
   if (await je(ht(e))) return "bank";
   const t = nt(e), n = t ? t.nameNikud : e;
   return await He(() => C.speak(n)) ? "tts" : t && await $e(t.sound, "a", { durationMs: 400 }) ? "synth" : "none";
 }
-async function Zn(e) {
+async function Jn(e) {
   if (await je(pt(e))) return "bank";
   if (await He(() => C.speakVowel(e))) return "tts";
   const t = ct[e];
   return t && await xn(t) ? "synth" : "none";
 }
-async function Jn(e, t, n = {}) {
+async function er(e, t, n = {}) {
   const { signal: r } = n;
   if (r != null && r.aborted) return "none";
   if (await je(yt(e, t), r ? n : void 0)) return "bank";
@@ -1720,7 +1724,7 @@ async function Jn(e, t, n = {}) {
   const s = nt(e), a = ct[t];
   return a && await (r ? $e(s ? s.sound : "", a, n) : $e(s ? s.sound : "", a)) ? "synth" : "none";
 }
-function er(e, t) {
+function tr(e, t) {
   let n = document.getElementById("nikud-settings");
   n || (n = document.createElement("div"), n.id = "nikud-settings", Object.assign(n.style, {
     position: "fixed",
@@ -1789,46 +1793,47 @@ export {
   ct as NIKUD_VOWEL,
   Be as SOUND_BANK_ID,
   Ln as VOWEL_TEMPLATES,
-  ce as animate,
+  ue as animate,
   Ot as bootstrapGame,
   qn as countNoun,
+  On as countingSteps,
   Pn as createChoiceRound,
-  On as createDragSource,
-  Dn as createDropTarget,
+  Dn as createDragSource,
+  zn as createDropTarget,
   fn as createFeedback,
   jn as createHintTracker,
   an as createNarrator,
   Wt as createProgressBar,
   Lt as createRoundScope,
   Wn as createStoryRound,
-  Gn as deleteVoice,
+  Qn as deleteVoice,
   Vn as exerciseWords,
   pe as getAudioContext,
   nt as getLetter,
   Ut as getLettersByGroup,
   Hn as injectHeaderButton,
-  Qn as isSynthSupported,
+  Xn as isSynthSupported,
   Qt as letterWithNikud,
   Sn as loadVoice,
   St as lockPageZoom,
   Gt as nikudBaseLetters,
   x as nikudList,
-  me as numberWord,
+  te as numberWord,
   Ze as playVoice,
   $n as randomLetters,
   Bn as randomNikud,
   dn as randomPraise,
   In as randomRetryHint,
-  Kn as recordedKeys,
+  Yn as recordedKeys,
   Dt as runGame,
-  Un as saveVoice,
+  Gn as saveVoice,
   Bt as showCompletionScreen,
-  er as showNikudSettingsDialog,
-  zn as shuffle,
-  de as sounds,
-  Yn as speakLetter,
-  Zn as speakNikudSound,
-  Jn as speakSyllable,
-  Xn as standardSoundKeys,
+  tr as showNikudSettingsDialog,
+  Un as shuffle,
+  fe as sounds,
+  Zn as speakLetter,
+  Jn as speakNikudSound,
+  er as speakSyllable,
+  Kn as standardSoundKeys,
   C as tts
 };

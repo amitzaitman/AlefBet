@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createRounds, countChoices, countingSteps, buildAsk, basketMiss } from '../../../games/apple-basket/game.js';
+import { createRounds, countChoices, buildAsk, basketMiss } from '../../../games/apple-basket/game.js';
 
 const NIKUD = /[֑-ׇ]/g;
 
@@ -37,18 +37,7 @@ describe('apple-basket rounds', () => {
   });
 });
 
-describe('apple-basket counting aloud', () => {
-  it('counts one by one up to five, and from a full row of five past it', () => {
-    expect(countingSteps(3)).toEqual([
-      { upto: 1, say: 'אַחַת' }, { upto: 2, say: 'שְׁתַּיִם' }, { upto: 3, say: 'שָׁלוֹשׁ' },
-    ]);
-    expect(countingSteps(5).map(step => step.upto)).toEqual([1, 2, 3, 4, 5]);
-    expect(countingSteps(7)).toEqual([
-      { upto: 5, say: 'חָמֵשׁ' }, { upto: 6, say: 'שֵׁשׁ' }, { upto: 7, say: 'שֶׁבַע' },
-    ]);
-    expect(countingSteps(10).at(-1)).toEqual({ upto: 10, say: 'עֶשֶׂר' });
-  });
-
+describe('apple-basket sentences', () => {
   it('asks with a digit on screen and a matching number word aloud', () => {
     expect(buildAsk(4)).toEqual({ text: 'שִׂימוּ 4 תַּפּוּחִים בַּסַּל.', say: 'שִׂימוּ אַרְבָּעָה תַּפּוּחִים בַּסַּל.' });
     expect(buildAsk(2).say).toBe('שִׂימוּ שְׁנֵי תַּפּוּחִים בַּסַּל.');

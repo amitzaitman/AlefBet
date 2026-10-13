@@ -7,7 +7,7 @@
  * העזרה סופרת שורה מלאה כ"חמש" וממשיכה משם. העקרונות ב-docs/math-pedagogy.md.
  */
 import {
-  runGame, createStoryRound, createNarrator, createFeedback, numberWord, countNoun, shuffle,
+  runGame, createStoryRound, createNarrator, createFeedback, numberWord, countNoun, countingSteps, shuffle,
 } from '../../framework/dist/runtime.js';
 
 /** תַּפּוּחַ is masculine: 'תַּפּוּחַ אֶחָד', 'שְׁנֵי תַּפּוּחִים', 'חֲמִשָּׁה תַּפּוּחִים'. */
@@ -50,17 +50,6 @@ export function createRounds() {
 export function countChoices(n) {
   const near = [n - 1, n + 1, ...shuffle([n - 2, n + 2]), n - 3, n + 3].filter(v => v >= 1 && v <= PLACES);
   return [n, ...near.slice(0, 3)].sort((a, b) => a - b);
-}
-
-/**
- * How the help counts n apples: one by one up to five. Past five the full row
- * is one step, 'חָמֵשׁ', and the count goes on from there.
- * @param {number} n
- * @returns {{ upto: number, say: string }[]} upto - how many apples are counted after the step
- */
-export function countingSteps(n) {
-  const from = n > 5 ? 5 : 1;
-  return Array.from({ length: n - from + 1 }, (_, k) => ({ upto: from + k, say: numberWord(from + k) }));
 }
 
 /**
