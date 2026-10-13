@@ -1,3 +1,5 @@
+import { makeTen } from './games/make-ten/index.js';
+
 /**
  * One pilot game: its home-page card and how to play it.
  * @typedef {object} GameDefinition
@@ -14,4 +16,4 @@
  * The pilot's game list. The math home page shows these, in this order.
  * @type {GameDefinition[]}
  */
-export const games = [];
+export const games = [makeTen];

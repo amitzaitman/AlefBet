@@ -66,6 +66,9 @@ Svelte compiler warnings (accessibility, unused CSS) fail the build.
 
 ## Differences from today's games
 
+- `make-ten`: the ten frame fills from the left (today it fills from the right
+  inside the RTL page). After a correct answer the empty cells fill in, in the
+  colour of the answer in the exercise. Same rounds, choices and hint.
 - The replay button speaks to the children in plural (`שַׂחֲקוּ שׁוּב`), like
   every other text.
 - No adult tools menu and no error screen.
