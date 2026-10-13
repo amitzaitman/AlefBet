@@ -29,36 +29,22 @@ describe('starsFor', () => {
 });
 
 describe('recordGameResult', () => {
-  it('רישום ראשון יוצר רשומה מלאה', () => {
-    const result = recordGameResult('syllable-read', { score: 7, total: 8 });
-    expect(result).toMatchObject({ plays: 1, bestScore: 7, bestStars: 3, total: 8 });
+  it('רישום ראשון יוצר רשומה מלאה, שנשמרת לכל משחק במפתח שדף הבית קורא', () => {
+    expect(recordGameResult('syllable-read', { score: 7, total: 8 })).toMatchObject({ plays: 1, bestScore: 7, bestStars: 3, total: 8 });
+    recordGameResult('b', { score: 8, total: 8 });
     expect(saved()['syllable-read']).toMatchObject({ bestScore: 7, bestStars: 3 });
+    expect(Object.keys(saved()).sort()).toEqual(['b', 'syllable-read']);
   });
 
-  it('משפר-בלבד: תוצאה חלשה לא דורסת שיא, אבל plays נספר', () => {
-    recordGameResult('g', { score: 8, total: 8 });
-    const after = recordGameResult('g', { score: 2, total: 8 });
-    expect(after.plays).toBe(2);
-    expect(after.bestScore).toBe(8);
-    expect(after.bestStars).toBe(3);
-  });
-
-  it('תוצאה טובה יותר מעדכנת את השיא', () => {
+  it('משפר-בלבד: תוצאה טובה יותר מעדכנת שיא, חלשה לא דורסת אותו, ו-plays נספר', () => {
     recordGameResult('g', { score: 3, total: 8 });
-    const after = recordGameResult('g', { score: 8, total: 8 });
-    expect(after.bestScore).toBe(8);
-    expect(after.bestStars).toBe(3);
+    expect(recordGameResult('g', { score: 8, total: 8 })).toMatchObject({ bestScore: 8, bestStars: 3 });
+    expect(recordGameResult('g', { score: 2, total: 8 })).toMatchObject({ plays: 3, bestScore: 8, bestStars: 3 });
   });
 
   it('קלט שגוי מוחזר null ולא נכתב', () => {
     expect(recordGameResult('', { score: 5, total: 8 })).toBeNull();
     expect(recordGameResult('g', { score: NaN, total: 8 })).toBeNull();
     expect(saved().g).toBeUndefined();
-  });
-
-  it('שומר את כל המשחקים במפתח שדף הבית קורא', () => {
-    recordGameResult('a', { score: 5, total: 8 });
-    recordGameResult('b', { score: 8, total: 8 });
-    expect(Object.keys(saved()).sort()).toEqual(['a', 'b']);
   });
 });

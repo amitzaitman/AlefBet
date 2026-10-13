@@ -15,55 +15,52 @@ beforeEach(() => {
 describe('bootstrapGame', () => {
   it('runs rounds, ignores stale answers and cleans up on completion and replay', async () => {
     vi.useFakeTimers();
-    try {
-      const host = mountContainer();
-      const rounds = [];
-      const dispose = vi.fn();
-      const replay = vi.fn();
-      const result = await runGame(host, {
-        gameId: 'runner', title: 'בדיקה', audio: false,
-        defaultRounds: [{ target: 'א' }, { target: 'ב' }],
-        transitionMs: 20, onReplay: replay,
-        buildRound: context => { rounds.push(context); return dispose; },
-      });
-      expect(rounds[0].round.target).toBe('א');
-      const first = rounds[0].onCorrect();
-      await vi.runAllTimersAsync();
-      await first;
-      expect(rounds[1].round.target).toBe('ב');
-      await rounds[0].onCorrect();
-      expect(result.shell.state.score).toBe(1);
-      const second = rounds[1].onCorrect();
-      await vi.runAllTimersAsync();
-      await second;
-      expect(result.shell.ended).toBe(true);
-      expect(result.shell.state.score).toBe(2);
-      expect(dispose).toHaveBeenCalledTimes(2);
-      expect(host.querySelector('.completion-screen')).not.toBeNull();
-      host.querySelector('.completion-screen__replay').click();
-      expect(replay).toHaveBeenCalledOnce();
-    } finally { vi.useRealTimers(); }
+    const host = mountContainer();
+    const rounds = [];
+    const dispose = vi.fn();
+    const replay = vi.fn();
+    const result = await runGame(host, {
+      gameId: 'runner', title: 'בדיקה', audio: false,
+      defaultRounds: [{ target: 'א' }, { target: 'ב' }],
+      transitionMs: 20, onReplay: replay,
+      buildRound: context => { rounds.push(context); return dispose; },
+    });
+    expect(rounds[0].round.target).toBe('א');
+    const first = rounds[0].onCorrect();
+    await vi.runAllTimersAsync();
+    await first;
+    expect(rounds[1].round.target).toBe('ב');
+    await rounds[0].onCorrect();
+    expect(result.shell.state.score).toBe(1);
+    const second = rounds[1].onCorrect();
+    await vi.runAllTimersAsync();
+    await second;
+    expect(result.shell.ended).toBe(true);
+    expect(result.shell.state.score).toBe(2);
+    expect(dispose).toHaveBeenCalledTimes(2);
+    expect(host.querySelector('.completion-screen')).not.toBeNull();
+    host.querySelector('.completion-screen__replay').click();
+    expect(replay).toHaveBeenCalledOnce();
   });
 
   it('cancels a pending round transition when another game starts', async () => {
     vi.useFakeTimers();
-    try {
-      const host = mountContainer();
-      let round;
-      const result = await runGame(host, {
-        gameId: 'cancel-runner', title: 'ישן', audio: false,
-        defaultRounds: [{ target: 'א' }, { target: 'ב' }],
-        buildRound: context => { round = context; },
-      });
-      const pending = round.onCorrect();
-      await bootstrapGame(host, { gameId: 'next', title: 'חדש', audio: false });
-      await vi.runAllTimersAsync();
-      await pending;
-      expect(result.shell.ended).toBe(true);
-      expect(host.querySelector('.game-title').textContent).toBe('חדש');
-      expect(host.querySelector('.completion-screen')).toBeNull();
-    } finally { vi.useRealTimers(); }
+    const host = mountContainer();
+    let round;
+    const result = await runGame(host, {
+      gameId: 'cancel-runner', title: 'ישן', audio: false,
+      defaultRounds: [{ target: 'א' }, { target: 'ב' }],
+      buildRound: context => { round = context; },
+    });
+    const pending = round.onCorrect();
+    await bootstrapGame(host, { gameId: 'next', title: 'חדש', audio: false });
+    await vi.runAllTimersAsync();
+    await pending;
+    expect(result.shell.ended).toBe(true);
+    expect(host.querySelector('.game-title').textContent).toBe('חדש');
+    expect(host.querySelector('.completion-screen')).toBeNull();
   });
+
   it('does not let a slow start overwrite a newer game', async () => {
     const host = mountContainer();
     let release;
@@ -93,7 +90,8 @@ describe('bootstrapGame', () => {
     add.mockRestore();
     remove.mockRestore();
   });
-  it('plays the rounds the game passes', async () => {
+
+  it('plays the rounds the game passes, or totalRounds when the game runs its own flow', async () => {
     const host = mountContainer();
     const rounds = [{ target: 'א' }, { target: 'ב' }];
     const result = await bootstrapGame(host, { gameId: 'rounds', title: 'בדיקה', defaultRounds: rounds });
@@ -104,24 +102,15 @@ describe('bootstrapGame', () => {
     expect(host.querySelector('.game-title')?.textContent).toBe('בדיקה');
     expect(host.querySelector('.adult-tools')).toBeNull();
     result.shell.end();
-  });
-
-  it('uses totalRounds when the game runs its own flow', async () => {
-    const result = await bootstrapGame(mountContainer(), { gameId: 'free', title: 'חופשי', totalRounds: 8 });
-    expect(result.activeRounds).toEqual([]);
-    expect(result.shell.state.totalRounds).toBe(8);
-    result.shell.end();
+    const free = await bootstrapGame(host, { gameId: 'free', title: 'חופשי', totalRounds: 8 });
+    expect(free.activeRounds).toEqual([]);
+    expect(free.shell.state.totalRounds).toBe(8);
+    free.shell.end();
   });
 
   it('aborts when onBeforeHide returns false and keeps the loading screen intact', async () => {
     const host = mountContainer();
-
-    const result = await bootstrapGame(host, {
-      gameId: 'test-abort',
-      title: 'יבטל',
-      onBeforeHide: () => false,
-    });
-
+    const result = await bootstrapGame(host, { gameId: 'test-abort', title: 'יבטל', onBeforeHide: () => false });
     expect(result).toEqual({ shell: null, activeRounds: [], aborted: true });
     // caller is responsible for the DOM; bootstrap did not hide the loading screen
     expect(host.querySelector('.ab-loading')).not.toBeNull();

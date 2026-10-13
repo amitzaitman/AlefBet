@@ -28,7 +28,7 @@ describe('lockPageZoom', () => {
     for (const [, , options] of add.mock.calls) expect(options).toEqual({ passive: false });
   });
 
-  it('cancels the Safari pinch gesture', () => {
+  it('cancels the Safari pinch gesture and two-finger moves, and keeps one-finger scrolling', () => {
     const doc = freshDocument();
     lockPageZoom(doc);
     for (const type of ['gesturestart', 'gesturechange']) {
@@ -36,11 +36,6 @@ describe('lockPageZoom', () => {
       doc.dispatchEvent(event);
       expect(event.defaultPrevented).toBe(true);
     }
-  });
-
-  it('cancels two-finger moves and keeps one-finger scrolling', () => {
-    const doc = freshDocument();
-    lockPageZoom(doc);
     const pinch = touchEvent('touchmove', 2);
     doc.dispatchEvent(pinch);
     expect(pinch.defaultPrevented).toBe(true);

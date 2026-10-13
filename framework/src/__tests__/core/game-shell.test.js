@@ -13,29 +13,20 @@ let container;
 beforeEach(() => { container = mountContainer(); });
 
 describe('GameShell — DOM scaffold', () => {
-  it('renders title, body, footer and a back button into the container', () => {
-    new GameShell(container, { title: 'משחק ניקוד', totalRounds: 5 });
-
+  it('renders title, body, footer and a back button into the container; setTitle updates the title', () => {
+    const shell = new GameShell(container, { title: 'משחק ניקוד', totalRounds: 5 });
     expect(container.classList.contains('alefbet-game')).toBe(true);
     expect(container.querySelector('.game-title').textContent).toBe('משחק ניקוד');
     expect(container.querySelector('.game-body')).not.toBeNull();
     expect(container.querySelector('.game-footer')).not.toBeNull();
     expect(container.querySelector('.game-back-btn')?.getAttribute('href')).toBe('../../index.html');
-  });
-
-  it('omits the back button when homeUrl is explicitly null', () => {
-    new GameShell(container, { homeUrl: null });
-    expect(container.querySelector('.game-back-btn')).toBeNull();
-  });
-
-  it('setTitle updates the rendered title', () => {
-    const shell = new GameShell(container, { title: 'a' });
     shell.setTitle('b');
     expect(container.querySelector('.game-title').textContent).toBe('b');
   });
 
-  it('defaults totalRounds to 8 when unspecified', () => {
-    const shell = new GameShell(container);
+  it('omits the back button when homeUrl is explicitly null, and defaults totalRounds to 8', () => {
+    const shell = new GameShell(container, { homeUrl: null });
+    expect(container.querySelector('.game-back-btn')).toBeNull();
     expect(shell.state.totalRounds).toBe(8);
   });
 });
@@ -43,68 +34,34 @@ describe('GameShell — DOM scaffold', () => {
 describe('GameShell — lifecycle events', () => {
   it('replacing a game ends it once and cancels its pending work', async () => {
     vi.useFakeTimers();
-    try {
-      const shell = new GameShell(container);
-      const end = vi.fn();
-      const staleUI = vi.fn();
-      shell.on('end', end);
-      shell.schedule(staleUI, 100);
-      const waiting = shell.delay(200);
-      const replacement = new GameShell(container);
-      shell.end();
-      await vi.runAllTimersAsync();
-      expect(await waiting).toBe(false);
-      expect(end).toHaveBeenCalledOnce();
-      expect(staleUI).not.toHaveBeenCalled();
-      expect(shell.nextRound()).toBe(false);
-      expect(replacement.ended).toBe(false);
-    } finally {
-      vi.useRealTimers();
-    }
+    const shell = new GameShell(container);
+    const end = vi.fn();
+    const staleUI = vi.fn();
+    shell.on('end', end);
+    shell.schedule(staleUI, 100);
+    const waiting = shell.delay(200);
+    const replacement = new GameShell(container);
+    shell.end();
+    await vi.runAllTimersAsync();
+    expect(await waiting).toBe(false);
+    expect(end).toHaveBeenCalledOnce();
+    expect(staleUI).not.toHaveBeenCalled();
+    expect(shell.nextRound()).toBe(false);
+    expect(replacement.ended).toBe(false);
   });
-  it('emits "start" with the current state when start() is called', () => {
-    const shell = new GameShell(container, { totalRounds: 3 });
-    const onStart = vi.fn();
-    shell.on('start', onStart);
 
-    shell.start();
-
+  it('emits "start", then "round" while rounds remain, then "end" instead of "round"; on() chains', () => {
+    const shell = new GameShell(container, { totalRounds: 2 });
+    const onStart = vi.fn(), onRound = vi.fn(), onEnd = vi.fn();
+    expect(shell.on('start', onStart).on('round', onRound).on('end', onEnd)).toBe(shell);
+    shell.start(); // → round 1
     expect(onStart).toHaveBeenCalledOnce();
     expect(onStart.mock.calls[0][0].state.currentRound).toBe(1);
-  });
-
-  it('emits "round" when nextRound advances within the game', () => {
-    const shell = new GameShell(container, { totalRounds: 3 });
-    const onRound = vi.fn();
-    shell.on('round', onRound);
-
-    shell.start();           // → round 1
-    const more = shell.nextRound(); // → round 2
-
-    expect(more).toBe(true);
+    expect(shell.nextRound()).toBe(true); // → round 2
     expect(onRound).toHaveBeenCalledOnce();
-  });
-
-  it('emits "end" instead of "round" when the last round is passed', () => {
-    const shell = new GameShell(container, { totalRounds: 2 });
-    const onRound = vi.fn();
-    const onEnd = vi.fn();
-    shell.on('round', onRound);
-    shell.on('end', onEnd);
-
-    shell.start();            // → round 1
-    shell.nextRound();        // → round 2 (emits round)
-    const more = shell.nextRound(); // no more rounds → end
-
-    expect(more).toBe(false);
-    expect(onRound).toHaveBeenCalledTimes(1);
+    expect(shell.nextRound()).toBe(false); // no more rounds → end
+    expect(onRound).toHaveBeenCalledOnce();
     expect(onEnd).toHaveBeenCalledOnce();
     expect(onEnd.mock.calls[0][0]).toMatchObject({ score: 0 });
-  });
-
-  it('on() returns the shell so handlers can be chained', () => {
-    const shell = new GameShell(container);
-    const ret = shell.on('start', () => {}).on('end', () => {});
-    expect(ret).toBe(shell);
   });
 });
