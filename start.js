@@ -95,7 +95,8 @@ server.once('listening', () => {
   console.log('  ╚══════════════════════════════════════╝');
   console.log('');
 
-  // Auto-open browser
+  // Auto-open a browser only for a person at a terminal, not when a test runner starts the server.
+  if (!process.stdout.isTTY) return;
   let openCmd;
   if (process.platform === 'win32') {
     openCmd = `start "" "${url}"`;
