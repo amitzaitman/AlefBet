@@ -78,13 +78,16 @@ scripts/          build, release manifest, check-dist, create-game
 - **Custom interaction per round:** `runGame` with your own `buildRound`. Register components with `scope.use`, listeners with `scope.listen`, timers with `scope.schedule`, and pass `scope.signal` to `speakSyllable`. Everything is disposed on advance, replay and exit. After an `await`, check `isActive()`. Use `isAnswered`/`subscribeAnswered` to block double answers. Examples: `number-line`, `balloon-stories`.
 - **No rounds:** `bootstrapGame` + `createRoundScope`. Use `shell.nextRound()` (never `shell.state.nextRound()`), `shell.schedule` for delayed work, check `shell.ended` after awaits, dispose on `end`. `sound-studio` works this way; `nikud-speak` keeps its three-attempt policy locally.
 - **Math games** follow `docs/math-pedagogy.md` (Aharoni: meaning before calculation; picture, exercise and story each enough alone). `balloon-stories` is the narrated reference.
-- Add a browser spec for each game (correct answer, retry, completion, replay, offline). Put unit tests for non-trivial game logic in `framework/src/__tests__/`, importing from `games/<id>/`.
+- Add one browser spec per game that plays it through (correct answer, retry, completion, a round after replay, offline). Don't add a separate one-round 'golden path' test next to it. Put unit tests for non-trivial game logic in `framework/src/__tests__/`, importing from `games/<id>/`.
 
 ## Tests and CI
 
 - PRs trigger CI; branch pushes do not (use workflow_dispatch for a branch without a PR). Pushes to `main` run the full gate before deploying to GitHub Pages. Changes only to Markdown, `docs/` or `LICENSE` skip both workflows.
 - No scheduled runs and no repeated stability passes.
-- Offline browser tests use the helper in `e2e/network-server.js`; don't copy offline plumbing into specs.
+- Specs import `test` and `expect` from `e2e/network-server.js`, which also has `activate`, `noVoice`, `expectTouchTargets` and `network.reloadOffline`. Don't copy offline plumbing or speech stubs into specs.
+- Projects: `chromium` runs every spec except `mobile.spec.js`; `mobile-chromium` runs only `mobile` and `home` (owner decision 2026-10-13: same engine as desktop); `mobile-webkit` runs `mobile`, `home`, `math` and `fractions-math`.
+- Don't wait out fixed game pauses: `page.clock.install()` before `goto`, then `page.clock.runFor(<the game's delay>)` only after an assertion proves the action was handled. Keep at least one real-time test per narrated game.
+- CI runs on Node 22, where vitest uses the `vmForks` pool (unit tests take about 3s); below Node 22 it falls back to `forks`.
 - Service worker internals are covered by `framework/src/__tests__/service-worker.test.js`. Don't add browser tests for background infrastructure.
 
 ## Working rules

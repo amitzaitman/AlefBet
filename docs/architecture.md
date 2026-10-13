@@ -144,14 +144,19 @@ framework/src/
 
 ## בדיקות
 
-- **בדיקות יחידה** (vitest עם jsdom) ב-`framework/src/__tests__/`: מודולי
+- **בדיקות יחידה** (vitest עם jsdom, במצב הבידוד `vmForks` ב-Node 22 ומעלה,
+  ו-`forks` בגרסאות ישנות יותר) ב-`framework/src/__tests__/`: מודולי
   התשתית, לוגיקה לא פשוטה של משחקים (כמו `balloon-stories` ו-`long-exercise`),
   פנימיות ה-service worker (`service-worker.test.js`), מניפסט הגרסה, ובדיקות
   שמירה כמו `no-meteg.test.js`.
 - **בדיקות דפדפן** (Playwright) ב-`e2e/`: לכל משחק, לדף הבית, לאופליין
-  (`pwa.spec.js`) ולמובייל. הפרויקטים: `chromium` (מחשב), ‏`mobile-chromium`
-  (Pixel 7) ו-`mobile-webkit` (iPhone 13), שני האחרונים לבדיקות המובייל,
-  החשבון ודף הבית.
+  (`pwa.spec.js`) ולמובייל. הפרויקטים: `chromium` (מחשב) מריץ הכול חוץ
+  מ-`mobile.spec.js`; ‏`mobile-chromium` (Pixel 7) מריץ רק את בדיקות הטלפון
+  ודף הבית; ‏`mobile-webkit` (iPhone 13) מריץ את בדיקות הטלפון, דף הבית,
+  החשבון והשברים. כל משחק ארוך רץ במלואו במחשב ובאייפון.
+- המתנות קבועות של המשחקים (מעבר סיבוב, משפט בסיפור) מדולגות בשעון המדומה של
+  Playwright (`page.clock`), כך שהבדיקות לא מחכות להן בזמן אמת. בדיקת "בלי קול"
+  של `balloon-stories` נשארת בזמן אמת.
 - בדיקות אופליין משתמשות ב-`e2e/network-server.js`, שרת אמיתי שאפשר לנתק.
   לא מעתיקים קוד ניתוק לתוך spec.
 - פנימיות ה-service worker נבדקות בבדיקות יחידה, לא בדפדפן.
@@ -162,7 +167,7 @@ framework/src/
 ## CI ופרסום
 
 - `.github/workflows/ci.yml` רץ על pull request (ואפשר להפעיל ידנית). הוא מריץ
-  את `.github/actions/verify`: ‏`npm ci`, התקנת דפדפנים ו-`npm run verify:ci`,
+  את `.github/actions/verify` על Node 22: ‏`npm ci`, התקנת דפדפנים ו-`npm run verify:ci`,
   כלומר lint, טיפוסים, בדיקות יחידה, בנייה נקייה, כל בדיקות הדפדפן, ובדיקה
   ש-`framework/dist` המחויב זהה לבנייה.
 - `.github/workflows/deploy.yml` רץ על דחיפה ל-`main`: אותה בדיקה, ואז העתקה
