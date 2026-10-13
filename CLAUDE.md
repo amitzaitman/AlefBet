@@ -42,9 +42,9 @@ scripts/          build, release manifest, check-dist, create-game
 
 ## Build and offline contract
 
-- Games load `../../framework/dist/runtime.js` and `runtime.css`.
+- Games load `../../framework/dist/runtime.js` (preloaded with `<link rel="modulepreload">`) and `runtime.css`. Fonts are separate files in `framework/dist/fonts/`; keep them out of the CSS so first load stays fast.
 - **After editing site code or assets, run `npm run build`** and commit `framework/dist/`. The owner decided (2026-10-13) to keep dist in git so games open without a build step; don't propose removing it.
-- The build writes `runtime-assets.js` (the entry and the files it imports, statically or on demand) and `release-manifest.js` (SHA-256 of every release file: home page, catalog, icons, runtime files and every file in every catalog game folder).
+- The build writes `runtime-assets.js` (the entry, its fonts and anything it imports) and `release-manifest.js` (SHA-256 of every release file: home page, catalog, icons, runtime files and every file in every catalog game folder).
 - Every file in a game folder is precached for offline play. Don't put tests, drafts or large unused files there.
 - `sw.js`: all-or-nothing verified install, no `skipWaiting`/`clients.claim` (updates wait for old tabs to close), cache-first only for release files; `refresh.html` triggers the adult "full refresh" (`refresh-assets` message).
 - Dev server: `node start.js` (or `start.bat` on Windows). Node 20+.
