@@ -42,15 +42,6 @@ export async function startGame(container) {
     playCorrectSound: false,
     onReplay: () => startGame(container),
     onStart: () => injectHeaderButton(container, '⚙️', 'הגדרות', () => showNikudSettingsDialog(container, startGame)),
-    // Rounds a teacher saved in the past still load (alefbet.editor.nikud-match).
-    editor: {
-      content: {
-        version: 1,
-        createRound: () => ({ target: nikudBaseLetters[0], correct: nikudList[0].id, correctEmoji: '' }),
-        validateRound: round => nikudBaseLetters.includes(round.target)
-          && nikudList.some(n => n.id === round.correct || n.name === round.correct),
-      },
-    },
     buildRound: ({ shell, round, onCorrect, isAnswered, subscribeAnswered, scope }) => {
       const targetNikud = nikudList.find(n => n.id === round.correct || n.name === round.correct) || randomNikud(1)[0];
       const letter = round.target || pickLetter();

@@ -5,13 +5,6 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await page.route('**/translate.google.com/**', route => route.abort());
   await page.route('**/translate_tts**', route => route.abort());
   await page.addInitScript(() => {
-    localStorage.setItem('alefbet.editor.letter-match-animals', JSON.stringify({
-      id: 'letter-match-animals', version: 1, meta: { type: 'multiple-choice' },
-      rounds: [
-        { id: 'a', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' },
-        { id: 'b', target: 'ב', correct: 'בֵּיצָה', correctEmoji: '🥚' },
-      ],
-    }));
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => undefined });
     HTMLAudioElement.prototype.play = () => Promise.reject(new DOMException('blocked', 'NotAllowedError'));
   });
@@ -27,9 +20,9 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
     await tts.speak('שלום');
   });
   await expect(page.locator('#alefbet-audio-status-banner')).toBeVisible();
-  await page.locator('[data-id="correct"]').tap();
-  await expect(page.locator('.letter-display')).toHaveText('ב');
-  await page.locator('[data-id="correct"]').tap();
+  for (let round = 0; round < 8; round++) {
+    await page.locator('[data-id="correct"]:enabled').tap();
+  }
   await expect(page.locator('.completion-screen')).toBeVisible();
   await page.locator('.completion-screen__replay').tap();
   await expect(cards).toHaveCount(4);
@@ -39,7 +32,7 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await page.reload();
   await expect(cards).toHaveCount(4);
   await page.locator('[data-id="correct"]').tap();
-  await expect(page.locator('.letter-display')).toHaveText('ב');
+  await expect(page.locator('.progress-bar__label')).toHaveText('1 / 8');
 });
 
 test('adult tools stay separate and feedback does not move the choices', async ({ page }) => {
@@ -74,32 +67,38 @@ test('adult tools stay separate and feedback does not move the choices', async (
 });
 
 test('nikud supports tap selection, retry, completion and returning home', async ({ page }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem('alefbet.editor.nikud-match', JSON.stringify({
-      id: 'nikud-match', version: 1, meta: { type: 'drag-match' },
-      rounds: [{ id: 'a', target: 'ב', correct: 'kamatz', correctEmoji: '' }],
-    }));
-  });
   await page.goto('/games/nikud-match/');
   const letter = page.locator('.nm-arena .nm-letter');
-  const correct = page.locator('.nm-zone[data-nikud="kamatz"]');
-  const wrong = page.locator('.nm-zone:not([data-nikud="kamatz"])');
+  const label = page.locator('.progress-bar__label');
+  // The nikud on the letter, read from the screen with the game's own nikud list.
+  const target = () => page.evaluate(async () => {
+    const { nikudList } = await import('/framework/dist/runtime.js');
+    const text = document.querySelector('.nm-arena .nm-letter').textContent;
+    const shown = [...document.querySelectorAll('.nm-zone')].map(zone => zone.dataset.nikud);
+    return nikudList.find(n => shown.includes(n.id) && text.includes(n.symbol)).id;
+  });
   await expect(letter).toBeVisible();
-  await correct.tap();
+  let nikud = await target();
+  const correct = () => page.locator(`.nm-zone[data-nikud="${nikud}"]`);
+  // Tapping a zone before choosing the letter does nothing; a wrong zone keeps the letter chosen.
+  await correct().tap();
   await expect(letter).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('.completion-screen')).toHaveCount(0);
   await letter.tap();
   await expect(letter).toHaveAttribute('aria-pressed', 'true');
-  await wrong.tap();
+  await page.locator(`.nm-zone:not([data-nikud="${nikud}"])`).tap();
   await expect(letter).toBeEnabled();
   await expect(letter).toHaveAttribute('aria-pressed', 'true');
-  await correct.tap();
-  await expect(page.locator('.completion-screen__score')).toHaveText('הִשְׁלַמְתֶּם מְשִׂימָה!');
-  await page.locator('.completion-screen__replay').tap();
-  await expect(page.locator('.nm-arena .nm-letter')).toHaveAttribute('aria-pressed', 'false');
-  await letter.tap();
-  await correct.tap();
-  await expect(page.locator('.completion-screen')).toBeVisible();
+  // Each answered letter is marked, so the next round is read only once it is on screen.
+  const answer = async () => { await letter.evaluate(el => { el.dataset.answered = ''; }); await correct().tap(); };
+  await answer();
+  for (let round = 1; round < 8; round++) {
+    await expect(page.locator('.nm-arena .nm-letter:not([data-answered])')).toBeVisible();
+    await expect(label).toHaveText(`${round} / 8`);
+    nikud = await target();
+    await letter.tap();
+    await answer();
+  }
+  await expect(page.locator('.completion-screen__score')).toHaveText('הִשְׁלַמְתֶּם 8 מְשִׂימוֹת!');
   await page.locator('.completion-screen__home').tap();
   await expect(page.locator('.games-grid').first()).toBeVisible();
 });

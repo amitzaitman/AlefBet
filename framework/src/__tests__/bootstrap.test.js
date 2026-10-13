@@ -1,9 +1,6 @@
 /**
- * bootstrapGame - שלושה נתיבים עיקריים:
- * 1) עם חוזה תוכן: סיבובים שמורים תקינים מחליפים את defaultRounds,
- *    ובלי תוכן שמור משחקים ב-defaultRounds.
- * 2) בלי חוזה תוכן: תוכן שמור לא נקרא.
- * 3) onBeforeHide מחזיר false: כל השלבים שאחריו לא רצים, aborted=true.
+ * bootstrapGame ו-runGame: הסיבובים שהמשחק מעביר, ביטול התחלה ישנה,
+ * ניקוי מאזינים ו-scope של סיבוב, ו-onBeforeHide שמבטל את האתחול.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
@@ -95,57 +92,24 @@ describe('bootstrapGame', () => {
     add.mockRestore();
     remove.mockRestore();
   });
-  const content = {
-    version: 1,
-    createRound: () => ({ target: 'א' }),
-    validateRound: round => typeof round.target === 'string',
-  };
-
-  it('plays saved rounds when the game has a content contract', async () => {
+  it('plays the rounds the game passes', async () => {
     const host = mountContainer();
-    const saved = [{ id: 'saved-1', target: 'ב', zones: [{ id: 'z', x: 1, y: 1, w: 5, h: 5 }] }];
-    localStorage.setItem('alefbet.editor.test-game', JSON.stringify({
-      id: 'test-game', version: 1, meta: { title: '', type: 'multiple-choice' }, rounds: saved, distractors: [],
-    }));
-
-    const result = await bootstrapGame(host, {
-      gameId: 'test-game',
-      title: 'בדיקה',
-      defaultRounds: [{ id: 'default', target: 'א' }],
-      editor: { content },
-    });
-
+    const rounds = [{ target: 'א' }, { target: 'ב' }];
+    const result = await bootstrapGame(host, { gameId: 'rounds', title: 'בדיקה', defaultRounds: rounds });
     expect(result.aborted).toBe(false);
-    // Rounds saved by the removed editor, zones included, still load.
-    expect(result.activeRounds).toEqual(saved);
-    expect(result.shell.state.totalRounds).toBe(1);
+    expect(result.activeRounds).toEqual(rounds);
+    expect(result.shell.state.totalRounds).toBe(2);
     expect(host.querySelector('.ab-loading')).toBeNull();
     expect(host.querySelector('.game-title')?.textContent).toBe('בדיקה');
-    // There is no editing UI any more.
-    expect(host.querySelector('.ab-lazy-editor')).toBeNull();
     expect(host.querySelector('.adult-tools')).toBeNull();
+    result.shell.end();
   });
 
-  it('plays the default rounds when nothing is saved', async () => {
-    const host = mountContainer();
-    const rounds = [{ id: 'default', target: 'א' }];
-    const result = await bootstrapGame(host, { gameId: 'test-empty', title: 'ריק', defaultRounds: rounds, editor: { content } });
-    expect(result.activeRounds).toEqual(rounds);
-  });
-
-  it('ignores saved content when the game has no content contract', async () => {
-    const host = mountContainer();
-    localStorage.setItem('alefbet.editor.test-no-editor', JSON.stringify({ id: 'test-no-editor', rounds: [{ id: 'x' }] }));
-
-    const result = await bootstrapGame(host, {
-      gameId: 'test-no-editor',
-      title: 'ללא תוכן שמור',
-      totalRounds: 8,
-    });
-
-    expect(result.aborted).toBe(false);
+  it('uses totalRounds when the game runs its own flow', async () => {
+    const result = await bootstrapGame(mountContainer(), { gameId: 'free', title: 'חופשי', totalRounds: 8 });
     expect(result.activeRounds).toEqual([]);
     expect(result.shell.state.totalRounds).toBe(8);
+    result.shell.end();
   });
 
   it('aborts when onBeforeHide returns false and keeps the loading screen intact', async () => {

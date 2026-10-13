@@ -1,21 +1,21 @@
-let C = null;
-function ie() {
+let A = null;
+function ee() {
   return typeof window > "u" ? null : window.AudioContext || /** @type {any} */
   window.webkitAudioContext || null;
 }
-function P() {
-  const e = ie();
+function D() {
+  const e = ee();
   if (!e) return null;
-  if (!C)
+  if (!A)
     try {
-      C = new e();
+      A = new e();
     } catch {
       return null;
     }
-  return C;
+  return A;
 }
-async function Fe() {
-  const e = P();
+async function Ie() {
+  const e = D();
   if (!e) return !1;
   try {
     e.state === "suspended" && await e.resume();
@@ -28,8 +28,8 @@ async function Fe() {
   }
   return e.state === "running";
 }
-async function oe() {
-  const e = P();
+async function te() {
+  const e = D();
   if (!e) return null;
   if (e.state === "suspended")
     try {
@@ -38,7 +38,7 @@ async function oe() {
     }
   return e.state === "running" ? e : null;
 }
-function ae(e) {
+function ne(e) {
   return typeof e.arrayBuffer == "function" ? e.arrayBuffer() : new Promise((t, n) => {
     const r = new FileReader();
     r.onload = () => t(
@@ -47,13 +47,13 @@ function ae(e) {
     ), r.onerror = () => n(r.error), r.readAsArrayBuffer(e);
   });
 }
-async function Xe(e, { signal: t } = {}) {
+async function De(e, { signal: t } = {}) {
   if (t != null && t.aborted || !e) return !1;
-  const n = await oe();
+  const n = await te();
   if (t != null && t.aborted || !n || typeof n.decodeAudioData != "function") return !1;
   let r;
   try {
-    const s = await ae(e);
+    const s = await ne(e);
     r = await new Promise((i, o) => {
       const a = n.decodeAudioData(s, i, o);
       a && typeof a.then == "function" && a.then(i, o);
@@ -63,9 +63,9 @@ async function Xe(e, { signal: t } = {}) {
   }
   return t != null && t.aborted ? !1 : new Promise((s) => {
     let i, o, a = !1;
-    const d = (l) => {
+    const c = (l) => {
       if (!a) {
-        if (a = !0, clearTimeout(o), t == null || t.removeEventListener("abort", c), i) {
+        if (a = !0, clearTimeout(o), t == null || t.removeEventListener("abort", d), i) {
           i.onended = null;
           try {
             i.stop(), i.disconnect();
@@ -74,16 +74,16 @@ async function Xe(e, { signal: t } = {}) {
         }
         s(l);
       }
-    }, c = () => d(!1);
+    }, d = () => c(!1);
     try {
-      i = n.createBufferSource(), i.buffer = r, i.connect(n.destination), i.onended = () => d(!0), t == null || t.addEventListener("abort", c, { once: !0 }), o = setTimeout(() => d(!0), (r.duration + 0.5) * 1e3), i.start(0);
+      i = n.createBufferSource(), i.buffer = r, i.connect(n.destination), i.onended = () => c(!0), t == null || t.addEventListener("abort", d, { once: !0 }), o = setTimeout(() => c(!0), (r.duration + 0.5) * 1e3), i.start(0);
     } catch {
-      d(!1);
+      c(!1);
     }
   });
 }
-const B = "alefbet-audio-status-banner";
-function de(e) {
+const P = "alefbet-audio-status-banner";
+function re(e) {
   switch (e) {
     case "awaiting-interaction":
       return { message: "הַקֵּשׁ כְּדֵי לְהַפְעִיל קוֹל", kind: "await" };
@@ -95,57 +95,57 @@ function de(e) {
       return null;
   }
 }
-function Ue(e = typeof document < "u" ? document.body : null, t = {}) {
+function He(e = typeof document < "u" ? document.body : null, t = {}) {
   const n = t.window || (typeof window < "u" ? window : null);
   if (!e || !n)
     return { destroy() {
     } };
-  const r = e.querySelector("#" + B);
+  const r = e.querySelector("#" + P);
   r && r.parentNode && r.parentNode.removeChild(r);
   const s = e.ownerDocument.createElement("div");
-  s.id = B, s.className = "alefbet-audio-banner", s.setAttribute("role", "status"), s.setAttribute("aria-live", "polite"), s.dir = "rtl", s.hidden = !0;
+  s.id = P, s.className = "alefbet-audio-banner", s.setAttribute("role", "status"), s.setAttribute("aria-live", "polite"), s.dir = "rtl", s.hidden = !0;
   const i = e.ownerDocument.createElement("span");
   i.className = "alefbet-audio-banner__msg", s.appendChild(i);
   const o = e.ownerDocument.createElement("button");
   o.type = "button", o.className = "alefbet-audio-banner__dismiss", o.setAttribute("aria-label", "סְגוֹר הוֹדָעָה"), o.textContent = "×", o.hidden = !0, s.appendChild(o), e.appendChild(s);
   let a = null;
-  function d() {
+  function c() {
     a && (clearTimeout(a), a = null);
   }
-  function c() {
-    d(), s.hidden = !0, s.classList.remove("is-visible", "is-await", "is-unsupported", "is-failed"), s.onclick = null, o.hidden = !0;
+  function d() {
+    c(), s.hidden = !0, s.classList.remove("is-visible", "is-await", "is-unsupported", "is-failed"), s.onclick = null, o.hidden = !0;
   }
-  function l(m) {
-    const u = de(m);
+  function l(h) {
+    const u = re(h);
     if (!u) {
-      c();
+      d();
       return;
     }
-    d(), i.textContent = u.message, s.hidden = !1, s.classList.add("is-visible"), s.classList.toggle("is-await", u.kind === "await"), s.classList.toggle("is-unsupported", u.kind === "unsupported"), s.classList.toggle("is-failed", u.kind === "failed"), u.kind, u.kind === "await" ? (s.onclick = () => {
+    c(), i.textContent = u.message, s.hidden = !1, s.classList.add("is-visible"), s.classList.toggle("is-await", u.kind === "await"), s.classList.toggle("is-unsupported", u.kind === "unsupported"), s.classList.toggle("is-failed", u.kind === "failed"), u.kind, u.kind === "await" ? (s.onclick = () => {
       try {
         e.ownerDocument.body.dispatchEvent(new MouseEvent("pointerdown", { bubbles: !0 }));
       } catch {
       }
-      c();
-    }, o.hidden = !0) : u.kind === "unsupported" ? (s.onclick = null, o.hidden = !1, o.onclick = (h) => {
-      h.stopPropagation(), c();
-    }) : u.kind === "failed" && (s.onclick = null, o.hidden = !0, a = setTimeout(() => c(), 6e3));
+      d();
+    }, o.hidden = !0) : u.kind === "unsupported" ? (s.onclick = null, o.hidden = !1, o.onclick = (m) => {
+      m.stopPropagation(), d();
+    }) : u.kind === "failed" && (s.onclick = null, o.hidden = !0, a = setTimeout(() => d(), 6e3));
   }
-  function f(m) {
-    const h = /** @type {CustomEvent} */ (m.detail || {}).state;
-    if (h === "ready" || h === "idle") {
-      c();
+  function f(h) {
+    const m = /** @type {CustomEvent} */ (h.detail || {}).state;
+    if (m === "ready" || m === "idle") {
+      d();
       return;
     }
-    l(h);
+    l(m);
   }
   return n.addEventListener("alefbet:tts-state", f), {
     destroy() {
-      n.removeEventListener("alefbet:tts-state", f), d(), s.parentNode && s.parentNode.removeChild(s);
+      n.removeEventListener("alefbet:tts-state", f), c(), s.parentNode && s.parentNode.removeChild(s);
     }
   };
 }
-class ue {
+class se {
   constructor() {
     this._handlers = {};
   }
@@ -162,7 +162,7 @@ class ue {
     return (this._handlers[t] || []).slice().forEach((r) => r(n)), this;
   }
 }
-class ce {
+class ie {
   constructor(t) {
     this._totalRounds = t, this._currentRound = 0, this._score = 0;
   }
@@ -195,43 +195,43 @@ class ce {
     return this._currentRound >= this._totalRounds;
   }
 }
-const le = "alefbet-zoom-lock", F = /* @__PURE__ */ new WeakSet();
-function $(e) {
+const oe = "alefbet-zoom-lock", O = /* @__PURE__ */ new WeakSet();
+function N(e) {
   e.cancelable && e.preventDefault();
 }
-function fe(e) {
+function ae(e) {
   const t = (
     /** @type {TouchEvent} */
     e.touches
   );
-  t && t.length > 1 && $(e);
+  t && t.length > 1 && N(e);
 }
-function he(e = typeof document < "u" ? document : null) {
-  if (!e || F.has(e)) return !1;
-  F.add(e), e.documentElement.classList.add(le);
+function ce(e = typeof document < "u" ? document : null) {
+  if (!e || O.has(e)) return !1;
+  O.add(e), e.documentElement.classList.add(oe);
   const t = { passive: !1 };
-  return e.addEventListener("gesturestart", $, t), e.addEventListener("gesturechange", $, t), e.addEventListener("touchmove", fe, t), !0;
+  return e.addEventListener("gesturestart", N, t), e.addEventListener("gesturechange", N, t), e.addEventListener("touchmove", ae, t), !0;
 }
-const S = /* @__PURE__ */ new WeakMap();
-function J(e) {
+const L = /* @__PURE__ */ new WeakMap();
+function Y(e) {
   var t;
-  (t = S.get(e)) == null || t.end();
+  (t = L.get(e)) == null || t.end();
 }
-class me {
+class ue {
   /**
    * @param {HTMLElement} containerEl - אלמנט המיכל
    * @param {object} config - הגדרות: { totalRounds, title, homeUrl }
    */
   constructor(t, n = {}) {
-    J(t), S.set(t, this), this.ended = !1, this._timers = /* @__PURE__ */ new Set(), this.container = t, this.config = {
+    Y(t), L.set(t, this), this.ended = !1, this._timers = /* @__PURE__ */ new Set(), this.container = t, this.config = {
       totalRounds: 8,
       title: "מִשְׂחָק",
       homeUrl: "../../index.html",
       ...n
-    }, this.events = new ue(), this.state = new ce(this.config.totalRounds), this.gameId = typeof n.gameId == "string" ? n.gameId : "", this._buildShell();
+    }, this.events = new se(), this.state = new ie(this.config.totalRounds), this.gameId = typeof n.gameId == "string" ? n.gameId : "", this._buildShell();
   }
   _buildShell() {
-    this.container.classList.add("alefbet-game"), he(this.container.ownerDocument);
+    this.container.classList.add("alefbet-game"), ce(this.container.ownerDocument);
     const t = this.config.homeUrl ? `<a href="${this.config.homeUrl}" class="game-back-btn" aria-label="סִפְרִיַּית מִשְׂחָקִים">🏠</a>` : '<div class="game-header__spacer"></div>';
     this.container.innerHTML = `
       <div class="game-header">
@@ -262,7 +262,7 @@ class me {
     if (!this.ended) {
       this.ended = !0;
       for (const n of this._timers) clearTimeout(n);
-      this._timers.clear(), S.get(this.container) === this && S.delete(this.container), this.events.emit("end", { score: t, state: this.state });
+      this._timers.clear(), L.get(this.container) === this && L.delete(this.container), this.events.emit("end", { score: t, state: this.state });
     }
   }
   /** פעולה מושהית מתבטלת אוטומטית בסיום או בהפעלה מחדש. */
@@ -295,7 +295,7 @@ class me {
     return this.events.on(t, n), this;
   }
 }
-function je(e) {
+function $e(e) {
   const t = [...e];
   for (let n = t.length - 1; n > 0; n--) {
     const r = Math.floor(Math.random() * (n + 1));
@@ -303,12 +303,12 @@ function je(e) {
   }
   return t;
 }
-function pe() {
-  const e = P();
+function de() {
+  const e = D();
   return e ? (e.state === "suspended" && e.resume(), e) : null;
 }
 function w(e, t, n = "sine", r = 0.3) {
-  const s = pe();
+  const s = de();
   if (s)
     try {
       const i = s.createOscillator(), o = s.createGain();
@@ -316,7 +316,7 @@ function w(e, t, n = "sine", r = 0.3) {
     } catch {
     }
 }
-const x = {
+const C = {
   /** צליל תשובה נכונה */
   correct() {
     w(523.25, 0.15), setTimeout(() => w(659.25, 0.2), 120), setTimeout(() => w(783.99, 0.3), 240);
@@ -333,7 +333,7 @@ const x = {
   click() {
     w(900, 0.04, "sine", 0.12);
   }
-}, X = {
+}, q = {
   shake: [
     { transform: "translateX(0)" },
     { transform: "translateX(-8px)" },
@@ -364,21 +364,21 @@ const x = {
     { transform: "scale(1.3) rotate(180deg)", opacity: "1" },
     { transform: "scale(1) rotate(360deg)", opacity: "1" }
   ]
-}, ge = {
+}, le = {
   shake: 420,
   bounce: 480,
   pulse: 600,
   fadeIn: 320,
   confetti: 700
 };
-function L(e, t) {
-  !e || !X[t] || e.animate(X[t], {
-    duration: ge[t] || 400,
+function R(e, t) {
+  !e || !q[t] || e.animate(q[t], {
+    duration: le[t] || 400,
     easing: "ease-in-out",
     fill: "none"
   });
 }
-function z(e, t) {
+function fe(e, t) {
   const n = [];
   function r() {
     try {
@@ -391,33 +391,33 @@ function z(e, t) {
   function s(a) {
     try {
       localStorage.setItem(e, JSON.stringify(a));
-    } catch (d) {
-      return console.warn(`[createLocalState] שגיאה בשמירת "${e}":`, d), !1;
+    } catch (c) {
+      return console.warn(`[createLocalState] שגיאה בשמירת "${e}":`, c), !1;
     }
-    return n.forEach((d) => d(a)), !0;
+    return n.forEach((c) => c(a)), !0;
   }
   function i(a) {
     return s(a(r()));
   }
   function o(a) {
     return n.push(a), function() {
-      const c = n.indexOf(a);
-      c !== -1 && n.splice(c, 1);
+      const d = n.indexOf(a);
+      d !== -1 && n.splice(d, 1);
     };
   }
   return { get: r, set: s, update: i, subscribe: o };
 }
-const _e = "alefbet.progress.v1", O = z(_e, {});
-function K(e, t) {
+const me = "alefbet.progress.v1", H = fe(me, {});
+function j(e, t) {
   if (!Number.isFinite(e) || !Number.isFinite(t) || t <= 0) return 1;
   const n = e / t;
   return n >= 0.8 ? 3 : n >= 0.5 ? 2 : 1;
 }
-function be(e, { score: t, total: n }) {
+function he(e, { score: t, total: n }) {
   if (!e || !Number.isFinite(t) || !Number.isFinite(n) || n <= 0) return null;
-  const r = K(t, n);
+  const r = j(t, n);
   let s = null;
-  return O.update((i) => {
+  return H.update((i) => {
     const o = i[e];
     return s = {
       plays: ((o == null ? void 0 : o.plays) ?? 0) + 1,
@@ -428,16 +428,16 @@ function be(e, { score: t, total: n }) {
     }, { ...i, [e]: s };
   }), s;
 }
-function Ge(e) {
-  return O.get()[e] ?? null;
+function Pe(e) {
+  return H.get()[e] ?? null;
 }
-function Ye() {
-  return O.get();
+function Oe() {
+  return H.get();
 }
-function ye(e, t, n, r, s = {}) {
-  x.cheer(), s.gameId && be(s.gameId, { score: t, total: n });
-  const i = s.completionOnly ? n === 1 ? "הִשְׁלַמְתֶּם מְשִׂימָה!" : `הִשְׁלַמְתֶּם ${n} מְשִׂימוֹת!` : `נִיקּוּד: ${t} מִתּוֹךְ ${n}`, o = K(t, n), a = "⭐".repeat(o) + "☆".repeat(3 - o), d = document.createElement("div");
-  d.className = "completion-screen", d.innerHTML = `
+function pe(e, t, n, r, s = {}) {
+  C.cheer(), s.gameId && he(s.gameId, { score: t, total: n });
+  const i = s.completionOnly ? n === 1 ? "הִשְׁלַמְתֶּם מְשִׂימָה!" : `הִשְׁלַמְתֶּם ${n} מְשִׂימוֹת!` : `נִיקּוּד: ${t} מִתּוֹךְ ${n}`, o = j(t, n), a = "⭐".repeat(o) + "☆".repeat(3 - o), c = document.createElement("div");
+  c.className = "completion-screen", c.innerHTML = `
     <div class="completion-screen__content">
       <div class="completion-screen__stars" aria-label="${o} כּוֹכָבִים">${a}</div>
       <h2 class="completion-screen__title">כָּל הַכָּבוֹד!</h2>
@@ -447,52 +447,52 @@ function ye(e, t, n, r, s = {}) {
       </div>
     </div>
   `;
-  const c = s.homeUrl === void 0 ? "../../index.html" : s.homeUrl;
-  if (c) {
+  const d = s.homeUrl === void 0 ? "../../index.html" : s.homeUrl;
+  if (d) {
     const l = document.createElement("a");
-    l.className = "completion-screen__home btn", l.href = c, l.textContent = "בְּחִירַת מִשְׂחָק", d.querySelector(".completion-screen__actions").appendChild(l);
+    l.className = "completion-screen__home btn", l.href = d, l.textContent = "בְּחִירַת מִשְׂחָק", c.querySelector(".completion-screen__actions").appendChild(l);
   }
-  d.querySelector(".completion-screen__replay").addEventListener("click", () => {
-    d.remove(), r();
-  }), e.innerHTML = "", e.appendChild(d), L(d.querySelector(".completion-screen__content"), "fadeIn");
+  c.querySelector(".completion-screen__replay").addEventListener("click", () => {
+    c.remove(), r();
+  }), e.innerHTML = "", e.appendChild(c), R(c.querySelector(".completion-screen__content"), "fadeIn");
 }
-function we(e, t, {
+function be(e, t, {
   totalRounds: n,
   progressBar: r = null,
   buildRoundUI: s,
   onCorrect: i,
   onWrong: o,
   transitionMs: a = 800,
-  playCorrectSound: d = !0,
-  completionOnly: c = !1,
+  playCorrectSound: c = !0,
+  completionOnly: d = !1,
   onReplay: l = () => location.reload()
 }) {
   let f = !1;
-  const m = /* @__PURE__ */ new Set();
+  const h = /* @__PURE__ */ new Set();
   function u(p) {
-    f = p || e.ended, m.forEach((q) => q(f));
+    f = p || e.ended, h.forEach(($) => $(f));
   }
-  function h(p) {
-    return m.add(p), p(f || e.ended), () => {
-      m.delete(p);
+  function m(p) {
+    return h.add(p), p(f || e.ended), () => {
+      h.delete(p);
     };
   }
   e.on("end", () => {
-    u(!0), m.clear();
+    u(!0), h.clear();
   });
-  async function y(p) {
+  async function _(p) {
     if (f || e.ended) return;
-    u(!0), d && x.correct();
+    u(!0), c && C.correct();
     try {
       if (p && await p(), e.ended) return;
       i && await i();
-    } catch (se) {
-      throw u(!1), se;
+    } catch (Q) {
+      throw u(!1), Q;
     }
     if (e.ended || (e.state.addScore(1), r == null || r.update(e.state.currentRound), !await e.delay(a))) return;
-    e.nextRound() ? (u(!1), s()) : ye(t, e.state.score, n, l, { gameId: e.gameId, completionOnly: c, homeUrl: e.config.homeUrl });
+    e.nextRound() ? (u(!1), s()) : pe(t, e.state.score, n, l, { gameId: e.gameId, completionOnly: d, homeUrl: e.config.homeUrl });
   }
-  async function te(p) {
+  async function Z(p) {
     if (!(f || e.ended)) {
       u(!0);
       try {
@@ -502,15 +502,15 @@ function we(e, t, {
       }
     }
   }
-  function ne() {
+  function K() {
     return f;
   }
-  function re() {
+  function V() {
     u(!1);
   }
-  return { handleCorrect: y, handleWrong: te, isAnswered: ne, reset: re, subscribe: h };
+  return { handleCorrect: _, handleWrong: Z, isAnswered: K, reset: V, subscribe: m };
 }
-function ve() {
+function ge() {
   const e = new AbortController(), t = /* @__PURE__ */ new Set();
   function n(r) {
     e.signal.aborted ? r() : t.add(r);
@@ -549,7 +549,7 @@ function ve() {
     }
   };
 }
-function Ee(e, t) {
+function ye(e, t) {
   const n = document.createElement("div");
   n.className = "progress-bar", n.setAttribute("role", "progressbar"), n.setAttribute("aria-valuemin", "0"), n.setAttribute("aria-valuemax", String(t)), n.innerHTML = `
     <div class="progress-bar__track">
@@ -573,21 +573,21 @@ function Ee(e, t) {
     }
   };
 }
-let k = !1, D = !1, E = null;
-const Re = [
+let x = !1, I = !1, E = null;
+const _e = [
   "ResizeObserver loop",
   // אזהרת דפדפן שפירה
   "Script error."
   // שגיאת cross-origin אטומה, לרוב תוסף דפדפן
 ];
-function U(e) {
+function B(e) {
   const t = String(e || "");
-  return Re.some((n) => t.includes(n));
+  return _e.some((n) => t.includes(n));
 }
-function j() {
+function F() {
   var t;
-  if (D || typeof document > "u" || !document.body) return;
-  D = !0;
+  if (I || typeof document > "u" || !document.body) return;
+  I = !0;
   const e = document.createElement("div");
   e.className = "ab-error-screen", e.setAttribute("role", "alert"), e.dir = "rtl", e.innerHTML = `
     <div class="ab-error-screen__card">
@@ -603,249 +603,96 @@ function j() {
     }
   }), document.body.appendChild(e);
 }
-function Se() {
+function we() {
   if (typeof window > "u") return { destroy() {
   } };
-  if (k) return { destroy() {
+  if (x) return { destroy() {
   } };
-  k = !0;
+  x = !0;
   const e = (n) => {
-    U(n == null ? void 0 : n.message) || (console.error("[alefbet] uncaught error:", (n == null ? void 0 : n.error) ?? (n == null ? void 0 : n.message)), j());
+    B(n == null ? void 0 : n.message) || (console.error("[alefbet] uncaught error:", (n == null ? void 0 : n.error) ?? (n == null ? void 0 : n.message)), F());
   }, t = (n) => {
     const r = (
       /** @type {any} */
       n == null ? void 0 : n.reason
     );
-    U((r == null ? void 0 : r.message) ?? r) || (console.error("[alefbet] unhandled rejection:", r), j());
+    B((r == null ? void 0 : r.message) ?? r) || (console.error("[alefbet] unhandled rejection:", r), F());
   };
   return window.addEventListener("error", e), window.addEventListener("unhandledrejection", t), E = () => {
-    window.removeEventListener("error", e), window.removeEventListener("unhandledrejection", t), k = !1, D = !1;
+    window.removeEventListener("error", e), window.removeEventListener("unhandledrejection", t), x = !1, I = !1;
   }, { destroy: () => {
     E == null || E(), E = null;
   } };
 }
-function Le(e, t = "טוֹעֵן...") {
+function ve(e, t = "טוֹעֵן...") {
   e.innerHTML = `<div class="ab-loading">${t}</div>`;
 }
-function xe(e) {
+function Ee(e) {
   e.innerHTML = "";
 }
-function T(e) {
-  return e !== null && typeof e == "object" && !Array.isArray(e);
-}
-function G(e) {
-  if (!T(e) || typeof e.id != "string" || !e.id || !Array.isArray(e.rounds) || !e.rounds.every(T) || e.meta !== void 0 && !T(e.meta) || e.distractors !== void 0 && !Array.isArray(e.distractors))
-    throw new Error("Invalid game content");
-  const t = e.version ?? 1;
-  if (!Number.isInteger(t) || Number(t) < 1) throw new Error("Invalid content version");
-  const n = /* @__PURE__ */ new Set();
-  for (const r of e.rounds)
-    if (r.id !== void 0) {
-      if (typeof r.id != "string" || !r.id || n.has(r.id)) throw new Error("Invalid round id");
-      n.add(r.id);
-    }
-  return { ...e, version: t };
-}
-let Ae = 0;
-function I() {
-  return `round-${Date.now()}-${Ae++}`;
-}
-class A {
-  // redo stack
-  constructor(t, n) {
-    this._contract = n, this._id = t.id ?? "game", this._version = t.version ?? 1, this._meta = { title: "", type: "multiple-choice", ...t.meta ?? {} }, this._rounds = (t.rounds ?? []).map((r) => ({ ...r, id: r.id || I() })), this._distractors = t.distractors ?? [], this._handlers = [], this._past = [], this._future = [];
-  }
-  // ── Identity ──────────────────────────────────────────────────────────────
-  get id() {
-    return this._id;
-  }
-  get meta() {
-    return { ...this._meta };
-  }
-  get distractors() {
-    return [...this._distractors];
-  }
-  // ── Rounds (read) ─────────────────────────────────────────────────────────
-  get rounds() {
-    return [...this._rounds];
-  }
-  getRound(t) {
-    return this._rounds.find((n) => n.id === t) ?? null;
-  }
-  getRoundIndex(t) {
-    return this._rounds.findIndex((n) => n.id === t);
-  }
-  // ── Rounds (write) ────────────────────────────────────────────────────────
-  updateRound(t, n) {
-    const r = this.getRoundIndex(t);
-    r !== -1 && (this._saveHistory(), this._rounds[r] = { ...this._rounds[r], ...n }, this._emit());
-  }
-  addRound(t = null) {
-    var r;
-    this._saveHistory();
-    const n = { ...(r = this._contract) == null ? void 0 : r.createRound(), id: I() };
-    if (t === null)
-      this._rounds.push(n);
-    else {
-      const s = this.getRoundIndex(t);
-      this._rounds.splice(s + 1, 0, n);
-    }
-    return this._emit(), n.id;
-  }
-  duplicateRound(t) {
-    const n = this.getRound(t);
-    if (!n) return null;
-    this._saveHistory();
-    const r = { ...n, id: I() };
-    return this._rounds.splice(this.getRoundIndex(t) + 1, 0, r), this._emit(), r.id;
-  }
-  removeRound(t) {
-    const n = this.getRoundIndex(t);
-    n === -1 || this._rounds.length <= 1 || (this._saveHistory(), this._rounds.splice(n, 1), this._emit());
-  }
-  moveRound(t, n) {
-    const r = this.getRoundIndex(t);
-    if (r === -1) return;
-    this._saveHistory();
-    const [s] = this._rounds.splice(r, 1);
-    this._rounds.splice(Math.max(0, Math.min(n, this._rounds.length)), 0, s), this._emit();
-  }
-  // ── Undo / Redo ───────────────────────────────────────────────────────────
-  get canUndo() {
-    return this._past.length > 0;
-  }
-  get canRedo() {
-    return this._future.length > 0;
-  }
-  undo() {
-    this.canUndo && (this._future.push(this._snapshot()), this._rounds = this._past.pop(), this._emit());
-  }
-  redo() {
-    this.canRedo && (this._past.push(this._snapshot()), this._rounds = this._future.pop(), this._emit());
-  }
-  _saveHistory() {
-    this._past.push(this._snapshot()), this._future = [], this._past.length > 50 && this._past.shift();
-  }
-  _snapshot() {
-    return this._rounds.map((t) => ({ ...t }));
-  }
-  // ── Change events ─────────────────────────────────────────────────────────
-  onChange(t) {
-    return this._handlers.push(t), () => this.offChange(t);
-  }
-  offChange(t) {
-    const n = this._handlers.indexOf(t);
-    n !== -1 && this._handlers.splice(n, 1);
-  }
-  _emit() {
-    this._handlers.forEach((t) => t(this));
-  }
-  // ── Serialisation ─────────────────────────────────────────────────────────
-  toJSON() {
-    return {
-      id: this._id,
-      version: this._version,
-      meta: { ...this._meta },
-      rounds: this._snapshot(),
-      distractors: [...this._distractors]
-    };
-  }
-  validate() {
-    return !this._contract || this._rounds.every((t) => this._contract.validateRound(t));
-  }
-  static fromJSON(t, n) {
-    let r = G(t);
-    const s = (n == null ? void 0 : n.version) ?? 1;
-    if (r.version < s && (n != null && n.migrate)) {
-      const o = r.id;
-      if (r = G(n.migrate(r)), r.id !== o) throw new Error("Migration changed game identity");
-    }
-    if (r.version !== s) throw new Error("Unsupported content version");
-    const i = new A(r, n);
-    if (!i.validate()) throw new Error("Invalid round content");
-    return i;
-  }
-  static fromRoundsArray(t, n, r = {}, s = [], i) {
-    return new A({ id: t, meta: r, rounds: n, distractors: s, version: (i == null ? void 0 : i.version) ?? 1 }, i);
-  }
-}
-const Ce = "alefbet.editor.";
-function ke(e) {
-  return z(`${Ce}${e}`, null);
-}
-function Te(e, t) {
-  const n = ke(e).get();
-  if (!n) return null;
-  try {
-    const r = A.fromJSON(n, t);
-    return r.id === e ? r : null;
-  } catch {
-    return null;
-  }
-}
-const M = /* @__PURE__ */ new WeakMap();
-async function Ie(e, t) {
-  J(e);
+const T = /* @__PURE__ */ new WeakMap();
+async function Se(e, t) {
+  Y(e);
   const n = {};
-  M.set(e, n), Se(), Le(e, t.loadingMessage ?? "טוֹעֵן...");
-  const r = t.audio !== !1 ? await import("./game-audio-Cwpuytb0.js").then((a) => a.e) : null;
-  if (M.get(e) !== n)
+  T.set(e, n), we(), ve(e, t.loadingMessage ?? "טוֹעֵן...");
+  const r = t.audio !== !1 ? await import("./game-audio-Cwpuytb0.js").then((o) => o.e) : null;
+  if (T.get(e) !== n)
     return { shell: null, activeRounds: [], aborted: !0 };
-  if (t.onBeforeHide && (await t.onBeforeHide() === !1 || M.get(e) !== n))
+  if (t.onBeforeHide && (await t.onBeforeHide() === !1 || T.get(e) !== n))
     return { shell: null, activeRounds: [], aborted: !0 };
-  xe(e);
-  const s = t.editor ? Te(t.gameId, t.editor.content) : null, i = s != null && s.rounds.length ? s.rounds : t.defaultRounds ?? [], o = new me(e, {
-    totalRounds: t.totalRounds ?? i.length,
+  Ee(e);
+  const s = t.defaultRounds ?? [], i = new ue(e, {
+    totalRounds: t.totalRounds ?? s.length,
     title: t.title,
     gameId: t.gameId
   });
-  return r == null || r.attachGameAudio(o), { shell: o, activeRounds: i, aborted: !1 };
+  return r == null || r.attachGameAudio(i), { shell: i, activeRounds: s, aborted: !1 };
 }
-async function Me(e, t) {
-  const n = await Ie(e, t);
+async function Le(e, t) {
+  const n = await Se(e, t);
   if (n.aborted) return n;
   const { shell: r, activeRounds: s } = n;
   if (!s.length)
     return r.bodyEl.textContent = "אֵין סִבּוּבִים לַמִּשְׂחָק.", r.end(), n;
-  const i = Ee(r.footerEl, s.length);
+  const i = ye(r.footerEl, s.length);
   let o;
   const a = () => {
     o == null || o.dispose(), o = void 0;
-  }, d = we(r, e, {
+  }, c = be(r, e, {
     totalRounds: s.length,
     completionOnly: !0,
     progressBar: i,
     transitionMs: t.transitionMs,
     playCorrectSound: t.playCorrectSound,
     onReplay: t.onReplay ?? (() => {
-      Me(e, t);
+      Le(e, t);
     }),
-    buildRoundUI: c
+    buildRoundUI: d
   });
   r.on("end", a), r.on("start", () => {
     var l;
-    i.update(0), (l = t.onStart) == null || l.call(t, r), d.reset();
-  }), r.on("start", c);
-  function c() {
+    i.update(0), (l = t.onStart) == null || l.call(t, r), c.reset();
+  }), r.on("start", d);
+  function d() {
     a(), r.bodyEl.innerHTML = "";
-    const l = ve();
+    const l = ge();
     o = l;
-    const f = () => !r.ended && !l.signal.aborted, m = r.state.currentRound - 1;
+    const f = () => !r.ended && !l.signal.aborted, h = r.state.currentRound - 1;
     try {
       const u = t.buildRound({
         shell: r,
-        index: m,
-        round: s[m],
+        index: h,
+        round: s[h],
         isActive: f,
         scope: l,
-        isAnswered: () => !f() || d.isAnswered(),
-        subscribeAnswered: (h) => f() ? l.use(d.subscribe(h)) : (h(!0), () => {
+        isAnswered: () => !f() || c.isAnswered(),
+        subscribeAnswered: (m) => f() ? l.use(c.subscribe(m)) : (m(!0), () => {
         }),
-        onCorrect: async (h) => {
-          f() && await d.handleCorrect(h);
+        onCorrect: async (m) => {
+          f() && await c.handleCorrect(m);
         },
-        onWrong: async (h) => {
-          f() && await d.handleWrong(h);
+        onWrong: async (m) => {
+          f() && await c.handleWrong(m);
         },
         schedule: l.schedule
       });
@@ -856,7 +703,7 @@ async function Me(e, t) {
   }
   return r.start(), n;
 }
-function Ne(e, t, n) {
+function Re(e, t, n) {
   e.innerHTML = "";
   const r = document.createElement("div");
   r.className = "option-cards-grid";
@@ -865,22 +712,22 @@ function Ne(e, t, n) {
     o.className = "option-card", o.dataset.id = i.id, o.type = "button";
     const a = document.createElement("span");
     a.className = "option-card__emoji", a.textContent = i.emoji || "";
-    const d = document.createElement("span");
-    return d.className = "option-card__text", d.textContent = i.text, o.append(a, d), o.addEventListener("click", () => {
+    const c = document.createElement("span");
+    return c.className = "option-card__text", c.textContent = i.text, o.append(a, c), o.addEventListener("click", () => {
       o.disabled || n(i);
     }), r.appendChild(o), { el: o, option: i };
   });
   return e.appendChild(r), {
     /** הַדָּגֵשׁ כַּרְטִיס לְפִי סוּג: 'correct' | 'wrong' | 'hint' */
     highlight(i, o) {
-      s.forEach(({ el: a, option: d }) => {
-        d.id === i && a.classList.add(`option-card--${o}`);
+      s.forEach(({ el: a, option: c }) => {
+        c.id === i && a.classList.add(`option-card--${o}`);
       });
     },
     /** Visual hints never change the answer lock or other highlights. */
     clearHighlight(i, o) {
-      s.forEach(({ el: a, option: d }) => {
-        d.id === i && a.classList.remove(`option-card--${o}`);
+      s.forEach(({ el: a, option: c }) => {
+        c.id === i && a.classList.remove(`option-card--${o}`);
       });
     },
     setDisabled(i) {
@@ -906,8 +753,8 @@ function Ne(e, t, n) {
     }
   };
 }
-function We(e, t, n) {
-  const r = e.scope.use(Ne(t, n.options, (s) => {
+function qe(e, t, n) {
+  const r = e.scope.use(Re(t, n.options, (s) => {
     e.isAnswered() || (n.isCorrect(s) ? e.onCorrect(() => {
       var i;
       return r.highlight(s.id, "correct"), (i = n.onCorrect) == null ? void 0 : i.call(n, s);
@@ -918,7 +765,7 @@ function We(e, t, n) {
   }));
   return e.subscribeAnswered((s) => r.setDisabled(s)), { highlight: r.highlight, clearHighlight: r.clearHighlight };
 }
-function Je({ hintAfter: e = 2, escalateAfter: t = 4, onHint: n, onEscalate: r } = {}) {
+function Be({ hintAfter: e = 2, escalateAfter: t = 4, onHint: n, onEscalate: r } = {}) {
   let s = 0;
   function i(o) {
     return o >= t ? 2 : o >= e ? 1 : 0;
@@ -944,26 +791,26 @@ function Je({ hintAfter: e = 2, escalateAfter: t = 4, onHint: n, onEscalate: r }
     }
   };
 }
-const Y = [
+const X = [
   "כָּל הַכָּבוֹד",
   "מְצֻיָּן",
   "יֹפִי",
   "נֶהְדָּר",
   "וָאוּ",
   "אֵיזֶה כֵּיף"
-], W = [
+], G = [
   "נַסּוּ שׁוּב, אַתֶּם יְכוֹלִים",
   "כִּמְעַט! הַקְשִׁיבוּ שׁוּב",
   "עוֹד נִסָּיוֹן קָטָן",
   "קְרוֹבִים מְאֹד"
 ];
-function He() {
-  return Y[Math.floor(Math.random() * Y.length)];
+function Ce() {
+  return X[Math.floor(Math.random() * X.length)];
 }
-function ze() {
-  return W[Math.floor(Math.random() * W.length)];
+function Fe() {
+  return G[Math.floor(Math.random() * G.length)];
 }
-function Ke(e) {
+function Xe(e) {
   const t = document.createElement("div");
   t.className = "feedback-message", t.setAttribute("aria-live", "polite"), t.setAttribute("role", "status"), e.appendChild(t);
   let n = null;
@@ -975,15 +822,15 @@ function Ke(e) {
   return {
     /** הצג משוב חיובי - טקסט מפורש, או ביטוי שבח אקראי אם לא סופק */
     correct(s) {
-      x.correct(), r(s ?? `!${He()}`, "correct"), L(t, "bounce");
+      C.correct(), r(s ?? `!${Ce()}`, "correct"), R(t, "bounce");
     },
     /** הצג עידוד — נסה שוב */
     wrong(s = "נַסֵּה שׁוּב") {
-      x.wrong(), r(s, "wrong"), L(t, "pulse");
+      C.wrong(), r(s, "wrong"), R(t, "pulse");
     },
     /** הצג רמז */
     hint(s) {
-      r(s, "hint"), L(t, "pulse");
+      r(s, "hint"), R(t, "pulse");
     },
     /** הסר את הרכיב */
     destroy() {
@@ -991,7 +838,7 @@ function Ke(e) {
     }
   };
 }
-function $e(e) {
+function Ae(e) {
   let t = e.querySelector(".adult-tools__panel");
   if (t) return t;
   const n = e.querySelector(".game-header");
@@ -1001,8 +848,8 @@ function $e(e) {
     s.key === "Escape" && (r.open = !1, r.querySelector("summary").focus(), s.stopPropagation());
   }), n.appendChild(r), r.querySelector(".adult-tools__panel");
 }
-function Ze(e, t, n, r) {
-  const s = $e(e);
+function Ge(e, t, n, r) {
+  const s = Ae(e);
   if (!s) return null;
   const i = document.createElement("button");
   return i.className = "btn", i.setAttribute("aria-label", n), i.textContent = `${t} ${n}`, i.onclick = (o) => {
@@ -1010,16 +857,16 @@ function Ze(e, t, n, r) {
     a && (a.open = !1), r(o);
   }, s.appendChild(i), i;
 }
-let b = null, g = null, Z = 0, V = 0, v = null, N = 0, H = 0;
-const R = /* @__PURE__ */ new Map();
-function Q(e, t) {
+let y = null, b = null, U = 0, W = 0, v = null, k = 0, M = 0;
+const S = /* @__PURE__ */ new Map();
+function z(e, t) {
   var r;
   const n = (r = document.elementFromPoint(e, t)) == null ? void 0 : r.closest('[data-drop-target="true"]');
-  return n && R.has(n) && !n.matches(":disabled") && n.getAttribute("aria-disabled") !== "true" ? n : null;
+  return n && S.has(n) && !n.matches(":disabled") && n.getAttribute("aria-disabled") !== "true" ? n : null;
 }
-function De(e, t, n) {
+function xe(e, t, n) {
   const r = e.getBoundingClientRect();
-  Z = r.width / 2, V = r.height / 2, g = e.cloneNode(!0), g.setAttribute("aria-hidden", "true"), g.setAttribute("tabindex", "-1"), Object.assign(g.style, {
+  U = r.width / 2, W = r.height / 2, b = e.cloneNode(!0), b.setAttribute("aria-hidden", "true"), b.setAttribute("tabindex", "-1"), Object.assign(b.style, {
     position: "fixed",
     left: "0",
     top: "0",
@@ -1036,106 +883,106 @@ function De(e, t, n) {
     transition: "none",
     willChange: "transform"
     // מקדם שכבת compositor מראש - בלי זה הפריים הראשון של תזוזה עלול לגמגם
-  }), ee(t, n), document.body.appendChild(g);
+  }), J(t, n), document.body.appendChild(b);
 }
-function ee(e, t) {
-  g && (g.style.transform = `translate3d(${e - Z}px, ${t - V}px, 0) scale(1.12)`);
+function J(e, t) {
+  b && (b.style.transform = `translate3d(${e - U}px, ${t - W}px, 0) scale(1.12)`);
 }
-function Pe(e, t) {
-  N = e, H = t, v === null && (v = requestAnimationFrame(() => {
-    v = null, ee(N, H), qe(Q(N, H));
+function Te(e, t) {
+  k = e, M = t, v === null && (v = requestAnimationFrame(() => {
+    v = null, J(k, M), Me(z(k, M));
   }));
 }
-function Oe() {
-  v !== null && (cancelAnimationFrame(v), v = null), g == null || g.remove(), g = null;
+function ke() {
+  v !== null && (cancelAnimationFrame(v), v = null), b == null || b.remove(), b = null;
 }
-let _ = null;
-function qe(e) {
-  _ !== e && (_ == null || _.classList.remove("drop-target--hover"), _ = e, e == null || e.classList.add("drop-target--hover"));
+let g = null;
+function Me(e) {
+  g !== e && (g == null || g.classList.remove("drop-target--hover"), g = e, e == null || e.classList.add("drop-target--hover"));
 }
-function Be() {
-  _ == null || _.classList.remove("drop-target--hover"), _ = null;
+function Ne() {
+  g == null || g.classList.remove("drop-target--hover"), g = null;
 }
-function Ve(e, t, { onTap: n } = {}) {
+function Ye(e, t, { onTap: n } = {}) {
   e.classList.add("drag-source");
   let r = null, s = null, i = null, o = null;
   function a() {
     var l;
-    r && (e.removeEventListener("pointermove", r), e.removeEventListener("pointerup", s), e.removeEventListener("pointercancel", i), e.removeEventListener("lostpointercapture", i), r = s = i = null), Be(), Oe(), e.classList.remove("drag-source--dragging"), b = null;
-    const c = o;
-    o = null, c !== null && ((l = e.hasPointerCapture) != null && l.call(e, c)) && e.releasePointerCapture(c);
+    r && (e.removeEventListener("pointermove", r), e.removeEventListener("pointerup", s), e.removeEventListener("pointercancel", i), e.removeEventListener("lostpointercapture", i), r = s = i = null), Ne(), ke(), e.classList.remove("drag-source--dragging"), y = null;
+    const d = o;
+    o = null, d !== null && ((l = e.hasPointerCapture) != null && l.call(e, d)) && e.releasePointerCapture(d);
   }
-  function d(c) {
-    if (e.matches(":disabled") || e.getAttribute("aria-disabled") === "true" || c.button !== void 0 && c.button !== 0 || o !== null) return;
-    c.preventDefault(), b && b.cancel(), b = { el: e, data: t, cancel: a }, o = c.pointerId;
+  function c(d) {
+    if (e.matches(":disabled") || e.getAttribute("aria-disabled") === "true" || d.button !== void 0 && d.button !== 0 || o !== null) return;
+    d.preventDefault(), y && y.cancel(), y = { el: e, data: t, cancel: a }, o = d.pointerId;
     let l = !1;
     const f = () => {
-      l = !0, e.classList.add("drag-source--dragging"), De(e, c.clientX, c.clientY);
-    }, m = (u) => Math.hypot(u.clientX - c.clientX, u.clientY - c.clientY) >= 8;
-    n || f(), e.setPointerCapture(c.pointerId), r = (u) => {
-      u.pointerId === o && (!l && m(u) && f(), l && Pe(u.clientX, u.clientY));
+      l = !0, e.classList.add("drag-source--dragging"), xe(e, d.clientX, d.clientY);
+    }, h = (u) => Math.hypot(u.clientX - d.clientX, u.clientY - d.clientY) >= 8;
+    n || f(), e.setPointerCapture(d.pointerId), r = (u) => {
+      u.pointerId === o && (!l && h(u) && f(), l && Te(u.clientX, u.clientY));
     }, s = (u) => {
       if (u.pointerId !== o) return;
-      const h = !l && !m(u), y = h && n ? null : Q(u.clientX, u.clientY);
-      if (a(), h && n) {
+      const m = !l && !h(u), _ = m && n ? null : z(u.clientX, u.clientY);
+      if (a(), m && n) {
         n();
         return;
       }
-      y && R.has(y) && R.get(y).onDrop({ data: t, sourceEl: e, targetEl: y });
+      _ && S.has(_) && S.get(_).onDrop({ data: t, sourceEl: e, targetEl: _ });
     }, i = (u) => {
       u.pointerId === o && a();
     }, e.addEventListener("pointermove", r), e.addEventListener("pointerup", s), e.addEventListener("pointercancel", i), e.addEventListener("lostpointercapture", i);
   }
-  return e.addEventListener("pointerdown", d), {
+  return e.addEventListener("pointerdown", c), {
     destroy() {
-      e.removeEventListener("pointerdown", d), (b == null ? void 0 : b.el) === e && a(), e.classList.remove("drag-source");
+      e.removeEventListener("pointerdown", c), (y == null ? void 0 : y.el) === e && a(), e.classList.remove("drag-source");
     }
   };
 }
-function Qe(e, t) {
-  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), R.set(e, { onDrop: t }), {
+function je(e, t) {
+  return e.setAttribute("data-drop-target", "true"), e.classList.add("drop-target--active"), S.set(e, { onDrop: t }), {
     destroy() {
-      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), R.delete(e);
+      e.removeAttribute("data-drop-target"), e.classList.remove("drop-target--active", "drop-target--hover"), S.delete(e);
     }
   };
 }
 export {
-  ue as EventBus,
-  me as GameShell,
-  ce as GameState,
-  Y as PRAISE_PHRASES,
-  W as RETRY_HINTS,
-  L as animate,
-  Ie as bootstrapGame,
-  We as createChoiceRound,
-  Ve as createDragSource,
-  Qe as createDropTarget,
-  Ke as createFeedback,
-  Je as createHintTracker,
-  z as createLocalState,
-  Ne as createOptionCards,
-  Ee as createProgressBar,
-  we as createRoundManager,
-  ve as createRoundScope,
-  J as endGame,
-  oe as ensureAudioRunning,
-  Ye as getAllProgress,
-  P as getAudioContext,
-  Ge as getGameProgress,
-  xe as hideLoadingScreen,
-  Ze as injectHeaderButton,
-  Se as installGlobalErrorScreen,
-  he as lockPageZoom,
-  Ue as mountAudioStatusBanner,
-  Xe as playBlob,
-  He as randomPraise,
-  ze as randomRetryHint,
-  be as recordGameResult,
-  Me as runGame,
-  ye as showCompletionScreen,
-  Le as showLoadingScreen,
-  je as shuffle,
-  x as sounds,
-  K as starsFor,
-  Fe as unlockAudioOutput
+  se as EventBus,
+  ue as GameShell,
+  ie as GameState,
+  X as PRAISE_PHRASES,
+  G as RETRY_HINTS,
+  R as animate,
+  Se as bootstrapGame,
+  qe as createChoiceRound,
+  Ye as createDragSource,
+  je as createDropTarget,
+  Xe as createFeedback,
+  Be as createHintTracker,
+  fe as createLocalState,
+  Re as createOptionCards,
+  ye as createProgressBar,
+  be as createRoundManager,
+  ge as createRoundScope,
+  Y as endGame,
+  te as ensureAudioRunning,
+  Oe as getAllProgress,
+  D as getAudioContext,
+  Pe as getGameProgress,
+  Ee as hideLoadingScreen,
+  Ge as injectHeaderButton,
+  we as installGlobalErrorScreen,
+  ce as lockPageZoom,
+  He as mountAudioStatusBanner,
+  De as playBlob,
+  Ce as randomPraise,
+  Fe as randomRetryHint,
+  he as recordGameResult,
+  Le as runGame,
+  pe as showCompletionScreen,
+  ve as showLoadingScreen,
+  $e as shuffle,
+  C as sounds,
+  j as starsFor,
+  Ie as unlockAudioOutput
 };

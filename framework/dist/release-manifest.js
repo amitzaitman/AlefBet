@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "bf52d2bb752454bff96e1f754f752f6ce40ddf10b5d5a1fb92c6db68cf36543d",
+  "version": "6142c9f1e9abf72a0547e46dc53adb27bd9bf2fa6bda38f54ec8d3c69f3f94bf",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -69,7 +69,7 @@ self.ALEFBET_RELEASE = {
     "./assets/icons/apple-touch-icon.png": "efefd01ca2a1c1cdbbd7f89701cb8972f173048a3319434b284f8fddfe5cc2c1",
     "./assets/icons/icon-192.png": "13ceea9702342b307d2d6596d1fb0c46ad4d232a24732221a4b3325140190f29",
     "./assets/icons/icon-512.png": "91ab2f1968ff273a45d9f4e6e6ffaf52fc78807c76517c2a2a63d94b711f2283",
-    "./framework/dist/common.js": "e657637071c3b32e252e262d91bee3c283ec08f74160d4253971115aa73dda5f",
+    "./framework/dist/common.js": "509b1264b8c3178bf3ec2dd3986612f7cce703d4ae0ee6fecd75e0914cd6fa64",
     "./framework/dist/game-audio-Cwpuytb0.js": "f70e07b8d2735e34e84bf900c176e67328e5a3792aa5c80b25aa243f6aef6b6f",
     "./framework/dist/runtime-assets.js": "53b3fe7477b3baadc9a52d15a6946cfe9b716131953d871256644e58f1fa545c",
     "./framework/dist/runtime.css": "fdc0f294bd63ad52d20e18fca94719ddf818387866bae65932c4cfb025599268",
@@ -93,7 +93,7 @@ self.ALEFBET_RELEASE = {
     "./games/fraction-whole/index.html": "5cf33b3774cf8b12fc0373b438812baa32d46e236e1fc1b6cd5dc51e407d0f47",
     "./games/letter-match-animals/": "2664d7fe3510deb8f277d4f4b298bf91ef68f72c426429d10c589ee75c370487",
     "./games/letter-match-animals/game.css": "9edeea444a45473ec44c3bfc351ed998fc5053377baa39dd050869ea1fbdc13e",
-    "./games/letter-match-animals/game.js": "e8712e50efebf2aca3dc58db0cea12eafe18f8d0ffa9714699def8a56de71e3a",
+    "./games/letter-match-animals/game.js": "c3fd55c0de1520f14eb1559d4753832cecf8e6315eff715babdce9376fc4f026",
     "./games/letter-match-animals/index.html": "2664d7fe3510deb8f277d4f4b298bf91ef68f72c426429d10c589ee75c370487",
     "./games/long-exercise/": "9a036516db9ae3f2c759a4906103f680ebb94ea5bf43997957da467c112022eb",
     "./games/long-exercise/game.css": "a147de28b52e1721590ecb3f9da6672bafd9771a49a7967feda28f85ec33f561",
@@ -105,7 +105,7 @@ self.ALEFBET_RELEASE = {
     "./games/make-ten/index.html": "d69e2107396c1f1a1910edc0c550129747ef1697ca04169fc183016a26b742b3",
     "./games/nikud-match/": "852b39b1923b30a3d3f9c1cd8ffd5f2acd3f85fcbb91e3725505856a49ffb147",
     "./games/nikud-match/game.css": "67b1760e5c7f2b38a120cfd45e139795a9bb367f9ec31d2363e5d73b278f6c50",
-    "./games/nikud-match/game.js": "1d3083c873e273140ece106f8244ddbc924503c745d42a42e39722dcb3196211",
+    "./games/nikud-match/game.js": "46fdab4f60dc0e46af8b8c85d9979de5636a9ebec9b952dbd19bcb5798744425",
     "./games/nikud-match/index.html": "852b39b1923b30a3d3f9c1cd8ffd5f2acd3f85fcbb91e3725505856a49ffb147",
     "./games/nikud-match/nikud-box.js": "ca57bfddb25e7ebeaaf28f2f48be500f17fda2eb7bbe8ba7aa12b751b9ef818a",
     "./games/nikud-match/nikud-glyphs.js": "9d9ca6f769476e4256c262c0ffa2143955f514309d290c205fbfcf3de843f54a",

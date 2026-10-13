@@ -5,16 +5,11 @@ import { createRoundManager } from './round-manager.js';
 import { createProgressBar } from '../ui/progress-bar.js';
 import { installGlobalErrorScreen } from '../ui/error-screen.js';
 import { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
-import { loadGameData } from './editor-storage.js';
-import type { ContentContract, RoundRecord } from './game-data.js';
 
 const starts = new WeakMap<HTMLElement, object>();
 
-/** תוכן שמור: סיבובים שנערכו בעבר ונשמרו ב-alefbet.editor.<gameId>. */
-export interface BootstrapEditorOptions {
-  /** חוזה התוכן של המשחק: בדיקת סיבוב שמור, גרסה והמרה אופציונלית */
-  content?: ContentContract;
-}
+/** סיבוב: מפה פתוחה שהמשחק מגדיר. */
+export type RoundRecord = Record<string, unknown>;
 
 export interface BootstrapOptions {
   /** מזהה יציב לשמירה ב-localStorage */
@@ -23,12 +18,10 @@ export interface BootstrapOptions {
   title:           string;
   /** ברירת מחדל: 'טוֹעֵן...' */
   loadingMessage?: string;
-  /** סיבובים שיוחלו כאשר אין נתונים שמורים */
+  /** סיבובי המשחק */
   defaultRounds?:  RoundRecord[];
   /** אם לא מסופק, נגזר מ-activeRounds.length */
   totalRounds?:    number;
-  /** השמט אם למשחק אין תוכן שמור */
-  editor?:         BootstrapEditorOptions;
   audio?:          boolean;
   /**
    * הפעל בין preload ל-hide. החזרת false מאותתת שהמשחק טיפל ב-DOM בעצמו
@@ -73,8 +66,7 @@ export async function bootstrapGame(container: HTMLElement, opts: BootstrapOptio
 
   hideLoadingScreen(container);
 
-  const saved = opts.editor ? loadGameData(opts.gameId, opts.editor.content) : null;
-  const activeRounds: RoundRecord[] = saved?.rounds.length ? saved.rounds : (opts.defaultRounds ?? []);
+  const activeRounds: RoundRecord[] = opts.defaultRounds ?? [];
 
   const shell = new GameShell(container, {
     totalRounds: opts.totalRounds ?? activeRounds.length,

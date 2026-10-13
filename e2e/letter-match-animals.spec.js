@@ -143,30 +143,8 @@ test.describe('letter-match-animals', () => {
   });
 });
 
-test('rounds saved with the old editor still play, offline too', async ({ page, network }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem('alefbet.editor.letter-match-animals', JSON.stringify({
-      id: 'letter-match-animals', version: 1, meta: { type: 'multiple-choice' },
-      rounds: [{ id: 'saved', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁', zones: [{ id: 'z', x: 1, y: 1, w: 5, h: 5 }] }],
-    }));
-  });
-  await page.goto(`${network.url}/games/letter-match-animals/`);
-  await expect(page.locator('.letter-display')).toHaveText('א');
-  await expect(page.locator('.progress-bar__label')).toHaveText('0 / 1');
-  // Editing is gone, so this game has no adult menu.
-  await expect(page.locator('.adult-tools')).toHaveCount(0);
-  await page.evaluate(() => navigator.serviceWorker.ready);
-  await network.offline(page);
-  await page.reload();
-  await expect(page.locator('.letter-display')).toHaveText('א');
-});
-
 test('completion and replay do not accumulate audio listeners', async ({ page }) => {
   await page.addInitScript(() => {
-    localStorage.setItem('alefbet.editor.letter-match-animals', JSON.stringify({
-      id: 'letter-match-animals', version: 1, meta: { type: 'multiple-choice' },
-      rounds: [{ id: 'only', target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }],
-    }));
     const listeners = new Set();
     const add = window.addEventListener.bind(window);
     const remove = window.removeEventListener.bind(window);
@@ -184,7 +162,9 @@ test('completion and replay do not accumulate audio listeners', async ({ page })
   for (let replay = 0; replay < 2; replay++) {
     await expect(page.locator('.option-card')).toHaveCount(4);
     expect(await page.evaluate(() => window.audioListenerCount())).toBe(1);
-    await page.locator('.option-card[data-id="correct"]').click();
+    for (let round = 0; round < 8; round++) {
+      await page.locator('.option-card[data-id="correct"]:enabled').click();
+    }
     await expect(page.locator('.completion-screen')).toBeVisible();
     expect(await page.evaluate(() => window.audioListenerCount())).toBe(0);
     await page.locator('.completion-screen__replay').click();

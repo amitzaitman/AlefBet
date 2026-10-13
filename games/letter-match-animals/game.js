@@ -54,17 +54,6 @@ export async function startGame(container) {
     transitionMs: 800,
     playCorrectSound: false,
     onReplay: () => startGame(container),
-    // Rounds a teacher saved in the past still load (alefbet.editor.letter-match-animals).
-    editor: {
-      content: {
-        version: 1,
-        createRound: () => ({ target: 'א', correct: 'אַרְיֵה', correctEmoji: '🦁' }),
-        validateRound: round => typeof round.target === 'string' && !!getLetter(round.target)
-          && typeof round.correct === 'string' && !!round.correct.trim()
-          && round.correct.replace(/[\u0591-\u05C7]/g, '').startsWith(round.target)
-          && typeof round.correctEmoji === 'string',
-      },
-    },
     buildRound: context => {
       const { shell, round, scope } = context;
       // ── Left panel: instruction + letter ──

@@ -10,7 +10,7 @@ Keep game-specific rules and rendering in the game. Extract a shared named-expor
 
 Read [`MIGRATION.md`](./MIGRATION.md) before touching build, `sw.js`, the framework entries in `framework/src/runtime/`, or more than one `games/*/game.js` in the same PR.
 
-- Games import `framework/dist/runtime.js` (or `common.js`). There is no combined `alefbet.js`/UMD bundle and no in-browser editor any more. Rounds saved by the old editor still load: a game passes `editor: { content }`, its own contract for round creation, validation and optional version migrations, and core reads `alefbet.editor.<gameId>`.
+- Games import `framework/dist/runtime.js` (or `common.js`). There is no combined `alefbet.js`/UMD bundle, no in-browser editor and no saved round content: a game's rounds come from its own code.
 - One step per branch. `npm run verify` must pass. Merge to `main` so Pages stays shippable.
 - Do **not** start with a Vite multi-page rewrite of the site. That is step 5, last on purpose.
 - Do **not** convert runtime JS to TypeScript "while the file is open". Separate PR, never required.
@@ -45,7 +45,6 @@ There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-
 
 - Games load `../../framework/dist/runtime.js` and `runtime.css` (committed artifacts).
 - The runtime build generates `runtime-assets.js` from static dependencies and `release-manifest.js` with content hashes for deployed assets. Every cached asset must match the active release. Updates activate after old tabs close.
-- Saved content (`core/game-data`, `core/editor-storage`) has no editing UI. Preserve the existing `alefbet.editor.*` keys.
 - **After editing site code or assets, run `npm run build`** to rebuild the framework and release manifest. `framework/dist/` is committed on purpose so games open without a build step. Un-committing it is migration step 5, not a drive-by.
 - Dev server: `node start.js` (or double-click `start.bat` on Windows). Node 20+.
 
