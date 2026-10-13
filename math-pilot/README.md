@@ -54,14 +54,22 @@ round. The component gets `round` and `runner`; it calls `runner.correct()` or
 Timers that belong to a round go through `useScope()`, so they stop with it.
 To add a game, add its folder and one entry in `src/games.js`.
 
+A round with more flow than a choice can keep that flow in a `.svelte.js`
+class beside its component. In `balloon-stories`, `story-round.svelte.js`
+tells the story, builds the picture and the exercise and gives the hints;
+`BalloonStoriesRound.svelte` and `Scene.svelte` only draw that state. The
+class has its own unit tests, so the hint ladder is tested without a browser.
+
 ## Rules it keeps
 
 The same rules as the site's math games (`docs/math-pedagogy.md`): Hebrew with
 nikud and no meteg (a unit test checks every Hebrew word in `src/`), an RTL page
 with equations and frames in `dir="ltr"`, rows of five from the left, touch
 targets of at least 64px, and feedback that helps instead of judging. Motion is
-a Svelte transition only where it carries meaning, such as the missing cells
-filling in after a correct answer; with reduced motion every duration is 0.
+a Svelte transition only where it carries meaning: balloons popping, arriving
+and filling as the story says, each new part of the exercise sliding in, the
+answer taking the place of `?`, and the missing cells of the ten frame filling
+in after a correct answer. With reduced motion every duration is 0.
 Svelte compiler warnings (accessibility, unused CSS) fail the build.
 
 ## Differences from today's games
@@ -69,6 +77,20 @@ Svelte compiler warnings (accessibility, unused CSS) fail the build.
 - `make-ten`: the ten frame fills from the left (today it fills from the right
   inside the RTL page). After a correct answer the empty cells fill in, in the
   colour of the answer in the exercise. Same rounds, choices and hint.
+- `balloon-stories` has no audio, so the story is read:
+  - Each sentence stays the newest line for 1 s plus 0.1 s a letter (about
+    2.5 to 3 s), and the earlier lines stay on the screen. The question comes
+    within 7 s. Today a sentence lasts as long as its speech, at least 1.2 s.
+  - The story starts by itself; there is no tap to start, since there is no
+    speech to unlock. No pop sound, and counting on the picture is silent:
+    one number every 0.7 s, as today.
+  - The first hint says 'בּוֹאוּ נִקְרָא שׁוּב אֶת הַסִּפּוּר' (read, not hear), and
+    hints stay 4 s instead of 1.8 s, because they are read.
+  - Number buttons are 64px wide instead of 68px, so four fit in one row on a
+    320px phone.
+  - Same stages, rounds, choices, sentences, story cards and hint ladder (the
+    story again, counting on the picture, the answer marked), and the same
+    2.6 s pause after an answer.
 - The replay button speaks to the children in plural (`שַׂחֲקוּ שׁוּב`), like
   every other text.
 - No adult tools menu and no error screen.
@@ -81,5 +103,5 @@ vitest 3.2.7 (vite ^5 to ^7). Vite 8 needs vitest 4 or 5: vitest 4 crashes
 the npm 10 resolver that ships with Node 22, and vitest 5 needs Node 22.12,
 while this repository supports Node 20.19. The framework keeps its own vite 5.
 
-The build is about 51 KB of JavaScript (20 KB gzipped) and 108 KB of fonts.
+The build is about 65 KB of JavaScript (24 KB gzipped) and 108 KB of fonts.
 It targets the browsers Vite 7 supports by default (Safari 16, Chrome 107).
