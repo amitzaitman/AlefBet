@@ -425,3 +425,117 @@ test('apple-basket: count by touch, put a number in the basket, help, completion
   await expect(choice).toHaveCount(4);
   expect(errors).toEqual([]);
 });
+
+test('fair-share: deal by touch, an unfair deal goes back, help, completion, replay and offline', async ({ page, activate, network }) => {
+  test.setTimeout(60_000);
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  // Without a voice each sentence takes 1200 ms and each counted cookie 700 ms; the page
+  // clock skips those, the 600 ms pause before an unfair deal goes back, and the 2800 ms transition.
+  await noVoice(page);
+  await page.clock.install();
+  const skip = ms => page.clock.runFor(ms);
+  await page.goto(`${network.url}/games/fair-share/`);
+  const plates = page.locator('.fs-plate');
+  const choice = page.locator('.story-choice');
+  const solved = page.locator('.story-solved');
+  const note = page.locator('.fs-note');
+  const inJar = page.locator('.fs-jar .fs-cookie:not([data-state="taken"])');
+  const onPlate = k => plates.nth(k).locator('.fs-dish .fs-cookie');
+  const start = page.locator('.story-start');
+  await expect(page.locator('.fs-jar')).toBeVisible();
+  if (await start.count()) await activate(start);
+  /** The exercise on screen: total : by. */
+  const exercise = async () => {
+    const [total, , by] = (await page.locator('.story-equation').innerText()).trim().split(/\s+/).map(Number);
+    return { total, by };
+  };
+  /** Waits for the dealing step: two sentences, then the plates open. */
+  const toDealing = async () => {
+    await skip(2600);
+    await expect(plates.first()).toBeEnabled();
+  };
+  /** Deals fairly: one to each child in turn, or `by` on each plate from the left. */
+  const dealFairly = async ({ total, by }, group) => {
+    for (let k = 0; k < total; k++) await activate(plates.nth(group ? Math.floor(k / by) : k % by));
+  };
+  const answerTo = ({ total, by }) => total / by;
+
+  await toDealing();
+  const first = await exercise();
+  expect(first.by).toBe(2);
+  await expect(plates).toHaveCount(2);
+  await expect(choice.first()).toBeDisabled();
+  await expectTouchTargets(plates);
+  await expect(note).toContainText('גְּעוּ בְּצַלַּחַת');
+  // Everything to Noa: the plates say what each got, and the cookies go back to the jar.
+  for (let k = 0; k < first.total; k++) await activate(plates.first());
+  await expect(note).toHaveText(`לְנוֹעָה ${first.total} וּלְדָנִי 0. זֶה לֹא שָׁוֶה.`);
+  await expect(plates.first().locator('.fs-badge')).toHaveText(String(first.total));
+  await expect(plates.first()).toBeDisabled();
+  await skip(1900);
+  await expect(inJar).toHaveCount(first.total);
+  await expect(onPlate(0)).toHaveCount(0);
+  // From the first miss the plate with the fewest cookies glows.
+  await expect(page.locator('.fs-plate--next')).toHaveCount(1);
+  await dealFairly(first, false);
+  await expect(onPlate(1)).toHaveCount(answerTo(first));
+  await skip(1300);
+  await expect(choice.first()).toBeEnabled();
+  await expectTouchTargets(choice);
+  // The number of children is the telling mistake; it shows on Noa's plate, then the help counts.
+  const each = answerTo(first);
+  const wrong = each === 2 ? 3 : 2;
+  await activate(page.locator(`.story-choice[data-value="${wrong}"]`));
+  await expect(page.locator('.fs-chosen')).toHaveCount(Math.min(wrong, each));
+  await expect(page.locator('.fs-cookie--ghost')).toHaveCount(Math.max(0, wrong - each));
+  await skip(1300);
+  await expect(page.locator('.feedback-message')).toContainText('בְּצַלַּחַת אַחַת');
+  await skip(700 * each + 1300);
+  await expect(page.locator('.fs-cookie.fs-counted')).toHaveCount(each);
+  await activate(page.locator(`.story-choice[data-value="${each}"]`));
+  await expect(solved).toHaveText(String(each));
+  await expect(page.locator('.story-line--result')).toHaveText(`כָּל אֶחָד קִבֵּל ${each} עוּגִיּוֹת.`);
+
+  for (let round = 2; round <= 6; round++) {
+    await skip(3000);
+    await expect(solved).toHaveCount(0);
+    const group = round >= 5;
+    await expect(page.locator('.fs-scene--group')).toHaveCount(group ? 1 : 0);
+    await toDealing();
+    const ex = await exercise();
+    if (round === 5) {
+      // The plates repeat the first exercise with its other meaning.
+      expect(ex).toEqual(first);
+      await expect(note).toContainText('לָשִׂים');
+      // A full plate takes no more, and says so.
+      for (let k = 0; k <= ex.by; k++) await activate(plates.first());
+      await expect(onPlate(0)).toHaveCount(ex.by);
+      await expect(note).toHaveText(`בְּכָל צַלַּחַת ${ex.by} עוּגִיּוֹת, לֹא יוֹתֵר.`);
+      // The first plate is full; the rest go on the next plates.
+      for (let k = ex.by; k < ex.total; k++) await activate(plates.nth(Math.floor(k / ex.by)));
+    }
+    if (round !== 5) await dealFairly(ex, group);
+    if (round === 3) await expect(page.locator('.story-line').last()).toContainText('חֲצִי מִתּוֹךְ');
+    await skip(1300);
+    await expect(choice.first()).toBeEnabled();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await activate(page.locator(`.story-choice[data-value="${answerTo(ex)}"]`));
+    await expect(solved).toHaveText(String(answerTo(ex)));
+  }
+  await skip(3000);
+  await expect(page.locator('.completion-screen')).toBeVisible();
+  await activate(page.locator('.completion-screen__replay'));
+  await expect(page.locator('.fs-jar')).toBeVisible();
+  await expect(start).toHaveCount(0);
+  await toDealing();
+  const again = await exercise();
+  await dealFairly(again, false);
+  await skip(1300);
+  await activate(page.locator(`.story-choice[data-value="${answerTo(again)}"]`));
+  await expect(solved).toHaveText(String(answerTo(again)));
+  await network.reloadOffline(page);
+  await expect(page.locator('.fs-jar')).toBeVisible();
+  await expect(choice).toHaveCount(4);
+  expect(errors).toEqual([]);
+});

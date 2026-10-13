@@ -1,0 +1,34 @@
+.fs-game { --fs-cookie: clamp(14px, 4.2vw, 22px); --fs-jar-cookie: clamp(22px, 6.4vw, 34px); }
+.fs-scene { display: grid; justify-items: center; gap: 10px; margin: 4px auto; }
+
+/* The jar: rows of five, left to right. A cookie that was dealt leaves its place. */
+.fs-jar { display: grid; gap: 6px; padding: 10px 12px; border: 3px solid #9cc0d8; border-radius: 14px 14px 22px 22px; background: #f2f8fc; }
+.fs-row { display: flex; gap: 6px; }
+
+.fs-cookie { position: relative; display: block; box-sizing: border-box; width: var(--fs-cookie); height: var(--fs-cookie); border-radius: 50%; background: radial-gradient(circle at 30% 34%, #6b3f22 0 9%, transparent 10%), radial-gradient(circle at 66% 44%, #6b3f22 0 8%, transparent 9%), radial-gradient(circle at 44% 70%, #6b3f22 0 8%, transparent 9%), #d9a35b; }
+.fs-jar .fs-cookie { width: var(--fs-jar-cookie); height: var(--fs-jar-cookie); }
+.fs-cookie[data-state="taken"] { background: none; border: 2px dashed #9aa6b8; }
+/* A cookie a wrong number asks for that is not on the plate. */
+.fs-cookie--ghost { background: none; border: 2px dashed #783952; }
+
+/* Plates: one per child, or plates waiting to be filled. */
+.fs-plates { display: grid; grid-template-columns: repeat(var(--fs-cols, 2), auto); justify-content: center; gap: 8px; }
+.fs-plate { position: relative; display: grid; justify-items: center; align-content: start; gap: 4px; min-width: 64px; min-height: 64px; padding: 6px 8px 10px; border: 3px solid #c9b79c; border-radius: 22px; background: #fff; color: inherit; font: inherit; cursor: pointer; touch-action: manipulation; }
+.fs-plate:disabled { cursor: default; }
+.fs-plate:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
+.fs-scene--share .fs-plate:enabled, .fs-scene--part .fs-plate:enabled, .fs-scene--group .fs-plate:enabled { border-color: #2868a6; }
+.fs-face { font-size: clamp(24px, 7vw, 32px); line-height: 1; }
+.fs-dish { display: grid; grid-template-columns: repeat(5, var(--fs-cookie)); gap: 3px; min-height: var(--fs-cookie); }
+.fs-scene--group .fs-dish { grid-template-columns: repeat(3, var(--fs-cookie)); }
+.fs-badge { position: absolute; top: -10px; inset-inline-end: -10px; display: grid; place-items: center; min-width: 30px; height: 30px; border-radius: 15px; background: #783952; color: #fff; font-weight: 700; }
+.fs-badge:empty { display: none; }
+/* After a miss, the plate to touch next. */
+.fs-plate--next { box-shadow: 0 0 0 5px rgba(217, 146, 33, .55); }
+.fs-note { min-height: 1.3em; margin: 0; color: #783952; font-size: clamp(1rem, 3.6vw, 1.2rem); font-weight: 700; }
+
+/* Counting help and what a wrong number says. */
+.fs-counted { box-shadow: 0 0 0 3px rgba(120, 57, 82, .45); }
+.fs-cookie.fs-counted::after, .fs-plate.fs-counted::after { content: attr(data-count); position: absolute; display: grid; place-items: center; color: #fff; font-weight: 700; }
+.fs-cookie.fs-counted::after { inset: 0; font-size: calc(var(--fs-cookie) * .7); text-shadow: 0 0 3px #4a2a14; }
+.fs-plate.fs-counted::after { top: -10px; inset-inline-start: -10px; width: 30px; height: 30px; border-radius: 15px; background: #2a7b71; }
+.fs-chosen { box-shadow: 0 0 0 3px #d99221; }

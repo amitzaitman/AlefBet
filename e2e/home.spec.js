@@ -6,9 +6,9 @@ test('home groups games by subject, supports navigation and keeps groups offline
   const math = page.locator('#subject-math');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(reading.locator('.game-card')).toHaveCount(4);
-  await expect(math.locator('.game-card')).toHaveCount(8);
+  await expect(math.locator('.game-card')).toHaveCount(9);
   await expect(page.locator('#subject-other')).toHaveCount(0);
-  await expect(math.locator('.game-card__topic')).toHaveCount(8);
+  await expect(math.locator('.game-card__topic')).toHaveCount(9);
   await expect(reading.locator('[data-game-id="letter-match-animals"]')).toBeVisible();
   await expect(reading.locator('[data-game-id="letter-match-animals"] .game-card__desc')).toContainText('22');
   await expect(math.locator('[data-game-id="fraction-picture"]')).toBeVisible();
@@ -25,5 +25,5 @@ test('home groups games by subject, supports navigation and keeps groups offline
   await expect(page.locator('.game-card')).toHaveCount(await page.evaluate(() => self.ALEFBET_CATALOG.length));
   await network.reloadOffline(page);
   await expect(reading.locator('.game-card')).toHaveCount(4);
-  await expect(math.locator('.game-card')).toHaveCount(8);
+  await expect(math.locator('.game-card')).toHaveCount(9);
 });
