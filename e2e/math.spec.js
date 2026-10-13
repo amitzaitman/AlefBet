@@ -399,6 +399,11 @@ test('apple-basket: count by touch, put a number in the basket, help, completion
       await expect(choice.first()).toBeEnabled();
       const count = await onTree.count();
       expect(count).toBeGreaterThanOrEqual(round === 3 ? 2 : 6);
+      // Apples stay full touch targets on a 360px phone.
+      if (round === 3) {
+        await page.setViewportSize({ width: 360, height: 640 });
+        await expectTouchTargets(onTree);
+      }
       expect(await fits()).toBe(true);
       await activate(page.locator(`.story-choice[data-value="${count}"]`));
       await expect(solved).toHaveText(String(count));

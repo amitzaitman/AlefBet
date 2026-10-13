@@ -411,7 +411,7 @@ function buildRound(context, n) {
   scope.listen(again, 'click', () => {
     void (async () => {
       await quiet();
-      if (isActive()) void say(ask.say);
+      if (isActive() && !context.isAnswered()) void say(ask.say);
     })();
   });
   context.subscribeAnswered(render);
