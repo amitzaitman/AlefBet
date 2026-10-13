@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "8633a3637a7085608d5e45973cb499fe8cba29215cb439a5e4bdaf82cf3c2207",
+  "version": "7b53dfd3051878da0c5e92a40a5818f9ccc55ebf8e90b9d834ebe631ab30942d",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -75,6 +75,10 @@ self.ALEFBET_RELEASE = {
     "./games/syllable-read/game.css",
     "./games/syllable-read/game.js",
     "./games/syllable-read/index.html",
+    "./games/tens-bundles/",
+    "./games/tens-bundles/game.css",
+    "./games/tens-bundles/game.js",
+    "./games/tens-bundles/index.html",
     "./index.html",
     "./manifest.webmanifest"
   ],
@@ -99,7 +103,7 @@ self.ALEFBET_RELEASE = {
     "./games/balloon-stories/game.css": "eb88e3a30a6746d28599927d1367f7e8b755e3ecc1dfcb11e9ae8d9cb787131b",
     "./games/balloon-stories/game.js": "98489a8b2c66ab6b0438b1a00e14ac100f7917126c07e540ff9d7ff305eb1b17",
     "./games/balloon-stories/index.html": "ad387374dc4b99f2fb6279cba05becbcb1cc189581b83745f532098db25a6626",
-    "./games/catalog.js": "edb4cd007d60f9e555a6638fbb2aa1ed626fccc5b3815864c13a6b03549890ea",
+    "./games/catalog.js": "f7d8524b88707f60d399aa931afc978a361df1a0219cc57bbc5cbc1252fb29f2",
     "./games/fair-share/": "4728317cec3986d2abff5d90a1a7d921ee24c3354c6a00ce78753cdbee2b713c",
     "./games/fair-share/game.css": "08a3bea4ded212058720fed9c40fc9cbcfdd28b2f69f941b0443f0bfe133f3ce",
     "./games/fair-share/game.js": "d1a752d26a957a1ac530fa53c22baa174a78be2f8217d4d7efc5e03c6903a743",
@@ -153,6 +157,10 @@ self.ALEFBET_RELEASE = {
     "./games/syllable-read/game.css": "1a5b023bd0b0e3078915db150a7382595d85dc8da03beac283f096e800259868",
     "./games/syllable-read/game.js": "330b0efc32f640216e7f133374e3ea0a3d567ea4e28d9e6982255e6cecf7bfa0",
     "./games/syllable-read/index.html": "55246cea53f33d126031063d05e5674865f8aa1a12262cebfcadbd2b308c1b19",
+    "./games/tens-bundles/": "6f64767afb897fe3eb74d7fcb400079094bf390b3c23d77afabab6e6a0ee2dca",
+    "./games/tens-bundles/game.css": "e553bee5246823f29ffb491bf2e580b6510c85dff8cb0e39cbf65c272f0235c0",
+    "./games/tens-bundles/game.js": "4447cb0bd1d28bf531890458736d3d1577fc6a89a64efb6f40bda16dbb00e16a",
+    "./games/tens-bundles/index.html": "6f64767afb897fe3eb74d7fcb400079094bf390b3c23d77afabab6e6a0ee2dca",
     "./index.html": "ca01cfdf073518de4d421cfc8ba71a7c5cff48f3526a9f8329a124a337f2bd4b",
     "./manifest.webmanifest": "61199ec6fe79202159f986f7fd7fd2058697d890788a97993b4db5eafef9c9d4"
   }

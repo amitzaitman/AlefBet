@@ -642,3 +642,133 @@ test('balance-scale: add cubes and weigh, the beam shows the heavier side, help,
   await expect(weigh).toBeEnabled();
   expect(errors).toEqual([]);
 });
+
+test('tens-bundles: tie ten straws into a bundle, read, build a number, help, completion, replay and offline', async ({ page, activate, network }) => {
+  test.setTimeout(60_000);
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  // Without a voice a sentence takes 1200 ms and a counted step 700 ms; the page clock
+  // skips those and the 3000 ms round transition.
+  await noVoice(page);
+  await page.clock.install();
+  const skip = ms => page.clock.runFor(ms);
+  await page.goto(`${network.url}/games/tens-bundles/`);
+  const pile = page.locator('.tb-pile');
+  const tie = page.locator('.tb-tie');
+  const choice = page.locator('.story-choice');
+  const solved = page.locator('.story-solved');
+  const bundles = page.locator('.tb-bundles .tb-bundle[data-state="shown"]');
+  const loose = page.locator('.tb-loose .tb-straw[data-state="shown"]');
+  const making = page.locator('.tb-frame .tb-straw[data-state="shown"]');
+  const fits = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  const start = page.locator('.story-start');
+  /** Takes ten straws from the pile and ties them. */
+  const tieBundle = async () => {
+    for (let k = 0; k < 10; k++) await activate(pile);
+    await expect(making).toHaveCount(10);
+    await activate(tie);
+  };
+  /** The number on the mat: bundles and single straws. */
+  const onMat = async () => ({ tens: await bundles.count(), ones: await loose.count() });
+
+  await expect(page.locator('.tb-mat')).toBeVisible();
+  if (await start.count()) await activate(start);
+  await skip(2600);
+  await expect(pile).toBeEnabled();
+  await expectTouchTargets(pile);
+  await expect(choice.first()).toBeDisabled();
+  for (let k = 0; k < 10; k++) await activate(pile);
+  await expect(tie).toBeEnabled();
+  // The bundle being made holds ten, and says so.
+  await activate(pile);
+  await expect(page.locator('.tb-note')).toContainText('כְּבָר עֶשֶׂר');
+  await expect(making).toHaveCount(10);
+  await expectTouchTargets(tie);
+  await activate(tie);
+  await expect(page.locator('.tb-note')).toHaveText('עֶשֶׂר קַשִּׁיּוֹת הֵן צְרוֹר אֶחָד.');
+  await expect(bundles).toHaveCount(1);
+  await expect(page.locator('.tb-workbench')).toBeHidden();
+  await expect(choice.first()).toBeEnabled();
+  const first = await onMat();
+  const n = 10 + first.ones;
+  await expect(page.locator('.story-equation')).toHaveText(`10 + ${first.ones} = ?`);
+  // Counting the bundle as one straw shows on the mat, then the help counts by tens.
+  const chosen = 1 + first.ones;
+  await activate(page.locator(`.story-choice[data-value="${chosen}"]`));
+  // Places the number needs are ghosts, places it does not need fade.
+  const [wantTens, wantOnes] = [Math.floor(chosen / 10), chosen % 10];
+  await expect(page.locator('.tb-straw[data-state="ghost"]')).toHaveCount(Math.max(0, wantOnes - first.ones));
+  await expect(page.locator('.tb-straw.tb-extra')).toHaveCount(Math.max(0, first.ones - wantOnes));
+  await expect(page.locator('.tb-bundle.tb-extra')).toHaveCount(1 - wantTens);
+  await skip(1300);
+  await expect(page.locator('.feedback-message')).toContainText('בַּעֲשָׂרוֹת');
+  await skip(700 * (1 + first.ones) + 1300);
+  await expect(page.locator('.tb-counted')).toHaveCount(1 + first.ones);
+  await expect(page.locator('.tb-running')).toHaveText(String(n));
+  await activate(page.locator(`.story-choice[data-value="${n}"]`));
+  await expect(solved).toHaveText(String(n));
+  await expect(page.locator('.story-line--result')).toHaveText(`יֵשׁ ${n} קַשִּׁיּוֹת.`);
+
+  for (let round = 2; round <= 6; round++) {
+    await skip(3200);
+    await expect(solved).toHaveCount(0);
+    if (round <= 4) {
+      if (round === 3) await expect(bundles).toHaveCount(2);
+      if (round < 4) {
+        await skip(2600);
+        await tieBundle();
+        if (round === 2) await tieBundle();
+      }
+      await expect(choice.first()).toBeEnabled();
+      const { tens, ones } = await onMat();
+      if (round < 4) expect(tens).toBe(round);
+      expect(await fits()).toBe(true);
+      await activate(page.locator(`.story-choice[data-value="${tens * 10 + ones}"]`));
+      await expect(solved).toHaveText(String(tens * 10 + ones));
+      continue;
+    }
+    // Build the written number from bundles and straws.
+    const target = Number(await page.locator('.tb-target').innerText());
+    const tens = Math.floor(target / 10);
+    const ones = target % 10;
+    const set = async (name, count, now) => {
+      for (let k = now; k < count; k++) await activate(page.getByRole('button', { name: `הוֹסָפַת ${name}`, exact: true }));
+      for (let k = now; k > count; k--) await activate(page.getByRole('button', { name: `הוֹרָדַת ${name}`, exact: true }));
+    };
+    if (round === 5) {
+      await expectTouchTargets(page.locator('.tb-step, .tb-check'));
+      // Swapped digits: what was built and what is needed, then the places to fill.
+      await set('צְרוֹר', ones > 5 ? 5 : ones, 0);
+      await set('קַשִּׁית', tens, 0);
+      const built = (ones > 5 ? 5 : ones) * 10 + tens;
+      await activate(page.locator('.tb-check'));
+      await expect(page.locator('.tb-miss')).toHaveText(`בְּנִיתֶם ${built}. צָרִיךְ ${target}.`);
+      await skip(1300);
+      await activate(page.locator('.tb-check'));
+      await expect(page.locator('.tb-straw[data-state="ghost"], .tb-bundle[data-state="ghost"], .tb-extra')).not.toHaveCount(0);
+      await skip(1300);
+      await set('צְרוֹר', tens, ones > 5 ? 5 : ones);
+      await set('קַשִּׁית', ones, tens);
+    } else {
+      await set('צְרוֹר', tens, 0);
+    }
+    await expect(page.locator('.tb-running')).toHaveText(String(target));
+    await activate(page.locator('.tb-check'));
+    await expect(solved).toHaveText(String(target));
+    await expect(page.locator('.story-equation')).toHaveText(`${[...Array(tens).fill('10'), ...(ones ? [ones] : [])].join(' + ')} = ${target}`);
+  }
+  await skip(3200);
+  await expect(page.locator('.completion-screen')).toBeVisible();
+  await activate(page.locator('.completion-screen__replay'));
+  await expect(page.locator('.tb-mat')).toBeVisible();
+  await expect(start).toHaveCount(0);
+  await skip(2600);
+  await tieBundle();
+  const again = await onMat();
+  await activate(page.locator(`.story-choice[data-value="${10 + again.ones}"]`));
+  await expect(solved).toHaveText(String(10 + again.ones));
+  await network.reloadOffline(page);
+  await expect(page.locator('.tb-mat')).toBeVisible();
+  await expect(choice).toHaveCount(4);
+  expect(errors).toEqual([]);
+});

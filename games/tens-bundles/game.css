@@ -1,0 +1,55 @@
+/* A straw is a striped stick; a bundle is ten of them with a band. */
+/* Five bundles, nine straws and the gaps fit a 320px phone. */
+.tb-game { --tb-straw-h: clamp(44px, 12vw, 58px); --tb-bundle: clamp(22px, 7vw, 30px); }
+.tb-game .story { min-height: 0; }
+.tb-scene { display: grid; justify-items: center; gap: 6px; margin: 4px auto; }
+
+/* The mat, left to right like the digits: bundles, then single straws. */
+.tb-mat { display: flex; justify-content: center; align-items: stretch; gap: 10px; margin: 4px auto; }
+.tb-column { display: grid; align-content: start; justify-items: center; gap: 4px; min-height: calc(var(--tb-straw-h) * 2 + 40px); padding: 6px 8px 10px; border: 2px solid #d8cdb9; border-radius: 16px; background: #fffaf1; }
+.tb-label { margin: 0; color: #6b5a45; font-size: clamp(.85rem, 3.2vw, 1rem); font-weight: 700; }
+.tb-bundles { display: flex; gap: 5px; align-items: end; min-height: var(--tb-straw-h); }
+.tb-loose { display: grid; gap: 6px; }
+.tb-row { display: flex; gap: 5px; }
+
+.tb-straw { position: relative; display: block; box-sizing: border-box; width: 9px; height: var(--tb-straw-h); border-radius: 5px; background: repeating-linear-gradient(0deg, #d94b3d 0 6px, #fff4ef 6px 11px); box-shadow: inset 0 0 0 1px rgba(80, 30, 20, .2); }
+.tb-bundle { position: relative; display: block; box-sizing: border-box; width: var(--tb-bundle); height: var(--tb-straw-h); border-radius: 3px; background: repeating-linear-gradient(90deg, #d94b3d 0 calc(var(--tb-bundle) / 15), #fbe1da calc(var(--tb-bundle) / 15) calc(var(--tb-bundle) / 10)); }
+.tb-bundle::after { content: ''; position: absolute; top: 42%; left: -3px; right: -3px; height: 7px; border-radius: 3px; background: #2868a6; }
+.tb-straw[data-state="empty"], .tb-bundle[data-state="empty"] { visibility: hidden; }
+/* A place a wrong number asks for, or the number to build, that the mat does not have. */
+.tb-straw[data-state="ghost"], .tb-bundle[data-state="ghost"] { visibility: visible; background: none; border: 2px dashed #783952; box-shadow: none; }
+.tb-bundle[data-state="ghost"]::after { display: none; }
+.tb-counted { box-shadow: 0 0 0 3px rgba(120, 57, 82, .5); }
+.tb-chosen { box-shadow: 0 0 0 3px #d99221; }
+.tb-extra { opacity: .35; }
+.tb-running { min-height: 1.2em; margin: 0; color: #783952; font-size: clamp(28px, 7vw, 40px); font-weight: 700; line-height: 1.2; }
+
+/* The pile: single straws every which way, all one button. */
+.tb-pile { position: relative; width: clamp(96px, 27vw, 150px); min-height: calc(var(--tb-straw-h) * 2 + 12px); padding: 0; border: 3px dashed #2868a6; border-radius: 16px; background: #fff; cursor: pointer; touch-action: manipulation; }
+.tb-pile:disabled { border-color: #c9b79c; cursor: default; }
+.tb-pile:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
+.tb-straw--lying { position: absolute; }
+.tb-column--pile .tb-loose, .tb-column:not(.tb-column--pile) .tb-pile { display: none; }
+
+/* The bundle being made, and the button that ties it. */
+.tb-workbench { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.tb-workbench[hidden] { display: none; }
+.tb-frame { display: flex; gap: 3px; padding: 6px 8px; border: 2px dashed #9aa6b8; border-radius: 12px; }
+.tb-tie { min-width: 64px; min-height: 64px; padding: 8px 16px; border: 0; border-radius: 16px; background: #2868a6; color: #fff; font: inherit; font-size: 1.1rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.tb-tie:disabled { opacity: .4; cursor: default; }
+.tb-tie--ready { box-shadow: 0 0 0 5px rgba(217, 146, 33, .55); }
+.tb-note { min-height: 1.3em; margin: 0; color: #1e5a52; font-size: clamp(1rem, 3.6vw, 1.15rem); font-weight: 700; }
+
+/* Past ten, dots under an answer are a blur; the digits and the mat carry the number. */
+.tb-game .story-choice__dots { display: none; }
+
+/* Building a number: a pair of buttons under each column. */
+.tb-target { padding: 0 10px; border-radius: 10px; background: #f0e4eb; color: #783952; }
+.tb-controls { display: flex; justify-content: center; gap: 12px; }
+.tb-steps { display: flex; gap: 6px; }
+.tb-step { min-width: 64px; min-height: 64px; border: 3px solid #2868a6; border-radius: 16px; background: #fff; color: #174774; font: inherit; font-size: 32px; font-weight: 700; line-height: 1; cursor: pointer; touch-action: manipulation; }
+.tb-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 6px 0 8px; }
+.tb-check { min-width: 120px; min-height: 64px; padding: 8px 22px; border: 0; border-radius: 16px; background: #2a7b71; color: #fff; font: inherit; font-size: 1.2rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.tb-step:disabled, .tb-check:disabled { opacity: .45; cursor: default; }
+.tb-step:focus-visible, .tb-check:focus-visible, .tb-tie:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
+.tb-miss { color: #783952; }
