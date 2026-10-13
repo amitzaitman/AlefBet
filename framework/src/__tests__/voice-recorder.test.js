@@ -18,7 +18,7 @@ describe('isVoiceRecordingSupported', () => {
       mediaDevices: { getUserMedia: vi.fn() },
     });
 
-    const { isVoiceRecordingSupported } = await import('../audio/voice-recorder.js');
+    const { isVoiceRecordingSupported } = await import('../../../games/sound-studio/voice-recorder.js');
     expect(isVoiceRecordingSupported()).toBe(true);
   });
 
@@ -28,7 +28,7 @@ describe('isVoiceRecordingSupported', () => {
     });
     // no MediaRecorder stubbed
 
-    const { isVoiceRecordingSupported } = await import('../audio/voice-recorder.js');
+    const { isVoiceRecordingSupported } = await import('../../../games/sound-studio/voice-recorder.js');
     expect(isVoiceRecordingSupported()).toBe(false);
   });
 
@@ -36,7 +36,7 @@ describe('isVoiceRecordingSupported', () => {
     vi.stubGlobal('MediaRecorder', makeMockMediaRecorder());
     vi.stubGlobal('navigator', { mediaDevices: {} }); // no getUserMedia
 
-    const { isVoiceRecordingSupported } = await import('../audio/voice-recorder.js');
+    const { isVoiceRecordingSupported } = await import('../../../games/sound-studio/voice-recorder.js');
     expect(isVoiceRecordingSupported()).toBe(false);
   });
 
@@ -44,7 +44,7 @@ describe('isVoiceRecordingSupported', () => {
     vi.stubGlobal('MediaRecorder', makeMockMediaRecorder());
     vi.stubGlobal('navigator', {});
 
-    const { isVoiceRecordingSupported } = await import('../audio/voice-recorder.js');
+    const { isVoiceRecordingSupported } = await import('../../../games/sound-studio/voice-recorder.js');
     expect(isVoiceRecordingSupported()).toBe(false);
   });
 });
@@ -58,7 +58,7 @@ describe('createVoiceRecorder — initial state', () => {
       mediaDevices: { getUserMedia: vi.fn().mockResolvedValue(makeMockStream()) },
     });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
     expect(rec.isActive()).toBe(false);
   });
@@ -77,7 +77,7 @@ describe('createVoiceRecorder — start / stop', () => {
     vi.stubGlobal('MediaRecorder', MockMR);
     vi.stubGlobal('navigator', { mediaDevices: { getUserMedia } });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
 
     await rec.start();
@@ -98,7 +98,7 @@ describe('createVoiceRecorder — start / stop', () => {
       mediaDevices: { getUserMedia: vi.fn().mockResolvedValue(stream) },
     });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
     await rec.start();
     const blob = await rec.stop();
@@ -119,7 +119,7 @@ describe('createVoiceRecorder — start / stop', () => {
       mediaDevices: { getUserMedia: vi.fn().mockResolvedValue(stream) },
     });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
     await rec.start();
     await rec.stop();
@@ -133,7 +133,7 @@ describe('createVoiceRecorder — start / stop', () => {
       mediaDevices: { getUserMedia: vi.fn() },
     });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
 
     await expect(rec.stop()).rejects.toThrow('[voice-recorder] not recording');
@@ -151,7 +151,7 @@ describe('createVoiceRecorder — cancel', () => {
       mediaDevices: { getUserMedia: vi.fn() },
     });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
 
     expect(() => rec.cancel()).not.toThrow();
@@ -167,7 +167,7 @@ describe('createVoiceRecorder — cancel', () => {
       mediaDevices: { getUserMedia: vi.fn().mockResolvedValue(stream) },
     });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
     await rec.start();
     rec.cancel();
@@ -183,7 +183,7 @@ describe('createVoiceRecorder — cancel', () => {
     vi.stubGlobal('MediaRecorder', MockMR);
     vi.stubGlobal('navigator', { mediaDevices: { getUserMedia } });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
     await rec.start();
     await rec.start(); // second call while already recording
@@ -212,7 +212,7 @@ describe('createVoiceRecorder — MIME type selection', () => {
       mediaDevices: { getUserMedia: vi.fn().mockResolvedValue(stream) },
     });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
     await rec.start();
 
@@ -232,7 +232,7 @@ describe('createVoiceRecorder — MIME type selection', () => {
       mediaDevices: { getUserMedia: vi.fn().mockResolvedValue(stream) },
     });
 
-    const { createVoiceRecorder } = await import('../audio/voice-recorder.js');
+    const { createVoiceRecorder } = await import('../../../games/sound-studio/voice-recorder.js');
     const rec = createVoiceRecorder();
     await rec.start();
 

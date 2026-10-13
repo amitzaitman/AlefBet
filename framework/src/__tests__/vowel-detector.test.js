@@ -1,13 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
+import { VOWEL_TEMPLATES, NIKUD_VOWEL } from '../data/vowels.js';
 import {
-  VOWEL_TEMPLATES,
-  NIKUD_VOWEL,
   classifyFormants,
   cepstralEnvelope,
   extractFormantsFromSpectrum,
   matchNikudVowel,
   createVowelDetector,
-} from '../audio/vowel-detector.js';
+} from '../../../games/nikud-speak/vowel-detector.js';
 
 it('cancels immediately during permission and stops a late microphone stream', async () => {
   const descriptor = Object.getOwnPropertyDescriptor(navigator, 'mediaDevices');

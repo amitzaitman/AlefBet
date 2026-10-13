@@ -22,9 +22,8 @@ Read [`MIGRATION.md`](./MIGRATION.md) before touching build, `sw.js`, the framew
 ```
 framework/src/
   core/      EventBus, GameState, GameShell, round-manager, local-state, bootstrap
-  audio/     hebrew-audio, tts, phoneme-synth, audio-context, vowel-detector,
-             sounds, voice-recorder, voice-store
-  data/      hebrew-letters, nikud, encouragement
+  audio/     hebrew-audio, tts, phoneme-synth, audio-context, sounds, voice-store
+  data/      hebrew-letters, nikud, vowels, encouragement
   ui/        option-cards, progress-bar, feedback, completion, adult-tools, ...
   render/    animations
   input/     drag
@@ -39,7 +38,7 @@ games/<name>/     index.html + game.js + game.css, plus any modules or assets th
 e2e/              Playwright specs, one per live game + pwa
 ```
 
-There is no `audio/speech-recognition.js`. Pronunciation games use `audio/vowel-detector.js`.
+There is no speech recognition module. nikud-speak owns its vowel detector (`games/nikud-speak/vowel-detector.js`); the sound studio owns recording.
 
 ## Build contract
 

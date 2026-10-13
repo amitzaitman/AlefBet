@@ -5,7 +5,7 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { vowelFormantSpec, consonantOnsetSpec, isSynthSupported, synthesizeVowel, synthesizeSyllable } from '../../audio/phoneme-synth.js';
-import { VOWEL_TEMPLATES } from '../../audio/vowel-detector.js';
+import { VOWEL_TEMPLATES } from '../../data/vowels.js';
 import { hebrewLetters } from '../../data/hebrew-letters.js';
 
 describe('vowelFormantSpec', () => {

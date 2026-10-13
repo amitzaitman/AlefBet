@@ -10,8 +10,7 @@ import '../styles/alefbet.css';
 // ===== Core =====
 
 // ===== Audio =====
-export { createVowelDetector, matchNikudVowel, classifyFormants, extractFormantsFromSpectrum, VOWEL_TEMPLATES, NIKUD_VOWEL } from '../audio/vowel-detector.js';
-export { createVoiceRecorder, isVoiceRecordingSupported } from '../audio/voice-recorder.js';
+export { VOWEL_TEMPLATES, NIKUD_VOWEL } from '../data/vowels.js';
 export { saveVoice, loadVoice, deleteVoice, listVoiceKeys, playVoice, hasVoice } from '../audio/voice-store.js';
 export { isSynthSupported, vowelFormantSpec, consonantOnsetSpec, synthesizeVowel, synthesizeSyllable } from '../audio/phoneme-synth.js';
 export {
@@ -26,7 +25,6 @@ export { nikudList, nikudBaseLetters, letterWithNikud, randomNikud }  from '../d
 
 // ===== UI =====
 export { showNikudSettingsDialog } from '../ui/nikud-settings.js';
-export { createVoiceRecordButton } from '../ui/voice-record-button.js';
 
 // ===== Render =====
 

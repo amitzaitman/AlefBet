@@ -12,8 +12,6 @@ import {
   showCompletionScreen,
   animate,
   sounds,
-  createVowelDetector,
-  matchNikudVowel,
   randomNikud,
   showNikudSettingsDialog,
   injectHeaderButton,
@@ -21,6 +19,7 @@ import {
   isSynthSupported,
   randomRetryHint,
 } from '../../framework/dist/runtime.js';
+import { createVowelDetector, matchNikudVowel } from './vowel-detector.js';
 
 // ── Game ──────────────────────────────────────────────────────────────────
 

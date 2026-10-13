@@ -23,7 +23,7 @@
  */
 import { tts } from './tts.js';
 import { playVoice, listVoiceKeys } from './voice-store.js';
-import { NIKUD_VOWEL } from './vowel-detector.js';
+import { NIKUD_VOWEL } from '../data/vowels.js';
 import { synthesizeVowel, synthesizeSyllable } from './phoneme-synth.js';
 import { hebrewLetters, getLetter } from '../data/hebrew-letters.js';
 import { nikudList, nikudBaseLetters, letterWithNikud } from '../data/nikud.js';

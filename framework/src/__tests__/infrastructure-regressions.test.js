@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createDragSource, createDropTarget } from '../input/drag.js';
-import { createVoiceRecorder } from '../audio/voice-recorder.js';
-import { createVoiceRecordButton } from '../ui/voice-record-button.js';
+import { createVoiceRecorder } from '../../../games/sound-studio/voice-recorder.js';
+import { createVoiceRecordButton } from '../../../games/sound-studio/voice-record-button.js';
 import { createOptionCards } from '../ui/option-cards.js';
 import { makeMockMediaRecorder } from './helpers.js';
-vi.mock('../audio/voice-store.js', () => ({ playVoice: vi.fn(async () => true), loadVoice: vi.fn(async () => null), saveVoice: vi.fn(), deleteVoice: vi.fn() }));
+// The record button lives in the sound studio and reaches the voice store through the runtime bundle.
+vi.mock('../../dist/runtime.js', async importOriginal => ({ ...await importOriginal(), playVoice: vi.fn(async () => true), loadVoice: vi.fn(async () => null), saveVoice: vi.fn(), deleteVoice: vi.fn() }));
 afterEach(() => { vi.unstubAllGlobals(); vi.clearAllMocks(); });
 function pointer(el, type, pointerId = 1) {
   const event = new Event(type, { bubbles: true, cancelable: true });

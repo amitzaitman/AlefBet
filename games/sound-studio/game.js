@@ -14,10 +14,10 @@ import {
   speakLetter,
   speakNikudSound,
   speakSyllable,
-  createVoiceRecordButton,
-  isVoiceRecordingSupported,
   tts,
 } from '../../framework/dist/runtime.js';
+import { isVoiceRecordingSupported } from './voice-recorder.js';
+import { createVoiceRecordButton } from './voice-record-button.js';
 
 const GROUPS = [
   { id: 'letters',   title: 'שְׁמוֹת הָאוֹתִיּוֹת',  hint: 'הַקְלִיטוּ אֶת שֵׁם הָאוֹת, לְמָשָׁל: "בֵּית"' },

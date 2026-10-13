@@ -18,7 +18,7 @@
  *   synthesizeVowel(vowel, opts) - השמעת תנועה a/e/i/o/u.
  *   synthesizeSyllable(consonantSound, vowel, opts) - השמעת הברה עיצור+תנועה.
  */
-import { VOWEL_TEMPLATES } from './vowel-detector.js';
+import { VOWEL_TEMPLATES } from '../data/vowels.js';
 import { getAudioContext, ensureAudioRunning } from './audio-context.js';
 
 /** תדר יסוד ברירת מחדל (Hz) - קול נשי/ילדי נעים. */

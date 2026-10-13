@@ -4,8 +4,8 @@
  * ניתן להטמיע בכל מקום בממשק
  */
 
-import { createVoiceRecorder, isVoiceRecordingSupported } from '../audio/voice-recorder.js';
-import { saveVoice, loadVoice, deleteVoice, playVoice }   from '../audio/voice-store.js';
+import { createVoiceRecorder, isVoiceRecordingSupported } from './voice-recorder.js';
+import { saveVoice, loadVoice, deleteVoice, playVoice } from '../../framework/dist/runtime.js';
 
 /**
  * @param {HTMLElement} container - element to append the button group into
