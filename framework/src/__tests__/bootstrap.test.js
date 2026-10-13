@@ -37,6 +37,7 @@ describe('bootstrapGame', () => {
       await vi.runAllTimersAsync();
       await second;
       expect(result.shell.ended).toBe(true);
+      expect(result.shell.state.score).toBe(2);
       expect(dispose).toHaveBeenCalledTimes(2);
       expect(host.querySelector('.completion-screen')).not.toBeNull();
       host.querySelector('.completion-screen__replay').click();

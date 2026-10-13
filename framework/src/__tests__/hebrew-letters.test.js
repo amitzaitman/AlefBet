@@ -50,6 +50,13 @@ describe('hebrewLetters data integrity', () => {
       expect(/^[א-ת]$/.test(l.letter), `letter "${l.name}" must be a bare Hebrew letter`).toBe(true);
     }
   });
+
+  it('every regular letter has an example word that starts with it', () => {
+    // Letter games show the example word's picture as the answer for its letter.
+    for (const l of hebrewLetters.filter(entry => !entry.isFinal)) {
+      expect(l.exampleWord.replace(/[\u0591-\u05C7]/g, '')[0], `exampleWord of ${l.letter}`).toBe(l.letter);
+    }
+  });
 });
 
 describe('getLetter', () => {

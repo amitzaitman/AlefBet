@@ -25,8 +25,8 @@ if (typeof Element !== 'undefined' && typeof Element.prototype.animate !== 'func
 }
 
 // ── Web Audio API ──────────────────────────────────────────────────────────
-// `framework/src/audio/sounds.js` יוצר AudioContext בעת הטעינה. אנו מספקים
-// stub שקט כדי לא להדפיס אזהרות.
+// jsdom אינו מממש Web Audio. audio-context.js יוצר את הקונטקסט בעצלנות, ו-sounds
+// ו-phoneme-synth מנגנים דרכו; stub שקט מאפשר להם לרוץ בלי אזהרות.
 if (typeof window !== 'undefined' && typeof window.AudioContext === 'undefined') {
   // פרמטר אודיו מדומה שמקבל את כל שיטות התזמון של AudioParam.
   const silentParam = () => ({

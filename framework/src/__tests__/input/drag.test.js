@@ -220,3 +220,37 @@ describe('tap selection alongside dragging', () => {
     handle.destroy();
   });
 });
+
+describe('drag ownership', () => {
+  const at = { x: 20, y: 20 };
+  const button = () => container.appendChild(document.createElement('button'));
+
+  it('ignores other fingers, cancels the old source, and handles capture loss', () => {
+    const a = button(), b = button();
+    const first = createDragSource(a, {}), second = createDragSource(b, {});
+    firePointer(a, 'pointerdown', at);
+    firePointer(a, 'pointerup', { ...at, pointerId: 2 });
+    expect(a.classList.contains('drag-source--dragging')).toBe(true);
+    firePointer(b, 'pointerdown', { ...at, pointerId: 2 });
+    expect(a.classList.contains('drag-source--dragging')).toBe(false);
+    firePointer(a, 'pointerup', at);
+    expect(document.querySelector('[aria-hidden="true"]')).not.toBeNull();
+    firePointer(b, 'lostpointercapture', { ...at, pointerId: 2 });
+    expect(document.querySelector('[aria-hidden="true"]')).toBeNull();
+    first.destroy(); second.destroy();
+  });
+
+  it.each(['disabled', 'aria-disabled'])('rejects a target locked with %s during a drag', attribute => {
+    const from = button(), locked = button(), drop = vi.fn();
+    const drag = createDragSource(from, {}), zone = createDropTarget(locked, drop);
+    document.elementFromPoint = vi.fn(() => locked);
+    firePointer(from, 'pointerdown', at);
+    locked.setAttribute(attribute, 'true');
+    firePointer(from, 'pointerup', at);
+    expect(drop).not.toHaveBeenCalled();
+    locked.removeAttribute(attribute);
+    firePointer(from, 'pointerdown', at); firePointer(from, 'pointerup', at);
+    expect(drop).toHaveBeenCalledOnce();
+    drag.destroy(); zone.destroy();
+  });
+});

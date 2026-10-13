@@ -97,9 +97,11 @@ it('reports failed persistence without publishing an unsaved value', () => {
   const fail = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
     throw new DOMException('Full', 'QuotaExceededError');
   });
+  const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   try {
     expect(s.update(n => n + 1)).toBe(false);
     expect(s.get()).toBe(1);
     expect(listener).not.toHaveBeenCalled();
-  } finally { fail.mockRestore(); }
+    expect(warn).toHaveBeenCalledOnce();
+  } finally { fail.mockRestore(); warn.mockRestore(); }
 });

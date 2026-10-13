@@ -3,7 +3,7 @@ import { GameShell } from '../core/game-shell.js';
  * עוזרי בדיקה משותפים
  *
  * כולל מפעלי mock שהיו כפולים בעבר ב-voice-store.test.js וב-voice-recorder.test.js.
- * כמו כן עוזרי DOM ו-shell סטאבים לבדיקות round-manager ואינטגרציה.
+ * כמו כן עוזרי DOM ו-shell סטאבים לבדיקות round-manager ו-choice-round.
  */
 import { vi } from 'vitest';
 
@@ -18,14 +18,6 @@ export function mountContainer() {
   const el = document.createElement('div');
   document.body.appendChild(el);
   return el;
-}
-
-/**
- * ממתין ל-microtasks ו-timers שנתלו לפתור.
- * @param {number} ms
- */
-export function tick(ms = 0) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // ── GameShell stub ──────────────────────────────────────────────────────────
@@ -107,7 +99,7 @@ export function createIDBMock() {
     return req;
   }
 
-  return { open: vi.fn(open), _data };
+  return { open: vi.fn(open) };
 }
 
 // ── MediaRecorder mock (משותף ל-voice-recorder tests) ──────────────────────

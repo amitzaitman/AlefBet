@@ -3,7 +3,7 @@
  * כך שמשחק יכול להחזיק מודולים ונכסים משלו ליד game.js.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runInNewContext } from 'node:vm';
@@ -41,5 +41,22 @@ describe('release manifest', () => {
     }
     // Hidden files are never deployed content.
     expect(core.some(path => path.includes('.DS_Store'))).toBe(false);
+  });
+});
+
+describe('committed release files', () => {
+  const repo = join(import.meta.dirname, '..', '..', '..');
+
+  it('the web manifest is Hebrew and every icon it lists exists', () => {
+    const manifest = JSON.parse(readFileSync(join(repo, 'manifest.webmanifest'), 'utf8'));
+    expect(manifest.lang).toBe('he');
+    expect(manifest.icons.length).toBeGreaterThanOrEqual(2);
+    for (const { src } of manifest.icons) expect(existsSync(join(repo, src)), src).toBe(true);
+  });
+
+  it('the built runtime asset list includes the entry files games load', () => {
+    const context = { self: {} };
+    runInNewContext(readFileSync(join(repo, 'framework/dist/runtime-assets.js'), 'utf8'), context);
+    expect(context.self.ALEFBET_RUNTIME_ASSETS).toEqual(expect.arrayContaining(['runtime.css', 'runtime.js', 'common.js']));
   });
 });

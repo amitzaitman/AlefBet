@@ -40,6 +40,12 @@ describe('createOptionCards — rendering', () => {
     expect(card.querySelector('.option-card__text').textContent).toBe('הלום');
     expect(card.querySelector('.option-card__emoji').textContent).toBe('');
   });
+
+  it('renders answer text and emoji literally', () => {
+    createOptionCards(container, [{ id: 'x', text: '<b>text</b>', emoji: '<img src=x>' }], vi.fn());
+    expect(container.querySelector('.option-card__text').textContent).toBe('<b>text</b>');
+    expect(container.querySelector('b, img')).toBeNull();
+  });
 });
 
 describe('createOptionCards — click', () => {

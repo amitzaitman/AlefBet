@@ -12,9 +12,6 @@ import { makeShellStub } from '../helpers.js';
 vi.mock('../../audio/sounds.js', () => ({
   sounds: { correct: vi.fn(), wrong: vi.fn(), cheer: vi.fn(), click: vi.fn() },
 }));
-vi.mock('../../audio/tts.js', () => ({
-  tts: { speak: vi.fn().mockResolvedValue(undefined), speakNikud: vi.fn().mockResolvedValue(undefined) },
-}));
 vi.mock('../../ui/completion-screen.js', () => ({
   showCompletionScreen: vi.fn(),
 }));

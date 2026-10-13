@@ -5,28 +5,37 @@ import {
 
 const NIKUD = /[֑-ׇ]/g;
 
+// The two hottest random loops collect failures in plain JS and assert once;
+// each failure names the broken rule and the round.
+/** @param {*} n @param {number} min @param {number} max */
+const wholeIn = (n, min, max) => Number.isInteger(n) && n >= min && n <= max;
+/** @param {any[]} actual @param {any[]} expected */
+const same = (actual, expected) => actual.length === expected.length && actual.every((value, i) => value === expected[i]);
+
 describe('balloon-stories rounds', () => {
   it('follows the three stages and keeps every picture within ten', () => {
+    const bad = [];
     for (let run = 0; run < 300; run++) {
       const rounds = createRounds();
-      expect(rounds.map(round => round.kind).slice(0, 2)).toEqual(['take', 'add']);
-      expect(['take', 'add']).toContain(rounds[2].kind);
-      expect(rounds.map(round => round.kind).slice(3, 5)).toEqual(['compare', 'missing']);
-      expect(['compare', 'missing']).toContain(rounds[5].kind);
-      expect(rounds.slice(6).every(round => round.kind === 'match')).toBe(true);
-      expect(rounds.slice(6, 8).map(round => round.op)).toEqual(['-', '+']);
+      const check = (ok, why, round) => { if (!ok) bad.push({ why, round: round ?? rounds }); };
+      const kinds = rounds.map(round => round.kind);
+      check(same(kinds.slice(0, 2), ['take', 'add']), 'stage one does not open with take, add');
+      check(['take', 'add'].includes(rounds[2].kind), 'round 3 is not take or add');
+      check(same(kinds.slice(3, 5), ['compare', 'missing']), 'stage two does not open with compare, missing');
+      check(['compare', 'missing'].includes(rounds[5].kind), 'round 6 is not compare or missing');
+      check(rounds.slice(6).every(round => round.kind === 'match'), 'stage three is not all match');
+      check(same(rounds.slice(6, 8).map(round => round.op), ['-', '+']), 'stage three does not open with -, +');
       // The last round of each of the first two stages trades balloons for circles.
-      expect(rounds.slice(0, 6).map(round => round.look)).toEqual(['balloons', 'balloons', 'dots', 'balloons', 'balloons', 'dots']);
+      check(same(rounds.slice(0, 6).map(round => round.look), ['balloons', 'balloons', 'dots', 'balloons', 'balloons', 'dots']), 'wrong looks');
       for (const round of rounds) {
-        const answer = answerFor(round);
-        expect(answer).toBeGreaterThanOrEqual(1);
-        expect(answer).toBeLessThanOrEqual(10);
-        expect(round.b).toBeGreaterThanOrEqual(2);
-        if (round.kind === 'take' || round.kind === 'compare') expect(round.b).toBeLessThan(round.a);
-        if (round.kind === 'add') expect(round.a + round.b).toBeLessThanOrEqual(10);
-        if (round.kind === 'missing') expect(round.a).toBeGreaterThanOrEqual(2);
+        check(wholeIn(answerFor(round), 1, 10), 'answer outside 1-10', round);
+        check(wholeIn(round.b, 2, Infinity), 'b below 2', round);
+        if (round.kind === 'take' || round.kind === 'compare') check(Number.isInteger(round.a) && round.b < round.a, 'b not below a', round);
+        if (round.kind === 'add') check(Number.isInteger(round.a) && round.a + round.b <= 10, 'sum above 10', round);
+        if (round.kind === 'missing') check(wholeIn(round.a, 2, Infinity), 'a below 2', round);
       }
     }
+    expect(bad).toEqual([]);
   });
 
   it('solves each meaning of addition and subtraction', () => {
@@ -39,17 +48,20 @@ describe('balloon-stories rounds', () => {
   });
 
   it('offers four sorted choices with the telling mistakes', () => {
+    const bad = [];
     for (let run = 0; run < 300; run++) {
       for (const kind of ['take', 'add', 'compare', 'missing']) {
         const round = createRound({ kind, max: 9 });
         const choices = answerChoices(round);
-        expect(choices).toHaveLength(4);
-        expect(new Set(choices).size).toBe(4);
-        expect(choices).toContain(answerFor(round));
-        expect([...choices].sort((x, y) => x - y)).toEqual(choices);
-        expect(choices.every(n => n >= 0 && n <= 10)).toBe(true);
+        const check = (ok, why) => { if (!ok) bad.push({ why, round, choices }); };
+        check(choices.length === 4, 'not four choices');
+        check(new Set(choices).size === 4, 'repeated choice');
+        check(choices.includes(answerFor(round)), 'correct answer missing');
+        check(same([...choices].sort((x, y) => x - y), choices), 'not sorted');
+        check(choices.every(n => wholeIn(n, 0, 10)), 'choice outside 0-10');
       }
     }
+    expect(bad).toEqual([]);
     // Adding instead of subtracting, and naming the popped balloons, are both offered.
     expect(answerChoices({ kind: 'take', a: 6, b: 2, look: 'balloons' })).toEqual(expect.arrayContaining([4, 8, 2]));
     expect(answerChoices({ kind: 'missing', a: 4, b: 7, look: 'balloons' })).toEqual(expect.arrayContaining([3, 7, 4]));

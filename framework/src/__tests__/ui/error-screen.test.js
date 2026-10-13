@@ -3,19 +3,23 @@
  * שגיאה לא-מטופלת מציגה כיסוי ידידותי פעם אחת; רעש מוכר מסונן;
  * ההתקנה אידמפוטנטית וניתנת לפירוק.
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { installGlobalErrorScreen } from '../../ui/error-screen.js';
 
 /** @type {{ destroy: () => void } | null} */
 let handle = null;
+/** המסך מדפיס כל שגיאה שהוא תופס, ורוב הבדיקות כאן גורמות לשגיאה בכוונה. */
+let errorLog;
 
 beforeEach(() => {
   document.body.innerHTML = '';
+  errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
   handle?.destroy();
   handle = null;
+  errorLog.mockRestore();
 });
 
 function fireError(message) {
@@ -31,6 +35,7 @@ describe('installGlobalErrorScreen', () => {
     expect(overlay).not.toBeNull();
     expect(overlay.textContent).toContain('מַשֶּׁהוּ הִשְׁתַּבֵּשׁ');
     expect(overlay.querySelector('.ab-error-screen__reload')).not.toBeNull();
+    expect(errorLog).toHaveBeenCalledWith('[alefbet] uncaught error:', expect.objectContaining({ message: 'boom' }));
   });
 
   it('הכיסוי מוצג פעם אחת בלבד גם על שגיאות מרובות', () => {
@@ -47,12 +52,14 @@ describe('installGlobalErrorScreen', () => {
     /** @type {any} */ (ev).reason = new Error('rejected!');
     window.dispatchEvent(ev);
     expect(document.querySelector('.ab-error-screen')).not.toBeNull();
+    expect(errorLog).toHaveBeenCalledWith('[alefbet] unhandled rejection:', /** @type {any} */ (ev).reason);
   });
 
   it('רעש מוכר (ResizeObserver) מסונן ולא מקפיץ כיסוי', () => {
     handle = installGlobalErrorScreen();
     fireError('ResizeObserver loop completed with undelivered notifications.');
     expect(document.querySelector('.ab-error-screen')).toBeNull();
+    expect(errorLog).not.toHaveBeenCalled();
   });
 
   it('התקנה כפולה לא מוסיפה מאזינים; destroy מנקה', () => {

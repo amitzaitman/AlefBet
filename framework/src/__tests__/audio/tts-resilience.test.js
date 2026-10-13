@@ -112,6 +112,7 @@ afterEach(() => {
   delete globalThis.SpeechSynthesisUtterance;
   vi.resetModules();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe('tts resilience (local-only)', () => {
@@ -168,6 +169,7 @@ describe('tts resilience (local-only)', () => {
 
   it('voiceschanged never fires within ~2s timeout → fallthrough with warning', async () => {
     vi.useFakeTimers();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const synth = makeSynthStub({ voices: [] });
     globalThis.speechSynthesis = synth;
 
@@ -185,6 +187,7 @@ describe('tts resilience (local-only)', () => {
       typeof e.detail?.reason === 'string' && e.detail.reason.toLowerCase().includes('timeout')
     );
     expect(errorTimeout).toBe(true);
+    expect(warn).toHaveBeenCalledWith('[tts] browser TTS failed', expect.objectContaining({ reason: 'voice-load-timeout' }));
   });
 
   it('offline prefers a locally-installed voice over a network voice', async () => {
@@ -234,6 +237,7 @@ describe('tts resilience (local-only)', () => {
   });
 
   it('browser speech fails → state=failed + error event (no silent fallback)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const synth = makeSynthStub({
       voices: [{ name: 'Carmit', lang: 'he-IL' }],
       speakImpl: (utt) => {
@@ -252,10 +256,12 @@ describe('tts resilience (local-only)', () => {
     const failed = stateEvents().filter(e => e.detail?.state === 'failed');
     expect(failed.length).toBeGreaterThanOrEqual(1);
     expect(errorEvents().length).toBeGreaterThanOrEqual(1);
+    expect(warn).toHaveBeenCalledWith('[tts] browser TTS failed', expect.objectContaining({ reason: 'language-unavailable' }));
   });
 
   it('watchdog: utterance that never ends resolves as failure instead of hanging', async () => {
     vi.useFakeTimers();
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     // קול רשת אופליין ב-Chrome: speak() נקרא אבל לא onend ולא onerror.
     const synth = makeSynthStub({
       voices: [{ name: 'Google עברית', lang: 'he-IL', localService: false }],
@@ -273,6 +279,7 @@ describe('tts resilience (local-only)', () => {
     expect(tts.audioState).toBe('failed');
     const timeoutError = errorEvents().some(e => String(e.detail?.reason).includes('utterance-timeout'));
     expect(timeoutError).toBe(true);
+    expect(warn).toHaveBeenCalledWith('[tts] browser TTS failed', expect.objectContaining({ reason: 'utterance-timeout' }));
   });
 
   it('audioState transitions idle → ready on success', async () => {
