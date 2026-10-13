@@ -1,13 +1,9 @@
-import { GameShell } from '../core/game-shell.js';
 /**
- * עוזרי בדיקה משותפים
- *
- * כולל מפעלי mock שהיו כפולים בעבר ב-voice-store.test.js וב-voice-recorder.test.js.
- * כמו כן עוזרי DOM ו-shell סטאבים לבדיקות round-manager ו-choice-round.
+ * עוזרי בדיקה משותפים: מיכל DOM, shell לבדיקות סיבובים, ו-mocks ל-IndexedDB
+ * (voice-store) ול-MediaRecorder (voice-recorder).
  */
 import { vi } from 'vitest';
-
-// ── DOM ─────────────────────────────────────────────────────────────────────
+import { GameShell } from '../core/game-shell.js';
 
 /**
  * בונה אלמנט מיכל טרי במסמך. מנקה קודם את ה-body.
@@ -15,141 +11,64 @@ import { vi } from 'vitest';
  */
 export function mountContainer() {
   document.body.innerHTML = '';
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
+  return document.body.appendChild(document.createElement('div'));
 }
 
-// ── GameShell stub ──────────────────────────────────────────────────────────
-
 /**
- * shell מינימלי לבדיקות round-manager: חושף state עם nextRound/addScore/score/currentRound.
+ * GameShell אמיתי בלי DOM במסמך, לבדיקות round-manager ו-choice-round.
  * @param {number} totalRounds
  */
 export function makeShellStub(totalRounds = 3) {
   return new GameShell(document.createElement('div'), { totalRounds });
 }
 
-// ── IndexedDB mock (משותף ל-voice-store tests) ──────────────────────────────
-
 /**
- * מחזיר stub של IndexedDB בזיכרון.
- * תומך ב-open, transaction (readwrite/readonly), put, get, delete, getAllKeys.
+ * IndexedDB בזיכרון: open, transaction, put, get, delete, getAllKeys.
+ * בקשות וטרנזקציות נסגרות ב-microtask, כמו ב-API האמיתי.
  */
 export function createIDBMock() {
-  const _data = new Map();
-
-  function makeReq(resolveFn) {
-    const req = { result: undefined, error: null, onsuccess: null, onerror: null };
-    Promise.resolve().then(() => {
-      try {
-        req.result = resolveFn();
-        req.onsuccess?.({ target: req });
-      } catch (err) {
-        req.error = err;
-        req.onerror?.({ target: req });
-      }
-    });
+  const data = new Map();
+  const later = fn => Promise.resolve().then(fn);
+  const request = read => {
+    const req = { result: undefined, onsuccess: null };
+    later(() => { req.result = read(); req.onsuccess?.({ target: req }); });
     return req;
-  }
-
-  function makeDB() {
-    return {
-      transaction() {
-        const tx = { oncomplete: null, onerror: null };
-        tx.objectStore = function () {
-          return {
-            put(value, key) {
-              _data.set(key, value);
-              Promise.resolve().then(() => tx.oncomplete?.());
-              return {};
-            },
-            get(key) {
-              return makeReq(() => _data.get(key));
-            },
-            delete(key) {
-              _data.delete(key);
-              Promise.resolve().then(() => tx.oncomplete?.());
-              return {};
-            },
-            getAllKeys() {
-              return makeReq(() => [..._data.keys()]);
-            },
-          };
-        };
-        return tx;
-      },
-    };
-  }
-
-  const db = makeDB();
-
-  function open() {
-    const req = {
-      result: null,
-      error: null,
-      onupgradeneeded: null,
-      onsuccess: null,
-      onerror: null,
-    };
-    Promise.resolve().then(() => {
-      req.result = db;
-      req.onsuccess?.({ target: req });
-    });
-    return req;
-  }
-
-  return { open: vi.fn(open) };
+  };
+  const db = {
+    transaction() {
+      const tx = { oncomplete: null };
+      const write = change => { change(); later(() => tx.oncomplete?.()); return {}; };
+      tx.objectStore = () => ({
+        put: (value, key) => write(() => data.set(key, value)),
+        get: key => request(() => data.get(key)),
+        delete: key => write(() => data.delete(key)),
+        getAllKeys: () => request(() => [...data.keys()]),
+      });
+      return tx;
+    },
+  };
+  return { open: vi.fn(() => request(() => db)) };
 }
-
-// ── MediaRecorder mock (משותף ל-voice-recorder tests) ──────────────────────
 
 /**
- * בונה class MockMediaRecorder עם הגדרות:
- *   supported[] — רשימת mime types שיודיעו עליהם כנתמכים.
- *   autoStop    — אם true, stop() ישגר onstop מיידית.
+ * MediaRecorder מדומה. `supported`: ה-MIME types שידווחו כנתמכים;
+ * עם autoStop, stop() יורה onstop מיד. כל המופעים נאספים ב-`instances`.
  */
 export function makeMockMediaRecorder({ supported = ['audio/webm'], autoStop = true } = {}) {
-  const instances = [];
-
-  class MockMediaRecorder {
+  return class MockMediaRecorder {
+    static instances = [];
+    static isTypeSupported(type) { return supported.includes(type); }
     constructor(stream, options) {
-      this.stream    = stream;
-      this.options   = options;
-      this.state     = 'inactive';
-      this.mimeType  = options?.mimeType ?? 'audio/webm';
-      this.ondataavailable = null;
-      this.onstop    = null;
-      this.onerror   = null;
-      instances.push(this);
+      Object.assign(this, { stream, options, state: 'inactive', mimeType: options?.mimeType ?? 'audio/webm' });
+      MockMediaRecorder.instances.push(this);
     }
-
     start() {
       this.state = 'recording';
-      Promise.resolve().then(() => {
-        this.ondataavailable?.({ data: { size: 10 } });
-      });
+      Promise.resolve().then(() => this.ondataavailable?.({ data: { size: 10 } }));
     }
-
     stop() {
       this.state = 'inactive';
-      if (autoStop) {
-        Promise.resolve().then(() => this.onstop?.());
-      }
+      if (autoStop) Promise.resolve().then(() => this.onstop?.());
     }
-
-    static isTypeSupported(type) {
-      return supported.includes(type);
-    }
-  }
-
-  MockMediaRecorder.instances = instances;
-  return MockMediaRecorder;
-}
-
-/** Stream mock עם track יחיד שחושף stop. */
-export function makeMockStream() {
-  return {
-    getTracks: vi.fn(() => [{ stop: vi.fn() }]),
   };
 }

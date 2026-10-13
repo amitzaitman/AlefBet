@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createVoiceRecorder, isVoiceRecordingSupported } from '../../../games/sound-studio/voice-recorder.js';
 import { createVoiceRecordButton } from '../../../games/sound-studio/voice-record-button.js';
-import { makeMockMediaRecorder, makeMockStream, mountContainer } from './helpers.js';
+import { makeMockMediaRecorder, mountContainer } from './helpers.js';
 
 // The record button lives in the sound studio and reaches the voice store through the runtime bundle.
 vi.mock('../../dist/runtime.js', async importOriginal => ({ ...await importOriginal(), playVoice: vi.fn(async () => true), loadVoice: vi.fn(async () => null), saveVoice: vi.fn(), deleteVoice: vi.fn() }));
@@ -10,19 +10,20 @@ vi.mock('../../dist/runtime.js', async importOriginal => ({ ...await importOrigi
 // so one import serves every test and each test stubs the globals it needs.
 afterEach(() => { vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
+/** A microphone stream whose single track can be stopped. */
+const stream = (stop = vi.fn()) => ({ getTracks: () => [{ stop }] });
+
 /**
  * Stubs a working microphone and returns a fresh recorder.
- * @param {{ supported?: string[], autoStop?: boolean, stream?: object }} [opts]
+ * @param {{ supported?: string[], autoStop?: boolean, getUserMedia?: Function, MR?: Function }} [opts]
  */
-function setup({ supported, autoStop, stream = makeMockStream() } = {}) {
-  const MockMR = makeMockMediaRecorder({ supported, autoStop });
-  const getUserMedia = vi.fn().mockResolvedValue(stream);
-  vi.stubGlobal('MediaRecorder', MockMR);
+function setup({ supported, autoStop, getUserMedia = vi.fn().mockResolvedValue(stream()), MR = makeMockMediaRecorder({ supported, autoStop }) } = {}) {
+  vi.stubGlobal('MediaRecorder', MR);
   vi.stubGlobal('Blob', class MockBlob {
     constructor(parts, opts) { this.parts = parts; this.type = opts?.type ?? ''; }
   });
   vi.stubGlobal('navigator', { mediaDevices: { getUserMedia } });
-  return { MockMR, getUserMedia, rec: createVoiceRecorder() };
+  return { MR, getUserMedia, rec: createVoiceRecorder() };
 }
 
 describe('isVoiceRecordingSupported', () => {
@@ -38,72 +39,43 @@ describe('isVoiceRecordingSupported', () => {
   });
 });
 
-describe('createVoiceRecorder — start / stop', () => {
-  it('isActive() is false before start()', () => {
-    expect(setup().rec.isActive()).toBe(false);
-  });
-
-  it('start() calls getUserMedia and transitions to recording state', async () => {
+describe('createVoiceRecorder', () => {
+  it('records from the microphone and stop() resolves with a Blob', async () => {
     const { rec, getUserMedia } = setup();
+    expect(rec.isActive()).toBe(false);
     await rec.start();
     expect(getUserMedia).toHaveBeenCalledWith({ audio: true, video: false });
     expect(rec.isActive()).toBe(true);
-  });
-
-  it('stop() resolves with a Blob', async () => {
-    const { rec } = setup({ autoStop: true });
-    await rec.start();
     const blob = await rec.stop();
-    expect(blob).toBeDefined();
     expect(blob.constructor.name).toBe('MockBlob');
-  });
-
-  it('isActive() returns false after stop()', async () => {
-    const { rec } = setup({ autoStop: true });
-    await rec.start();
-    await rec.stop();
     expect(rec.isActive()).toBe(false);
   });
 
-  it('stop() rejects when not recording', async () => {
-    await expect(setup().rec.stop()).rejects.toThrow('[voice-recorder] not recording');
-  });
-});
-
-describe('createVoiceRecorder — cancel', () => {
-  it('cancel() does not throw when not recording', () => {
+  it('stop() rejects and cancel() does nothing when not recording', async () => {
     const { rec } = setup();
     expect(() => rec.cancel()).not.toThrow();
+    await expect(rec.stop()).rejects.toThrow('[voice-recorder] not recording');
   });
 
-  it('cancel() stops the media stream tracks', async () => {
+  it('start() is idempotent while recording, and cancel() stops the stream tracks', async () => {
     const trackStop = vi.fn();
-    const { rec } = setup({ autoStop: false, stream: { getTracks: vi.fn(() => [{ stop: trackStop }]) } });
+    const { rec, getUserMedia } = setup({ autoStop: false, getUserMedia: vi.fn().mockResolvedValue(stream(trackStop)) });
     await rec.start();
+    await rec.start(); // second call while already recording
+    expect(getUserMedia).toHaveBeenCalledOnce();
     rec.cancel();
     expect(trackStop).toHaveBeenCalled();
     expect(rec.isActive()).toBe(false);
   });
 
-  it('start() is idempotent while already recording', async () => {
-    const { rec, getUserMedia } = setup({ autoStop: false });
+  it.each([
+    [['audio/ogg;codecs=opus'], 'audio/ogg;codecs=opus'],
+    [[], undefined],
+  ])('with %j supported, records with mimeType %s and labels the Blob with it', async (supported, mimeType) => {
+    const { rec, MR } = setup({ supported });
     await rec.start();
-    await rec.start(); // second call while already recording
-    expect(getUserMedia).toHaveBeenCalledOnce();
-  });
-});
-
-describe('createVoiceRecorder — MIME type selection', () => {
-  it('uses the first supported MIME type', async () => {
-    const { rec, MockMR } = setup({ supported: ['audio/ogg;codecs=opus'] });
-    await rec.start();
-    expect(MockMR.instances[0].options?.mimeType).toBe('audio/ogg;codecs=opus');
-  });
-
-  it('passes no mimeType option when none are supported', async () => {
-    const { rec, MockMR } = setup({ supported: [] });
-    await rec.start();
-    expect(MockMR.instances[0].options?.mimeType).toBeFalsy();
+    expect(MR.instances[0].options?.mimeType).toBe(mimeType);
+    expect((await rec.stop()).type).toBe(mimeType ?? 'audio/webm');
   });
 });
 
@@ -111,51 +83,45 @@ describe('createVoiceRecorder — recording permissions', () => {
   it('stops a late stream after cancellation and allows a new recording', async () => {
     let allow;
     const stop = vi.fn();
-    const getUserMedia = vi.fn().mockImplementationOnce(() => new Promise(resolve => { allow = resolve; }))
-      .mockResolvedValue({ getTracks: () => [{ stop: vi.fn() }] });
-    vi.stubGlobal('navigator', { mediaDevices: { getUserMedia } });
-    const MR = makeMockMediaRecorder(); vi.stubGlobal('MediaRecorder', MR);
-    const recorder = createVoiceRecorder();
-    const pending = recorder.start();
-    const rejected = expect(pending).rejects.toMatchObject({ name: 'AbortError' });
-    recorder.cancel();
-    await recorder.start();
-    allow({ getTracks: () => [{ stop }] });
+    const { rec, MR } = setup({
+      getUserMedia: vi.fn().mockImplementationOnce(() => new Promise(resolve => { allow = resolve; })).mockResolvedValue(stream()),
+    });
+    const rejected = expect(rec.start()).rejects.toMatchObject({ name: 'AbortError' });
+    rec.cancel();
+    await rec.start();
+    allow(stream(stop));
     await rejected;
     expect(stop).toHaveBeenCalledOnce();
-    expect(recorder.isActive()).toBe(true);
+    expect(rec.isActive()).toBe(true);
     expect(MR.instances).toHaveLength(1);
-    recorder.cancel();
+    rec.cancel();
   });
 
   it('shares a pending permission request and releases the stream if construction fails', async () => {
     let allow;
-    const stop = vi.fn(), getUserMedia = vi.fn(() => new Promise(resolve => { allow = resolve; }));
-    vi.stubGlobal('navigator', { mediaDevices: { getUserMedia } });
-    vi.stubGlobal('MediaRecorder', class { static isTypeSupported() { return false; } constructor() { throw new Error('unsupported'); } });
-    const recorder = createVoiceRecorder();
-    const a = recorder.start(), b = recorder.start();
-    const results = Promise.allSettled([a, b]);
+    const stop = vi.fn();
+    const { rec, getUserMedia } = setup({
+      getUserMedia: vi.fn(() => new Promise(resolve => { allow = resolve; })),
+      MR: class { static isTypeSupported() { return false; } constructor() { throw new Error('unsupported'); } },
+    });
+    const results = Promise.allSettled([rec.start(), rec.start()]);
     expect(getUserMedia).toHaveBeenCalledOnce();
-    allow({ getTracks: () => [{ stop }] });
+    allow(stream(stop));
     expect((await results).every(result => result.status === 'rejected')).toBe(true);
     expect(stop).toHaveBeenCalledOnce();
   });
-});
 
-describe('voice record button (voice-record-button.js)', () => {
-  it('destroying a recording button during permission prompt cannot restart it', async () => {
+  it('destroying a record button during the permission prompt cannot restart it', async () => {
     vi.useFakeTimers();
     let allow;
     const stop = vi.fn();
-    vi.stubGlobal('navigator', { mediaDevices: { getUserMedia: () => new Promise(resolve => { allow = resolve; }) } });
-    const MR = makeMockMediaRecorder(); vi.stubGlobal('MediaRecorder', MR);
+    const { MR } = setup({ getUserMedia: () => new Promise(resolve => { allow = resolve; }) });
     const host = mountContainer();
     const button = createVoiceRecordButton(host, { gameId: 'g', voiceKey: 'r' });
     await button.refresh();
     host.querySelector('.ab-voice-btn--record').click();
     button.destroy();
-    allow({ getTracks: () => [{ stop }] });
+    allow(stream(stop));
     await vi.advanceTimersByTimeAsync(0);
     expect(stop).toHaveBeenCalledOnce();
     expect(MR.instances).toHaveLength(0);

@@ -13,16 +13,12 @@ vi.mock('../../audio/voice-store.js', () => ({
 
 vi.mock('../../audio/tts.js', () => {
   const state = { value: 'ready' };
-  return {
-    tts: {
-      cancel: vi.fn(),
-      speak: vi.fn(async () => {}),
-      speakVowel: vi.fn(async () => {}),
-      speakNikud: vi.fn(async () => {}),
-      get audioState() { return state.value; },
-      _setTestState(v) { state.value = v; },
-    },
-  };
+  const speech = () => vi.fn(async () => {});
+  return { tts: {
+    cancel: vi.fn(), speak: speech(), speakVowel: speech(), speakNikud: speech(),
+    get audioState() { return state.value; },
+    _setTestState(v) { state.value = v; },
+  } };
 });
 
 vi.mock('../../audio/phoneme-synth.js', () => ({
@@ -31,10 +27,7 @@ vi.mock('../../audio/phoneme-synth.js', () => ({
 }));
 
 import {
-  SOUND_BANK_ID,
-  letterKey, nikudKey, syllableKey,
-  standardSoundKeys,
-  speakLetter, speakNikudSound, speakSyllable,
+  SOUND_BANK_ID, letterKey, nikudKey, syllableKey, standardSoundKeys, speakLetter, speakNikudSound, speakSyllable,
 } from '../../audio/hebrew-audio.js';
 import { playVoice } from '../../audio/voice-store.js';
 import { tts } from '../../audio/tts.js';
@@ -51,73 +44,54 @@ beforeEach(() => {
   vi.stubGlobal('indexedDB', {});
 });
 
-describe('סכימת מפתחות', () => {
-  it('בוני מפתחות יציבים', () => {
-    expect(letterKey('ב')).toBe('letter:ב');
-    expect(nikudKey('kamatz')).toBe('nikud:kamatz');
-    expect(syllableKey('ב', 'kamatz')).toBe('syllable:ב:kamatz');
-  });
-
-  it('standardSoundKeys מכסה אותיות + ניקוד + הברות ללא כפילויות', () => {
-    const keys = standardSoundKeys();
-    const expected = hebrewLetters.length + nikudList.length + nikudBaseLetters.length * nikudList.length;
-    expect(keys).toHaveLength(expected);
-    expect(new Set(keys.map(k => k.key)).size).toBe(expected);
-    for (const k of keys) {
-      expect(['letters', 'nikud', 'syllables']).toContain(k.group);
-      expect(k.label).toBeTruthy();
-    }
-  });
+it('סכימת מפתחות יציבה, ו-standardSoundKeys מכסה אותיות + ניקוד + הברות ללא כפילויות', () => {
+  expect(letterKey('ב')).toBe('letter:ב');
+  expect(nikudKey('kamatz')).toBe('nikud:kamatz');
+  expect(syllableKey('ב', 'kamatz')).toBe('syllable:ב:kamatz');
+  const keys = standardSoundKeys();
+  const expected = hebrewLetters.length + nikudList.length + nikudBaseLetters.length * nikudList.length;
+  expect(keys).toHaveLength(expected);
+  expect(new Set(keys.map(k => k.key)).size).toBe(expected);
+  for (const k of keys) {
+    expect(['letters', 'nikud', 'syllables']).toContain(k.group);
+    expect(k.label).toBeTruthy();
+  }
 });
 
 describe('סדר הספקים', () => {
   it('הקלטת מורה קודמת לכל: בנק מצליח => TTS וסינתזה לא נקראים', async () => {
     playVoice.mockResolvedValue(true);
-    const source = await speakSyllable('ב', 'kamatz');
-    expect(source).toBe('bank');
+    expect(await speakSyllable('ב', 'kamatz')).toBe('bank');
     expect(playVoice).toHaveBeenCalledWith(SOUND_BANK_ID, 'syllable:ב:kamatz');
     expect(tts.speakNikud).not.toHaveBeenCalled();
     expect(synthesizeSyllable).not.toHaveBeenCalled();
   });
 
   it('אין הקלטה => TTS, וכשה-TTS תקין לא מסנתזים', async () => {
-    const source = await speakSyllable('ב', 'kamatz');
-    expect(source).toBe('tts');
+    expect(await speakSyllable('ב', 'kamatz')).toBe('tts');
     expect(tts.speakNikud).toHaveBeenCalledWith('ב', 'ָ');
     expect(synthesizeSyllable).not.toHaveBeenCalled();
   });
 
-  it('TTS נכשל => נופלים לסינתזה מקומית', async () => {
+  it('TTS נכשל => נופלים לסינתזה מקומית של העיצור והתנועה הנכונים', async () => {
     tts._setTestState('failed');
-    const source = await speakSyllable('ב', 'kamatz');
-    expect(source).toBe('synth');
-    // ב=b, קמץ=a - הסינתזה מקבלת את העיצור והתנועה הנכונים
-    expect(synthesizeSyllable).toHaveBeenCalledWith('b', 'a');
-  });
-
-  it('speakNikudSound נופל לסינתזת התנועה המתאימה', async () => {
-    tts._setTestState('failed');
-    const source = await speakNikudSound('hiriq');
-    expect(source).toBe('synth');
+    expect(await speakSyllable('ב', 'kamatz')).toBe('synth');
+    expect(synthesizeSyllable).toHaveBeenCalledWith('b', 'a'); // ב=b, קמץ=a
+    expect(await speakNikudSound('hiriq')).toBe('synth');
     expect(synthesizeVowel).toHaveBeenCalledWith('i');
   });
 
-
   it('speakLetter מקריא את שם האות ב-TTS', async () => {
-    const source = await speakLetter('ב');
-    expect(source).toBe('tts');
+    expect(await speakLetter('ב')).toBe('tts');
     // השוואה מול הנתונים עצמם - סדר תווי הניקוד המשולבים אינו נורמליזציה יציבה
-    const bet = hebrewLetters.find(l => l.letter === 'ב');
-    expect(tts.speak).toHaveBeenCalledWith(bet.nameNikud);
+    expect(tts.speak).toHaveBeenCalledWith(hebrewLetters.find(l => l.letter === 'ב').nameNikud);
   });
 
   it('כשל בבנק (חריגה) לא מפיל את השרשרת', async () => {
     playVoice.mockRejectedValue(new Error('idb broken'));
-    const source = await speakNikudSound('kamatz');
-    expect(source).toBe('tts');
+    expect(await speakNikudSound('kamatz')).toBe('tts');
   });
 });
-
 
 describe('round audio cancellation', () => {
   it('never starts playback for an ended round', async () => {

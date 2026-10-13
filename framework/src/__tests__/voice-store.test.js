@@ -1,220 +1,75 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createIDBMock } from './helpers.js';
 
-// voice-store.js has a module-level _dbPromise cache.
-// Reset modules before each test to get a fresh cache, then stub indexedDB.
-
-afterEach(() => {
-  vi.unstubAllGlobals();
+// voice-store.js caches its database promise at module level,
+// so each test loads a fresh module over a fresh IndexedDB stub.
+let store;
+beforeEach(async () => {
+  vi.stubGlobal('indexedDB', createIDBMock());
   vi.resetModules();
+  store = await import('../audio/voice-store.js');
 });
+afterEach(() => { vi.unstubAllGlobals(); });
 
-// ── saveVoice / loadVoice ─────────────────────────────────────────────────────
+/** Stubs blob URLs and the <audio> fallback; `onPlay(audio)` decides how playback goes. */
+function stubAudio(onPlay) {
+  vi.stubGlobal('URL', { createObjectURL: vi.fn(() => 'blob:fake-url'), revokeObjectURL: vi.fn() });
+  const pause = vi.fn(), play = vi.fn(onPlay);
+  vi.stubGlobal('Audio', class { pause = pause; play() { return play(this); } });
+  return { pause, play };
+}
 
-describe('saveVoice + loadVoice', () => {
-  it('saves and retrieves a blob by gameId + voiceKey', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { saveVoice, loadVoice } = await import('../audio/voice-store.js');
-    const blob = { _type: 'audio/webm', size: 42 };
-
-    await saveVoice('game-1', 'instruction-welcome', blob);
-    const result = await loadVoice('game-1', 'instruction-welcome');
-
-    expect(result).toBe(blob);
-  });
-
-  it('loadVoice returns null for an unknown key', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { loadVoice } = await import('../audio/voice-store.js');
-
-    expect(await loadVoice('game-1', 'nope')).toBeNull();
-  });
-
-  it('composite key isolates recordings per game', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { saveVoice, loadVoice } = await import('../audio/voice-store.js');
-    const blobA = { game: 'A' };
-    const blobB = { game: 'B' };
-
+describe('saveVoice / loadVoice / deleteVoice', () => {
+  it('saves, overwrites and isolates recordings per game; unknown keys load as null', async () => {
+    const { saveVoice, loadVoice } = store;
+    const blobA = { game: 'A' }, blobB = { game: 'B' }, updated = { version: 2 };
     await saveVoice('game-A', 'welcome', blobA);
     await saveVoice('game-B', 'welcome', blobB);
-
     expect(await loadVoice('game-A', 'welcome')).toBe(blobA);
     expect(await loadVoice('game-B', 'welcome')).toBe(blobB);
+    await saveVoice('game-A', 'welcome', updated);
+    expect(await loadVoice('game-A', 'welcome')).toBe(updated);
+    expect(await loadVoice('game-A', 'nope')).toBeNull();
   });
 
-  it('overwrites an existing recording', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { saveVoice, loadVoice } = await import('../audio/voice-store.js');
-    const old = { version: 1 };
-    const updated = { version: 2 };
-
-    await saveVoice('game-1', 'key', old);
-    await saveVoice('game-1', 'key', updated);
-
-    expect(await loadVoice('game-1', 'key')).toBe(updated);
+  it('deleteVoice removes a stored recording and does not throw for a missing key', async () => {
+    await store.saveVoice('game-1', 'to-delete', { size: 10 });
+    await store.deleteVoice('game-1', 'to-delete');
+    expect(await store.loadVoice('game-1', 'to-delete')).toBeNull();
+    await expect(store.deleteVoice('game-1', 'ghost')).resolves.not.toThrow();
   });
 });
-
-// ── deleteVoice ───────────────────────────────────────────────────────────────
-
-describe('deleteVoice', () => {
-  it('removes a stored recording', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { saveVoice, loadVoice, deleteVoice } = await import('../audio/voice-store.js');
-    const blob = { size: 10 };
-
-    await saveVoice('game-1', 'to-delete', blob);
-    await deleteVoice('game-1', 'to-delete');
-
-    expect(await loadVoice('game-1', 'to-delete')).toBeNull();
-  });
-
-  it('does not throw when key does not exist', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { deleteVoice } = await import('../audio/voice-store.js');
-
-    await expect(deleteVoice('game-1', 'ghost')).resolves.not.toThrow();
-  });
-});
-
-// ── listVoiceKeys ─────────────────────────────────────────────────────────────
 
 describe('listVoiceKeys', () => {
-  it('returns keys belonging to the specified game', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { saveVoice, listVoiceKeys } = await import('../audio/voice-store.js');
-    await saveVoice('game-1', 'feedback-correct', {});
-    await saveVoice('game-1', 'instruction-welcome', {});
-    await saveVoice('game-2', 'feedback-correct', {}); // different game — excluded
-
-    const keys = await listVoiceKeys('game-1');
-
-    expect(keys).toHaveLength(2);
-    expect(keys).toContain('feedback-correct');
-    expect(keys).toContain('instruction-welcome');
-  });
-
-  it('returns an empty array when no recordings exist', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { listVoiceKeys } = await import('../audio/voice-store.js');
-
-    expect(await listVoiceKeys('empty-game')).toEqual([]);
-  });
-
-  it('strips the gameId prefix from returned keys', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { saveVoice, listVoiceKeys } = await import('../audio/voice-store.js');
-    await saveVoice('game-1', 'nikud-kamatz', {});
-
-    const keys = await listVoiceKeys('game-1');
-
-    expect(keys[0]).toBe('nikud-kamatz'); // not 'game-1/nikud-kamatz'
+  it('lists only the given game\'s keys, without the gameId prefix', async () => {
+    expect(await store.listVoiceKeys('game-1')).toEqual([]);
+    await store.saveVoice('game-1', 'feedback-correct', {});
+    await store.saveVoice('game-1', 'nikud-kamatz', {});
+    await store.saveVoice('game-2', 'feedback-correct', {}); // different game — excluded
+    expect((await store.listVoiceKeys('game-1')).sort()).toEqual(['feedback-correct', 'nikud-kamatz']);
   });
 });
-
-// ── playVoice ─────────────────────────────────────────────────────────────────
 
 describe('playVoice', () => {
-  it('returns false when there is no recording', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { playVoice } = await import('../audio/voice-store.js');
-
-    expect(await playVoice('game-1', 'missing')).toBe(false);
+  it('returns false without a recording, true when the <audio> fallback ends, false when play() rejects', async () => {
+    expect(await store.playVoice('game-1', 'missing')).toBe(false);
+    await store.saveVoice('game-1', 'play-key', { size: 5 });
+    stubAudio(audio => { Promise.resolve().then(() => audio.onended?.()); return Promise.resolve(); });
+    expect(await store.playVoice('game-1', 'play-key')).toBe(true);
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fake-url');
+    stubAudio(() => Promise.reject(new Error('not allowed')));
+    expect(await store.playVoice('game-1', 'play-key')).toBe(false);
   });
 
-  it('plays the recording and returns true on success', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    // Mock URL and Audio APIs
-    vi.stubGlobal('URL', {
-      createObjectURL: vi.fn(() => 'blob:fake-url'),
-      revokeObjectURL: vi.fn(),
-    });
-
-    vi.stubGlobal('Audio', class MockAudio {
-      constructor(src) {
-        this.src = src;
-        this.onended = null;
-        this.onerror = null;
-      }
-      pause() {}
-      play() {
-        // Simulate successful playback: fire onended on next tick
-        Promise.resolve().then(() => this.onended?.());
-        return Promise.resolve();
-      }
-    });
-
-    const { saveVoice, playVoice } = await import('../audio/voice-store.js');
-    const blob = { size: 5 };
-    await saveVoice('game-1', 'play-key', blob);
-
-    const result = await playVoice('game-1', 'play-key');
-
-    expect(result).toBe(true);
+  it('pauses HTML audio and releases its URL when the round is aborted', async () => {
+    await store.saveVoice('round', 'target', { size: 5 });
+    const { pause, play } = stubAudio(() => Promise.resolve());
+    const controller = new AbortController();
+    const pending = store.playVoice('round', 'target', { signal: controller.signal });
+    await vi.waitFor(() => expect(play).toHaveBeenCalledOnce());
+    controller.abort();
+    expect(await pending).toBe(false);
+    expect(pause).toHaveBeenCalledOnce();
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:fake-url');
   });
-
-  it('returns false when audio.play() rejects', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    vi.stubGlobal('URL', {
-      createObjectURL: vi.fn(() => 'blob:fake-url'),
-      revokeObjectURL: vi.fn(),
-    });
-
-    vi.stubGlobal('Audio', class MockAudio {
-      constructor() { this.onended = null; this.onerror = null; }
-      pause() {}
-      play() { return Promise.reject(new Error('not allowed')); }
-    });
-
-    const { saveVoice, playVoice } = await import('../audio/voice-store.js');
-    await saveVoice('game-1', 'play-key', { size: 5 });
-
-    expect(await playVoice('game-1', 'play-key')).toBe(false);
-  });
-});
-
-
-it('pauses HTML audio and releases its URL when the round is aborted', async () => {
-  vi.stubGlobal('indexedDB', createIDBMock());
-  vi.stubGlobal('URL', {
-    createObjectURL: vi.fn(() => 'blob:round'), revokeObjectURL: vi.fn(),
-  });
-  const pause = vi.fn();
-  const play = vi.fn(() => Promise.resolve());
-  vi.stubGlobal('Audio', class { pause = pause; play = play; });
-  const { saveVoice, playVoice } = await import('../audio/voice-store.js');
-  await saveVoice('round', 'target', { size: 5 });
-  const controller = new AbortController();
-  const pending = playVoice('round', 'target', { signal: controller.signal });
-  await vi.waitFor(() => expect(play).toHaveBeenCalledOnce());
-  controller.abort();
-  expect(await pending).toBe(false);
-  expect(pause).toHaveBeenCalledOnce();
-  expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:round');
 });

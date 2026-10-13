@@ -3,133 +3,82 @@
  * unlock מריץ resume ומנגן באפר-אפס; playBlob נכשל ברכות כשאין decode;
  * ensureAudioRunning לא מחזיר קונטקסט קפוא (שורש הבאג של השקט באייפון).
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-
-/** בונה מחלקת AudioContext מבוקרת לבדיקה. */
-function makeCtxClass({ state = 'suspended', resumeWorks = true, withDecode = false } = {}) {
-  const calls = { resume: 0, bufferSourcesStarted: 0 };
-  class TestAudioContext {
-    constructor() {
-      this.state = state;
-      this.sampleRate = 44100;
-      this.destination = {};
-      TestAudioContext.instance = this;
-    }
-    resume() {
-      calls.resume++;
-      if (resumeWorks) this.state = 'running';
-      return Promise.resolve();
-    }
-    createBuffer(ch, len, rate) {
-      return { duration: len / rate, getChannelData: () => new Float32Array(len) };
-    }
-    createBufferSource() {
-      const src = {
-        buffer: null,
-        onended: null,
-        connect() {},
-        start() {
-          calls.bufferSourcesStarted++;
-          queueMicrotask(() => src.onended?.());
-        },
-      };
-      return src;
-    }
-  }
-  if (withDecode) {
-    TestAudioContext.prototype.decodeAudioData = function (bytes, resolve) {
-      const buffer = { duration: 0.01 };
-      if (resolve) resolve(buffer);
-      return Promise.resolve(buffer);
-    };
-  }
-  return { TestAudioContext, calls };
-}
-
-/** טוען מופע נקי של המודול אחרי החלפת ה-AudioContext הגלובלי. */
-async function loadModule(CtxClass) {
-  vi.resetModules();
-  vi.stubGlobal('AudioContext', CtxClass);
-  window.AudioContext = CtxClass;
-  return import('../../audio/audio-context.js');
-}
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 const originalCtor = window.AudioContext;
-
-beforeEach(() => { vi.resetModules(); });
 afterEach(() => {
   vi.unstubAllGlobals();
   window.AudioContext = originalCtor;
 });
 
-describe('unlockAudioOutput', () => {
-  it('resumes a suspended context and plays the canonical zero-buffer', async () => {
-    const { TestAudioContext, calls } = makeCtxClass({ state: 'suspended' });
-    const mod = await loadModule(TestAudioContext);
+/**
+ * מתקין AudioContext מבוקר וטוען מופע נקי של המודול.
+ * @param {{ state?: string, resumeWorks?: boolean, withDecode?: boolean, source?: object }} [opts]
+ */
+async function load({ state = 'suspended', resumeWorks = true, withDecode = false, source } = {}) {
+  const calls = { resume: 0, started: 0 };
+  class TestAudioContext {
+    state = state;
+    sampleRate = 44100;
+    destination = {};
+    resume() {
+      calls.resume++;
+      if (resumeWorks) this.state = 'running';
+      return Promise.resolve();
+    }
+    createBuffer(ch, len, rate) { return { duration: len / rate, getChannelData: () => new Float32Array(len) }; }
+    createBufferSource() {
+      if (source) return source;
+      const src = { connect() {}, start() { calls.started++; queueMicrotask(() => src.onended?.()); } };
+      return src;
+    }
+  }
+  if (withDecode) {
+    TestAudioContext.prototype.decodeAudioData = (bytes, resolve) => {
+      const buffer = { duration: 0.01 };
+      resolve?.(buffer);
+      return Promise.resolve(buffer);
+    };
+  }
+  vi.resetModules();
+  vi.stubGlobal('AudioContext', TestAudioContext);
+  window.AudioContext = TestAudioContext;
+  return { mod: await import('../../audio/audio-context.js'), calls };
+}
 
-    const ok = await mod.unlockAudioOutput();
-
-    expect(ok).toBe(true);
-    expect(calls.resume).toBeGreaterThanOrEqual(1);
-    expect(calls.bufferSourcesStarted).toBe(1);
-  });
-
-  it('reports false when the context stays suspended (no fake success)', async () => {
-    const { TestAudioContext } = makeCtxClass({ state: 'suspended', resumeWorks: false });
-    const mod = await loadModule(TestAudioContext);
-    expect(await mod.unlockAudioOutput()).toBe(false);
-  });
-});
-
-describe('ensureAudioRunning', () => {
-  it('returns the context only when it actually runs', async () => {
-    const { TestAudioContext } = makeCtxClass({ state: 'suspended' });
-    const mod = await loadModule(TestAudioContext);
-    expect(await mod.ensureAudioRunning()).not.toBeNull();
-  });
-
-  it('returns null for a context that cannot resume - callers fail honestly', async () => {
-    const { TestAudioContext } = makeCtxClass({ state: 'suspended', resumeWorks: false });
-    const mod = await loadModule(TestAudioContext);
-    expect(await mod.ensureAudioRunning()).toBeNull();
+describe('unlockAudioOutput / ensureAudioRunning', () => {
+  it.each([true, false])('suspended context, resume works: %s - unlock plays the zero-buffer and neither fakes success', async resumeWorks => {
+    const unlocked = await load({ resumeWorks });
+    expect(await unlocked.mod.unlockAudioOutput()).toBe(resumeWorks);
+    expect(unlocked.calls.resume).toBe(1);
+    expect(unlocked.calls.started).toBe(1);
+    // ensureAudioRunning מחזיר את הקונטקסט רק כשהוא באמת רץ - קוראים נכשלים בכנות.
+    const { mod } = await load({ resumeWorks });
+    expect(await mod.ensureAudioRunning()).toBe(resumeWorks ? mod.getAudioContext() : null);
   });
 });
 
 describe('playBlob', () => {
   it('plays a decodable blob through Web Audio and resolves true', async () => {
-    const { TestAudioContext, calls } = makeCtxClass({ state: 'running', withDecode: true });
-    const mod = await loadModule(TestAudioContext);
-
-    const ok = await mod.playBlob(new Blob(['bytes'], { type: 'audio/mpeg' }));
-
-    expect(ok).toBe(true);
-    expect(calls.bufferSourcesStarted).toBe(1);
+    const { mod, calls } = await load({ state: 'running', withDecode: true });
+    expect(await mod.playBlob(new Blob(['bytes'], { type: 'audio/mpeg' }))).toBe(true);
+    expect(calls.started).toBe(1);
   });
 
-  it('resolves false without throwing when decode is unavailable', async () => {
-    const { TestAudioContext } = makeCtxClass({ state: 'running', withDecode: false });
-    const mod = await loadModule(TestAudioContext);
-    expect(await mod.playBlob(new Blob(['bytes']))).toBe(false);
+  it('resolves false without throwing for a missing blob or when decode is unavailable', async () => {
+    expect(await (await load({ state: 'running', withDecode: true })).mod.playBlob(null)).toBe(false);
+    expect(await (await load({ state: 'running' })).mod.playBlob(new Blob(['bytes']))).toBe(false);
   });
 
-  it('resolves false for a missing blob', async () => {
-    const { TestAudioContext } = makeCtxClass({ state: 'running', withDecode: true });
-    const mod = await loadModule(TestAudioContext);
-    expect(await mod.playBlob(null)).toBe(false);
+  it('stops and disconnects a playing recording when aborted', async () => {
+    const source = { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn() };
+    const { mod } = await load({ state: 'running', withDecode: true, source });
+    const controller = new AbortController();
+    const pending = mod.playBlob(new Blob(['bytes']), { signal: controller.signal });
+    await vi.waitFor(() => expect(source.start).toHaveBeenCalledOnce());
+    controller.abort();
+    expect(await pending).toBe(false);
+    expect(source.stop).toHaveBeenCalledOnce();
+    expect(source.disconnect).toHaveBeenCalledOnce();
   });
-});
-
-
-it('stops and disconnects a playing recording when aborted', async () => {
-  const { TestAudioContext } = makeCtxClass({ state: 'running', withDecode: true });
-  const source = { connect: vi.fn(), start: vi.fn(), stop: vi.fn(), disconnect: vi.fn() };
-  TestAudioContext.prototype.createBufferSource = () => source;
-  const mod = await loadModule(TestAudioContext);
-  const controller = new AbortController();
-  const pending = mod.playBlob(new Blob(['bytes']), { signal: controller.signal });
-  await vi.waitFor(() => expect(source.start).toHaveBeenCalledOnce());
-  controller.abort();
-  expect(await pending).toBe(false);
-  expect(source.stop).toHaveBeenCalledOnce();
-  expect(source.disconnect).toHaveBeenCalledOnce();
 });
