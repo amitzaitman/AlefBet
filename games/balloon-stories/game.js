@@ -326,7 +326,7 @@ function buildScene(round, wait) {
       counted: () => after,
     },
   }[kind];
-  return { root, reset: () => setState(items, 'hidden'), question() {}, ...steps };
+  return { root, reset: () => setState(items, 'hidden'), ...steps };
 }
 
 /**
