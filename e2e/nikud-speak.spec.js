@@ -2,7 +2,6 @@
 import { test, expect, noVoice } from './network-server.js';
 
 const GAME_URL = '/games/nikud-speak/';
-const BANNER_SELECTOR = '#alefbet-audio-status-banner';
 
 /**
  * Stubs `navigator.mediaDevices.getUserMedia` so that the vowel detector
@@ -57,26 +56,17 @@ test.describe('nikud-speak', () => {
     await page.goto(GAME_URL);
 
     await expect(page.locator('.nikud-speak-card')).toBeVisible({ timeout: 10_000 });
-    const initialLabel = await page.locator('.progress-bar__label').textContent();
 
     // Tap the demo (speaker) button first. With no voice, speaking puts the
     // TTS state machine in `unsupported`, which surfaces the banner.
     await page.locator('.demo-btn').click();
 
-    const banner = page.locator(BANNER_SELECTOR);
-    await expect(banner).toBeVisible({ timeout: 5_000 });
-    const bannerText = (await banner.textContent()) || '';
-    expect(
-      bannerText.includes('הַקּוֹל אֵינוֹ זָמִין') || bannerText.includes('בְּעָיָה בַּקּוֹל'),
-      `unexpected banner text: ${JSON.stringify(bannerText)}`,
-    ).toBeTruthy();
+    const banner = page.locator('#alefbet-audio-status-banner');
+    await expect(banner).toBeVisible();
+    await expect(banner).toContainText('הַקּוֹל אֵינוֹ זָמִין');
 
     // And the round still progresses despite the audio failure.
     await pressMicUntilAdvance(page);
-
-    await expect(async () => {
-      const label = await page.locator('.progress-bar__label').textContent();
-      expect(label).not.toBe(initialLabel);
-    }).toPass({ timeout: 6_000 });
+    await expect(page.locator('.progress-bar__label')).toHaveText('1 / 8');
   });
 });

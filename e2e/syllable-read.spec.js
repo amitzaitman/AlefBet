@@ -32,13 +32,8 @@ test.describe('syllable-read', () => {
     await page.locator('.sr-replay').click();
     await expect(page.locator('.sr-replay')).toBeEnabled({ timeout: 10_000 });
 
-    const initialLabel = await page.locator('.progress-bar__label').textContent();
     await page.locator('.option-card').nth(await targetIndex(page)).click();
-
-    await expect(async () => {
-      const label = await page.locator('.progress-bar__label').textContent();
-      expect(label).not.toBe(initialLabel);
-    }).toPass({ timeout: 10_000 });
+    await expect(page.locator('.progress-bar__label')).toHaveText('1 / 8');
   });
 });
 
