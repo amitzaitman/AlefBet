@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "08819e8f31027f123cc8bbb7c2c0b4433501947b9fd74722a29b96a1c1d4b507",
+  "version": "9700d334f46374d247bde890063f8c3f2c18087f544894311bf3282483e3c9ae",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -103,7 +103,7 @@ self.ALEFBET_RELEASE = {
     "./games/balloon-stories/game.css": "eb88e3a30a6746d28599927d1367f7e8b755e3ecc1dfcb11e9ae8d9cb787131b",
     "./games/balloon-stories/game.js": "98489a8b2c66ab6b0438b1a00e14ac100f7917126c07e540ff9d7ff305eb1b17",
     "./games/balloon-stories/index.html": "ad387374dc4b99f2fb6279cba05becbcb1cc189581b83745f532098db25a6626",
-    "./games/catalog.js": "f7d8524b88707f60d399aa931afc978a361df1a0219cc57bbc5cbc1252fb29f2",
+    "./games/catalog.js": "8cf225f339271e57fd77ce4768594a78553ac3dc7c9ef06666d326214ce19306",
     "./games/fair-share/": "4728317cec3986d2abff5d90a1a7d921ee24c3354c6a00ce78753cdbee2b713c",
     "./games/fair-share/game.css": "08a3bea4ded212058720fed9c40fc9cbcfdd28b2f69f941b0443f0bfe133f3ce",
     "./games/fair-share/game.js": "d1a752d26a957a1ac530fa53c22baa174a78be2f8217d4d7efc5e03c6903a743",
