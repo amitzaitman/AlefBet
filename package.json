@@ -22,7 +22,7 @@
     "new:game": "node scripts/create-game.js",
     "setup:browsers": "playwright install --with-deps chromium webkit",
     "verify": "npm run check && npm run e2e",
-    "verify:ci": "npm run verify && npm run check:dist",
+    "verify:ci": "npm run check && npm run build && npm run check:dist && npm run e2e",
     "check:dist": "node scripts/check-dist.js"
   },
   "devDependencies": {

@@ -11,11 +11,15 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  // Public-repo Linux runners have 4 vCPUs. The tests mostly wait on game timers, so use all of them.
+  workers: process.env.CI ? '100%' : undefined,
   reporter: [['list']],
   use: {
     baseURL: 'http://localhost:8080',
     trace: 'retain-on-failure',
-
+    // A stuck click or page load fails after 15 s instead of waiting for the test timeout.
+    actionTimeout: 15_000,
+    navigationTimeout: 15_000,
   },
   projects: [
     {
@@ -27,14 +31,15 @@ export default defineConfig({
     },
     {
       name: 'mobile-chromium',
-      testMatch: /mobile\.spec\.js|math\.spec\.js|home\.spec\.js/,
+      // The same engine as desktop chromium, so only the phone specs: touch, pinch, adult tools and home.
+      testMatch: /[\\/](?:mobile|home)\.spec\.js$/,
       use: { ...devices['Pixel 7'],
         ...(process.env.PW_CHROMIUM_PATH ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } } : {}),
       },
     },
     {
       name: 'mobile-webkit',
-      testMatch: /mobile\.spec\.js|math\.spec\.js|home\.spec\.js/,
+      testMatch: /[\\/](?:mobile|home|math|fractions-math)\.spec\.js$/,
       use: { ...devices['iPhone 13'] },
     },
   ],
