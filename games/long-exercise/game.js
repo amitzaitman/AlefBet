@@ -3,7 +3,7 @@
  * כל חלק שנפתר מתכווץ למספר אחד, והתרגיל מתקצר עד שנשארת התשובה.
  * המשחק מחזיק את יצירת התרגילים, הרמזים והרינדור; runGame מנהל סיבובים וסיום.
  */
-import { runGame, createFeedback, sounds, shuffle, animate } from '../../framework/dist/common.js';
+import { runGame, createFeedback, sounds, shuffle, animate } from '../../framework/dist/runtime.js';
 
 /** Every running total stays within 1..MAX_TOTAL, so each part is a small sum. */
 const MAX_TOTAL = 20;

@@ -1,4 +1,4 @@
-import { t as p } from "./tts-Bcsf13GP.js";
+import { tts as p } from "./runtime.js";
 const w = "alefbet-audio-status-banner";
 function v(t) {
   switch (t) {
@@ -29,13 +29,13 @@ function k(t = typeof document < "u" ? document.body : null, u = {}) {
   function l() {
     d && (clearTimeout(d), d = null);
   }
-  function a() {
+  function r() {
     l(), e.hidden = !0, e.classList.remove("is-visible", "is-await", "is-unsupported", "is-failed"), e.onclick = null, i.hidden = !0;
   }
   function b(m) {
     const o = v(m);
     if (!o) {
-      a();
+      r();
       return;
     }
     l(), c.textContent = o.message, e.hidden = !1, e.classList.add("is-visible"), e.classList.toggle("is-await", o.kind === "await"), e.classList.toggle("is-unsupported", o.kind === "unsupported"), e.classList.toggle("is-failed", o.kind === "failed"), o.kind === "await" ? (e.onclick = () => {
@@ -43,18 +43,18 @@ function k(t = typeof document < "u" ? document.body : null, u = {}) {
         t.ownerDocument.body.dispatchEvent(new MouseEvent("pointerdown", { bubbles: !0 }));
       } catch {
       }
-      a();
-    }, i.hidden = !0) : o.kind === "unsupported" ? (e.onclick = null, i.hidden = !1, i.onclick = (r) => {
-      r.stopPropagation(), a();
-    }) : o.kind === "failed" && (e.onclick = null, i.hidden = !0, d = setTimeout(() => a(), 6e3));
+      r();
+    }, i.hidden = !0) : o.kind === "unsupported" ? (e.onclick = null, i.hidden = !1, i.onclick = (a) => {
+      a.stopPropagation(), r();
+    }) : o.kind === "failed" && (e.onclick = null, i.hidden = !0, d = setTimeout(() => r(), 6e3));
   }
   function f(m) {
-    const r = /** @type {CustomEvent} */ (m.detail || {}).state;
-    if (r === "ready" || r === "idle") {
-      a();
+    const a = /** @type {CustomEvent} */ (m.detail || {}).state;
+    if (a === "ready" || a === "idle") {
+      r();
       return;
     }
-    b(r);
+    b(a);
   }
   return s.addEventListener("alefbet:tts-state", f), {
     destroy() {

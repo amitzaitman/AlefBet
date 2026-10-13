@@ -7,7 +7,6 @@
   "exports": {
     ".": "./dist/runtime.js",
     "./runtime": "./dist/runtime.js",
-    "./common": "./dist/common.js",
     "./dist/runtime.css": "./dist/runtime.css"
   },
   "scripts": {

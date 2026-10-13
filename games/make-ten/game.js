@@ -1,4 +1,4 @@
-import { runGame, createChoiceRound, createFeedback, shuffle } from '../../framework/dist/common.js';
+import { runGame, createChoiceRound, createFeedback, shuffle } from '../../framework/dist/runtime.js';
 
 export function startGame(container) {
   return runGame(container, {

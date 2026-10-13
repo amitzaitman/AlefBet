@@ -1,5 +1,5 @@
 /** תבנית כללית: התוכן והחוקים כאן; התשתית מנהלת סיבובים וניקוי. */
-import { runGame, createChoiceRound, createFeedback, shuffle } from '../../framework/dist/common.js';
+import { runGame, createChoiceRound, createFeedback, shuffle } from '../../framework/dist/runtime.js';
 
 const ROUNDS = [
   { question: '1 + 1 = ?', answer: 2, choices: [1, 2, 3] },

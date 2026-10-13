@@ -10,7 +10,6 @@ export default defineConfig({
     lib: {
       entry: {
         runtime: resolve(root, 'src/runtime/index.js'),
-        common: resolve(root, 'src/runtime/common.js'),
       },
       formats: ['es'],
       fileName: (_format, name) => `${name}.js`,
@@ -40,7 +39,6 @@ export default defineConfig({
         }
       };
       visit('runtime.js');
-      visit('common.js');
       this.emitFile({ type: 'asset', fileName: 'runtime-assets.js',
         source: `self.ALEFBET_RUNTIME_ASSETS = ${JSON.stringify([...files].sort())};\n` });
     },

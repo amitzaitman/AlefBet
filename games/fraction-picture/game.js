@@ -1,4 +1,4 @@
-import { runGame, createChoiceRound, createFeedback, shuffle } from '../../framework/dist/common.js';
+import { runGame, createChoiceRound, createFeedback, shuffle } from '../../framework/dist/runtime.js';
 
 // These visual helpers are shared by the three fraction games, not the runtime.
 export function fraction(n, d) { return `${n}/${d}`; }

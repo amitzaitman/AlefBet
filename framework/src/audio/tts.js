@@ -25,7 +25,11 @@ const VOICE_LOAD_TIMEOUT_MS = 2000;
 let _queue = [];
 let _speaking = false;
 let _rate = 0.9;
-let _nikudRate = (typeof localStorage !== 'undefined' && parseFloat(localStorage.getItem('alefbet.nikudRate'))) || 0.5;
+let _nikudRate = 0.5;
+// המודול נטען בכל משחק, ולכן אחסון חסום (למשל חסימת עוגיות ב-Safari) לא יפיל את הטעינה.
+try {
+  _nikudRate = (typeof localStorage !== 'undefined' && parseFloat(localStorage.getItem('alefbet.nikudRate'))) || 0.5;
+} catch { /* נשארים עם ברירת המחדל */ }
 let _interactionReady = false;
 /** @type {Promise<void> | null} */
 let _interactionPromise = null;

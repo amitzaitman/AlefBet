@@ -1,4 +1,4 @@
-import { runGame, createFeedback, shuffle } from '../../framework/dist/common.js';
+import { runGame, createFeedback, shuffle } from '../../framework/dist/runtime.js';
 
 /** המשחק מחזיק את מיקום הסמן; אין צורך במנגנון סיבובים חדש בתשתית. */
 export function startGame(container) {
