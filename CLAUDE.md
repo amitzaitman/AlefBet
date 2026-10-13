@@ -93,5 +93,5 @@ scripts/          build, release manifest, check-dist, create-game
 - Don't land a new feature inside an infrastructure cleanup, or the other way around.
 - After every merge to `main` that touches the site: one real phone, offline, one game end-to-end including audio. Audio on iOS is the fragile part.
 - Don't rewrite the site as a Vite multi-page app, and don't bring back the in-browser editor, zones, saved round content or a network service at play time, without a new decision from the owner. `docs/architecture.md` lists past decisions and why.
-- Old unmerged work is archived as `archive/*` tags. Don't merge it.
+- Branches other than `main` are old: merged history, abandoned experiments, or unrelated apps (Passover, baby monitor). The owner chose to keep them. Don't merge or build on them.
 - For decisions that are the owner's to make, gather the facts and ask a multiple-choice question, rating each option with up to five stars and listing the recommended option first.
