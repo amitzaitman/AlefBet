@@ -33,6 +33,8 @@ jobs:
           cp -r assets _site/assets
           cp -r framework/dist _site/framework/dist
           cp -r games _site/games
+          # The math pilot is a separate Svelte build; nothing on the site links to it.
+          cp -r math-pilot/dist _site/math-pilot
 
       - uses: actions/upload-pages-artifact@v3
         with:
