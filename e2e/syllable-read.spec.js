@@ -1,12 +1,7 @@
 // @ts-check
-import { test, expect } from '@playwright/test';
+import { test, expect, noVoice } from './network-server.js';
 
 const GAME_URL = '/games/syllable-read/';
-
-async function blockGoogleTTS(page) {
-  await page.route('**/translate.google.com/**', route => route.abort());
-  await page.route('**/translate_tts**', route => route.abort());
-}
 
 /**
  * The index of the round's target card. The target shares its letter with one option
@@ -25,19 +20,9 @@ async function targetIndex(page) {
 }
 
 test.describe('syllable-read', () => {
-  test.beforeEach(async ({ page }) => {
-    await blockGoogleTTS(page);
-  });
-
   test('offline path: with no network and no system voices the game still plays (phoneme synth)', async ({ page }) => {
-    await page.addInitScript(() => {
-      // Simulate a fully offline device with no installed TTS voices.
-      Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false });
-      Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => undefined });
-    });
-    // Belt and braces: kill every outbound request beyond the local server.
-    await page.route(/^https?:\/\/(?!localhost)/, route => route.abort());
-
+    // A device with no network and no installed voices.
+    await noVoice(page, { offline: true });
     await page.goto(GAME_URL);
 
     await expect(page.locator('.sr-replay')).toBeVisible({ timeout: 10_000 });
@@ -59,7 +44,6 @@ test.describe('syllable-read', () => {
 
 
 test('a pending hint cannot unlock cards after a correct answer', async ({ page }) => {
-  await blockGoogleTTS(page);
   await page.clock.install();
   await page.goto(GAME_URL);
   const cards = page.locator('.option-card');

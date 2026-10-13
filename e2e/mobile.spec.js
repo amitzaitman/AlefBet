@@ -1,8 +1,6 @@
 import { test, expect, noVoice, targetNikud } from './network-server.js';
 
 test('touch retry, audio failure, completion, replay and offline reload', async ({ page, network }) => {
-  await page.route('**/translate.google.com/**', route => route.abort());
-  await page.route('**/translate_tts**', route => route.abort());
   await noVoice(page);
   // The page clock skips the fixed 800 ms round transition; it still flows in real time otherwise.
   await page.clock.install();

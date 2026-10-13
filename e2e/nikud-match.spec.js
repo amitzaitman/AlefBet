@@ -3,11 +3,6 @@ import { test, expect, noVoice, targetNikud } from './network-server.js';
 
 const GAME_URL = '/games/nikud-match/';
 
-async function blockGoogleTTS(page) {
-  await page.route('**/translate.google.com/**', route => route.abort());
-  await page.route('**/translate_tts**', route => route.abort());
-}
-
 test('keyboard play, the settings button, the demonstration and the no-voice banner', async ({ page }) => {
   // The syllable spoken after a correct answer has no voice, so the audio banner must show.
   await noVoice(page);
@@ -38,7 +33,6 @@ test('keyboard play, the settings button, the demonstration and the no-voice ban
 for (const input of ['mouse', 'touch']) {
   test(`drag preview follows real ${input} input and a wrong drop can be retried`, async ({ page }) => {
     await page.setViewportSize(input === 'touch' ? { width: 390, height: 844 } : { width: 1280, height: 720 });
-    await blockGoogleTTS(page);
     await page.goto(GAME_URL);
     const letter = page.locator('.nm-arena .nm-letter');
     await expect(letter).toBeVisible();

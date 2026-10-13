@@ -1,17 +1,7 @@
 // @ts-check
-import { expect } from '@playwright/test';
-import { test } from './network-server.js';
+import { test, expect } from './network-server.js';
 
 const GAME_URL = '/games/letter-match-animals/';
-
-/**
- * Always block the live Google TTS endpoints — keeps every spec deterministic
- * and offline regardless of which path it is exercising.
- */
-async function blockGoogleTTS(page) {
-  await page.route('**/translate.google.com/**', route => route.abort());
-  await page.route('**/translate_tts**', route => route.abort());
-}
 
 /**
  * Clicks the card the game grades as correct, after checking that its word starts with
@@ -27,7 +17,6 @@ async function answerCorrectly(page) {
 }
 
 test('eight rounds with a retry, a completion summary and a replay that keeps one audio listener', async ({ page }) => {
-  await blockGoogleTTS(page);
   // Counts the game's audio-state listeners, so a game that leaks one on completion or replay fails.
   await page.addInitScript(() => {
     const listeners = new Set();

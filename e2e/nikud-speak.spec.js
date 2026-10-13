@@ -1,13 +1,8 @@
 // @ts-check
-import { test, expect } from '@playwright/test';
+import { test, expect, noVoice } from './network-server.js';
 
 const GAME_URL = '/games/nikud-speak/';
 const BANNER_SELECTOR = '#alefbet-audio-status-banner';
-
-async function blockGoogleTTS(page) {
-  await page.route('**/translate.google.com/**', route => route.abort());
-  await page.route('**/translate_tts**', route => route.abort());
-}
 
 /**
  * Stubs `navigator.mediaDevices.getUserMedia` so that the vowel detector
@@ -54,29 +49,18 @@ async function pressMicUntilAdvance(page) {
 
 test.describe('nikud-speak', () => {
   test.beforeEach(async ({ page }) => {
-    await blockGoogleTTS(page);
     await stubMicrophone(page);
   });
 
   test('without a voice the banner surfaces and three misses still advance the round', async ({ page }) => {
-    await page.addInitScript(() => {
-      Object.defineProperty(window, 'speechSynthesis', {
-        configurable: true,
-        get: () => undefined,
-      });
-      HTMLAudioElement.prototype.play = function () {
-        return Promise.reject(new DOMException('blocked', 'NotAllowedError'));
-      };
-    });
-
+    await noVoice(page);
     await page.goto(GAME_URL);
 
     await expect(page.locator('.nikud-speak-card')).toBeVisible({ timeout: 10_000 });
     const initialLabel = await page.locator('.progress-bar__label').textContent();
 
-    // Tap the demo (speaker) button first — that triggers the TTS state
-    // machine, which under our stubs ends up in `unsupported`/`failed` and
-    // surfaces the banner.
+    // Tap the demo (speaker) button first. With no voice, speaking puts the
+    // TTS state machine in `unsupported`, which surfaces the banner.
     await page.locator('.demo-btn').click();
 
     const banner = page.locator(BANNER_SELECTOR);

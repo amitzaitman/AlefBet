@@ -1,5 +1,5 @@
 // @ts-check
-import { test, expect } from '@playwright/test';
+import { test, expect, noVoice } from './network-server.js';
 
 const STUDIO_URL = '/games/sound-studio/';
 
@@ -19,12 +19,7 @@ test.describe('sound-studio', () => {
   });
 
   test('listen button previews a sound without breaking when offline', async ({ page }) => {
-    await page.addInitScript(() => {
-      Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => false });
-      Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => undefined });
-    });
-    await page.route(/^https?:\/\/(?!localhost)/, route => route.abort());
-
+    await noVoice(page, { offline: true });
     await page.goto(STUDIO_URL);
     const firstListen = page.locator('.studio__listen').first();
     await expect(firstListen).toBeVisible({ timeout: 10_000 });
