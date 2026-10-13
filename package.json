@@ -8,17 +8,20 @@
     "node": ">=20.19.0"
   },
   "workspaces": [
-    "framework"
+    "framework",
+    "math-pilot"
   ],
   "scripts": {
     "build": "npm run build --workspace=framework",
-    "test": "npm run test --workspace=framework",
+    "build:pilot": "npm run build --workspace=math-pilot",
+    "test": "npm run test --workspace=framework && npm run test --workspace=math-pilot",
     "test:coverage": "npm run test:coverage --workspace=framework",
     "lint": "eslint .",
     "typecheck": "npm run typecheck --workspace=framework",
     "check": "npm run lint && npm run typecheck && npm test",
     "dev:framework": "npm run dev --workspace=framework",
-    "e2e": "npm run build && playwright test --output=test-results/games",
+    "dev:pilot": "npm run dev --workspace=math-pilot",
+    "e2e": "npm run build && npm run build:pilot && playwright test --output=test-results/games",
     "new:game": "node scripts/create-game.js",
     "setup:browsers": "playwright install --with-deps chromium webkit",
     "verify": "npm run check && npm run e2e",

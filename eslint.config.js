@@ -15,6 +15,7 @@ export default [
       '.claude/**',
       '**/dist/**',
       'framework/dist/**',
+      'math-pilot/dist/**',
       'games/_template/**',
       'package-lock.json',
       'test-results/**',
