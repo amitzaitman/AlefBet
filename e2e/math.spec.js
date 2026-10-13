@@ -677,7 +677,12 @@ test('tens-bundles: tie ten straws into a bundle, read, build a number, help, co
   await expect(pile).toBeEnabled();
   await expectTouchTargets(pile);
   await expect(choice.first()).toBeDisabled();
+  const inPile = page.locator('.tb-pile .tb-straw').filter({ visible: true });
+  const piled = await inPile.count();
+  expect(piled).toBeGreaterThanOrEqual(12);
   for (let k = 0; k < 10; k++) await activate(pile);
+  // Every straw in the bundle being made has left the pile.
+  await expect(inPile).toHaveCount(piled - 10);
   await expect(tie).toBeEnabled();
   // The bundle being made holds ten, and says so.
   await activate(pile);
@@ -744,6 +749,8 @@ test('tens-bundles: tie ten straws into a bundle, read, build a number, help, co
       await activate(page.locator('.tb-check'));
       await expect(page.locator('.tb-miss')).toHaveText(`בְּנִיתֶם ${built}. צָרִיךְ ${target}.`);
       await skip(1300);
+      // The number built stays under the mat after the miss.
+      await expect(page.locator('.tb-running')).toHaveText(String(built));
       await activate(page.locator('.tb-check'));
       await expect(page.locator('.tb-straw[data-state="ghost"], .tb-bundle[data-state="ghost"], .tb-extra')).not.toHaveCount(0);
       await skip(1300);

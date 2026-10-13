@@ -1,5 +1,5 @@
 self.ALEFBET_RELEASE = {
-  "version": "7b53dfd3051878da0c5e92a40a5818f9ccc55ebf8e90b9d834ebe631ab30942d",
+  "version": "08819e8f31027f123cc8bbb7c2c0b4433501947b9fd74722a29b96a1c1d4b507",
   "core": [
     "./",
     "./assets/icons/apple-touch-icon.png",
@@ -158,8 +158,8 @@ self.ALEFBET_RELEASE = {
     "./games/syllable-read/game.js": "330b0efc32f640216e7f133374e3ea0a3d567ea4e28d9e6982255e6cecf7bfa0",
     "./games/syllable-read/index.html": "55246cea53f33d126031063d05e5674865f8aa1a12262cebfcadbd2b308c1b19",
     "./games/tens-bundles/": "6f64767afb897fe3eb74d7fcb400079094bf390b3c23d77afabab6e6a0ee2dca",
-    "./games/tens-bundles/game.css": "e553bee5246823f29ffb491bf2e580b6510c85dff8cb0e39cbf65c272f0235c0",
-    "./games/tens-bundles/game.js": "4447cb0bd1d28bf531890458736d3d1577fc6a89a64efb6f40bda16dbb00e16a",
+    "./games/tens-bundles/game.css": "8cef91926f29d4c8818a25d165c30df0c51940879b745565d8e24206c6494453",
+    "./games/tens-bundles/game.js": "3a80d1c83d0e772a955f7148a94d7190a1503c283938e08cc3f4c0705895b85f",
     "./games/tens-bundles/index.html": "6f64767afb897fe3eb74d7fcb400079094bf390b3c23d77afabab6e6a0ee2dca",
     "./index.html": "ca01cfdf073518de4d421cfc8ba71a7c5cff48f3526a9f8329a124a337f2bd4b",
     "./manifest.webmanifest": "61199ec6fe79202159f986f7fd7fd2058697d890788a97993b4db5eafef9c9d4"

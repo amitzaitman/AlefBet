@@ -458,6 +458,8 @@ function buildRound(context, round) {
     mat.clearMarks();
     mat.show(tens, ones);
     if (misses > 1) mat.compare(n, tens, ones, 'target');
+    // The number on the mat stays under it once something is built.
+    mat.running.textContent = tens || ones ? String(tens * 10 + ones) : '';
     const locked = context.isAnswered();
     lessTens.disabled = locked || tens === 0;
     moreTens.disabled = locked || tens === MAX_TENS;
@@ -474,7 +476,6 @@ function buildRound(context, round) {
     ones = Math.max(0, Math.min(9, ones + dOnes));
     story.querySelector('.tb-miss')?.remove();
     render();
-    mat.running.textContent = String(tens * 10 + ones);
     void speak(countWord(tens * 10 + ones));
   }
 
@@ -506,7 +507,6 @@ function buildRound(context, round) {
       feedback.hint(tens !== round.tens ? 'בִּדְקוּ אֶת הַצְּרוֹרוֹת' : 'בִּדְקוּ אֶת הַקַּשִּׁיּוֹת הַבּוֹדְדוֹת');
       // From the second miss the mat shows the places still to fill, and what is extra fades.
       render();
-      mat.running.textContent = String(built);
       await say(line.say);
     });
   });
@@ -514,7 +514,7 @@ function buildRound(context, round) {
   scope.listen(again, 'click', () => {
     void (async () => {
       await quiet();
-      if (isActive()) void say(ask.say);
+      if (isActive() && !context.isAnswered()) void say(ask.say);
     })();
   });
   context.subscribeAnswered(render);

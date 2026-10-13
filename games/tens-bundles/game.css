@@ -29,6 +29,8 @@
 .tb-pile:disabled { border-color: #c9b79c; cursor: default; }
 .tb-pile:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
 .tb-straw--lying { position: absolute; }
+/* A straw taken from the pile leaves it: .tb-straw's display would otherwise keep it drawn. */
+.tb-straw--lying[hidden] { display: none; }
 .tb-column--pile .tb-loose, .tb-column:not(.tb-column--pile) .tb-pile { display: none; }
 
 /* The bundle being made, and the button that ties it. */
