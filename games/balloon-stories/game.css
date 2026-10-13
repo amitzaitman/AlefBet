@@ -1,10 +1,4 @@
-.bs-game { --bs-size: clamp(28px, 10vw, 52px); width: min(100%, 640px); margin-inline: auto; text-align: center; }
-.bs-story { display: grid; align-content: center; gap: 2px; min-height: 5em; margin: 4px 0 8px; }
-.bs-game--match .bs-story { min-height: 0; }
-.bs-line { margin: 0; color: #7a6a55; font-size: clamp(1.05rem, 3.8vw, 1.35rem); font-weight: 600; }
-.bs-line--now { color: #1b140c; font-weight: 700; }
-.bs-line--result { color: #1e5a52; }
-.bs-start { justify-self: center; min-height: 72px; padding: 10px 28px; border: 0; border-radius: 20px; background: #2868a6; color: #fff; font: inherit; font-size: clamp(1.2rem, 4.5vw, 1.5rem); font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.bs-game { --bs-size: clamp(28px, 10vw, 52px); }
 
 /* The picture: rows of five like a ten frame, or one column per pair when comparing. */
 .bs-scene { display: grid; justify-content: center; gap: 8px; margin: 4px auto; }
@@ -42,26 +36,3 @@
 .bs-scene--mini { --bs-size: clamp(14px, 4vw, 20px); gap: 4px; margin: 0; }
 .bs-scene--mini .bs-row { gap: 4px; }
 .bs-scene--mini .bs-balloon[data-state="popped"] { box-shadow: inset 0 0 0 1.5px #9aa6b8; }
-
-.bs-equation { min-height: 1.3em; margin: 6px 0; font-size: clamp(30px, 7vw, 44px); font-weight: 700; }
-.bs-unknown { color: #783952; }
-.bs-solved { padding: 0 8px; border-radius: 10px; background: #2a7b71; color: #fff; }
-
-.bs-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2.5vw, 12px); margin: 8px 0 12px; }
-.bs-choice { display: grid; justify-items: center; align-content: center; gap: 6px; min-width: 68px; min-height: 84px; padding: 6px 8px; border: 3px solid #2868a6; border-radius: 18px; background: #fff; color: #174774; font: inherit; cursor: pointer; touch-action: manipulation; }
-.bs-choice__number { font-size: clamp(28px, 7vw, 36px); font-weight: 700; line-height: 1; }
-.bs-choice__dots { display: grid; grid-template-columns: repeat(5, 7px); gap: 3px; min-height: 7px; }
-.bs-choice__dots span { width: 7px; height: 7px; border-radius: 50%; background: #2868a6; }
-
-.bs-cards { display: grid; gap: 10px; width: min(100%, 440px); margin: 8px auto 12px; }
-.bs-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 72px; padding: 10px 14px; border: 3px solid #2868a6; border-radius: 18px; background: #fff; color: #1b140c; font: inherit; font-size: clamp(1rem, 3.8vw, 1.2rem); font-weight: 700; text-align: start; cursor: pointer; touch-action: manipulation; }
-
-.bs-pick--tried { opacity: .35; border-style: dashed; }
-.bs-pick--hint { border-color: #783952; background: #f0e4eb; box-shadow: 0 0 0 4px rgba(120, 57, 82, .25); }
-.bs-pick--correct { border-color: #2a7b71; background: #dcefe9; }
-.bs-choice:disabled, .bs-card:disabled, .bs-again:disabled { cursor: default; }
-.bs-choice:disabled:not(.bs-pick--tried, .bs-pick--correct), .bs-card:disabled:not(.bs-pick--tried, .bs-pick--correct) { opacity: .6; }
-.bs-again { min-width: 96px; min-height: 64px; padding: 8px 24px; border: 2px solid #2868a6; border-radius: 16px; background: #fff; color: #2868a6; font: inherit; font-size: 1.1rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
-.bs-again:disabled { opacity: .45; }
-.bs-choice:focus-visible, .bs-card:focus-visible, .bs-again:focus-visible, .bs-start:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
-.bs-game .feedback-message { min-height: 2.4em; }

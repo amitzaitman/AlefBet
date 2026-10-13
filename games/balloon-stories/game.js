@@ -5,19 +5,12 @@
  * משמעויות הפעולות (לקחו, הוסיפו, השוואה, השלמה) ומסתיימים בכיוון ההפוך:
  * מתרגיל לסיפור. העקרונות מתוארים ב-docs/math-pedagogy.md.
  */
-import { runGame, createFeedback, sounds, shuffle, tts, getAudioContext } from '../../framework/dist/runtime.js';
+import {
+  runGame, createStoryRound, numberWord, countNoun, exerciseWords, sounds, shuffle, getAudioContext,
+} from '../../framework/dist/runtime.js';
 
-/** Shortest time a story sentence stays current, even when there is no voice. */
-const BEAT_MS = 1200;
 /** Gap between balloons that pop, arrive, fill or are counted one after another. */
 const STAGGER_MS = 280;
-/** Pause after cancelling speech; iOS can drop an utterance spoken right after cancel. */
-const HUSH_MS = 250;
-const NIKUD = /[֑-ׇ]/g;
-
-/** Masculine numbers agree with בָּלוֹן; feminine numbers are for counting and exercises. */
-const MASCULINE = ['אֶפֶס', 'אֶחָד', 'שְׁנַיִם', 'שְׁלוֹשָׁה', 'אַרְבָּעָה', 'חֲמִשָּׁה', 'שִׁשָּׁה', 'שִׁבְעָה', 'שְׁמוֹנָה', 'תִּשְׁעָה', 'עֲשָׂרָה'];
-const FEMININE = ['אֶפֶס', 'אַחַת', 'שְׁתַּיִם', 'שָׁלוֹשׁ', 'אַרְבַּע', 'חָמֵשׁ', 'שֵׁשׁ', 'שֶׁבַע', 'שְׁמוֹנֶה', 'תֵּשַׁע', 'עֶשֶׂר'];
 
 /**
  * take: a balloons, b pop. add: a balloons, b more arrive.
@@ -100,10 +93,12 @@ export function answerChoices(round) {
   return [answer, ...distractors.slice(0, 3)].sort((x, y) => x - y);
 }
 
+/** בָּלוֹן is masculine: 'בָּלוֹן אֶחָד', 'שְׁנֵי בָּלוֹנִים', 'אַרְבָּעָה בָּלוֹנִים'. */
+const BALLOON = { one: 'בָּלוֹן', many: 'בָּלוֹנִים', gender: /** @type {const} */ ('m') };
 /** @param {number} n */
-const shownBalloons = n => (n === 1 ? 'בָּלוֹן אֶחָד' : `${n} בָּלוֹנִים`);
+const shownBalloons = n => countNoun(n, BALLOON, { digits: true });
 /** @param {number} n */
-const spokenBalloons = n => (n === 1 ? 'בָּלוֹן אֶחָד' : n === 2 ? 'שְׁנֵי בָּלוֹנִים' : `${MASCULINE[n]} בָּלוֹנִים`);
+const spokenBalloons = n => countNoun(n, BALLOON);
 /**
  * A sentence is shown with digits, so it matches the exercise, and spoken with words.
  * @param {(count: (n: number) => string) => string} build
@@ -114,9 +109,6 @@ const fixed = text => ({ text, say: text });
 
 /** @param {'+' | '-'} op */
 const sign = op => (op === '+' ? '+' : '−');
-
-/** @param {'+' | '-'} op @param {number} a @param {number} b */
-export const exerciseWords = (op, a, b) => `${FEMININE[a]} ${op === '+' ? 'וְעוֹד' : 'פָּחוֹת'} ${FEMININE[b]}`;
 
 /**
  * The story as beats: start, change and question. Each beat names the scene
@@ -180,7 +172,7 @@ export function resultFor(round) {
     return c === 1 ? sentence(n => `חָסֵר לָהּ ${n(c)}.`) : sentence(n => `חֲסֵרִים לָהּ ${n(c)}.`);
   }
   const op = round.op ?? '-';
-  return { text: `${round.a} ${sign(op)} ${round.b} = ${c}`, say: `${exerciseWords(op, round.a, round.b)} שָׁוֶה ${FEMININE[c]}.` };
+  return { text: `${round.a} ${sign(op)} ${round.b} = ${c}`, say: `${exerciseWords(op, round.a, round.b)} שָׁוֶה ${numberWord(c)}.` };
 }
 
 /**
@@ -206,20 +198,6 @@ function el(tag, className, text) {
   if (className) node.className = className;
   if (text !== undefined) node.textContent = text;
   return node;
-}
-
-/** Sentences queued or playing, so speech is only cancelled when there is some. */
-let pendingSpeech = 0;
-/** @param {string} text */
-function speak(text) {
-  pendingSpeech++;
-  return tts.speak(text).finally(() => { pendingSpeech--; });
-}
-/** @returns {boolean} whether there was speech to cancel */
-function hush() {
-  if (!pendingSpeech) return false;
-  tts.cancel();
-  return true;
 }
 
 const calm = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -351,22 +329,17 @@ function buildScene(round, wait) {
   return { root, reset: () => setState(items, 'hidden'), question() {}, ...steps };
 }
 
-/** @param {number} value */
-function choiceDots(value) {
-  const dots = el('span', 'bs-choice__dots');
-  dots.setAttribute('aria-hidden', 'true');
-  for (let k = 0; k < value; k++) dots.append(el('span'));
-  return dots;
-}
-
-/** @param {string} equation @param {number} [answer] */
-function equationTokens(equation, answer) {
-  return equation.split(' ').filter(Boolean).flatMap((token, k) => {
-    const node = token === '?' && answer !== undefined
-      ? el('span', 'bs-solved', String(answer))
-      : el('span', token === '?' ? 'bs-unknown' : '', token);
-    return k ? [' ', node] : [node];
-  });
+/**
+ * A story card's picture: the take or add story drawn small, already finished.
+ * @param {{ op: '+' | '-', a: number, b: number }} option
+ * @param {(ms: number) => Promise<unknown>} wait
+ */
+function miniPicture(option, wait) {
+  const picture = buildScene({ kind: option.op === '-' ? 'take' : 'add', a: option.a, b: option.b, look: 'dots' }, wait);
+  picture.root.classList.add('bs-scene--mini');
+  picture.root.setAttribute('aria-hidden', 'true');
+  picture.settle();
+  return picture.root;
 }
 
 const COUNT_HINTS = {
@@ -376,6 +349,22 @@ const COUNT_HINTS = {
   missing: 'סִפְרוּ אֶת הַמְּקוֹמוֹת הָרֵיקִים',
 };
 
+/**
+ * The help goes back to the picture: the story again, then counting, then the answer.
+ * @param {Round['kind']} kind
+ * @returns {{ hint: string, action: 'replay' | 'count' | 'mark' }[]}
+ */
+const numberLadder = kind => [
+  { hint: 'בּוֹאוּ נִשְׁמַע שׁוּב אֶת הַסִּפּוּר', action: 'replay' },
+  { hint: COUNT_HINTS[kind], action: 'count' },
+  { hint: 'נַסּוּ אֶת הַמִּסְפָּר הַמְּסֻמָּן', action: 'mark' },
+];
+/** @type {{ hint: string, action: 'replay' | 'count' | 'mark' }[]} */
+const MATCH_LADDER = [
+  { hint: 'סִפְרוּ אֶת הַבָּלוֹנִים בְּכָל סִפּוּר', action: 'replay' },
+  { hint: 'נַסּוּ אֶת הַסִּפּוּר הַמְּסֻמָּן', action: 'mark' },
+];
+
 export function startGame(container) {
   return runGame(container, {
     gameId: 'balloon-stories', title: 'סִפּוּרֵי בָּלוֹנִים',
@@ -384,191 +373,49 @@ export function startGame(container) {
     transitionMs: 2600,
     onReplay: () => startGame(container),
     buildRound(context) {
-      const { shell, scope, isActive } = context;
       const round = /** @type {Round} */ (context.round);
       const matching = round.kind === 'match';
-      const beats = storyFor(round);
-      const answer = answerFor(round);
-      let storyRun = 0;
-      let asked = false;
-      let misses = 0;
-
-      /** @param {number} ms */
-      const wait = ms => new Promise(resolve => { scope.schedule(() => resolve(undefined), ms); });
-      /** Speaks without letting a silent or blocked voice hold the story for long. */
-      const say = (text, minMs = BEAT_MS, limitMs = minMs + 1500 + text.replace(NIKUD, '').length * 120) =>
-        Promise.all([wait(minMs), Promise.race([speak(text), wait(limitMs)])]);
-
-      const host = el('section', matching ? 'bs-game bs-game--match' : 'bs-game');
-      const story = el('div', 'bs-story');
-      story.setAttribute('aria-live', 'polite');
-      const scene = matching ? null : buildScene(round, wait);
-      const equation = el('p', 'bs-equation');
-      equation.dir = 'ltr';
-      const choices = el('div', matching ? 'bs-cards' : 'bs-choices');
-      if (!matching) choices.dir = 'ltr';
-      const again = el('button', 'bs-again', 'עוֹד פַּעַם 🔁');
-      again.type = 'button';
-      again.setAttribute('aria-label', 'שמיעת הסיפור שוב');
-      host.append(story, ...(scene ? [scene.root] : []), equation, choices, again);
-      shell.bodyEl.append(host);
-      const feedback = scope.use(createFeedback(host));
-      scope.use(() => { hush(); });
-
-      /** @param {{ text: string }} beat @param {string} [className] */
-      function addLine(beat, className = 'bs-line') {
-        story.querySelector('.bs-line--now')?.classList.remove('bs-line--now');
-        story.append(el('p', `${className} bs-line--now`, beat.text));
-        scene?.root.setAttribute('aria-label', [...story.querySelectorAll('.bs-line')].map(line => line.textContent).join(' '));
-      }
-
-      async function playStory() {
-        const run = ++storyRun;
-        const live = () => run === storyRun && isActive();
-        if (hush()) await wait(HUSH_MS);
-        if (!live()) return;
-        clearCounting();
-        scene?.reset();
-        story.replaceChildren();
-        for (const beat of beats) {
-          addLine(beat);
-          equation.replaceChildren(...equationTokens(beat.equation));
-          if (beat.scene === 'question' && !asked) { asked = true; update(); }
-          await Promise.all([say(beat.say), scene?.[beat.scene](live)]);
-          if (!live()) return;
-        }
-      }
-
-      function clearCounting() {
-        for (const item of host.querySelectorAll('.bs-balloon--counted')) {
-          item.classList.remove('bs-balloon--counted');
-          item.firstElementChild.textContent = '';
-        }
-      }
-
-      /**
-       * Shows the whole story at once, when a hint or an answer interrupts it.
-       * @returns {boolean} whether speech was cancelled
-       */
-      function settle() {
-        storyRun++;
-        const hushed = hush();
-        clearCounting();
-        scene?.settle();
-        story.replaceChildren();
-        beats.forEach(beat => addLine(beat));
-        equation.replaceChildren(...equationTokens(beats[beats.length - 1].equation));
-        return hushed;
-      }
-
-      async function countAloud() {
-        const hushed = settle();
-        const run = storyRun;
-        if (hushed) await wait(HUSH_MS);
-        for (const [k, item] of scene.counted().entries()) {
-          if (run !== storyRun || !isActive()) return;
-          item.classList.add('bs-balloon--counted');
-          item.firstElementChild.textContent = String(k + 1);
-          await say(FEMININE[k + 1], 700, 1500);
-        }
-      }
-
-      function update() {
-        const locked = !asked || context.isAnswered();
-        for (const button of choices.querySelectorAll('button')) {
-          button.disabled = locked || button.classList.contains('bs-pick--tried');
-        }
-        again.disabled = context.isAnswered();
-      }
-
-      function help() {
-        if (matching) {
-          if (misses >= 2) {
-            choices.querySelector('[data-id="right"]')?.classList.add('bs-pick--hint');
-            feedback.hint('נַסּוּ אֶת הַסִּפּוּר הַמְּסֻמָּן');
-          } else {
-            feedback.hint('סִפְרוּ אֶת הַבָּלוֹנִים בְּכָל סִפּוּר');
-            void playStory();
-          }
-          return;
-        }
-        // The help goes back to the picture: the story again, then counting, then the answer.
-        if (misses === 1) {
-          feedback.hint('בּוֹאוּ נִשְׁמַע שׁוּב אֶת הַסִּפּוּר');
-          void playStory();
-        } else if (misses === 2) {
-          feedback.hint(COUNT_HINTS[round.kind]);
-          void countAloud();
-        } else {
-          choices.querySelector(`[data-value="${answer}"]`)?.classList.add('bs-pick--hint');
-          feedback.hint('נַסּוּ אֶת הַמִּסְפָּר הַמְּסֻמָּן');
-        }
-      }
-
-      /** @param {HTMLButtonElement} button @param {boolean} correct */
-      function choose(button, correct) {
-        if (!asked || context.isAnswered() || button.disabled) return;
-        if (!correct) {
-          void context.onWrong(() => {
-            misses++;
-            button.classList.add('bs-pick--tried');
-            help();
-          });
-          return;
-        }
-        void context.onCorrect(() => {
-          button.classList.add('bs-pick--correct');
-          const hushed = settle();
-          const result = resultFor(round);
-          if (matching) equation.replaceChildren(...equationTokens(`${beats[0].equation} = ?`, answer));
-          else {
-            equation.replaceChildren(...equationTokens(beats[beats.length - 1].equation, answer));
-            addLine(result, 'bs-line bs-line--result');
-          }
-          feedback.correct();
-          scope.schedule(() => { void speak(result.say); }, hushed ? HUSH_MS : 0);
-        });
-      }
-
-      if (matching) {
-        choices.replaceChildren(...shuffle(matchOptions(round)).map(option => {
-          const card = el('button', 'bs-card');
-          card.type = 'button';
-          Object.assign(card.dataset, { id: option.id, op: option.op, a: String(option.a), b: String(option.b) });
-          const caption = storyCaption(option);
-          card.setAttribute('aria-label', caption);
-          const picture = buildScene({ kind: option.op === '-' ? 'take' : 'add', a: option.a, b: option.b, look: 'dots' }, wait);
-          picture.root.classList.add('bs-scene--mini');
-          picture.root.setAttribute('aria-hidden', 'true');
-          picture.settle();
-          card.append(el('span', 'bs-card__caption', caption), picture.root);
-          scope.listen(card, 'click', () => choose(card, option.id === 'right'));
-          return card;
-        }));
-      } else {
-        choices.replaceChildren(...answerChoices(round).map(value => {
-          const button = el('button', 'bs-choice');
-          button.type = 'button';
-          button.dataset.value = String(value);
-          button.setAttribute('aria-label', String(value));
-          button.append(el('span', 'bs-choice__number', String(value)), choiceDots(value));
-          scope.listen(button, 'click', () => choose(button, value === answer));
-          return button;
-        }));
-      }
-      scope.listen(again, 'click', () => { void playStory(); });
-      context.subscribeAnswered(update);
-
-      // Speech needs a first tap on most phones; until then the story waits for one.
-      if (navigator.userActivation && !navigator.userActivation.hasBeenActive) {
-        const start = el('button', 'bs-start', '▶ הַקְשִׁיבוּ לַסִּפּוּר');
-        start.type = 'button';
-        story.append(start);
-        again.hidden = true;
-        scope.listen(start, 'click', () => { again.hidden = false; void playStory(); });
-      } else {
-        void playStory();
-      }
+      createStoryRound(context, ({ wait }) => {
+        const picture = matching ? null : buildScene(round, wait);
+        return {
+          className: 'bs-game',
+          beats: storyFor(round),
+          scene: picture && {
+            ...picture,
+            counting: () => ({
+              items: picture.counted().map((item, k) => ({
+                say: numberWord(k + 1),
+                mark() {
+                  item.classList.add('bs-balloon--counted');
+                  item.firstElementChild.textContent = String(k + 1);
+                },
+              })),
+            }),
+            clearCount() {
+              for (const item of picture.root.querySelectorAll('.bs-balloon--counted')) {
+                item.classList.remove('bs-balloon--counted');
+                item.firstElementChild.textContent = '';
+              }
+            },
+          },
+          choices: matching
+            ? {
+              right: 'right',
+              answer: answerFor(round),
+              cards: shuffle(matchOptions(round)).map(option => ({
+                id: option.id,
+                label: storyCaption(option),
+                data: { op: option.op, a: String(option.a), b: String(option.b) },
+                picture: miniPicture(option, wait),
+              })),
+            }
+            : { values: answerChoices(round), answer: answerFor(round) },
+          result: resultFor(round),
+          resultLine: !matching,
+          solvedEquation: matching ? `${round.a} ${sign(round.op ?? '-')} ${round.b} = ?` : undefined,
+          ladder: matching ? MATCH_LADDER : numberLadder(round.kind),
+        };
+      });
     },
   });
 }

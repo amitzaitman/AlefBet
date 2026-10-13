@@ -198,15 +198,15 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
   await page.clock.install();
   const skip = ms => page.clock.runFor(ms);
   await page.goto(`${network.url}/games/balloon-stories/`);
-  const choice = page.locator('.bs-choice');
-  const equation = page.locator('.bs-equation');
+  const choice = page.locator('.story-choice');
+  const equation = page.locator('.story-equation');
   const feedback = page.locator('.feedback-message');
-  const solved = page.locator('.bs-solved');
+  const solved = page.locator('.story-solved');
   const fits = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
   const solve = () => solveBalloonExercise(equation);
   await expect(page.locator('.bs-scene')).toBeVisible();
   // Speech needs a first tap on phones, so the first story waits for one with its answers locked.
-  const start = page.locator('.bs-start');
+  const start = page.locator('.story-start');
   if (await start.count()) {
     await expect(choice.first()).toBeDisabled();
     await activate(start);
@@ -214,30 +214,30 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
   }
   await skip(3000);
   await expect(choice.first()).toBeEnabled();
-  await expect(page.locator('.bs-line')).toHaveCount(3);
+  await expect(page.locator('.story-line')).toHaveCount(3);
   await expect(equation).toHaveAttribute('dir', 'ltr');
   await expect(equation).toContainText('= ?');
   // Shown with digits, spoken with number words.
-  await expect(page.locator('.bs-line').first()).toHaveText(/^לְנוֹעָה יֵשׁ \d+ בָּלוֹנִים\.$/);
+  await expect(page.locator('.story-line').first()).toHaveText(/^לְנוֹעָה יֵשׁ \d+ בָּלוֹנִים\.$/);
   expect((await page.evaluate(() => window.__spoken))[0]).toMatch(/^לְנוֹעָה יֵשׁ \D+ בָּלוֹנִים\.$/);
   await expectTouchTargets(choice);
   const answer = await solve();
-  const correct = page.locator(`.bs-choice[data-value="${answer}"]`);
-  const wrong = page.locator(`.bs-choice:enabled:not([data-value="${answer}"])`);
+  const correct = page.locator(`.story-choice[data-value="${answer}"]`);
+  const wrong = page.locator(`.story-choice:enabled:not([data-value="${answer}"])`);
   // The help goes back to the picture: the story again, then counting aloud, then the answer.
   await activate(wrong.first());
   await expect(feedback).toContainText('הַסִּפּוּר');
-  await expect(page.locator('.bs-pick--tried')).toBeDisabled();
+  await expect(page.locator('.story-pick--tried')).toBeDisabled();
   await activate(wrong.first());
   await expect(feedback).toContainText('שֶׁנִּשְׁאֲרוּ');
   await skip(300 + 700 * answer);
   await expect(page.locator('.bs-balloon--counted')).toHaveCount(answer);
   await expect(page.locator('.bs-balloon--counted').last()).toHaveText(String(answer));
   await activate(wrong.first());
-  await expect(correct).toHaveClass(/bs-pick--hint/);
+  await expect(correct).toHaveClass(/story-pick--hint/);
   await activate(correct);
   await expect(solved).toHaveText(String(answer));
-  await expect(page.locator('.bs-line--result')).toBeVisible();
+  await expect(page.locator('.story-line--result')).toBeVisible();
 
   for (let round = 2; round <= 9; round++) {
     await skip(6500);
@@ -250,21 +250,21 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
       await expect(page.locator('.bs-scene--dots')).toHaveCount(round === 3 || round === 6 ? 1 : 0);
       expect(await fits()).toBe(true);
       const value = await solve();
-      await activate(page.locator(`.bs-choice[data-value="${value}"]`));
+      await activate(page.locator(`.story-choice[data-value="${value}"]`));
       await expect(solved).toHaveText(String(value));
     } else {
       // From exercise to story: pick the picture that matches a op b.
-      const cards = page.locator('.bs-card');
+      const cards = page.locator('.story-card');
       await expect(cards).toHaveCount(3);
       await expect(cards.first()).toBeEnabled();
       const [a, op, b] = (await equation.innerText()).trim().split(/\s+/);
       const sign = op === '+' ? '+' : '-';
       if (round === 7) {
-        await activate(page.locator(`.bs-card[data-op="${sign === '+' ? '-' : '+'}"]`));
+        await activate(page.locator(`.story-card[data-op="${sign === '+' ? '-' : '+'}"]`));
         await expect(feedback).toContainText('בְּכָל סִפּוּר');
-        await expect(page.locator('.bs-card.bs-pick--tried')).toBeDisabled();
+        await expect(page.locator('.story-card.story-pick--tried')).toBeDisabled();
       }
-      await activate(page.locator(`.bs-card[data-op="${sign}"][data-a="${a}"][data-b="${b}"]`));
+      await activate(page.locator(`.story-card[data-op="${sign}"][data-a="${a}"][data-b="${b}"]`));
       await expect(solved).toHaveText(String(sign === '+' ? Number(a) + Number(b) : Number(a) - Number(b)));
       await expect.poll(() => page.evaluate(() => window.__spoken.at(-1))).toContain('שָׁוֶה');
     }
@@ -288,12 +288,12 @@ test('balloon-stories: without a voice the story still plays and can be answered
   await noVoice(page);
   await page.goto(`${network.url}/games/balloon-stories/`);
   await expect(page.locator('.bs-scene')).toBeVisible();
-  const start = page.locator('.bs-start');
+  const start = page.locator('.story-start');
   if (await start.count()) await activate(start);
-  await expect(page.locator('.bs-choice').first()).toBeEnabled();
+  await expect(page.locator('.story-choice').first()).toBeEnabled();
   await expect(page.locator('#alefbet-audio-status-banner')).toContainText('הַקּוֹל אֵינוֹ זָמִין');
-  const answer = await solveBalloonExercise(page.locator('.bs-equation'));
-  await activate(page.locator(`.bs-choice[data-value="${answer}"]`));
-  await expect(page.locator('.bs-line--result')).toBeVisible();
+  const answer = await solveBalloonExercise(page.locator('.story-equation'));
+  await activate(page.locator(`.story-choice[data-value="${answer}"]`));
+  await expect(page.locator('.story-line--result')).toBeVisible();
   await expect(page.locator('.progress-bar__label')).toContainText('1');
 });

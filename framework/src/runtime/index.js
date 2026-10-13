@@ -5,10 +5,12 @@
  * (מעטפת, מנהל סיבובים, מסכי טעינה ושגיאה) נשאר מאחורי runGame ו-bootstrapGame.
  */
 import '../styles/alefbet.css';
+import '../styles/story.css';
 
 export { runGame, bootstrapGame }               from '../core/bootstrap.js';
 export { createRoundScope }                     from '../core/round-scope.js';
 export { createChoiceRound }                    from '../core/choice-round.js';
+export { createStoryRound }                     from '../core/story-round.js';
 export { createHintTracker }                    from '../core/hints.js';
 export { createFeedback }                       from '../ui/feedback.js';
 export { createProgressBar }                    from '../ui/progress-bar.js';
@@ -18,6 +20,7 @@ export { animate }                              from '../render/animations.js';
 export { sounds }                               from '../audio/sounds.js';
 export { getAudioContext }                      from '../audio/audio-context.js';
 export { randomPraise, randomRetryHint }        from '../data/encouragement.js';
+export { numberWord, countNoun, exerciseWords } from '../data/hebrew-numbers.js';
 export { createDragSource, createDropTarget }   from '../input/drag.js';
 export { lockPageZoom }                         from '../input/zoom-lock.js';
 export { shuffle }                              from '../utils/shuffle.js';
