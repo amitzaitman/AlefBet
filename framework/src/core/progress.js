@@ -8,8 +8,6 @@
  * API ציבורי:
  *   starsFor(score, total) - חישוב כוכבים 1-3 (טהור).
  *   recordGameResult(gameId, { score, total }) - עדכון אחרי סיום משחק.
- *   getGameProgress(gameId) - ההתקדמות השמורה או null.
- *   getAllProgress() - מפת gameId -> התקדמות.
  */
 import { createLocalState } from './local-state.js';
 
@@ -62,21 +60,4 @@ export function recordGameResult(gameId, { score, total }) {
     return { ...all, [gameId]: updated };
   });
   return updated;
-}
-
-/**
- * ההתקדמות השמורה למשחק.
- * @param {string} gameId
- * @returns {GameProgress | null}
- */
-export function getGameProgress(gameId) {
-  return _store.get()[gameId] ?? null;
-}
-
-/**
- * כל ההתקדמות השמורה.
- * @returns {Record<string, GameProgress>}
- */
-export function getAllProgress() {
-  return _store.get();
 }

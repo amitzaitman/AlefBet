@@ -28,11 +28,7 @@ export function writeReleaseManifest(root) {
     ...context.self.ALEFBET_RUNTIME_ASSETS.map(file => `./framework/dist/${file}`),
     ...context.self.ALEFBET_CATALOG.flatMap(({ id }) => [`./games/${id}/`, ...gameFiles(root, id)]),
   ].sort();
-  // Optional editor assets are verified on first use, but never downloaded for play.
-  const optional = readdirSync(resolve(root, 'framework/dist'))
-    .filter(file => /\.(js|css)$/.test(file) && !file.startsWith('alefbet.') && file !== 'release-manifest.js')
-    .map(file => `./framework/dist/${file}`);
-  const assets = Object.fromEntries([...new Set([...core, ...optional])].sort().map(path => [
+  const assets = Object.fromEntries(core.map(path => [
     path, digest(read(path.endsWith('/') ? `${path}index.html` : path)),
   ]));
   const version = digest(JSON.stringify({ core, assets }) + read('sw.js').toString());

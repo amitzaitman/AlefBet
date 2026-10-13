@@ -15,7 +15,6 @@ export default [
       '**/dist/**',
       'framework/dist/**',
       'games/_template/**',
-      '.a5c/**',
       'package-lock.json',
       'test-results/**',
       'playwright-report/**',

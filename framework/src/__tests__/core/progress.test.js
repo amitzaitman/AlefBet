@@ -3,7 +3,10 @@
  * חישוב כוכבים עקבי, רישום משפר-בלבד, ועמידות לקלט שגוי.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { starsFor, recordGameResult, getGameProgress, getAllProgress } from '../../core/progress.js';
+import { starsFor, recordGameResult } from '../../core/progress.js';
+
+/** What the home page reads to draw stars on the game cards. */
+const saved = () => JSON.parse(localStorage.getItem('alefbet.progress.v1') || '{}');
 
 beforeEach(() => {
   try { localStorage.clear(); } catch { /* ignore */ }
@@ -25,11 +28,11 @@ describe('starsFor', () => {
   });
 });
 
-describe('recordGameResult / getGameProgress', () => {
+describe('recordGameResult', () => {
   it('רישום ראשון יוצר רשומה מלאה', () => {
     const result = recordGameResult('syllable-read', { score: 7, total: 8 });
     expect(result).toMatchObject({ plays: 1, bestScore: 7, bestStars: 3, total: 8 });
-    expect(getGameProgress('syllable-read')).toMatchObject({ bestScore: 7, bestStars: 3 });
+    expect(saved()['syllable-read']).toMatchObject({ bestScore: 7, bestStars: 3 });
   });
 
   it('משפר-בלבד: תוצאה חלשה לא דורסת שיא, אבל plays נספר', () => {
@@ -50,13 +53,12 @@ describe('recordGameResult / getGameProgress', () => {
   it('קלט שגוי מוחזר null ולא נכתב', () => {
     expect(recordGameResult('', { score: 5, total: 8 })).toBeNull();
     expect(recordGameResult('g', { score: NaN, total: 8 })).toBeNull();
-    expect(getGameProgress('g')).toBeNull();
+    expect(saved().g).toBeUndefined();
   });
 
-  it('getAllProgress מחזיר את כל המשחקים', () => {
+  it('שומר את כל המשחקים במפתח שדף הבית קורא', () => {
     recordGameResult('a', { score: 5, total: 8 });
     recordGameResult('b', { score: 8, total: 8 });
-    const all = getAllProgress();
-    expect(Object.keys(all).sort()).toEqual(['a', 'b']);
+    expect(Object.keys(saved()).sort()).toEqual(['a', 'b']);
   });
 });

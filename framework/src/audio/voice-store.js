@@ -135,12 +135,3 @@ export async function playVoice(gameId, voiceKey, { signal } = {}) {
     audio.play().catch(() => done(false));
   });
 }
-
-/**
- * בדוק האם קיימת הקלטה למפתח
- * @returns {Promise<boolean>}
- */
-export async function hasVoice(gameId, voiceKey) {
-  const blob = await loadVoice(gameId, voiceKey).catch(() => null);
-  return blob !== null;
-}

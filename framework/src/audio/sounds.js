@@ -34,7 +34,7 @@ function _playTone(freq, duration, type = 'sine', gainVal = 0.3) {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + duration + 0.05);
-  } catch (e) {
+  } catch {
     // Audio context not available in this environment
   }
 }

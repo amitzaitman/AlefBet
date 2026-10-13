@@ -104,7 +104,6 @@ test.describe('letter-match-animals', () => {
         get: () => undefined,
       });
       // Reject every HTMLAudioElement.play() so Google TTS path also fails.
-      // eslint-disable-next-line no-undef
       HTMLAudioElement.prototype.play = function () {
         return Promise.reject(new DOMException('blocked', 'NotAllowedError'));
       };

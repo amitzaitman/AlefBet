@@ -13,12 +13,11 @@
  *   letter:<אות>            - שם האות ("בית")
  *   nikud:<id>              - צליל התנועה של הניקוד ("אָה")
  *   syllable:<אות>:<id>     - הברה אות+ניקוד ("בָּ")
- *   word:<טקסט>             - מילה/משפט חופשי (הוראות משחק)
  *
  * API ציבורי:
- *   SOUND_BANK_ID, letterKey, nikudKey, syllableKey, wordKey,
- *   standardSoundKeys, keyLabel, isOffline,
- *   speakLetter, speakNikudSound, speakSyllable, speakWord,
+ *   SOUND_BANK_ID, letterKey, nikudKey, syllableKey,
+ *   standardSoundKeys, isOffline,
+ *   speakLetter, speakNikudSound, speakSyllable,
  *   recordedKeys (רשימת המפתחות שכבר הוקלטו).
  */
 import { tts } from './tts.js';
@@ -60,15 +59,6 @@ export function syllableKey(letter, nikudId) {
 }
 
 /**
- * מפתח בנק למילה/משפט חופשי (הוראות, מילות עידוד).
- * @param {string} text
- * @returns {string}
- */
-export function wordKey(text) {
-  return `word:${text}`;
-}
-
-/**
  * כל המפתחות הסטנדרטיים של הבנק: 27 אותיות, 7 ניקודים,
  * וכל הברות אות-בסיס x ניקוד. משמש את אולפן ההקלטה של המורה
  * כדי להציג רשימת "מה נשאר להקליט".
@@ -93,18 +83,6 @@ export function standardSoundKeys() {
     }
   }
   return keys;
-}
-
-/**
- * תווית תצוגה למפתח בנק (לאולפן ההקלטה ולדיבוג).
- * @param {string} key
- * @returns {string}
- */
-export function keyLabel(key) {
-  const std = standardSoundKeys().find(k => k.key === key);
-  if (std) return std.label;
-  const [, ...rest] = key.split(':');
-  return rest.join(':');
 }
 
 /**
@@ -219,18 +197,5 @@ export async function speakSyllable(letter, nikudId, options = {}) {
   const data = getLetter(letter);
   const vowel = NIKUD_VOWEL[nikudId];
   if (vowel && await (signal ? synthesizeSyllable(data ? data.sound : '', vowel, options) : synthesizeSyllable(data ? data.sound : '', vowel))) return 'synth';
-  return 'none';
-}
-
-/**
- * השמע מילה/משפט חופשי (הוראות משחק, עידוד).
- * שרשרת: בנק (אם המורה הקליטה את המשפט) -> TTS. אין סינתזה למילים
- * שלמות - אם אין קול, מוחזר 'none' והמשחק ימשיך בשקט.
- * @param {string} text
- * @returns {Promise<'bank'|'tts'|'none'>}
- */
-export async function speakWord(text) {
-  if (await _tryBank(wordKey(text))) return 'bank';
-  if (await _tryTTS(() => tts.speak(text))) return 'tts';
   return 'none';
 }

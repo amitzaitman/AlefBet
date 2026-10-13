@@ -32,9 +32,9 @@ vi.mock('../../audio/phoneme-synth.js', () => ({
 
 import {
   SOUND_BANK_ID,
-  letterKey, nikudKey, syllableKey, wordKey,
-  standardSoundKeys, keyLabel,
-  speakLetter, speakNikudSound, speakSyllable, speakWord,
+  letterKey, nikudKey, syllableKey,
+  standardSoundKeys,
+  speakLetter, speakNikudSound, speakSyllable,
 } from '../../audio/hebrew-audio.js';
 import { playVoice } from '../../audio/voice-store.js';
 import { tts } from '../../audio/tts.js';
@@ -56,7 +56,6 @@ describe('סכימת מפתחות', () => {
     expect(letterKey('ב')).toBe('letter:ב');
     expect(nikudKey('kamatz')).toBe('nikud:kamatz');
     expect(syllableKey('ב', 'kamatz')).toBe('syllable:ב:kamatz');
-    expect(wordKey('שלום')).toBe('word:שלום');
   });
 
   it('standardSoundKeys מכסה אותיות + ניקוד + הברות ללא כפילויות', () => {
@@ -68,11 +67,6 @@ describe('סכימת מפתחות', () => {
       expect(['letters', 'nikud', 'syllables']).toContain(k.group);
       expect(k.label).toBeTruthy();
     }
-  });
-
-  it('keyLabel מחזיר תווית קריאה', () => {
-    expect(keyLabel(nikudKey('kamatz'))).toContain('קָמָץ');
-    expect(keyLabel(wordKey('שלום'))).toBe('שלום');
   });
 });
 
@@ -108,10 +102,6 @@ describe('סדר הספקים', () => {
     expect(synthesizeVowel).toHaveBeenCalledWith('i');
   });
 
-  it('speakWord ללא בנק וללא TTS מחזיר none בלי לזרוק', async () => {
-    tts._setTestState('failed');
-    await expect(speakWord('שלום')).resolves.toBe('none');
-  });
 
   it('speakLetter מקריא את שם האות ב-TTS', async () => {
     const source = await speakLetter('ב');

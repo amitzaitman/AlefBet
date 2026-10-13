@@ -72,8 +72,6 @@ export function mountAudioStatusBanner(parent = (typeof document !== 'undefined'
 
   /** @type {ReturnType<typeof setTimeout> | null} */
   let autoDismissTimer = null;
-  /** @type {'await'|'unsupported'|'failed'|null} */
-  let currentKind = null;
 
   function clearAutoDismiss() {
     if (autoDismissTimer) {
@@ -84,7 +82,6 @@ export function mountAudioStatusBanner(parent = (typeof document !== 'undefined'
 
   function hide() {
     clearAutoDismiss();
-    currentKind = null;
     banner.hidden = true;
     banner.classList.remove('is-visible', 'is-await', 'is-unsupported', 'is-failed');
     banner.onclick = null;
@@ -105,7 +102,6 @@ export function mountAudioStatusBanner(parent = (typeof document !== 'undefined'
     banner.classList.toggle('is-await', info.kind === 'await');
     banner.classList.toggle('is-unsupported', info.kind === 'unsupported');
     banner.classList.toggle('is-failed', info.kind === 'failed');
-    currentKind = info.kind;
 
     if (info.kind === 'await') {
       banner.onclick = () => {
@@ -150,7 +146,6 @@ export function mountAudioStatusBanner(parent = (typeof document !== 'undefined'
       win.removeEventListener('alefbet:tts-state', onState);
       clearAutoDismiss();
       if (banner.parentNode) banner.parentNode.removeChild(banner);
-      currentKind = null;
     },
   };
 }

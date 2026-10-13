@@ -64,20 +64,6 @@ self.addEventListener('fetch', event => {
   })());
 });
 
-// The first page can open the editor before any worker controls that page.
-// Cache it explicitly on demand without claiming or reloading that document.
-self.addEventListener('message', event => {
-  if (event.data?.type !== 'cache-editor') return;
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_VERSION);
-    const core = new Set(release.core);
-    await Promise.allSettled(Object.keys(release.assets).filter(path => !core.has(path)).map(async path => {
-      const url = absolute(path);
-      if (!await cache.match(url)) await cache.put(url, await fetchVerified(url));
-    }));
-  })());
-});
-
 // Explicit adult action: refresh verified assets without unregistering the worker.
 // WebKit may discard unrelated CacheStorage entries when a registration is removed.
 self.addEventListener('message', event => {

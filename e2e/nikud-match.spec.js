@@ -84,7 +84,6 @@ test.describe('nikud-match', () => {
         configurable: true,
         get: () => undefined,
       });
-      // eslint-disable-next-line no-undef
       HTMLAudioElement.prototype.play = function () {
         return Promise.reject(new DOMException('blocked', 'NotAllowedError'));
       };

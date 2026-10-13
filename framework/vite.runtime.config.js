@@ -33,13 +33,14 @@ export default defineConfig({
         const item = bundle[name];
         if (item?.type === 'chunk') {
           item.imports.forEach(visit);
+          // Games load these on start (audio setup); offline play needs them precached.
+          item.dynamicImports.forEach(visit);
           item.viteMetadata?.importedCss?.forEach(visit);
           item.viteMetadata?.importedAssets?.forEach(visit);
         }
       };
       visit('runtime.js');
       visit('common.js');
-      // Dynamic imports are cached on first use, never required for play.
       this.emitFile({ type: 'asset', fileName: 'runtime-assets.js',
         source: `self.ALEFBET_RUNTIME_ASSETS = ${JSON.stringify([...files].sort())};\n` });
     },

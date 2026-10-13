@@ -85,7 +85,7 @@ Pushing to `main` triggers `.github/workflows/deploy.yml`, gated by unit/type/li
 - Choice games use `createChoiceRound(context, host, { options, isCorrect, onCorrect, onWrong })`. The manager owns the answer lock; games only control grading and feedback. Use `clearHighlight` for timed hints, never `reset` to unlock cards.
 - Custom games use `bootstrapGame` and `shell.nextRound()` (never bypass the shell with `shell.state.nextRound()`). Use `shell.schedule` for delayed work, check `shell.ended` after awaits, and dispose resources on `end`.
 - nikud-speak keeps its three-attempt policy locally. sound-studio remains outside the round runner.
-- Do not delete `createRoundManager`: runGame still uses it internally and it remains a compatibility export.
+- `createRoundManager` is runGame's internal round loop. The public API (`runtime/common.ts`, `runtime/index.ts`) exports only what games use; add an export when a game needs one.
 
 ## General games (2026-09-09)
 

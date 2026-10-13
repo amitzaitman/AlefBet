@@ -1,28 +1,20 @@
-/** API כללי למשחקים: מחזור חיים, קלט ומשוב. ללא תלות בתוכן לימודי. */
-export { EventBus }          from '../core/events.js';
-export { GameState }         from '../core/state.js';
-export { GameShell }         from '../core/game-shell.js';
-export { endGame }           from '../core/game-shell.js';
-export { shuffle }           from '../utils/shuffle.js';
-export { createRoundManager } from '../core/round-manager.js';
-export { createLocalState }  from '../core/local-state.js';
-export { bootstrapGame }     from '../core/bootstrap.js';
-export { createChoiceRound } from '../core/choice-round.js';
-export { runGame }           from '../core/bootstrap.js';
-export { createHintTracker } from '../core/hints.js';
-export { starsFor, recordGameResult, getGameProgress, getAllProgress } from '../core/progress.js';
-export { sounds } from '../audio/sounds.js';
-export { getAudioContext, unlockAudioOutput, ensureAudioRunning, playBlob } from '../audio/audio-context.js';
-export { PRAISE_PHRASES, RETRY_HINTS, randomPraise, randomRetryHint } from '../data/encouragement.js';
-export { createOptionCards }       from '../ui/option-cards.js';
-export { createProgressBar }       from '../ui/progress-bar.js';
-export { createFeedback }          from '../ui/feedback.js';
-export { showCompletionScreen }    from '../ui/completion-screen.js';
-export { showLoadingScreen, hideLoadingScreen } from '../ui/loading-screen.js';
-export { injectHeaderButton }      from '../ui/header-button.js';
-export { mountAudioStatusBanner } from '../ui/audio-status-banner.js';
-export { installGlobalErrorScreen } from '../ui/error-screen.js';
-export { animate } from '../render/animations.js';
-export { createDragSource, createDropTarget } from '../input/drag.js';
-export { lockPageZoom } from '../input/zoom-lock.js';
-export { createRoundScope } from '../core/round-scope.js';
+/**
+ * API כללי למשחקים: מחזור חיים, קלט ומשוב, ללא תוכן לימודי.
+ * מייצא רק מה שמשחקים משתמשים בו או מה שהמדריך מתעד. קוד פנימי
+ * (מעטפת, מנהל סיבובים, מסכי טעינה ושגיאה) נשאר מאחורי runGame ו-bootstrapGame.
+ */
+export { runGame, bootstrapGame }               from '../core/bootstrap.js';
+export { createRoundScope }                     from '../core/round-scope.js';
+export { createChoiceRound }                    from '../core/choice-round.js';
+export { createHintTracker }                    from '../core/hints.js';
+export { createFeedback }                       from '../ui/feedback.js';
+export { createProgressBar }                    from '../ui/progress-bar.js';
+export { showCompletionScreen }                 from '../ui/completion-screen.js';
+export { injectHeaderButton }                   from '../ui/header-button.js';
+export { animate }                              from '../render/animations.js';
+export { sounds }                               from '../audio/sounds.js';
+export { getAudioContext }                      from '../audio/audio-context.js';
+export { randomPraise, randomRetryHint }        from '../data/encouragement.js';
+export { createDragSource, createDropTarget }   from '../input/drag.js';
+export { lockPageZoom }                         from '../input/zoom-lock.js';
+export { shuffle }                              from '../utils/shuffle.js';

@@ -80,7 +80,6 @@ test.describe('nikud-speak', () => {
         configurable: true,
         get: () => undefined,
       });
-      // eslint-disable-next-line no-undef
       HTMLAudioElement.prototype.play = function () {
         return Promise.reject(new DOMException('blocked', 'NotAllowedError'));
       };

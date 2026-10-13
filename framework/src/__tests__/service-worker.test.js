@@ -31,7 +31,7 @@ function worker(caches, version, network) {
   const handlers = {};
   const release = {
     version, core: ['./', './app.js'],
-    assets: { './': hash('home'), './app.js': hash(version), './editor.js': hash(`editor-${version}`) },
+    assets: { './': hash('home'), './app.js': hash(version), './late.js': hash(`late-${version}`) },
   };
   const self = {
     ALEFBET_RELEASE: release, location: { href: `${origin}sw.js` },
@@ -67,7 +67,7 @@ function worker(caches, version, network) {
 describe('release updates', () => {
   it('refreshes poisoned assets and removes stale entries without touching unrelated caches', async () => {
     const caches = storage();
-    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1'], [`${origin}editor.js`, 'editor-v1']]);
+    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1'], [`${origin}late.js`, 'late-v1']]);
     const active = worker(caches, 'v1', network);
     await active.lifecycle('install');
     const cache = await caches.open('alefbet-release-v1');
@@ -83,7 +83,7 @@ describe('release updates', () => {
 
   it('keeps working offline assets when a full refresh fails integrity checks', async () => {
     const caches = storage();
-    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1'], [`${origin}editor.js`, 'wrong-release']]);
+    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1'], [`${origin}late.js`, 'wrong-release']]);
     const active = worker(caches, 'v1', network);
     await active.lifecycle('install');
     expect(await active.refresh()).toEqual({ ok: false });
@@ -125,12 +125,12 @@ describe('release updates', () => {
     expect(await (await next.request('app.js')).text()).toBe('v2');
   });
 
-  it('rejects mixed deployment files and does not cache a newer optional editor in an old release', async () => {
+  it('rejects mixed deployment files and does not serve a file from a newer release', async () => {
     const caches = storage();
-    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1'], [`${origin}editor.js`, 'editor-v2']]);
+    const network = new Map([[origin, 'home'], [`${origin}app.js`, 'v1'], [`${origin}late.js`, 'late-v2']]);
     const old = worker(caches, 'v1', network);
     await old.lifecycle('install');
-    expect((await old.request('editor.js')).type).toBe('error');
+    expect((await old.request('late.js')).type).toBe('error');
     const next = worker(caches, 'v2', network);
     await expect(next.lifecycle('install')).rejects.toThrow('Incomplete');
     expect(await caches.keys()).toEqual(['alefbet-release-v1']);

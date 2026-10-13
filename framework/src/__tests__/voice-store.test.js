@@ -131,29 +131,6 @@ describe('listVoiceKeys', () => {
   });
 });
 
-// ── hasVoice ──────────────────────────────────────────────────────────────────
-
-describe('hasVoice', () => {
-  it('returns true when a recording exists', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { saveVoice, hasVoice } = await import('../audio/voice-store.js');
-    await saveVoice('game-1', 'existing', {});
-
-    expect(await hasVoice('game-1', 'existing')).toBe(true);
-  });
-
-  it('returns false when no recording exists', async () => {
-    const idb = createIDBMock();
-    vi.stubGlobal('indexedDB', idb);
-
-    const { hasVoice } = await import('../audio/voice-store.js');
-
-    expect(await hasVoice('game-1', 'missing')).toBe(false);
-  });
-});
-
 // ── playVoice ─────────────────────────────────────────────────────────────────
 
 describe('playVoice', () => {
@@ -176,13 +153,11 @@ describe('playVoice', () => {
       revokeObjectURL: vi.fn(),
     });
 
-    let capturedAudio;
     vi.stubGlobal('Audio', class MockAudio {
       constructor(src) {
         this.src = src;
         this.onended = null;
         this.onerror = null;
-        capturedAudio = this;
       }
       pause() {}
       play() {
