@@ -1,13 +1,9 @@
-import { expect } from '@playwright/test';
-import { test } from './network-server.js';
+import { test, expect, noVoice, targetNikud } from './network-server.js';
 
 test('touch retry, audio failure, completion, replay and offline reload', async ({ page, network }) => {
   await page.route('**/translate.google.com/**', route => route.abort());
   await page.route('**/translate_tts**', route => route.abort());
-  await page.addInitScript(() => {
-    Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => undefined });
-    HTMLAudioElement.prototype.play = () => Promise.reject(new DOMException('blocked', 'NotAllowedError'));
-  });
+  await noVoice(page);
   await page.goto(`${network.url}/games/letter-match-animals/`);
   const cards = page.locator('.option-card');
   await expect(cards).toHaveCount(4);
@@ -27,9 +23,7 @@ test('touch retry, audio failure, completion, replay and offline reload', async 
   await page.locator('.completion-screen__replay').tap();
   await expect(cards).toHaveCount(4);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.evaluate(() => navigator.serviceWorker.ready);
-  await network.offline(page);
-  await page.reload();
+  await network.reloadOffline(page);
   await expect(cards).toHaveCount(4);
   await page.locator('[data-id="correct"]').tap();
   await expect(page.locator('.progress-bar__label')).toHaveText('1 / 8');
@@ -70,15 +64,8 @@ test('nikud supports tap selection, retry, completion and returning home', async
   await page.goto('/games/nikud-match/');
   const letter = page.locator('.nm-arena .nm-letter');
   const label = page.locator('.progress-bar__label');
-  // The nikud on the letter, read from the screen with the game's own nikud list.
-  const target = () => page.evaluate(async () => {
-    const { nikudList } = await import('/framework/dist/runtime.js');
-    const text = document.querySelector('.nm-arena .nm-letter').textContent;
-    const shown = [...document.querySelectorAll('.nm-zone')].map(zone => zone.dataset.nikud);
-    return nikudList.find(n => shown.includes(n.id) && text.includes(n.symbol)).id;
-  });
   await expect(letter).toBeVisible();
-  let nikud = await target();
+  let nikud = await targetNikud(page);
   const correct = () => page.locator(`.nm-zone[data-nikud="${nikud}"]`);
   // Tapping a zone before choosing the letter does nothing; a wrong zone keeps the letter chosen.
   await correct().tap();
@@ -94,7 +81,7 @@ test('nikud supports tap selection, retry, completion and returning home', async
   for (let round = 1; round < 8; round++) {
     await expect(page.locator('.nm-arena .nm-letter:not([data-answered])')).toBeVisible();
     await expect(label).toHaveText(`${round} / 8`);
-    nikud = await target();
+    nikud = await targetNikud(page);
     await letter.tap();
     await answer();
   }

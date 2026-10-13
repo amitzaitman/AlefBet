@@ -1,5 +1,4 @@
-import { expect } from '@playwright/test';
-import { test } from './network-server.js';
+import { test, expect } from './network-server.js';
 
 test('home groups games by subject, supports navigation and keeps groups offline', async ({ page, network }) => {
   await page.goto(network.url);
@@ -21,9 +20,7 @@ test('home groups games by subject, supports navigation and keeps groups offline
   await expect(page.locator('.teacher-tools-grid .game-card')).toBeHidden();
   await page.getByText('להורים ולמורים', { exact: true }).click();
   await expect(page.locator('.teacher-tools-grid .game-card')).toBeVisible();
-  await page.evaluate(() => navigator.serviceWorker.ready);
-  await network.offline(page);
-  await page.reload();
+  await network.reloadOffline(page);
   await expect(reading.locator('.game-card')).toHaveCount(4);
   await expect(math.locator('.game-card')).toHaveCount(7);
 });

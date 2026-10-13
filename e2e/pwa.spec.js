@@ -1,6 +1,5 @@
 // @ts-check
-import { expect } from '@playwright/test';
-import { test } from './network-server.js';
+import { test, expect } from './network-server.js';
 
 test.describe('PWA', () => {
   test('service worker registers and precaches the site core', async ({ page }) => {
@@ -44,7 +43,6 @@ test.describe('PWA', () => {
     // ביקור יחיד: ההתקנה שומרת מראש את כל האתר, כולל משחקים שלא בוקרו.
     await page.goto(`${network.url}/games/syllable-read/`);
     await page.waitForSelector('.option-card', { timeout: 15_000 });
-    await page.evaluate(() => navigator.serviceWorker.ready);
 
     // המתן שה-precache של ההתקנה יכלול את עמוד המשחק עצמו.
     await expect(async () => {
@@ -67,7 +65,6 @@ test.describe('PWA', () => {
     await page.reload();
     await expect(page.locator('.sr-replay')).toBeVisible({ timeout: 15_000 });
     await expect(page.locator('.option-card')).toHaveCount(3);
-    await network.online(page);
   });
 
   test('home cards come from the catalog and catalog is precached', async ({ page }) => {
@@ -97,7 +94,6 @@ test.describe('PWA', () => {
 test('a game that was never opened plays offline, including its own modules', async ({ page, network }) => {
   await page.goto(`${network.url}/games/syllable-read/`);
   await expect(page.locator('.option-card')).toHaveCount(3);
-  await page.evaluate(() => navigator.serviceWorker.ready);
   await network.offline(page);
   // nikud-match draws its choices with nikud-box.js, a file in its own folder.
   await page.goto(`${network.url}/games/nikud-match/`);

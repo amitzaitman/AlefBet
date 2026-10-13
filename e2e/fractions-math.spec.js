@@ -1,9 +1,7 @@
-import { expect } from '@playwright/test';
-import { test } from './network-server.js';
+import { test, expect, expectTouchTargets } from './network-server.js';
 
 for (const game of ['fraction-picture', 'fraction-whole', 'fraction-compare']) {
-  test(`${game}: visual answers, retry, completion, replay and offline`, async ({ page, isMobile, network }) => {
-    const activate = locator => isMobile ? locator.tap() : locator.click();
+  test(`${game}: visual answers, retry, completion, replay and offline`, async ({ page, activate, network }) => {
     const painting = game !== 'fraction-compare';
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -40,11 +38,7 @@ for (const game of ['fraction-picture', 'fraction-whole', 'fraction-compare']) {
           await activate(page.locator('.fraction-reset'));
           await expect(page.locator('.fraction-bar [aria-pressed="true"]')).toHaveCount(0);
           await expect(page.locator('.fraction-cell--given')).toHaveCount(game === 'fraction-whole' ? n : 0);
-          for (const cell of await cells.all()) {
-            const box = await cell.boundingBox();
-            expect(box.width).toBeGreaterThanOrEqual(64);
-            expect(box.height).toBeGreaterThanOrEqual(64);
-          }
+          await expectTouchTargets(cells);
           expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         }
         for (let i = 0; i < goal; i++) {
@@ -86,9 +80,7 @@ for (const game of ['fraction-picture', 'fraction-whole', 'fraction-compare']) {
     await activate(page.locator('.completion-screen__replay'));
     await expect(page.locator('.fraction-bar').first()).toBeVisible();
     if (painting) await expect(page.locator('.fraction-bar [aria-pressed="true"]')).toHaveCount(0);
-    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-    await network.offline(page);
-    await page.reload();
+    await network.reloadOffline(page);
     await expect(page.locator('.fraction-bar').first()).toBeVisible();
     await expect(page.locator(painting ? '.fraction-check' : '.option-card').first()).toBeEnabled();
     expect(errors).toEqual([]);

@@ -1,9 +1,7 @@
-import { expect } from '@playwright/test';
-import { test } from './network-server.js';
+import { test, expect, noVoice, expectTouchTargets } from './network-server.js';
 
 for (const game of ['make-ten', 'number-line']) {
-  test(`${game}: retry, completion, replay and offline`, async ({ page, isMobile, network }) => {
-    const activate = locator => isMobile ? locator.tap() : locator.click();
+  test(`${game}: retry, completion, replay and offline`, async ({ page, activate, network }) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(`${network.url}/games/${game}/`);
@@ -45,17 +43,13 @@ for (const game of ['make-ten', 'number-line']) {
     await activate(page.locator('.completion-screen__replay'));
     await expect(page.locator('.game-title')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-    await network.offline(page);
-    await page.reload();
-    await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
+    await network.reloadOffline(page);
     await expect(page.locator(game === 'make-ten' ? '.ten-frame' : '.number-line')).toBeVisible();
     expect(errors).toEqual([]);
   });
 }
 
-test('equations and the number line read left to right inside the RTL page', async ({ page, isMobile, network }) => {
-  const activate = locator => isMobile ? locator.tap() : locator.click();
+test('equations and the number line read left to right inside the RTL page', async ({ page, activate, network }) => {
   // Compares where the first and last visible characters are drawn, not the DOM order.
   const readsLeftToRight = locator => locator.evaluate(el => {
     const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
@@ -104,9 +98,8 @@ test('equations and the number line read left to right inside the RTL page', asy
   expect(Math.abs(lastLineGaps.left - lastLineGaps.right)).toBeLessThan(6);
 });
 
-test('long-exercise: solve part by part, hints, keyboard, completion, replay and offline', async ({ page, isMobile, network }) => {
+test('long-exercise: solve part by part, hints, keyboard, completion, replay and offline', async ({ page, activate, network }) => {
   test.setTimeout(120_000);
-  const activate = locator => isMobile ? locator.tap() : locator.click();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto(`${network.url}/games/long-exercise/`);
@@ -127,11 +120,7 @@ test('long-exercise: solve part by part, hints, keyboard, completion, replay and
       await expect(page.locator('.chain-question')).toContainText(`${step + 1} מִתּוֹךְ ${terms[round] - 1}`);
       const correct = page.locator(`.chain-choice[data-value="${last}"]`);
       if (round === 0 && step === 0) {
-        for (const choice of await page.locator('.chain-choice').all()) {
-          const box = await choice.boundingBox();
-          expect(box.width).toBeGreaterThanOrEqual(64);
-          expect(box.height).toBeGreaterThanOrEqual(64);
-        }
+        await expectTouchTargets(page.locator('.chain-choice'));
         await expect(page.locator('.chain-dots')).toBeHidden();
         const wrong = page.locator(`.chain-choice:not([data-value="${last}"])`);
         await activate(wrong.first());
@@ -168,10 +157,7 @@ test('long-exercise: solve part by part, hints, keyboard, completion, replay and
   await expect(part).toBeVisible();
   await expect(trail).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-  await network.offline(page);
-  await page.reload();
-  await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
+  await network.reloadOffline(page);
   await expect(part).toBeVisible();
   await expect(page.locator('.chain-choice').first()).toBeEnabled();
   expect(errors).toEqual([]);
@@ -184,9 +170,8 @@ async function solveBalloonExercise(equation) {
   return op === '+' ? Number(x) + Number(y) : Number(x) - Number(y);
 }
 
-test('balloon-stories: narrated story, hints, exercise to story, completion, replay and offline', async ({ page, isMobile, network }) => {
+test('balloon-stories: narrated story, hints, exercise to story, completion, replay and offline', async ({ page, activate, network }) => {
   test.setTimeout(180_000);
-  const activate = locator => isMobile ? locator.tap() : locator.click();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   // A recording voice that answers at once, so the story's sentences can be checked.
@@ -222,11 +207,7 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
   // Shown with digits, spoken with number words.
   await expect(page.locator('.bs-line').first()).toHaveText(/^לְנוֹעָה יֵשׁ \d+ בָּלוֹנִים\.$/);
   expect((await page.evaluate(() => window.__spoken))[0]).toMatch(/^לְנוֹעָה יֵשׁ \D+ בָּלוֹנִים\.$/);
-  for (const button of await choice.all()) {
-    const box = await button.boundingBox();
-    expect(box.width).toBeGreaterThanOrEqual(64);
-    expect(box.height).toBeGreaterThanOrEqual(64);
-  }
+  await expectTouchTargets(choice);
   const answer = await solve();
   const correct = page.locator(`.bs-choice[data-value="${answer}"]`);
   const wrong = page.locator(`.bs-choice:enabled:not([data-value="${answer}"])`);
@@ -280,20 +261,14 @@ test('balloon-stories: narrated story, hints, exercise to story, completion, rep
   await expect(start).toHaveCount(0);
   await expect(choice.first()).toBeEnabled({ timeout: 10_000 });
   expect(await fits()).toBe(true);
-  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
-  await network.offline(page);
-  await page.reload();
-  await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
+  await network.reloadOffline(page);
   await expect(page.locator('.bs-scene')).toBeVisible();
   await expect(choice).toHaveCount(4);
   expect(errors).toEqual([]);
 });
 
-test('balloon-stories: without a voice the story still plays and can be answered', async ({ page, isMobile, network }) => {
-  const activate = locator => isMobile ? locator.tap() : locator.click();
-  await page.addInitScript(() => {
-    Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => undefined });
-  });
+test('balloon-stories: without a voice the story still plays and can be answered', async ({ page, activate, network }) => {
+  await noVoice(page);
   await page.goto(`${network.url}/games/balloon-stories/`);
   await expect(page.locator('.bs-scene')).toBeVisible();
   const start = page.locator('.bs-start');
