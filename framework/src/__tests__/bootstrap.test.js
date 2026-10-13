@@ -4,7 +4,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { bootstrapGame, runGame } from '../core/bootstrap.ts';
+import { bootstrapGame, runGame } from '../core/bootstrap.js';
 import { mountContainer } from './helpers.js';
 
 beforeEach(() => {

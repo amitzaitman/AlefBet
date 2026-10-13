@@ -1,4 +1,4 @@
-import { u as C } from "./common-BqHHFCxq.js";
+import { u as C } from "./common-BxxfeCzW.js";
 const g = [
   { letter: "א", name: "אֶלֶף", nameNikud: "אָלֶף", sound: "", exampleWord: "אַרְיֵה", emoji: "🦁", isFinal: !1 },
   { letter: "ב", name: "בַּיִת", nameNikud: "בֵּית", sound: "b", exampleWord: "בַּיִת", emoji: "🏠", isFinal: !1 },

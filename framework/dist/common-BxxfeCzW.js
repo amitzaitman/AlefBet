@@ -532,7 +532,7 @@ async function _e(e, t) {
   F(e);
   const n = {};
   T.set(e, n), ge(), be(e, t.loadingMessage ?? "טוֹעֵן...");
-  const r = t.audio !== !1 ? await import("./game-audio-BbLXdX8-.js") : null;
+  const r = t.audio !== !1 ? await import("./game-audio-CwQJKj-t.js") : null;
   if (T.get(e) !== n)
     return { shell: null, activeRounds: [], aborted: !0 };
   if (t.onBeforeHide && (await t.onBeforeHide() === !1 || T.get(e) !== n))
@@ -551,7 +551,11 @@ async function we(e, t) {
   const { shell: r, activeRounds: a } = n;
   if (!a.length)
     return r.bodyEl.textContent = "אֵין סִבּוּבִים לַמִּשְׂחָק.", r.end(), n;
-  const s = he(r.footerEl, a.length);
+  const s = he(
+    /** @type {HTMLElement} */
+    r.footerEl,
+    a.length
+  );
   let o;
   const u = () => {
     o == null || o.dispose(), o = void 0;

@@ -9,8 +9,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
-        runtime: resolve(root, 'src/runtime/index.ts'),
-        common: resolve(root, 'src/runtime/common.ts'),
+        runtime: resolve(root, 'src/runtime/index.js'),
+        common: resolve(root, 'src/runtime/common.js'),
       },
       formats: ['es'],
       fileName: (_format, name) => `${name}.js`,
