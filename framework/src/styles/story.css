@@ -1,0 +1,36 @@
+/* סיבוב סיפור (core/story-round.js): שורות הסיפור, התרגיל, כפתורי התשובה ו"עוד פעם".
+   הכללים עברו כמו שהם מ-balloon-stories; התמונה עצמה נשארת ב-CSS של המשחק. */
+.story-round { width: min(100%, 640px); margin-inline: auto; text-align: center; }
+.story { display: grid; align-content: center; gap: 2px; min-height: 5em; margin: 4px 0 8px; }
+.story-round--cards .story { min-height: 0; }
+.story-line { margin: 0; color: #7a6a55; font-size: clamp(1.05rem, 3.8vw, 1.35rem); font-weight: 600; }
+.story-line--now { color: #1b140c; font-weight: 700; }
+.story-line--result { color: #1e5a52; }
+.story-start { justify-self: center; min-height: 72px; padding: 10px 28px; border: 0; border-radius: 20px; background: #2868a6; color: #fff; font: inherit; font-size: clamp(1.2rem, 4.5vw, 1.5rem); font-weight: 700; cursor: pointer; touch-action: manipulation; }
+
+.story-equation { min-height: 1.3em; margin: 6px 0; font-size: clamp(30px, 7vw, 44px); font-weight: 700; }
+.story-unknown { color: #783952; }
+.story-solved { padding: 0 8px; border-radius: 10px; background: #2a7b71; color: #fff; }
+/* איבר שהמשפט הנוכחי הוסיף לתרגיל מהבהב פעם אחת. */
+.story-term--new { display: inline-block; animation: story-term-new 600ms ease-out; }
+@keyframes story-term-new { 40% { transform: scale(1.3); color: #2a7b71; } }
+@media (prefers-reduced-motion: reduce) { .story-term--new { animation: none; } }
+
+.story-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2.5vw, 12px); margin: 8px 0 12px; }
+.story-choice { display: grid; justify-items: center; align-content: center; gap: 6px; min-width: 68px; min-height: 84px; padding: 6px 8px; border: 3px solid #2868a6; border-radius: 18px; background: #fff; color: #174774; font: inherit; cursor: pointer; touch-action: manipulation; }
+.story-choice__number { font-size: clamp(28px, 7vw, 36px); font-weight: 700; line-height: 1; }
+.story-choice__dots { display: grid; grid-template-columns: repeat(5, 7px); gap: 3px; min-height: 7px; }
+.story-choice__dots span { width: 7px; height: 7px; border-radius: 50%; background: #2868a6; }
+
+.story-cards { display: grid; gap: 10px; width: min(100%, 440px); margin: 8px auto 12px; }
+.story-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 72px; padding: 10px 14px; border: 3px solid #2868a6; border-radius: 18px; background: #fff; color: #1b140c; font: inherit; font-size: clamp(1rem, 3.8vw, 1.2rem); font-weight: 700; text-align: start; cursor: pointer; touch-action: manipulation; }
+
+.story-pick--tried { opacity: .35; border-style: dashed; }
+.story-pick--hint { border-color: #783952; background: #f0e4eb; box-shadow: 0 0 0 4px rgba(120, 57, 82, .25); }
+.story-pick--correct { border-color: #2a7b71; background: #dcefe9; }
+.story-choice:disabled, .story-card:disabled, .story-again:disabled { cursor: default; }
+.story-choice:disabled:not(.story-pick--tried, .story-pick--correct), .story-card:disabled:not(.story-pick--tried, .story-pick--correct) { opacity: .6; }
+.story-again { min-width: 96px; min-height: 64px; padding: 8px 24px; border: 2px solid #2868a6; border-radius: 16px; background: #fff; color: #2868a6; font: inherit; font-size: 1.1rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.story-again:disabled { opacity: .45; }
+.story-choice:focus-visible, .story-card:focus-visible, .story-again:focus-visible, .story-start:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
+.story-round .feedback-message { min-height: 2.4em; }
