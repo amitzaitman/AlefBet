@@ -1,10 +1,10 @@
 import Round from './BalloonStoriesRound.svelte';
-import { DESCRIPTION, TITLE, createRounds } from './logic.js';
+import { DESCRIPTION, TITLE, createRounds, pauseAfter } from './logic.js';
 
 /**
- * 2600 ms after a correct answer: time to read the story's closing sentence.
+ * After a correct answer the next round waits until the closing sentence has been read.
  * @type {import('../../games.js').GameDefinition}
  */
 export const balloonStories = {
-  id: 'balloon-stories', title: TITLE, description: DESCRIPTION, icon: '🎈', createRounds, Round, transitionMs: 2600,
+  id: 'balloon-stories', title: TITLE, description: DESCRIPTION, icon: '🎈', createRounds, Round, transitionMs: pauseAfter,
 };

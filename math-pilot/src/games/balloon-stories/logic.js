@@ -7,20 +7,18 @@
  * Ported from games/balloon-stories with the same rounds, choices, stories
  * and hints. The pilot has no audio, so the story is read, not heard.
  */
+import { HOLD_MS, readingMs } from '../../lib/reading.js';
 import { shuffle } from '../../lib/shuffle.js';
 
 export const TITLE = 'סִפּוּרֵי בָּלוֹנִים';
 export const DESCRIPTION = 'סִפּוּר קָצָר קוֹרֶה עַל הַמָּסָךְ, וּבוֹ מְגַלִּים חִבּוּר וְחִסּוּר עַד 10';
 
-/** A sentence stays the newest line for this long, plus a little per letter. */
-export const READ_BASE_MS = 1000;
-export const READ_LETTER_MS = 100;
 /** Gap between balloons that pop, arrive or fill one after another. */
 export const STAGGER_MS = 280;
+/** After a change on the picture, the next sentence waits this long, so the change is seen. */
+export const LOOK_MS = 800;
 /** How long each balloon stays the newest one while the picture is counted. */
 export const COUNT_MS = 700;
-/** A hint is read, not heard, so it stays longer than the shell's default. */
-export const HINT_MS = 4000;
 
 /** The help after each wrong answer goes back to the picture: the story, then counting, then the answer. */
 export const STORY_AGAIN_HINT = 'בּוֹאוּ נִקְרָא שׁוּב אֶת הַסִּפּוּר';
@@ -185,12 +183,25 @@ export function resultFor(round) {
 }
 
 /**
- * How long a sentence stays the newest line: long enough for a child who is
- * still learning to read it, and the earlier lines stay on the screen.
- * @param {string} text
+ * How long the story takes to reach its question. The setting comes with its
+ * sentence; a change happens on the picture once its sentence has been read,
+ * one balloon after another, and the child gets a moment to look at it.
+ * @param {Round} round
  * @returns {number} milliseconds
  */
-export const readingMs = text => READ_BASE_MS + (text.match(/[א-ת0-9]/g)?.length ?? 0) * READ_LETTER_MS;
+export function storyMs(round) {
+  if (round.kind === 'match') return 0;
+  const [start, change] = storyFor(round);
+  return readingMs(start.text) + readingMs(change.text) + (scenePlan(round).change.length - 1) * STAGGER_MS + LOOK_MS;
+}
+
+/**
+ * The pause after a correct answer: the closing sentence (or the finished
+ * exercise) stays until it has been read, then the next round comes.
+ * @param {Round} round
+ * @returns {number} milliseconds
+ */
+export const pauseAfter = round => readingMs(resultFor(round)) + HOLD_MS;
 
 /**
  * The right story, the same numbers with the other operation, and one more

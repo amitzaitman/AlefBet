@@ -4,23 +4,27 @@ import { Feedback } from '../src/shell/feedback.svelte.js';
 import { RoundRunner } from '../src/shell/round-runner.svelte.js';
 import { StoryRound } from '../src/games/balloon-stories/story-round.svelte.js';
 import {
-  COUNT_HINTS, COUNT_MS, HINT_MS, MATCH_HINT, NUMBER_HINT, STAGGER_MS, STORY_AGAIN_HINT, STORY_HINT,
-  readingMs, resultFor, storyFor,
+  COUNT_HINTS, COUNT_MS, LOOK_MS, MATCH_HINT, NUMBER_HINT, STAGGER_MS, STORY_AGAIN_HINT, STORY_HINT,
+  pauseAfter, resultFor, storyFor, storyMs,
 } from '../src/games/balloon-stories/logic.js';
+import { readingMs } from '../src/lib/reading.js';
 
 /** @param {import('../src/games/balloon-stories/logic.js').Round} round */
 function setup(round) {
   const scope = createScope();
-  const runner = new RoundRunner([round], { transitionMs: 2600 });
-  const story = new StoryRound(round, { scope, runner, feedback: new Feedback(scope, HINT_MS) });
+  const runner = new RoundRunner([round], { transitionMs: pauseAfter });
+  const story = new StoryRound(round, { scope, runner, feedback: new Feedback(scope) });
   return { scope, runner, story };
 }
 
 /** Plays the story up to its question. @param {StoryRound} story */
 async function untilQuestion(story) {
   void story.play();
-  for (const beat of storyFor(story.round).slice(0, -1)) await vi.advanceTimersByTimeAsync(readingMs(beat.text));
+  await vi.advanceTimersByTimeAsync(storyMs(story.round));
 }
+
+/** @param {StoryRound} story */
+const texts = story => story.lines.map(line => line.text);
 
 /** @param {StoryRound} story */
 const states = story => story.balloons.map(balloon => balloon.state);
@@ -38,30 +42,40 @@ describe('a balloon-stories round', () => {
   beforeEach(() => { vi.useFakeTimers(); });
   afterEach(() => { vi.useRealTimers(); });
 
-  it('tells the story one sentence at a time, and the picture and exercise build with it', async () => {
+  it('tells the story one sentence at a time, and each change happens once its sentence is read', async () => {
     const round = /** @type {const} */ ({ kind: 'take', a: 5, b: 2, look: 'balloons' });
-    const [start, change] = storyFor(round);
+    const [start, change, question] = storyFor(round);
     const { story } = setup(round);
     void story.play();
-    expect(story.lines.map(line => line.text)).toEqual([start.text]);
+    expect(texts(story)).toEqual([start.text]);
     expect(story.equation).toBe('5');
     expect(states(story)).toEqual(Array(5).fill('shown'));
     // The choices wait for the question.
     expect(story.isOpen(3)).toBe(false);
 
     await vi.advanceTimersByTimeAsync(readingMs(start.text));
-    expect(story.lines).toHaveLength(2);
+    expect(texts(story)).toEqual([start.text, change.text]);
+    expect(story.now).toBe(1);
+    // Nothing pops before the sentence that says so has been read.
+    expect(story.equation).toBe('5');
+    expect(states(story)).toEqual(Array(5).fill('shown'));
+    await vi.advanceTimersByTimeAsync(readingMs(change.text));
+    // Then the balloons pop one after another, at the end of the row, and '− 2' with them.
     expect(story.equation).toBe('5 − 2');
-    // The balloons pop one after another, at the end of the row.
     expect(states(story)).toEqual(['shown', 'shown', 'shown', 'popped', 'shown']);
     await vi.advanceTimersByTimeAsync(STAGGER_MS);
     expect(states(story)).toEqual(['shown', 'shown', 'shown', 'popped', 'popped']);
 
-    await vi.advanceTimersByTimeAsync(readingMs(change.text) - STAGGER_MS);
-    expect(story.lines.map(line => line.text)).toEqual(storyFor(round).map(beat => beat.text));
-    expect(story.lines.at(-1).motion).toBe('appear');
+    // A moment to look at the picture, then the question opens the choices.
+    await vi.advanceTimersByTimeAsync(LOOK_MS - 1);
+    expect(story.isOpen(3)).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(texts(story)).toEqual([start.text, change.text, question.text]);
+    expect(story.now).toBe(2);
     expect(story.equation).toBe('5 − 2 = ?');
     expect(story.isOpen(3)).toBe(true);
+    // storyMs is how long the story takes to ask.
+    expect(storyMs(round)).toBe(readingMs(start.text) + readingMs(change.text) + STAGGER_MS + LOOK_MS);
   });
 
   it('helps after each wrong answer: the story again, counting on the picture, then the answer marked', async () => {
@@ -73,15 +87,21 @@ describe('a balloon-stories round', () => {
 
     await tap(story, wrong[0]);
     expect(story.feedback.text).toBe(STORY_AGAIN_HINT);
-    expect(story.lines).toHaveLength(1);
+    // Read again: every sentence stays on the screen, the question too, and the
+    // highlight goes back to the start, so the child reads at their own pace.
+    expect(texts(story)).toEqual(storyFor(round).map(beat => beat.text));
+    expect(story.now).toBe(0);
     expect(story.isOpen(wrong[0])).toBe(false);
     // Reading the story again keeps the other choices open.
     expect(story.isOpen(3)).toBe(true);
+    await vi.advanceTimersByTimeAsync(storyMs(round) / 2);
+    expect(texts(story)).toContain(storyFor(round)[2].text);
+    await vi.advanceTimersByTimeAsync(storyMs(round) / 2);
+    expect(story.now).toBe(2);
 
     await tap(story, wrong[1]);
     expect(story.feedback.text).toBe(COUNT_HINTS.take);
-    // The whole story is back at once, and the balloons that are left get numbers.
-    expect(story.lines.every(line => line.motion === 'none')).toBe(true);
+    // The finished picture at once, and the balloons that are left get numbers.
     expect(story.lines).toHaveLength(3);
     expect(states(story)).toEqual(['shown', 'shown', 'shown', 'popped', 'popped']);
     expect(story.balloons.map(balloon => balloon.count)).toEqual([1, 0, 0, 0, 0]);
@@ -95,7 +115,9 @@ describe('a balloon-stories round', () => {
     await tap(story, 3);
     expect(story.solved).toBe(true);
     expect(story.lines.at(-1)).toMatchObject({ text: resultFor(round), result: true });
-    expect(story.feedback.tone).toBe('correct');
+    expect(story.now).toBe(3);
+    // The closing sentence is the feedback: the hint goes, and no praise competes with it.
+    expect(story.feedback.text).toBe('');
     expect(runner.solved).toBe(1);
     expect(story.choices.some(value => story.isOpen(value))).toBe(false);
     // The counting stopped with the answer.
@@ -141,6 +163,10 @@ describe('a balloon-stories round', () => {
     await untilQuestion(missing);
     expect(states(missing)).toEqual([...Array(4).fill('shown'), ...Array(3).fill('empty')]);
     expect(missing.equation).toBe('4 + ? = 7');
+    // After the answer the empty places fill in, in the missing part's colour.
+    await tap(missing, 3);
+    expect(missing.balloons.map(balloon => `${balloon.owner} ${balloon.state}`))
+      .toEqual([...Array(4).fill('noa shown'), ...Array(3).fill('added shown')]);
   });
 
   it('stops when the round is gone, and a new telling stops the old one', async () => {
@@ -156,7 +182,7 @@ describe('a balloon-stories round', () => {
     await vi.advanceTimersByTimeAsync(readingMs(storyFor(round)[0].text));
     void story.play();
     await vi.advanceTimersByTimeAsync(20_000);
-    expect(story.lines.map(line => line.text)).toEqual(storyFor(round).map(beat => beat.text));
+    expect(texts(story)).toEqual(storyFor(round).map(beat => beat.text));
     expect(states(story)).toEqual(Array(5).fill('shown'));
   });
 });

@@ -10,7 +10,8 @@ import { makeTen } from './games/make-ten/index.js';
  * @property {string} icon
  * @property {() => any[]} createRounds - new rounds for every start and replay
  * @property {import('svelte').Component<any>} Round - draws one round; gets `round` and `runner`
- * @property {number} [transitionMs] - pause after a correct answer, before the next round
+ * @property {number | ((round: any) => number)} [transitionMs] - pause after a correct answer,
+ *   before the next round; a function gives each round its own
  */
 
 /**

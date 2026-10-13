@@ -1,7 +1,8 @@
+import { readingMs } from '../../lib/reading.js';
 import { shuffle } from '../../lib/shuffle.js';
 import {
-  COUNT_HINTS, COUNT_MS, MATCH_HINT, NUMBER_HINT, STAGGER_MS, STORY_AGAIN_HINT, STORY_HINT,
-  answerChoices, answerFor, finalStates, matchOptions, readingMs, resultFor, scenePlan, storyFor,
+  COUNT_HINTS, COUNT_MS, LOOK_MS, MATCH_HINT, NUMBER_HINT, STAGGER_MS, STORY_AGAIN_HINT, STORY_HINT,
+  answerChoices, answerFor, finalStates, matchOptions, resultFor, scenePlan, storyFor,
 } from './logic.js';
 
 /**
@@ -34,8 +35,10 @@ function withPicture(card) {
  * The view only draws this state and calls `play` and `choose`.
  */
 export class StoryRound {
-  /** @type {Line[]} */
+  /** @type {Line[]} the sentences told so far; they stay on the screen while the round lasts */
   lines = $state([]);
+  /** The line being read: the newest one, or the one the story has reached when it is told again. */
+  now = $state(0);
   /** The exercise as far as the story has written it. */
   equation = $state('');
   /** @type {Balloon[]} */
@@ -88,19 +91,29 @@ export class StoryRound {
     return this.asked && !this.runner.locked && !this.tried.includes(choice);
   }
 
-  /** Tells the story from the start: one sentence at a time, with the picture and the exercise. */
+  /**
+   * Tells the story from the start: one sentence at a time, with the picture
+   * and the exercise. Told again, every sentence stays on the screen, so the
+   * child can read at their own pace; only the highlight and the picture move.
+   */
   async play() {
     const run = ++this.#run;
     const live = () => run === this.#run && this.scope.active();
-    this.lines = [];
+    /** @param {number} ms */
+    const wait = async ms => (await this.scope.wait(ms)) && live();
     this.paired = false;
     if (this.plan) this.balloons = this.plan.owners.map(owner => this.#balloon(owner, 'hidden', 'none'));
-    for (const beat of this.beats) {
-      this.lines.push(this.#line(beat.text));
+    for (const [k, beat] of this.beats.entries()) {
+      if (k === this.lines.length) this.lines.push(this.#line(beat.text));
+      this.now = k;
+      // The setting and the question come with their sentence. A change happens
+      // once its sentence has been read, and its part of the exercise with it.
+      const change = beat.scene === 'change';
+      if (change && !await wait(readingMs(beat.text))) return;
       this.equation = beat.equation;
       if (beat.scene === 'question') this.asked = true;
-      await Promise.all([this.scope.wait(readingMs(beat.text)), this.#step(beat.scene, live)]);
-      if (!live()) return;
+      await this.#step(beat.scene, live);
+      if (beat.scene === 'question' || !await wait(change ? LOOK_MS : readingMs(beat.text))) return;
     }
   }
 
@@ -119,10 +132,18 @@ export class StoryRound {
     void this.runner.correct(() => {
       this.picked = choice;
       this.#settle();
-      // The exercise is completed, and the story closes with its answer.
+      // The exercise is completed on the picture, and the story closes with its answer.
+      // That sentence is the feedback, so no praise competes with it for reading time.
       if (this.matching) this.equation = `${this.beats[0].equation} = ?`;
-      else this.lines.push(this.#line(resultFor(this.round), 'appear', true));
-      this.feedback.correct();
+      else {
+        // The missing balloons fill in, in the missing part's colour, as in make-ten.
+        if (this.round.kind === 'missing') {
+          for (const index of this.plan?.counted ?? []) this.balloons[index] = this.#balloon('added', 'shown', 'fill');
+        }
+        this.lines.push(this.#line(resultFor(this.round), 'appear', true));
+        this.now = this.lines.length - 1;
+      }
+      this.feedback.clear();
     });
   }
 
@@ -175,7 +196,8 @@ export class StoryRound {
   /** Shows the whole story at once, when a hint or an answer interrupts it. */
   #settle() {
     this.#run += 1;
-    this.lines = this.beats.map(beat => this.#line(beat.text, 'none'));
+    this.lines = this.beats.map((beat, k) => this.lines[k] ?? this.#line(beat.text, 'none'));
+    this.now = this.beats.length - 1;
     this.equation = this.beats[this.beats.length - 1].equation;
     const plan = this.plan;
     if (!plan) return;

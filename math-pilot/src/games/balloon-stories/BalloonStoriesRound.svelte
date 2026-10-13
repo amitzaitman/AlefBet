@@ -7,7 +7,7 @@
   import { ms } from '../../lib/motion.js';
   import Scene from './Scene.svelte';
   import { StoryRound } from './story-round.svelte.js';
-  import { AGAIN, AGAIN_LABEL, HINT_MS, storyCaption } from './logic.js';
+  import { AGAIN, AGAIN_LABEL, storyCaption } from './logic.js';
 
   /**
    * @type {{
@@ -19,7 +19,7 @@
 
   const scope = useScope();
   // GameShell makes a new component for every round, so round and runner never change here.
-  const story = untrack(() => new StoryRound(round, { scope, runner, feedback: new Feedback(scope, HINT_MS) }));
+  const story = untrack(() => new StoryRound(round, { scope, runner, feedback: new Feedback(scope) }));
   // No audio, so nothing waits for a first tap: the story starts by itself.
   onMount(() => { void story.play(); });
 
@@ -34,13 +34,18 @@
   ];
 </script>
 
-<section class={['game', story.matching && 'game--match']}>
+<section class="game">
   <div class="story" aria-live="polite">
     {#each story.lines as line, k (line.key)}
       <p
-        class={['line', line.result && 'line--result', k === story.lines.length - 1 && 'line--now']}
+        class={['line', line.result && 'line--result', k === story.now && 'line--now']}
         in:fly={{ y: 8, duration: line.motion === 'none' ? 0 : ms(320) }}
       >{line.text}</p>
+    {/each}
+    <!-- The sentences still to come hold their place, so the picture and the choices
+         below never move, least of all when the question opens the choices. -->
+    {#each story.beats.slice(story.lines.length) as beat, k (k)}
+      <p class="line-space" aria-hidden="true">{beat.text}</p>
     {/each}
   </div>
 
@@ -52,7 +57,7 @@
   <p class="equation" dir="ltr">{#each tokens as token, k (k)}{#if k}{' '}{/if}<span
       class={['token', token === '?' && !story.solved && 'unknown']}
       in:fly={{ y: 6, duration: ms(240) }}
-    >{#if token === '?' && story.solved}<span class="solved" in:scale={{ start: 0.5, duration: ms(240) }}>{story.answer}</span>{:else}{token}{/if}</span>{/each}</p>
+    >{#if token === '?' && story.solved}<span class={['solved', round.kind === 'missing' && 'solved--part']} in:scale={{ start: 0.5, duration: ms(240) }}>{story.answer}</span>{:else}{token}{/if}</span>{/each}</p>
 
   {#if story.matching}
     <div class="cards">
@@ -106,26 +111,27 @@
     margin-inline: auto;
   }
 
-  /* The story so far: earlier sentences stay, the newest one is dark. */
+  /* The story so far: earlier sentences stay, the one being read is dark. */
   .story {
     display: grid;
     align-content: center;
     gap: 2px;
     width: 100%;
-    min-height: 4.4em;
     margin: 0 0 8px;
     font-size: clamp(19px, 4.6dvmin, 26px);
     line-height: 1.45;
   }
-  .game--match .story { min-height: 0; }
-  .line { margin: 0; color: var(--muted); font-weight: 600; }
-  .line--now { color: var(--ink); font-weight: 700; }
+  .line, .line-space { margin: 0; color: var(--muted); font-weight: 600; }
+  .line--now, .line-space { color: var(--ink); font-weight: 700; }
+  .line-space { visibility: hidden; }
   .line--result { color: var(--solved); }
 
   .equation { min-height: 1.3em; margin: 6px 0; font-size: clamp(30px, 7vw, 44px); font-weight: 700; }
   .token { display: inline-block; }
   .unknown { color: var(--hint); }
   .solved { display: inline-block; padding: 0 8px; border-radius: var(--radius-sm); background: var(--solved); color: #fff; }
+  /* Completing: the answer is the missing part, in its colour, as in make-ten. */
+  .solved--part { background: var(--part-added); color: var(--ink); }
 
   .choices { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(6px, 2vw, 12px); margin: 8px 0 4px; }
   .choice {

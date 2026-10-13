@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs';
 import { test, expect, expectTouchTargets } from './network-server.js';
+import { pauseAfter, storyMs } from '../math-pilot/src/games/balloon-stories/logic.js';
 
 /** The pilot is its own Svelte build; start.js serves it from the build folder. */
 const PILOT = '/math-pilot/dist/';
@@ -12,6 +13,8 @@ test.beforeAll(() => {
 const fitsWidth = page => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
 
 test('the math home opens every pilot game, and nothing loads from outside the pilot', async ({ page, activate }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
   const outside = [];
   page.on('request', request => {
     const url = new URL(request.url());
@@ -36,6 +39,7 @@ test('the math home opens every pilot game, and nothing loads from outside the p
     await expect(heading).toHaveText(HOME_TITLE);
   }
   expect(outside).toEqual([]);
+  expect(errors).toEqual([]);
 });
 
 test('make-ten: retry, completion and a round after replay', async ({ page, activate }) => {
@@ -100,6 +104,17 @@ test('make-ten: retry, completion and a round after replay', async ({ page, acti
   expect(errors).toEqual([]);
 });
 
+/**
+ * Every take, add, compare and missing round within ten. The story waits for the
+ * child to read, so the spec skips as long as the slowest round takes at the game's
+ * own pace: to the question, and from a correct answer to the next round.
+ */
+const PICTURE_ROUNDS = ['take', 'add', 'compare', 'missing']
+  .flatMap(kind => Array.from({ length: 100 }, (_, n) => ({ kind, a: 1 + Math.floor(n / 10), b: 1 + (n % 10), look: 'balloons' })))
+  .filter(({ kind, a, b }) => (kind === 'add' ? a + b <= 10 : kind === 'missing' ? a < b : b < a));
+const STORY_MS = Math.max(...PICTURE_ROUNDS.map(storyMs));
+const PAUSE_MS = Math.max(...[...PICTURE_ROUNDS, { kind: 'match', op: '+', a: 5, b: 3, look: 'dots' }].map(pauseAfter));
+
 /** Reads a balloon-stories question: a − b = ?, a + b = ? or a + ? = b. */
 async function solveBalloonExercise(equation) {
   const [x, op, y, , z] = (await equation.innerText()).trim().split(/\s+/);
@@ -111,15 +126,14 @@ test('balloon-stories: the story sentence by sentence, the hint ladder, exercise
   test.setTimeout(60_000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  // The story's pacing is fixed waits: a sentence stays 1 s plus 0.1 s a letter (a unit test
-  // checks that the question comes within 7 s), balloons change 280 ms apart, counting takes
-  // 700 ms a balloon and the next round comes 2600 ms after an answer. The page clock skips them.
+  // The story's pacing is fixed waits for reading (STORY_MS, PAUSE_MS), counting takes
+  // 700 ms a balloon. The page clock skips them.
   await page.clock.install();
   const skip = ms => page.clock.runFor(ms);
-  const STORY_MS = 7000;
   await page.goto(`${PILOT}#/balloon-stories`);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('סִפּוּרֵי בָּלוֹנִים');
   const line = page.locator('.line');
+  const now = page.locator('.line--now');
   const choice = page.locator('.choice');
   const equation = page.locator('.equation');
   const solved = page.locator('.solved');
@@ -132,6 +146,7 @@ test('balloon-stories: the story sentence by sentence, the hint ladder, exercise
   // start of the exercise, and the choices wait for the question.
   await expect(line).toHaveCount(1);
   await expect(line.first()).toHaveText(/^לְנוֹעָה יֵשׁ \d+ בָּלוֹנִים\.$/);
+  const opening = await line.first().innerText();
   await expect(equation).toHaveText(/^\d+$/);
   await expect(choice.first()).toBeDisabled();
   await skip(STORY_MS);
@@ -159,7 +174,9 @@ test('balloon-stories: the story sentence by sentence, the hint ladder, exercise
   await activate(wrong.first());
   await expect(status).toHaveText('בּוֹאוּ נִקְרָא שׁוּב אֶת הַסִּפּוּר');
   await expect(page.locator('.pick--tried')).toBeDisabled();
-  await expect(line).toHaveCount(1);
+  // Read again: the whole story stays on the screen, the question too; the highlight starts over.
+  await expect(line).toHaveCount(3);
+  await expect(now).toHaveText(opening);
   await expect(correct).toBeEnabled();
   await activate(wrong.first());
   await expect(status).toHaveText('סִפְרוּ אֶת הַבָּלוֹנִים שֶׁנִּשְׁאֲרוּ');
@@ -180,13 +197,20 @@ test('balloon-stories: the story sentence by sentence, the hint ladder, exercise
   await expect(progress).toHaveAttribute('aria-valuenow', '1');
 
   for (let round = 2; round <= 9; round++) {
-    await skip(2600);
+    await skip(PAUSE_MS);
     await expect(solved).toHaveCount(0);
-    // The comparing rounds are the widest pictures; they still fit a small phone.
-    if (round === 4) await page.setViewportSize({ width: 320, height: 640 });
+    let waiting = null;
+    if (round === 4) {
+      // The comparing rounds are the widest pictures; they still fit a small phone.
+      await page.setViewportSize({ width: 320, height: 640 });
+      // While the story is told the choices wait, and the question opens them where they are.
+      await expect(choice.first()).toBeDisabled();
+      waiting = await choice.first().boundingBox();
+    }
     await skip(STORY_MS);
     if (round <= 6) {
       await expect(choice.first()).toBeEnabled();
+      if (waiting) expect(await choice.first().boundingBox()).toEqual(waiting);
       // Each of the first two stages ends with plain circles instead of drawn balloons.
       await expect(page.locator('.scene--dots')).toHaveCount(round === 3 || round === 6 ? 1 : 0);
       const [, , y] = await numbers();
@@ -194,10 +218,11 @@ test('balloon-stories: the story sentence by sentence, the hint ladder, exercise
         await expect(page.locator('.balloon--added[data-state="shown"]')).toHaveCount(Number(y));
         // The story can be read again at any time, and the choices stay open meanwhile.
         await activate(again);
-        await expect(line).toHaveCount(1);
+        await expect(line).toHaveCount(3);
+        await expect(now).toHaveText(/^לְנוֹעָה יֵשׁ \d+ בָּלוֹנִים\.$/);
         await expect(choice.first()).toBeEnabled();
         await skip(STORY_MS);
-        await expect(line).toHaveCount(3);
+        await expect(now).toContainText('כַּמָּה');
       }
       if (round === 4) {
         await expect(page.locator('.pair--matched')).toHaveCount(Number(y));
@@ -208,6 +233,12 @@ test('balloon-stories: the story sentence by sentence, the hint ladder, exercise
       const value = await solveBalloonExercise(equation);
       await activate(page.locator(`.choice[data-value="${value}"]`));
       await expect(solved).toHaveText(String(value));
+      if (round === 5) {
+        // The full exercise on the picture: the empty places fill in, in the missing part's colour.
+        await expect(page.locator('.balloon--added[data-state="shown"]')).toHaveCount(value);
+        await expect(page.locator('.balloon[data-state="empty"]')).toHaveCount(0);
+        await expect(solved).toHaveClass(/solved--part/);
+      }
     } else {
       // From exercise to story: pick the picture that matches a op b.
       const cards = page.locator('.card');
@@ -232,7 +263,7 @@ test('balloon-stories: the story sentence by sentence, the hint ladder, exercise
     }
     await expect(progress).toHaveAttribute('aria-valuenow', String(round));
   }
-  await skip(2600);
+  await skip(PAUSE_MS);
   await expect(page.getByRole('heading', { name: 'כָּל הַכָּבוֹד!' })).toBeVisible();
   await expect(page.getByText('הִשְׁלַמְתֶּם 9 מְשִׂימוֹת!')).toBeVisible();
 
@@ -244,7 +275,7 @@ test('balloon-stories: the story sentence by sentence, the hint ladder, exercise
   const value = await solveBalloonExercise(equation);
   await activate(page.locator(`.choice[data-value="${value}"]`));
   await expect(solved).toHaveText(String(value));
-  await skip(2600);
+  await skip(PAUSE_MS);
   await expect(progress).toHaveAttribute('aria-valuenow', '1');
   await expect(solved).toHaveCount(0);
   await skip(STORY_MS);

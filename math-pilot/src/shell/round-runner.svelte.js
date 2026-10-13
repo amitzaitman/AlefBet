@@ -16,7 +16,8 @@ export class RoundRunner {
 
   /**
    * @param {Round[]} rounds
-   * @param {{ transitionMs?: number }} [options]
+   * @param {{ transitionMs?: number | ((round: Round) => number) }} [options] -
+   *   the pause after a correct answer; a function gives each round its own
    */
   constructor(rounds, { transitionMs = 800 } = {}) {
     if (!rounds.length) throw new Error('A game needs at least one round');
@@ -49,7 +50,8 @@ export class RoundRunner {
     }
     if (this.#destroyed) return false;
     this.solved += 1;
-    this.#timer = setTimeout(() => this.#advance(), this.transitionMs);
+    const pause = typeof this.transitionMs === 'function' ? this.transitionMs(this.round) : this.transitionMs;
+    this.#timer = setTimeout(() => this.#advance(), pause);
     return true;
   }
 

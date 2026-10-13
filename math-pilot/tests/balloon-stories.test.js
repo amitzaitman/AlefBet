@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
-  READ_BASE_MS, createRound, createRounds, answerFor, answerChoices, storyFor, resultFor,
-  matchOptions, storyCaption, readingMs, scenePlan, finalStates,
+  createRound, createRounds, answerFor, answerChoices, storyFor, resultFor,
+  matchOptions, storyCaption, scenePlan, finalStates, pauseAfter,
 } from '../src/games/balloon-stories/logic.js';
+import { readingMs } from '../src/lib/reading.js';
 
 const NIKUD = /[֑-ׇ]/g;
 const PICTURE_KINDS = /** @type {const} */ (['take', 'add', 'compare', 'missing']);
@@ -101,23 +102,13 @@ describe('balloon-stories story', () => {
     expect(resultFor({ kind: 'match', op: '-', a: 5, b: 2, look: 'dots' })).toBe('5 − 2 = 3');
   });
 
-  it('keeps sentences short, gives each one time to be read, and asks within seven seconds', () => {
+  it('keeps sentences short, and the next round waits until the closing sentence is read', () => {
     for (let run = 0; run < 100; run++) {
       for (const round of createRounds()) {
-        const beats = storyFor(round);
-        for (const { text } of beats) {
-          expect(text.replace(NIKUD, '').length).toBeLessThanOrEqual(48);
-          // Never shorter than today's shortest beat.
-          expect(readingMs(text)).toBeGreaterThanOrEqual(1200);
-        }
-        // The browser test skips 7 seconds to reach the question.
-        const untilQuestion = beats.slice(0, -1).reduce((sum, { text }) => sum + readingMs(text), 0);
-        expect(untilQuestion).toBeLessThanOrEqual(7000);
+        for (const { text } of storyFor(round)) expect(text.replace(NIKUD, '').length).toBeLessThanOrEqual(48);
+        expect(pauseAfter(round)).toBeGreaterThan(readingMs(resultFor(round)));
       }
     }
-    // Longer sentences stay longer; nikud and spaces do not count.
-    expect(readingMs('לְנוֹעָה יֵשׁ 5 בָּלוֹנִים.')).toBe(READ_BASE_MS + 14 * 100);
-    expect(readingMs('סָבְתָא הֵבִיאָה לָהּ עוֹד 3 בָּלוֹנִים.')).toBeGreaterThan(readingMs('לְנוֹעָה יֵשׁ 5 בָּלוֹנִים.'));
   });
 });
 

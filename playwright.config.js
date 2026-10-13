@@ -39,7 +39,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-webkit',
-      testMatch: /[\\/](?:mobile|home|math|fractions-math)\.spec\.js$/,
+      testMatch: /[\\/](?:mobile|home|math|math-pilot|fractions-math)\.spec\.js$/,
       use: { ...devices['iPhone 13'] },
     },
   ],

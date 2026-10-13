@@ -5,7 +5,14 @@
   import { games } from './games.js';
 
   // Hash routes (#/make-ten) work from any folder the build is copied to.
-  const routeFromHash = () => decodeURIComponent(location.hash.replace(/^#\/?/, ''));
+  // A mangled link ('#/%') opens the math home instead of a blank page.
+  function routeFromHash() {
+    try {
+      return decodeURIComponent(location.hash.replace(/^#\/?/, ''));
+    } catch {
+      return '';
+    }
+  }
   let route = $state(routeFromHash());
   const game = $derived(games.find(entry => entry.id === route));
 

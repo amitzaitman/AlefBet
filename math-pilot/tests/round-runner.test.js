@@ -20,6 +20,18 @@ describe('RoundRunner', () => {
     expect(runner).toMatchObject({ index: 1, round: 'b', locked: false, finished: false });
   });
 
+  it('gives each round its own pause when the game asks for one', async () => {
+    const runner = new RoundRunner(['short', 'long', 'end'], { transitionMs: round => (round === 'long' ? 500 : 100) });
+    await runner.correct();
+    vi.advanceTimersByTime(100);
+    expect(runner.round).toBe('long');
+    await runner.correct();
+    vi.advanceTimersByTime(499);
+    expect(runner.round).toBe('long');
+    vi.advanceTimersByTime(1);
+    expect(runner.round).toBe('end');
+  });
+
   it('keeps the round after a wrong answer, locked only while the help is shown', async () => {
     const runner = new RoundRunner(['a']);
     let lockedDuringHelp;
