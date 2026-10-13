@@ -539,3 +539,101 @@ test('fair-share: deal by touch, an unfair deal goes back, help, completion, rep
   await expect(choice).toHaveCount(4);
   expect(errors).toEqual([]);
 });
+
+test('balance-scale: add cubes and weigh, the beam shows the heavier side, help, completion, replay and offline', async ({ page, activate, network }) => {
+  test.setTimeout(60_000);
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  // Without a voice a sentence takes 1200 ms and a counted step 700 ms; the page clock skips
+  // those, the 700 ms swing of the beam and the 3400 ms round transition.
+  await noVoice(page);
+  await page.clock.install();
+  const skip = ms => page.clock.runFor(ms);
+  await page.goto(`${network.url}/games/balance-scale/`);
+  const scale = page.locator('.bl-scale');
+  const more = page.getByRole('button', { name: 'הוֹסָפַת קֻבִּיָּה', exact: true });
+  const less = page.getByRole('button', { name: 'הוֹרָדַת קֻבִּיָּה', exact: true });
+  const weigh = page.locator('.bl-weigh');
+  const solved = page.locator('.story-solved');
+  const mine = page.locator('.bl-side--mine .bl-cube[data-term="mine"]');
+  const fits = () => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  /** Reads the exercise: the total of the other side and the known part of the child's side. */
+  const read = async () => {
+    const [left, right] = (await page.locator('.story-equation').innerText()).split('=').map(side => side.trim().split(/\s*\+\s*/));
+    const sum = terms => terms.filter(t => t !== '?').reduce((a, t) => a + Number(t), 0);
+    const childLeft = left.includes('?');
+    const answer = childLeft ? sum(right) - sum(left) : sum(left) - sum(right);
+    return { answer, childLeft, other: childLeft ? sum(right) : sum(left) };
+  };
+  /** Sets the child's cubes to count. */
+  const setCubes = async count => {
+    while (await mine.count() < count) await activate(more);
+    while (await mine.count() > count) await activate(less);
+  };
+  const steps = n => (n > 5 ? n - 4 : n);
+
+  await expect(scale).toBeVisible();
+  await expect(page.locator('.story-line').first()).toContainText('אוֹמֵר: שְׁנֵי הַצְּדָדִים שָׁוִים');
+  const first = await read();
+  expect(first.childLeft).toBe(false);
+  await expect(page.locator('.story-equation')).toHaveText(`${first.other} = ?`);
+  await expect(page.locator('.story-equation')).toHaveAttribute('dir', 'ltr');
+  await expectTouchTargets(page.locator('.bl-step, .bl-weigh'));
+  await expect(less).toBeDisabled();
+  // One too few: the beam goes down on the other side and says the child's side has less.
+  await setCubes(first.answer - 1);
+  await activate(weigh);
+  await expect(weigh).toBeDisabled();
+  await expect(scale).toHaveAttribute('data-down', 'left');
+  await skip(700);
+  await expect(page.locator('.bl-miss')).toHaveText('בַּצַּד שֶׁלָּכֶם פָּחוֹת.');
+  await skip(1300);
+  // Any change holds the beam level again.
+  await setCubes(first.answer + 1);
+  await expect(scale).toHaveAttribute('data-down', 'level');
+  await activate(weigh);
+  await expect(scale).toHaveAttribute('data-down', 'right');
+  // The second miss counts both pans, left to right, and shows both totals.
+  await skip(700 + 700 * (steps(first.other) + steps(first.answer + 1)) + 1300);
+  await expect(page.locator('.bl-total')).toHaveText([String(first.other), String(first.answer + 1)]);
+  await expect(page.locator('.bl-miss')).toHaveText('שְׁנֵי הַצְּדָדִים אֵינָם שָׁוִים.');
+  await expect(weigh).toBeEnabled();
+  // The third miss marks the cube past the places to fill.
+  await activate(weigh);
+  await skip(700 + 700 * (steps(first.other) + steps(first.answer + 1)) + 1300);
+  await expect(page.locator('.bl-cube--extra')).toHaveCount(1);
+  await setCubes(first.answer);
+  await expect(page.locator('.bl-cube--extra')).toHaveCount(0);
+  await expect(page.locator('.bl-total').first()).toHaveText('');
+  await activate(weigh);
+  await expect(solved).toHaveText(String(first.answer));
+  await expect(scale).toHaveAttribute('data-down', 'level');
+  await expect(page.locator('.bl-total')).toHaveText([String(first.other), String(first.other)]);
+  await expect(page.locator('.story-line--result')).toHaveText('שְׁנֵי הַצְּדָדִים שָׁוִים.');
+
+  const shapes = [];
+  for (let round = 2; round <= 6; round++) {
+    await skip(3600);
+    await expect(solved).toHaveCount(0);
+    shapes.push((await page.locator('.story-equation').innerText()).replace(/\d+/g, 'n'));
+    const { answer } = await read();
+    expect(await fits()).toBe(true);
+    await setCubes(answer);
+    await activate(weigh);
+    await expect(solved).toHaveText(String(answer));
+  }
+  // The unknown and the sum also stand to the left of =.
+  expect(shapes).toEqual(['n + n = ?', '? = n + n', 'n = n + ?', 'n + n = n + ?', 'n + ? = n + n']);
+  await skip(3600);
+  await expect(page.locator('.completion-screen')).toBeVisible();
+  await activate(page.locator('.completion-screen__replay'));
+  await expect(scale).toBeVisible();
+  const again = await read();
+  await setCubes(again.answer);
+  await activate(weigh);
+  await expect(solved).toHaveText(String(again.answer));
+  await network.reloadOffline(page);
+  await expect(scale).toBeVisible();
+  await expect(weigh).toBeEnabled();
+  expect(errors).toEqual([]);
+});

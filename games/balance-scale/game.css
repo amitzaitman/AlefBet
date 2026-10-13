@@ -1,0 +1,45 @@
+/* Ten cubes in two rows of five fit each pan; two pans fit a 320px phone. */
+.bl-game { --bl-cube: clamp(18px, calc((100vw - 124px) / 10), 30px); }
+.bl-game .story { min-height: 0; }
+.bl-unknown { color: #2a7b71; }
+
+/* The scale, left to right like the exercise. Each pan rides its end of the beam. */
+.bl-scale { --bl-tilt: 0deg; --bl-lift: 0px; display: grid; width: fit-content; margin: 6px auto 4px; }
+.bl-sides { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
+.bl-side { display: grid; justify-items: center; gap: 2px; transition: transform 600ms ease-in-out; }
+.bl-side:first-child { transform: translateY(calc(var(--bl-lift) * -1)); }
+.bl-side:last-child { transform: translateY(var(--bl-lift)); }
+.bl-label { min-height: 1.2em; margin: 0; color: #2a7b71; font-size: clamp(.9rem, 3.4vw, 1.05rem); font-weight: 700; }
+.bl-total { min-height: 1.3em; margin: 0; color: #1b140c; font-size: clamp(22px, 6vw, 30px); font-weight: 700; line-height: 1.3; }
+.bl-pan { display: grid; gap: 3px; padding: 6px 8px 8px; border: 3px solid #8d99ab; border-top-width: 0; border-radius: 0 0 24px 24px; background: #f4f6f9; }
+.bl-side--mine .bl-pan { border-color: #2a7b71; border-style: dashed; border-top-width: 0; background: #eef7f4; }
+.bl-row { display: flex; gap: 3px; }
+.bl-beam { height: 8px; margin: 0; border-radius: 4px; background: #6b5a45; transform: rotate(var(--bl-tilt)); transition: transform 600ms ease-in-out; }
+.bl-stand { justify-self: center; width: 0; height: 0; border: 0 solid transparent; border-width: 0 18px 28px; border-bottom-color: #6b5a45; }
+.bl-scale--weighed .bl-beam { animation: bl-steady 700ms ease-out; }
+@keyframes bl-steady { 30% { transform: rotate(2.5deg); } 65% { transform: rotate(-1.5deg); } }
+
+/* Cubes: each term its own color, the child's cubes green like the "?" in the exercise. */
+.bl-cube { display: grid; place-items: center; box-sizing: border-box; width: var(--bl-cube); height: var(--bl-cube); border-radius: 5px; color: #fff; font-size: calc(var(--bl-cube) * .55); font-weight: 700; line-height: 1; }
+.bl-cube:not([data-term]) { visibility: hidden; }
+.bl-cube[data-term="0"] { background: #2868a6; }
+.bl-cube[data-term="1"] { background: #d99221; }
+.bl-cube[data-term="mine"] { background: #2a7b71; }
+.bl-cube--counted { box-shadow: 0 0 0 3px rgba(120, 57, 82, .5); }
+/* From the third miss: places still to fill, and cubes past them. */
+.bl-cube--target { visibility: visible; border: 2px dashed #2a7b71; }
+.bl-cube--extra { opacity: .4; }
+
+.bl-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 6px; }
+.bl-steps { display: flex; justify-content: center; gap: 8px; }
+.bl-step { min-width: 64px; min-height: 64px; border: 3px solid #2a7b71; border-radius: 16px; background: #fff; color: #1e5a52; font: inherit; font-size: 32px; font-weight: 700; line-height: 1; cursor: pointer; touch-action: manipulation; }
+.bl-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 6px 0 8px; }
+.bl-weigh { min-width: 132px; min-height: 64px; padding: 8px 22px; border: 0; border-radius: 16px; background: #2868a6; color: #fff; font: inherit; font-size: 1.2rem; font-weight: 700; cursor: pointer; touch-action: manipulation; }
+.bl-step:disabled, .bl-weigh:disabled { opacity: .45; cursor: default; }
+.bl-step:focus-visible, .bl-weigh:focus-visible { outline: 3px solid #be6922; outline-offset: 3px; }
+.bl-miss { color: #783952; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bl-side, .bl-beam { transition: none; }
+  .bl-scale--weighed .bl-beam { animation: none; }
+}
